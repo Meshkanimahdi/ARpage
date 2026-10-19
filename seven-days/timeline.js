@@ -21,7 +21,7 @@
     d6: T(29, 0), ding2: T(29, 2), count: T(30, 0), coin2: T(31, 0), wallet: T(33, 1.5),
     d7: T(34, 0), grid: T(37, 0),
     cube: T(40, 0), steps: [T(40, 1), T(40, 3), T(41, 1), T(41, 3)], gold: T(42, 0),
-    end1: T(43, 0), end2: T(43, 2), end3: T(44, 0), endInfo: T(44, 2), endTag: T(45, 0)
+    end1: T(43, 0), end2: T(43, 1), end3: T(43, 2), endInfo: T(43, 3), endTag: T(44, 2)
   };
   root.TL = { BPM, BEAT, BAR, T, DURATION, SCENES, M, NO_TIMES };
   if (typeof module !== 'undefined') module.exports = root.TL;
