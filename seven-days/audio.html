@@ -15,10 +15,11 @@ async function renderMix(opts = {}) {
   bufs.ding = await Tone.ToneAudioBuffer.fromUrl('sfx/ding.ogg');
   const out = await Tone.Offline(async () => {
     const ctx = Tone.getContext();
-    const master = new Tone.Gain(.5).toDestination();
+    const master = new Tone.Gain(.42).toDestination();
     const glue = new Tone.Compressor({threshold: -16, ratio: 2.5, attack: .01, release: .2}).connect(master);
     const music = new Tone.Gain(db(opts.musicDb ?? -3)).connect(glue);
-    const fxBus = new Tone.Gain(db(opts.sfxDb ?? 0)).connect(master);
+    const fxComp = new Tone.Compressor({threshold: -12, ratio: 6, attack: .002, release: .12}).connect(master);
+    const fxBus = new Tone.Gain(db(opts.sfxDb ?? 0)).connect(fxComp);
     /* algorithmic room: seeded noise impulse */
     const R = rng(77), irLen = Math.floor(ctx.sampleRate * 2.4), ir = ctx.createBuffer(2, irLen, ctx.sampleRate);
     for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < irLen; i++) d[i] = (R() * 2 - 1) * Math.pow(1 - i / irLen, 3.2); }
