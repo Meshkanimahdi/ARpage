@@ -1,0 +1,24 @@
+{
+  "name": "seven-days",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fontsource/lalezar": "^5.3.0",
+    "@fontsource/vazirmatn": "^5.3.0",
+    "@peal-sounds/peal": "^0.3.6",
+    "@remotion/sfx": "^4.0.536",
+    "@wubbleai/community-sfx": "^0.1.0",
+    "gsap": "^3.15.0",
+    "nodebb-plugin-soundpack-aosp": "^1.0.1",
+    "playwright": "^1.56.1",
+    "tone": "^15.1.22",
+    "uisfx": "^0.4.0"
+  }
+}
