@@ -1,2 +1,5 @@
 node_modules/
 out/
+voice/voice.wav
+voice/test-*/
+voice/v3/
