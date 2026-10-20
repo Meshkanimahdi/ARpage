@@ -14,7 +14,7 @@ const mime = {'.png': 'image/png', '.json': 'application/json', '.jpg': 'image/j
 const server = http.createServer((q, r) => { const f = path.join(repo, decodeURIComponent(q.url.split('?')[0])); fs.readFile(f, (e, d) => { if (e) { r.writeHead(404); r.end(); return; } r.writeHead(200, {'Content-Type': mime[path.extname(f).toLowerCase()] || 'application/octet-stream'}); r.end(d); }); }).listen(0);
 const browser = await chromium.launch({executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
 const page = await browser.newPage({viewport: {width: 1080, height: 1920}});
-const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => m.type() === 'error' && errors.push(m.text()));
+const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('response', r => r.status() >= 400 && !r.url().endsWith('favicon.ico') && errors.push(`HTTP ${r.status()} ${r.url()}`));
 await page.goto(`http://127.0.0.1:${server.address().port}/news-reel/reel.html?dir=${encodeURIComponent(rel)}`);
 try { await page.evaluate(() => window.ready); } catch (e) { errors.push(String(e.message || e)); }
 const issues = await page.evaluate(() => window.ISSUES || ['page did not finish loading']);

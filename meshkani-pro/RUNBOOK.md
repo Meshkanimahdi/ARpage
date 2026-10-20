@@ -3,7 +3,11 @@
 This file is the operating procedure for the scheduled cloud runs that research,
 design, store and publish one Persian AI-news package per slot for the
 Instagram account `meshkani.pro`. Each scheduled run starts a fresh Claude
-session and is told which phase to run: **PREPARE** or **PUBLISH**.
+session and is told which phase to run: **PREPARE** or **PUBLISH** (posts, §1–§2) or
+**REEL_PREPARE** / **REEL_PUBLISH** (the daily reel, §4–§5).
+
+Daily schedule (Tehran): **09:00** reel of the previous day's two news · **12:00** post + 3 stories ·
+**21:00** post + 3 stories. The reel is prepared the evening before (21:45, retry 23:15).
 
 Source of the rules: `TASK_SPEC.md` (standing task + cloud overrides) and «دستور کار انتقال انتشار محتوای meshkani.pro» (20 Oct 2026).
 Where this file and that brief disagree, the brief's safety rules win: never
@@ -15,8 +19,8 @@ publish twice, never publish late, never publish unverified content.
 
 - Time zone is `Asia/Tehran` everywhere. Get times only from
   `python3 meshkani-pro/scripts/tehran.py`.
-- Slots: `12:00` and `21:00`. Slot key format `YYYY-MM-DD|HH:MM`.
-- Per slot at most 1 post + 3 stories; per Tehran day at most 2 posts + 6 stories.
+- Slots: `12:00` and `21:00` (posts), `09:00` (reel). Slot key format `YYYY-MM-DD|HH:MM`.
+- Per slot at most 1 post + 3 stories; per Tehran day at most 2 posts + 6 stories + 1 reel.
 - Publish window: from the slot time until slot time + 30 minutes. After that the
   slot is `SKIPPED_LATE`. A missed slot is never caught up later.
 - Never print, log or write to the sheet: API keys, Drive upload-session URLs,
@@ -366,7 +370,7 @@ JSON.
     ID, Parent Content ID, Story Topic, Sequence, Status=`Ready`, Production,
     Scheduled, blank, Source URL, Story Text, Image Prompt, Image Drive URL,
     blank, blank, blank, blank, Notes (diversity exceptions go here).
-  - Read the rows back and confirm. Never touch other tabs (Reels), formulas,
+  - Read the rows back and confirm. Never touch other tabs (the reel phases own `Reels`), formulas,
     formatting or validation; never insert duplicate rows for the same id.
 - Slot JSON → `READY` with every id, md5 and URL. Log row (§3).
 
@@ -463,9 +467,104 @@ Before any retry of a publish call:
 
 ---
 
+## 4. REEL_PREPARE phase (main 21:45, retry 23:15 Tehran)
+
+Goal: by the next morning, slot file `slot_<D+1>_0900.json` (`"kind": "reel"`) with status `READY`, a
+QA-passed ≈60 s reel MP4 + cover in Drive and a `Ready` row in the `Reels` tab. The reel tells the two
+news that were **published** in day D's 12:00 and 21:00 slots, in that order. Tools and format:
+`news-reel/REEL_SPEC.md` (read it fully), voices `news-reel/VOICES.md`, style rules there too.
+
+### 4.1 Preconditions
+1. Setup (§0.1), control (§0.2). Slot: `python3 meshkani-pro/scripts/tehran.py reel prepare` (gives
+   `slot_key`, `slot_file`, `source_day`, `source_slot_files`); none → log, stop. Lock
+   `<slot_file without .json>__reel_prepare` (retry run: `__reel_prepare_retry`).
+2. Reel slot file: same rules as §1.1 (missing → create `RESEARCHING`; finished → stop; stale >15 min
+   → take over; fresh → stop). The retry run stops quietly if the main run is alive or finished.
+3. If the evening post is still `PUBLISHING`/not final, wait (≤ 9-minute `wait-until` steps) until
+   22:45 at most. Then read both source slot files. Use every source whose post is `PUBLISHED`
+   (with `post.permalink`):
+   - two → normal two-news reel;
+   - one → a one-news reel (≈32 s, same template with one entry in `news`, end line «جزئیات کامل، توی پست دیروز.»);
+   - none → status `SKIPPED_NO_NEWS`, log, stop.
+4. `npm`/fonts: `bash news-reel/setup.sh`.
+
+### 4.2 Material
+1. For each source: the six final JPEGs (`slides[].drive_file_id`, `stories[].drive_file_id`) →
+   `GOOGLEDRIVE_DOWNLOAD_FILE` (`fileId`) → `curl` the returned `s3url` into `work/reel/A/` (news 1) and
+   `work/reel/B/` (news 2) as `slide-1..3.jpg`, `story-1..3.jpg`. Read its dossier
+   (`folders.package` → `dossier.json`) for `allowed_claims`, `limits`, `source`, and the caption.
+2. Re-check each news once with WebSearch for corrections/denials since it was posted. A news that has
+   been corrected or denied is dropped from the reel (log why).
+3. Look at all 12 images (make contact sheets with ffmpeg `hstack` and Read them) and pick the crops.
+
+### 4.3 Script, voices, spec
+1. Write `work/reel/spec.json` per REEL_SPEC.md: fresh narration (never the on-image text), only
+   allowed claims, 4–6 lines per news, scenes per news (hook first), `tag` = the field in Persian,
+   `music_prompt` that fits both news.
+2. Voices: two different narrators, one female and one male, each fitting its news; the opening gender
+   alternates day to day (previous reel slot file → `voices`). The closing line uses news 2's voice.
+3. Clean plates only if needed (REEL_SPEC → Visuals), ≤ 2 per news; record prompt + cost.
+4. `node news-reel/reel_voice.mjs --dir=work/reel`. Exit 3 → shorten lines; exit 4 → respell/rephrase
+   the flagged lines (speech-to-text must hear the right words); max 3 rounds, else `FAILED`.
+
+### 4.4 Render and QC
+1. `node news-reel/reel_render.mjs --dir=work/reel --mode=check`; Read every `out/sheet*.jpg`. Check:
+   Persian text correct and fully inside the frame, nothing overlapping, crops free of baked-in text,
+   each scene matches its line, 3D/glow/particles present, no distorted product/person. Fix the spec and
+   repeat (max 3 rounds).
+2. `node news-reel/reel_render.mjs --dir=work/reel --mode=video` (run in the background, ~15 min), then
+   `python3 news-reel/reel_assemble.py --dir work/reel`. `reel.json` must show duration ≤ 61 s,
+   −15.5…−12 LUFS, true peak ≤ −1 dBFS; `ffprobe` must show H.264 1080×1920 30 fps + AAC 48 kHz.
+3. Extract frames at 2 s, the divider and the last second (`ffmpeg -ss`) and Read them (logo intro, divider,
+   end card present). Read `cover.jpg`.
+
+### 4.5 Storage, caption, sheet
+1. Content ID `REEL-NNN` (next after the highest in the `Reels` tab and reel slot files).
+   Drive: folder `YYYY-MM-DD_REEL-NNN` under `ریلز` (`google.reels_folder_id`) with `REEL-NNN.mp4` and
+   `REEL-NNN-cover.jpg` (resumable upload as in §0.3; md5 must match). `spec.json`, `timeline.json`,
+   `voice/qc.json` go to `_automation/packages/<D+1>_0900_REEL-NNN/`.
+2. Caption (Persian, user caption rules of §1.4 apply): one hook line; per news 1–2 sentences that
+   summarise it; one question; source line `منبع: <name>، <date> · <name>، <date>`; no URLs; no
+   real/concept note; 4–6 hashtags.
+3. `Reels` row (find-or-append on column A, `USER_ENTERED`), columns A–T: Content ID · Reel Topic
+   (`<field 1> + <field 2> | <topic 1> / <topic 2>`) · Status `Ready` · Production time · Scheduled
+   `<D+1> 09:00:00` · blank · Source URLs (one per line) · News Text (the two summaries) · **Reel Script**
+   (every line with its id and narrator) · **Motion Graphics Prompt** (the scene list: per scene type,
+   line, on-screen texts and image crops — compact text) · Duration (s) · Video Drive view URL · Final
+   Caption · blank · Source Post IDs · Voices · **Music Prompt** · **Image Edit Prompts** (clean-plate
+   prompts or «—») · blank · Notes. Read back to confirm.
+4. Reel slot file → `READY` with: `kind`, `content_id`, `sources` [{slot_key, content_id, permalink}],
+   `voices` [{news, name, id, gender}], `video` {drive_file_id, md5, bytes, duration, lufs, view_url},
+   `cover` {drive_file_id}, `caption`, `script`, `cost_usd` (clean plates), `sheet.reel_row`,
+   `reel` {container_id, media_id, permalink, published_at} all null. Log row (§3).
+
+## 5. REEL_PUBLISH phase (starts 08:57 → publish 09:00 Tehran)
+
+1. Setup (§0.1), control (§0.2), slot `tehran.py reel publish`, lock `__reel_publish`.
+2. Reel slot file by status: `READY` → continue; `RESEARCHING…QA` → wait like §2.1; `PUBLISHING` /
+   `NEEDS_RECONCILIATION` → reconcile only (§2.5 rules, container status + latest media); `PUBLISHED`
+   → stop; missing / `FAILED` / `SKIPPED_*` → log, stop.
+3. Cap: no other reel published today (slot files + live media). Identity and publishing limit as §2.1
+   (limit ≥ 1). Duplicate guard: last 10 media — a REELS item with this caption → record it, done.
+4. `tehran.py wait-until 09:00`; `check-deadline <slot_key>` must exit 0. `DRY_RUN` → stop here.
+5. `share_public` the MP4 and the cover. Re-check Kill Switch. `INSTAGRAM_POST_IG_USER_MEDIA` with
+   `ig_user_id`, `media_type: REELS`, `video_url: public_image_url(video_id)`, `cover_url:
+   public_image_url(cover_id)`, `caption` (raw `#`), `share_to_feed: true` → save `reel.container_id`,
+   status `PUBLISHING`, write state.
+6. Poll `INSTAGRAM_GET_POST_STATUS` every ~20 s (max ~10 min, inside the window) until `FINISHED`.
+   `ERROR`/`EXPIRED` before any publish call → one new container is allowed; a second failure → `FAILED`.
+7. `INSTAGRAM_POST_IG_USER_MEDIA_PUBLISH` (`creation_id` = container, `max_wait_seconds` 60) → save
+   `reel.media_id`. Unclear result → §2.5, never a second publish call before reconciliation.
+8. Verify `INSTAGRAM_GET_IG_MEDIA` (`id,permalink,timestamp,media_product_type,media_type,username,caption`):
+   `REELS`, right username, caption matches. Save permalink/time → `PUBLISHED`.
+9. `Reels` row: Status `Published`, Actual Publish time, Published Post URL, Instagram Media ID.
+   `unshare_public` both files. Log row.
+
+---
+
 ## 3. Reporting — sheet tab `Automation Log`
 
-Append one row per phase end and per error, columns A–H:
+Append one row per phase end and per error (reel phases: Slot `YYYY-MM-DD|09:00`, Phase `REEL_PREPARE`/`REEL_PUBLISH`, cost column = clean-plate cost), columns A–H:
 `Logged At (Tehran) | Slot | Phase | Status | Content ID | Details | Image Cost (USD) | Run ID`.
 Details are short, plain Persian or English, no secrets or temporary links.
 No other notification channel is used.

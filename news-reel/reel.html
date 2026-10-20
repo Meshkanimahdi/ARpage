@@ -226,7 +226,8 @@ B.grid = async s => {
 B.stat = async s => {
   const el = h('div', 'scene bg3'); el.append(h('div', 'grid'));
   let gl;
-  if (s.glyph && s.glyph.src) gl = await media({...s.glyph, fit: 'contain', alpha: true}, 420, 520, 'abs', 'left:330px; top:330px');
+  if (s.glyph && s.glyph.box) gl = await media(s.glyph, 640, 400, 'abs', 'left:220px; top:480px; border-radius:34px; border:3px solid rgba(255,122,26,.8); box-shadow:0 0 30px rgba(255,122,26,.5), 0 40px 90px rgba(0,0,0,.6)');
+  else if (s.glyph && s.glyph.src) gl = await media({...s.glyph, fit: 'contain', alpha: true}, 420, 520, 'abs', 'left:330px; top:330px');
   else gl = h('div', 'abs neono', 'left:0; right:0; top:300px; text-align:center; font-weight:900; font-size:400px; line-height:1.1; color:var(--orange)', esc(s.glyph?.text || '؟'));
   el.append(gl);
   const lab = h('div', 'abs h2', 'left:90px; right:90px; top:1060px; text-align:center', rich(s.label)); el.append(lab); FITS.push(() => fit(lab, 110));

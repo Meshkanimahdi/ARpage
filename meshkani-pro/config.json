@@ -29,7 +29,8 @@
       "posts": "Carousel Posts",
       "stories": "Stories",
       "control": "Automation Control",
-      "log": "Automation Log"
+      "log": "Automation Log",
+      "reels": "Reels"
     },
     "instagram_root_folder_id": "1QP2Qyzo_5j3dcLVxwq7hQXfR7Gozjulv",
     "post_images_folder_id": "10o8f4dqZ7cT4_MLZHrluER0eLUlkc7Tn",
@@ -46,8 +47,10 @@
     "sheet_ids": {
       "Carousel Posts": 453399775,
       "Stories": 906180,
-      "Automation Control": 1584448916
-    }
+      "Automation Control": 1584448916,
+      "Reels": 505181918
+    },
+    "reels_folder_id": "1p_z_InykkRzQW5HD6GMNbJu_K3k959ki"
   },
   "images": {
     "provider": "openrouter",
@@ -98,5 +101,36 @@
     "law and public policy",
     "everyday services and accessibility",
     "AI models and tools"
-  ]
+  ],
+  "reel": {
+    "publish_at": "09:00",
+    "prepare_main": "21:45",
+    "prepare_retry": "23:15",
+    "grace_minutes": 30,
+    "source": "the posts published in the previous Tehran day's 12:00 and 21:00 slots, in that order",
+    "max_seconds": 60.5,
+    "per_news_speech_budget_s": 26,
+    "max_clean_plates_per_news": 2,
+    "caps": {
+      "reels_per_day": 1
+    },
+    "voices": {
+      "female": [
+        {
+          "name": "Niloofar",
+          "id": "N7wuKHXQQ5fKd75noieq"
+        },
+        {
+          "name": "Setareh",
+          "id": "8Ebkg5uUcbSbeqGucAoR"
+        }
+      ],
+      "male": [
+        {
+          "name": "Hooman",
+          "id": "XzieuK0bwYWT9Kl1LhLs"
+        }
+      ]
+    }
+  }
 }
