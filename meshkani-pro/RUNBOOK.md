@@ -138,9 +138,19 @@ Drive and `Ready` rows in the sheet. Keep going only while
    `source.url`, `source.dedupe_key`.
 3. Read the last 20 feed posts of the account (`INSTAGRAM_GET_IG_USER_MEDIA`,
    fields `id,caption,permalink,timestamp`) as a live check.
-4. Allowed sectors: not the sector of the previous package; no sector already
-   used twice in the last 7 days — unless no other credible news exists (then
-   record the reason in `errors` and later in the story Notes).
+4. Sector rule (user rule, 2026-10-20 — stricter than the original brief):
+   - Every post must come from a **different field than the previous post**; two
+     posts in a row from the same field are **never** allowed, with no exception.
+     Example: two consecutive posts about AI models/releases are forbidden.
+   - Fields are the list in `config.json → sectors` (food, sports, film, music,
+     health, travel, …). "AI models and tools" (new LLMs, chatbots, model
+     releases) is itself one field; use it rarely — the page's focus is AI's
+     concrete effect in everyday fields.
+   - No field more than twice in the last 7 Tehran days; prefer the field used
+     least recently. If no credible current story exists in a fresh field, look
+     in other fresh fields; if still none, skip the slot (`SKIPPED_NO_NEWS`)
+     rather than repeat the previous field.
+   - Write the chosen field at the start of Post Topic and in the bundle state.
 5. Also read `_automation/history/publish-state.json` and `stories-state.json`
    (ids in config: the completed original batch). The never-republish list from the legacy state file (POST-001…POST-010,
    POST-011, the standalone test story) and everything in the sheet is history.
@@ -155,9 +165,9 @@ Use WebSearch/WebFetch, English first, local language if needed:
 > خبر هم‌سطح ترجیح بده. اگر خبر مناسب نیست، خروجی را «خبر مناسب پیدا نشد» قرار بده؛ خبر یا
 > آمار نساز.
 
-- Aim for 15–30 candidates across sectors (medicine/health, automotive/transport,
-  food/agriculture, education, science, energy/climate, robotics/manufacturing,
-  business, art/media, everyday services, public policy). Do not pad the list.
+- Aim for 15–30 candidates across many fields from `config.json → sectors`
+  (search each fresh field explicitly, e.g. "AI in football", "AI film
+  production", "AI restaurant"). Do not pad the list.
 - Open the **primary source** for every finalist (paper, university, hospital,
   regulator, company newsroom/docs, official report). Use independent reputable
   outlets only to confirm and to judge importance.

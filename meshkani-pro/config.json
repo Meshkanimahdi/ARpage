@@ -78,15 +78,25 @@
   },
   "sectors": [
     "medicine and health",
+    "food and cooking",
+    "agriculture",
+    "sports",
+    "film and TV",
+    "music",
+    "art and design",
+    "games",
+    "fashion and beauty",
+    "travel and tourism",
     "automotive and transport",
-    "food and agriculture",
-    "education",
-    "science",
     "energy and climate",
+    "science and space",
+    "education",
+    "business and work",
+    "finance",
+    "retail and shopping",
     "robotics and manufacturing",
-    "business",
-    "art and media",
-    "everyday services",
-    "public policy"
+    "law and public policy",
+    "everyday services and accessibility",
+    "AI models and tools"
   ]
 }
