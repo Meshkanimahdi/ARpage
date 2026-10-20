@@ -79,10 +79,10 @@ def main():
             fx.append(add(SFX / 'hit.mp3', s['t0'], 0.6))
     f.append(f"{''.join(voice)}amix=inputs={len(voice)}:normalize=0,apad=whole_dur={END},asplit=2[voice][key]")
     f.append(f"{mus}[key]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=350[duck]")
-    f.append(f"[voice][duck]{''.join(fx)}amix=inputs={2 + len(fx)}:normalize=0,atrim=0:{END},loudnorm=I=-13:TP=-2:LRA=8[out]")
+    f.append(f"[voice][duck]{''.join(fx)}amix=inputs={2 + len(fx)}:normalize=0,atrim=0:{END},loudnorm=I=-13.8:TP=-3:LRA=8[out]")
     run('ffmpeg', '-y', '-loglevel', 'error', *ins, '-filter_complex', ';'.join(f), '-map', '[out]', '-ar', '48000', str(out / 'mix.wav'))
     run('ffmpeg', '-y', '-loglevel', 'error', '-i', str(out / 'video.mp4'), '-i', str(out / 'mix.wav'), '-c:v', 'copy',
-        '-af', 'volume=-1.6dB,alimiter=limit=0.8', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-shortest', '-movflags', '+faststart', str(d / 'reel.mp4'))
+        '-af', 'alimiter=limit=0.708:level=false', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-shortest', '-movflags', '+faststart', str(d / 'reel.mp4'))
     # cover: a frame from the first news hook (after the logo)
     ct = spec.get('cover_t', START + 1.6)
     run('ffmpeg', '-y', '-loglevel', 'error', '-ss', str(ct), '-i', str(d / 'reel.mp4'), '-frames:v', '1', '-q:v', '2', str(d / 'cover.jpg'))
