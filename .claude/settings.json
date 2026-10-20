@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__e41468ee-3b12-440e-8f9d-d69c05f815db",
+      "mcp__Composio",
+      "mcp__Google_Drive__read_file_content",
+      "mcp__Google_Drive__search_files",
+      "mcp__Google_Drive__get_file_metadata",
+      "WebSearch",
+      "WebFetch",
+      "Bash(python3 meshkani-pro/scripts/*)",
+      "Bash(bash meshkani-pro/scripts/drive_put.sh *)",
+      "Bash(git pull*)",
+      "Bash(git fetch*)",
+      "Bash(git checkout*)"
+    ]
+  }
+}
