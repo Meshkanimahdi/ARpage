@@ -237,7 +237,7 @@ prompt in the slot JSON and the sheet):
 > تیتر، تصویر و متن بخشی از یک صفحه‌آرایی واحد و متناسب با موضوع باشند. متن دیگری نساز.
 > اعداد، نام محصول و ادعا را تغییر نده. ترکیب‌بندی این تصویر با دو تصویر دیگر متفاوت باشد.
 >
-> `[پست: نسبت ۴:۵؛ همهٔ متن‌ها دست‌کم ۶٪ از لبهٔ بالا و پایین فاصله داشته باشند.]`
+> `[پست: نسبت ۴:۵؛ همهٔ متن‌ها، حتی برچسب‌ها و امضای پایین، دست‌کم ۸٪ از هر چهار لبه فاصله داشته باشند.]`
 > `[استوری: نسبت ۹:۱۶؛ هیچ متنی در ۱۲٪ بالای تصویر و ۱۵٪ پایین تصویر نباشد.]`
 > از شبیه‌سازی دکمه یا استیکر تعاملی، نشان دادن صحنهٔ تولیدی به‌عنوان عکس واقعی و عناصر
 > نامربوط به خبر خودداری کن. `[اگر مفهومی است: برچسب کوچک و خوانای «تصویر مفهومی» را در طراحی
@@ -261,7 +261,8 @@ JSON.
    `.safezone.jpg`). Check: exact Persian text, correct letters and joining,
    RTL order, spacing, contrast, nothing cropped, text really inside the design
    (not an empty background), no extra/invented text, nothing important outside
-   the story safe zone (230 px top / 280 px bottom), fits the news and brief, not
+   the story safe zone (230 px top / 280 px bottom), on posts no text (including small
+   labels and the @meshkani.pro line) closer than ~6% to any edge, fits the news and brief, not
    a near-copy of recent packages, no misleading fake elements, concept label
    present when needed.
 2. Upload the finals to Drive (§1.8 folders) so Drive can OCR them; read each back
