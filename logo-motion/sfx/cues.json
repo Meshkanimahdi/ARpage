@@ -1,0 +1,51 @@
+[
+ {
+  "id": "streams",
+  "at": 0,
+  "dur": 1.8,
+  "vol": 0.8,
+  "text": "futuristic digital data streams whooshing inward and converging to the center, airy high-tech swooshes, clean, no music"
+ },
+ {
+  "id": "reveal",
+  "at": 0.9,
+  "dur": 1.4,
+  "vol": 0.9,
+  "text": "smooth premium glassy synth swipe reveal rising, sleek futuristic logo draw-on sound, clean"
+ },
+ {
+  "id": "impact",
+  "at": 2,
+  "dur": 2.6,
+  "vol": 1,
+  "text": "deep cinematic sub bass boom impact with a bright crystalline shimmer tail, premium tech logo hit, clean"
+ },
+ {
+  "id": "ping",
+  "at": 2.55,
+  "dur": 0.8,
+  "vol": 0.55,
+  "text": "tiny soft digital sonar ping blip, clean UI notification, short"
+ },
+ {
+  "id": "shine",
+  "at": 2.8,
+  "dur": 1,
+  "vol": 0.6,
+  "text": "soft bright light gleam shimmer sweep, sparkle swish across a surface, subtle"
+ },
+ {
+  "id": "type",
+  "at": 3.7,
+  "dur": 1.4,
+  "vol": 0.45,
+  "text": "subtle soft futuristic UI text appearing, gentle digital ticks and blips, very light"
+ },
+ {
+  "id": "pad",
+  "at": 3.2,
+  "dur": 2.8,
+  "vol": 0.4,
+  "text": "warm airy ambient synth pad swell then gentle fade out, calm tech atmosphere, no melody"
+ }
+]
