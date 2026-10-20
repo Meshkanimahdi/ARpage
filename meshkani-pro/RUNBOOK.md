@@ -260,27 +260,40 @@ Real photos only with checked licence and attribution, never manipulated in a
 way that changes the news content. Generated images of real events, patients,
 cars or products are labelled «تصویر مفهومی» and never presented as evidence.
 
-#### 1.5.1 Visual reference research (user rule, 2026-10-20)
-When the news is about a **specific real thing whose look the audience knows or can
-check** — a named car or vehicle, robot, device, product, building, place or a
-public person — do this before writing any prompt:
-1. Search for 3–6 real photos of it (official press kit/newsroom first, then
-   reputable outlets; WebSearch + WebFetch). Download them to `work/ref/` and
-   look at them yourself.
-2. Write down its real visual features in `work/brief.json` → `visual_reference`:
-   shape/silhouette, proportions, distinctive parts (lights, doors, wheels,
-   logo placement), colours and materials, and anything that must **not** appear
-   (features it does not have). Keep the source URL of every reference photo.
-3. Use them for generation: describe those features precisely in every prompt
-   that shows the object, and pass 1–2 of the clearest reference photos with
-   `--ref work/ref/<file>` so the model matches the real design. The output is
-   still a new design (do not copy the photo's composition or text, no watermark,
-   no logos beyond the product's own badge); if a photo is used **as-is** in the
-   design, its licence must allow it and it gets a credit (§1.5).
-4. QA (§1.7) adds a check: the object in each image must be recognisably the real
-   product (silhouette and key features right, nothing invented). If it does not
-   match, re-generate within the fix budget.
-Abstract topics (a study, a policy, a model release) do not need this step.
+#### 1.5.1 Real-product look — reference photos are mandatory (user rule, 2026-10-20, strengthened)
+When the news is about a **physical thing that exists and has been photographed** — a car or vehicle,
+robot, device, gadget, product, building, place, or a public person — the images must show it **as it
+really looks**: the audience has seen the real photos (often viral ones) and those photos are the
+strongest hook. The NVIDIA post (real CEO likeness) is the model; the Tesla Roadster post (invented
+red car instead of the real white Roadster seen in the viral launch photos) is the mistake not to
+repeat. Abstract topics (a study, a policy, a model release) skip this step.
+
+1. **Find the real photos (3–6).** The run container cannot reach image hosts directly, so:
+   - Official account first: in the workbench `refs = instagram_ref_urls("<brand handle>")`
+     (e.g. `teslamotors`, `nvidia`, `apple`; 1 ScrapeCreators credit) and pick the posts that show the
+     product from the launch/news. Also usable: press-kit or newsroom image URLs found with WebSearch,
+     and widely published launch photos (by the brand or reputable outlets).
+   - Copy them server-side into the package folder: `refs_to_drive([urls], <package folder id>,
+     "ref-<slug>")`, then `GOOGLEDRIVE_DOWNLOAD_FILE` each id and `curl` its `s3url` into `work/ref/`.
+   - Read every reference photo yourself. Keep each photo's source post/page URL in the brief.
+2. **Describe the real look** in `work/brief.json → visual_reference`: silhouette and proportions,
+   colour and finish, lights, wheels, doors/wings, distinctive parts (e.g. thrusters, rear wing), the
+   setting of the viral images (e.g. night launch with smoke and light beams), and what must **not**
+   appear (colours or parts it does not have).
+3. **Generate with the references, always.** Every prompt that shows the object includes that
+   description, and every such call passes the 1–2 clearest reference photos:
+   `gen_image.py ... --ref work/ref/<a>.jpg --ref work/ref/<b>.jpg`. Ask for a *new* composition in the
+   page's design (no copy of the photo's framing or text, no watermark or other page's logo), but the
+   object itself must match the photos. Prefer recreating the famous moment (e.g. the car hovering on
+   thrusters at the night launch) when it is the news.
+4. **QA side by side (blocking):** make a contact sheet of the reference photos next to each final
+   image (ffmpeg `hstack`) and Read it. The object must be recognisably the same product — shape,
+   colour, key parts. Not matching → regenerate within the fix budget; still wrong → `FAILED`, never
+   publish a look-alike.
+5. Record `visual_reference` (sources + Drive ids of the refs) in the slot JSON and the image prompts in
+   the sheet; mention the references in the Image Prompt cells («با تصاویر مرجع رسمی ...»).
+6. Using a real photo **as-is** in the design still needs a licence that allows it and a credit line;
+   as a generation reference it is fine.
 
 ### 1.6 Prompts and generation
 Mother prompt (fill every bracket from the dossier and brief; record each final
@@ -332,7 +345,8 @@ JSON.
    labels and the @meshkani.pro line) closer than 8% to any edge, fits the news and brief, not
    a near-copy of recent packages, no misleading fake elements, concept label
    present when needed (posts only; stories must have no number and no label, only the
-   centred @meshkani.pro as the lowest element).
+   centred @meshkani.pro as the lowest element). For a physical product: the side-by-side
+   reference check of §1.5.1 step 4 passes.
 2. Upload the finals to Drive (§1.8 folders) so Drive can OCR them; read each back
    with `mcp__Google_Drive__read_file_content` and compare (Drive often does not
    OCR new files for minutes; if no text comes back after ~2 tries, record

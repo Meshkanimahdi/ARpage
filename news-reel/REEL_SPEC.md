@@ -99,5 +99,8 @@ reel slot JSON → `voices`).
   its stories: `python3 meshkani-pro/scripts/gen_image.py --kind story --prompt-file
   news-reel/plates/p/clean.txt --ref work/reel/A/story-1.jpg --out work/reel/A/story-1-clean.png`
   (≤ 2 per news, ~$0.055 each, cost goes into the reel slot JSON). No other image generation.
+- Physical products (cars, devices, robots, places, people): the reel must show the real look too
+  (RUNBOOK §1.5.1). Posts made under that rule already do; if a plate must be generated, pass the
+  post's reference photos (`--ref`) as well.
 - After `--mode=check`, open every contact sheet with Read and fix: text outside the frame or overlapping,
   crops that show baked-in text, an element that does not match its line, faces/products distorted.
