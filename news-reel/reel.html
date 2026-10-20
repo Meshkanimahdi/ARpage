@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro daily reel</title>
+<style>
+  @font-face { font-family: Vaz; font-weight: 400; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-400-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-800-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: Inter; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-800-normal.woff2); }
+  @font-face { font-family: Inter; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-900-normal.woff2); }
+  :root { --cyan: #10F5EE; --orange: #FF7A1A; --ink: #F4F8FF; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #050A14; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Vaz, sans-serif; color: var(--ink); perspective: 1400px; }
+  .scene { position: absolute; inset: 0; opacity: 0; display: none; perspective: 1400px; }
+  .scene * { transform-style: flat; }
+  .abs { position: absolute; will-change: transform, opacity, filter; }
+  .bg1 { background: radial-gradient(1200px 900px at 50% 40%, #0f2a52, #050A14); }
+  .bg2 { background: radial-gradient(1200px 1000px at 50% 50%, #0f2547, #050A14); }
+  .bg3 { background: radial-gradient(1100px 1000px at 50% 45%, #13213d, #050A14); }
+  .plate { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  .media { background-repeat: no-repeat; background-color: #0d2140; }
+  .media.alpha { background-color: transparent; }
+  .circle { border-radius: 50%; border: 5px solid rgba(16,245,238,.85); box-shadow: 0 0 26px rgba(16,245,238,.6), 0 0 70px rgba(16,245,238,.2), inset 0 0 30px rgba(0,0,0,.5); }
+  .grid { position: absolute; inset: -80px 0; background-image: linear-gradient(rgba(16,245,238,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(16,245,238,.07) 1px, transparent 1px); background-size: 72px 72px; }
+  .shade-b { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,10,20,.35) 0%, rgba(5,10,20,0) 22%, rgba(5,10,20,0) 42%, rgba(5,10,20,.93) 76%); }
+  .h1 { font-weight: 900; font-size: 128px; line-height: 1.12; letter-spacing: -1px; }
+  .h2 { font-weight: 800; font-size: 78px; line-height: 1.22; }
+  .lbl { font-weight: 600; font-size: 40px; line-height: 1.4; }
+  .h1, .h2 { text-shadow: 0 6px 30px rgba(0,0,0,.6), 0 0 28px rgba(160,230,255,.18); }
+  .word { display: inline-block; margin-left: 22px; }
+  .chip { display: inline-flex; align-items: center; gap: 14px; padding: 14px 30px; border-radius: 60px; background: rgba(16,245,238,.12); border: 2px solid rgba(16,245,238,.55); font-weight: 800; font-size: 40px; color: var(--cyan); white-space: nowrap; box-shadow: 0 0 22px rgba(16,245,238,.25); }
+  .chip.o { color: var(--orange); border-color: rgba(255,122,26,.6); background: rgba(255,122,26,.12); box-shadow: 0 0 22px rgba(255,122,26,.25); }
+  .glass { background: linear-gradient(145deg, rgba(20,40,78,.8), rgba(8,18,38,.84)); border: 2px solid rgba(16,245,238,.75); border-radius: 36px; box-sizing: border-box;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset, 0 2px 0 rgba(255,255,255,.18) inset, 0 0 26px rgba(16,245,238,.55), 0 0 70px rgba(16,245,238,.25), 0 34px 90px rgba(0,0,0,.6); backdrop-filter: blur(10px); }
+  .glass.o { border-color: rgba(255,122,26,.8); box-shadow: 0 2px 0 rgba(255,255,255,.18) inset, 0 0 26px rgba(255,122,26,.55), 0 0 70px rgba(255,122,26,.25), 0 34px 90px rgba(0,0,0,.6); }
+  .neon { text-shadow: 0 0 18px rgba(16,245,238,.75), 0 0 46px rgba(16,245,238,.35); }
+  .neono { text-shadow: 0 0 18px rgba(255,122,26,.8), 0 0 46px rgba(255,122,26,.35); }
+  .hl { color: var(--orange); } .cy { color: var(--cyan); } .mut { color: #b9c8e2; }
+  .latin { font-family: Inter; direction: ltr; unicode-bidi: isolate; }
+  .bracket { position: absolute; width: 70px; height: 70px; border: 7px solid var(--cyan); filter: drop-shadow(0 0 10px rgba(16,245,238,.8)); box-sizing: border-box; }
+  .tile { position: absolute; width: 440px; height: 360px; border-radius: 30px; overflow: hidden; background: #0d2140; border: 2px solid rgba(255,122,26,.7); box-shadow: 0 2px 0 rgba(255,255,255,.2) inset, 0 0 24px rgba(255,122,26,.45), 0 30px 70px rgba(0,0,0,.55); backface-visibility: hidden; }
+  .tile .t { position: absolute; bottom: 0; left: 0; right: 0; height: 92px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(0deg, #0b1a33, rgba(11,26,51,.88)); }
+  .tile .fa { font-weight: 800; font-size: 38px; white-space: nowrap; }
+  .tile .en { font-family: Inter; font-weight: 800; font-size: 22px; color: #9fb4d6; direction: ltr; }
+  .row { position: absolute; left: 80px; right: 80px; height: 200px; display: flex; align-items: center; gap: 34px; padding: 0 46px; }
+  .badge { flex: none; width: 104px; height: 104px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 58px; color: var(--orange); border: 4px solid var(--orange); box-shadow: 0 0 22px rgba(255,122,26,.55), inset 0 0 16px rgba(255,122,26,.35); }
+  .row .tx { font-weight: 800; font-size: 50px; line-height: 1.3; }
+  #fx, #fxf { position: absolute; inset: 0; pointer-events: none; }
+  #fxf { mix-blend-mode: screen; }
+  .streak { position: absolute; left: -400px; top: -200px; width: 260px; height: 2600px; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(190,255,252,.38), rgba(255,255,255,0)); transform: rotate(24deg); mix-blend-mode: screen; opacity: 0; }
+  #subs { position: absolute; left: 70px; right: 70px; top: 1470px; text-align: center; font-weight: 800; font-size: 50px; line-height: 1.45; color: #fff; text-shadow: 0 4px 18px rgba(0,0,0,.85), 0 0 2px #000; }
+  #subs span { background: rgba(5,10,20,.55); padding: 6px 18px; border-radius: 14px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  #bar { position: absolute; left: 90px; right: 90px; top: 176px; height: 6px; display: flex; gap: 16px; }
+  #bar b { position: relative; flex: 1; background: rgba(255,255,255,.18); border-radius: 3px; overflow: hidden; }
+  #bar i { position: absolute; right: 0; top: 0; bottom: 0; width: 0; background: var(--cyan); box-shadow: 0 0 14px var(--cyan); }
+  #tag { position: absolute; right: 90px; top: 206px; font-size: 32px; padding: 8px 24px; }
+  #flash { position: absolute; inset: 0; background: var(--cyan); opacity: 0; mix-blend-mode: screen; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="fx" width="1080" height="1920"></canvas>
+  <div id="scenes"></div>
+  <canvas id="fxf" width="1080" height="1920"></canvas>
+  <div class="streak" id="streak"></div>
+  <div id="flash"></div>
+  <div id="bar"></div>
+  <div class="abs chip" id="tag"></div>
+  <div id="subs"><span id="subT"></span></div>
+</div>
+<script>
+// Daily two-news reel. Content comes from <dir>/spec.json, timing from <dir>/timeline.json
+// (written by reel_voice.mjs). window.seek(t) sets every element for absolute reel time t;
+// the logo intro (0..START) is joined later by reel_assemble.py.
+// Scene types: hook, duo, steps, grid, stat, quote, points, frame (+ automatic divider and end card).
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/reel/';
+const url = s => s.startsWith('/') ? s : DIR + s;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const lerp = (a, b, k) => a + (b - a) * k;
+const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const START = 4.2;
+
+function h(tag, cls, style, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (style) e.style.cssText = style; if (html !== undefined) e.innerHTML = html; return e; }
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
+// inline markup in spec text: *word* = orange accent, _word_ = cyan accent, [[Latin]] = Latin font
+const rich = s => esc(s).replace(/\*([^*]+)\*/g, '<span class="hl neono">$1</span>').replace(/_([^_]+)_/g, '<span class="cy neon">$1</span>').replace(/\[\[([^\]]+)\]\]/g, '<span class="latin">$1</span>');
+function set(e, o) {     // o: {x,y,s,r,o,b,f}
+  if (typeof e === 'string') e = $(e);
+  const base = e.dataset.base ?? (e.dataset.base = e.style.transform || '');
+  e.style.transform = `${base} translate(${o.x || 0}px,${o.y || 0}px) scale(${o.s ?? 1}) rotate(${o.r || 0}deg)`;
+  if (o.o !== undefined) e.style.opacity = o.o;
+  e.style.filter = o.b ? `blur(${o.b}px)` : (o.f || '');
+}
+const pop = (t, a, d = .5, dist = 60) => { const k = P(t, a, a + d); return {y: (1 - eo(k)) * dist, s: .85 + .15 * back(k), o: clamp(k * 1.6), b: (1 - eo(k)) * 12}; };
+const add3d = (e, s) => { e.style.transform += ' ' + s; };
+
+// image element: {src, box:[x,y,w,h] in source pixels (optional), fit:'cover'|'contain', shape:'circle'}
+const IM = {};
+const loadImg = src => IM[src] || (IM[src] = new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('missing image ' + src)); i.src = src; }));
+async function media(m, w, h_, cls = '', style = '') {
+  const d = h('div', `media ${m.shape === 'circle' ? 'circle' : ''} ${m.alpha ? 'alpha' : ''} ${cls}`, `width:${w}px;height:${h_}px;${style}`);
+  const src = url(m.src), im = await loadImg(src), W = im.naturalWidth, H = im.naturalHeight;
+  const [bx, by, bw, bh] = m.box || [0, 0, W, H];
+  const k = (m.fit === 'contain' ? Math.min : Math.max)(w / bw, h_ / bh);
+  d.style.backgroundImage = `url("${src}")`;
+  d.style.backgroundSize = `${W * k}px ${H * k}px`;
+  d.style.backgroundPosition = `${-bx * k + (w - bw * k) / 2}px ${-by * k + (h_ - bh * k) / 2}px`;
+  return d;
+}
+// shrink text until it fits its box (keeps every language/length inside the frame)
+function fit(e, maxH, minPx = 30) {
+  let fs = parseFloat(getComputedStyle(e).fontSize);
+  while (fs > minPx && (e.scrollHeight > maxH + 2 || e.scrollWidth > e.clientWidth + 2)) { fs -= 2; e.style.fontSize = fs + 'px'; }
+  if (e.scrollHeight > maxH + 2 || e.scrollWidth > e.clientWidth + 2) ISSUES.push(`text does not fit: "${e.textContent.slice(0, 40)}"`);
+}
+const ISSUES = [];
+
+// ---------------- scene builders: each returns {el, anim(t, a, b)} ----------------
+const B = {};
+B.hook = async s => {
+  const el = h('div', 'scene'), pl = await media(s.plate, 1080, 1920, 'plate'); el.append(pl, h('div', 'shade-b'));
+  const [fx, fy, fw, fh] = s.focus || [300, 500, 480, 420];
+  pl.style.transformOrigin = `${(fx + fw / 2) / 10.8}% ${(fy + fh / 2) / 19.2}%`;
+  const corners = [[fx + fw - 70, fy, 'border-left:0;border-bottom:0'], [fx + fw - 70, fy + fh - 70, 'border-left:0;border-top:0'], [fx, fy, 'border-right:0;border-bottom:0'], [fx, fy + fh - 70, 'border-right:0;border-top:0']];
+  const br = corners.map(([x, y, b]) => { const e = h('div', 'bracket', `left:${x}px;top:${y}px;${b}`); el.append(e); return e; });
+  const chips = (s.chips || []).slice(0, 2).map((c, i) => {
+    const e = h('div', 'abs chip' + (i ? ' o' : ''), '', '● ' + rich(c)); el.append(e);
+    const above = i === 0 && fy > 360;
+    e.style.top = (above ? fy - 100 : fy + fh + 30 + (i === 0 || fy > 360 ? 0 : 100)) + 'px';
+    e.style.left = clamp(fx + fw / 2 - 180, 60, 640) + 'px'; return e; });
+  const tt = h('div', 'abs h1', 'right:90px; top:1090px; width:900px; text-align:right');
+  const words = (s.words || []).map(w => { const e = h('span', 'word' + (w.hl ? ' hl neono' : w.cy ? ' cy neon' : ''), '', esc(w.t ?? w)); tt.append(e); return e; });
+  el.append(tt); FITS.push(() => fit(tt, 340));
+  return {el, anim(t, a, b) {
+    const k = P(t, a, b);
+    pl.style.transform = `scale(${lerp(1.16, 1.04, eio(k))}) translate(${lerp(-20, 10, k)}px,0) rotateY(${lerp(3, -2, k)}deg)`;
+    br.forEach((e, i) => { const p = eo(P(t, a + .15 + i * .05, a + .55 + i * .05)); set(e, {x: [1, 1, -1, -1][i] * (1 - p) * 70, y: [-1, 1, -1, 1][i] * (1 - p) * 70, o: p}); });
+    chips.forEach((e, i) => set(e, pop(t, a + .6 + i * .6)));
+    words.forEach((e, i) => set(e, pop(t, a + .2 + i * .17, .5, 90)));
+  }};
+};
+B.duo = async s => {
+  const el = h('div', 'scene bg1'), g = h('div', 'grid'); el.append(g);
+  const party = (p, side) => { const e = h('div', 'abs', `${side}:110px; top:520px; width:400px; text-align:center`);
+    const bar = h('div', '', 'display:flex; height:22px; border-radius:11px; overflow:hidden; margin-bottom:26px');
+    for (const c of (p.bar || ['#10F5EE'])) bar.append(h('i', '', `flex:1;background:${c}`));
+    const n = h('div', p.latin ? 'latin' : 'h2', p.latin ? 'font-weight:900; font-size:84px; letter-spacing:1px; white-space:nowrap' : 'font-size:92px; white-space:nowrap', esc(p.text));
+    e.append(bar, n); el.append(e); FITS.push(() => fit(n, 140)); return e; };
+  const R = party(s.a, 'right'), L = party(s.b, 'left');
+  const x = h('div', 'abs latin', 'left:510px; top:600px; font-weight:900; font-size:90px; color:var(--cyan); width:60px; text-align:center', '×'); el.append(x);
+  const chip = s.chip ? h('div', 'abs chip neon', 'left:50%; top:860px; transform:translateX(-50%)', rich(s.chip)) : null; if (chip) el.append(chip);
+  let card = null, sig = null;
+  if (s.card) { card = h('div', 'abs glass', 'left:150px; width:780px; top:1030px; min-height:300px; padding:40px 50px 110px');
+    card.innerHTML = `<div class="lbl mut">${rich(s.card.kicker)}</div><div class="h2" style="font-size:64px; margin-top:6px">${rich(s.card.title)}</div>`;
+    if (s.card.sign !== false) { card.insertAdjacentHTML('beforeend', '<svg width="600" height="100" style="position:absolute; left:50px; bottom:20px" viewBox="0 0 600 110"><path d="M20 80 C 70 10, 110 100, 160 50 S 240 20, 270 70 S 360 90, 400 40 S 500 30, 580 66" fill="none" stroke="#10F5EE" stroke-width="7" stroke-linecap="round"/></svg>'); sig = card.querySelector('path'); }
+    el.append(card); const tt = card.children[1]; FITS.push(() => fit(tt, 170)); }
+  return {el, anim(t, a) {
+    g.style.transform = `translateY(${-(t - a) * 30}px)`;
+    const kd = eo(P(t, a + .1, a + .7)), kn = eo(P(t, a + .25, a + .85));
+    set(R, {x: (1 - kd) * 300, o: kd}); add3d(R, `rotateY(${(1 - kd) * -50}deg)`);
+    set(L, {x: -(1 - kn) * 300, o: kn}); add3d(L, `rotateY(${(1 - kn) * 50}deg)`);
+    set(x, {s: .3 + .7 * back(P(t, a + .7, a + 1.1)), r: (1 - P(t, a + .7, a + 1.1)) * 180, o: P(t, a + .7, a + .9)});
+    if (chip) set(chip, pop(t, a + 1.0, .45, 40));
+    if (card) { set(card, pop(t, a + 1.35, .55, 80)); const kk = eo(P(t, a + 1.35, a + 1.9)); add3d(card, `rotateX(${(1 - kk) * 60 + Math.sin(t * 1.2) * 3}deg) rotateY(${Math.sin(t * .9) * 4}deg)`); }
+    if (sig) { const L_ = sig.getTotalLength(); sig.style.strokeDasharray = L_; sig.style.strokeDashoffset = L_ * (1 - eio(P(t, a + 1.8, a + 2.8))); }
+  }};
+};
+B.steps = async s => {
+  const el = h('div', 'scene bg1'); el.append(h('div', 'grid'));
+  const tt = h('div', 'abs h1', 'right:90px; left:90px; top:280px; text-align:center; font-size:100px', rich(s.title) + (s.accent ? `<br><span class="cy neon">${rich(s.accent)}</span>` : '')); el.append(tt); FITS.push(() => fit(tt, 260));
+  const sub = s.sub ? h('div', 'abs lbl mut', 'right:90px; left:90px; top:560px; text-align:center; font-size:46px', rich(s.sub)) : null; if (sub) { el.append(sub); FITS.push(() => fit(sub, 130)); }
+  const n = s.items.length, sz = n > 3 ? 230 : 290, gap = (1080 - n * sz) / (n + 1);
+  const xs = s.items.map((_, i) => 1080 - gap - sz - i * (sz + gap));   // right to left
+  const its = [], lbs = [];
+  for (const [i, it] of s.items.entries()) {
+    const m = await media(it.img, sz, sz, 'abs', `left:${xs[i]}px; top:${910 - sz / 2}px`); el.append(m); its.push(m);
+    const l = h('div', 'abs lbl', `left:${xs[i] - 20}px; top:${930 + sz / 2}px; width:${sz + 40}px; text-align:center`, rich(it.label)); el.append(l); lbs.push(l); FITS.push(() => fit(l, 120));
+  }
+  const dot = h('div', 'abs', 'width:22px; height:22px; border-radius:50%; background:var(--cyan); box-shadow:0 0 22px var(--cyan); top:899px'); el.append(dot);
+  let pill = null, strk = null;
+  if (s.pill) { pill = h('div', 'abs glass', 'left:50%; top:1250px; transform:translateX(-50%); padding:18px 46px; font-weight:800; font-size:46px; white-space:nowrap',
+      rich(s.pill.text) + (s.pill.strike ? ` <span style="position:relative">${esc(s.pill.strike)}<i style="position:absolute; right:-6px; top:50%; height:7px; background:var(--orange); width:0"></i></span>` : ''));
+    el.append(pill); strk = pill.querySelector('i'); }
+  return {el, anim(t, a, b) {
+    set(tt, pop(t, a + .05, .5, 70)); if (sub) set(sub, pop(t, a + .35));
+    const step = Math.min(.45, (b - a - 2.2) / n);
+    its.forEach((e, i) => { const st = a + .55 + i * step; const o = pop(t, st, .5, 90); set(e, {...o, r: Math.sin((t + i) * 1.6) * 2});
+      const kk = eo(P(t, st, st + .5)); add3d(e, `rotateY(${(1 - kk) * 180 + Math.sin(t * 1.4 + i) * 10}deg)`);
+      e.style.filter = `drop-shadow(0 0 ${18 + 10 * Math.sin(t * 3 + i)}px rgba(16,245,238,.55))`; set(lbs[i], pop(t, st + .2, .4, 30)); });
+    const fp = P(t, a + .6 + n * step, b - .3), x = lerp(xs[0] + sz / 2, xs[n - 1] + sz / 2, fp);
+    dot.style.opacity = fp > 0 && fp < 1 ? 1 : 0; dot.style.left = `${x - 11}px`; dot.style.top = `${899 - Math.abs(Math.sin(fp * Math.PI * (n - 1))) * (sz / 2 + 30)}px`;   // hops over each icon
+    if (pill) { set(pill, pop(t, a + .9 + n * step, .45, 40)); if (strk) strk.style.width = `${eio(P(t, a + 1.5 + n * step, a + 1.9 + n * step)) * 110}%`; }
+  }};
+};
+B.grid = async s => {
+  const el = h('div', 'scene bg2'); el.append(h('div', 'grid'));
+  const big = s.big ? h('div', 'abs neono', 'right:90px; top:240px; font-weight:900; font-size:250px; line-height:1; color:var(--orange)', esc(s.big)) : null; if (big) el.append(big);
+  const tt = h('div', 'abs h2', `right:${s.big ? 300 : 90}px; left:90px; top:290px`, rich(s.title) + (s.sub ? `<br><span class="lbl mut">${rich(s.sub)}</span>` : '')); el.append(tt); FITS.push(() => fit(tt, 260));
+  const n = s.tiles.length, pos = n <= 2 ? [[80, 720, 'right'], [80, 720, 'left']] : [[80, 640, 'right'], [80, 640, 'left'], [80, 1040, 'right'], [80, 1040, 'left']];
+  const tiles = [];
+  for (const [i, ti] of s.tiles.slice(0, 4).entries()) {
+    const [m, top, side] = pos[i]; const e = h('div', 'tile', `${side}:${m}px; top:${top}px` + (n === 3 && i === 2 ? '; right:320px' : ''));
+    e.append(await media(ti.img, 440, 300));
+    const lab = h('div', 't', '', `<div class="fa">${rich(ti.fa)}</div>` + (ti.en ? `<div class="en">${esc(ti.en)}</div>` : '')); e.append(lab); el.append(e); tiles.push(e);
+    FITS.push(() => fit(lab.firstChild, 50, 24));
+  }
+  return {el, anim(t, a, b) {
+    if (big) set(big, {s: .4 + .6 * back(P(t, a + .05, a + .5)), o: P(t, a + .05, a + .25), r: (1 - P(t, a, a + .5)) * -20});
+    set(tt, pop(t, a + .3));
+    const span = b - a, foc = s.focus || tiles.map((_, i) => .3 + i * (.6 / Math.max(1, n - 1)));
+    tiles.forEach((e, i) => { const st = a + .7 + i * .28; const o = pop(t, st, .5, 120);
+      const hl = Math.exp(-Math.pow((t - (a + foc[i] * span)) / .45, 2));
+      set(e, {...o, s: (o.s ?? 1) * (1 + .05 * hl)}); const kk = eo(P(t, st, st + .6));
+      add3d(e, `rotateY(${(1 - kk) * (i % 2 ? -90 : 90) + Math.sin(t * 1.1 + i) * 5}deg) rotateX(${Math.cos(t * .9 + i) * 4}deg)`);
+      const c = hl > .3 ? '16,245,238' : '255,122,26';
+      e.style.boxShadow = `0 2px 0 rgba(255,255,255,.2) inset, 0 0 ${24 + 40 * hl}px rgba(${c},.6), 0 30px 70px rgba(0,0,0,.55)`; e.style.borderColor = `rgba(${c},${.55 + .45 * hl})`; });
+  }};
+};
+B.stat = async s => {
+  const el = h('div', 'scene bg3'); el.append(h('div', 'grid'));
+  let gl;
+  if (s.glyph && s.glyph.src) gl = await media({...s.glyph, fit: 'contain', alpha: true}, 420, 520, 'abs', 'left:330px; top:330px');
+  else gl = h('div', 'abs neono', 'left:0; right:0; top:300px; text-align:center; font-weight:900; font-size:400px; line-height:1.1; color:var(--orange)', esc(s.glyph?.text || '؟'));
+  el.append(gl);
+  const lab = h('div', 'abs h2', 'left:90px; right:90px; top:1060px; text-align:center', rich(s.label)); el.append(lab); FITS.push(() => fit(lab, 110));
+  const val = h('div', 'abs neon', 'left:60px; right:60px; top:1180px; text-align:center; font-weight:900; font-size:130px; color:var(--cyan); white-space:nowrap; direction:ltr', esc(s.value || '')); el.append(val);
+  const stamp = s.stamp ? h('div', 'abs neono', 'left:50%; top:1205px; transform:translateX(-50%) rotate(-8deg); padding:10px 40px; border:7px solid var(--orange); border-radius:18px; color:var(--orange); font-weight:900; font-size:84px; white-space:nowrap; box-shadow:0 0 30px rgba(255,122,26,.6), inset 0 0 20px rgba(255,122,26,.35)', esc(s.stamp)) : null;
+  if (stamp) el.append(stamp);
+  return {el, anim(t, a) {
+    const k = P(t, a, a + .7); set(gl, {y: -(1 - back(k)) * 500, r: (1 - eo(k)) * 40 + Math.sin(t * 2.4) * 3, o: clamp(k * 3)});
+    add3d(gl, `rotateY(${(1 - eo(k)) * 360 + Math.sin(t * 1.5) * 18}deg)`); gl.style.filter = 'drop-shadow(0 0 30px rgba(255,122,26,.55)) drop-shadow(0 30px 40px rgba(0,0,0,.5))';
+    set(lab, pop(t, a + .3));
+    if (s.count) { const c = s.count, kc = eo(P(t, a + .5, a + 1.6)); val.textContent = (c.prefix || '') + fa((c.from || 0) + (c.to - (c.from || 0)) * kc).replace(/\.\d*/, m => c.decimals ? m.slice(0, c.decimals + 1) : '') + (c.suffix || ''); }
+    else if (s.flicker) val.textContent = (s.value || '?').replace(/[?؟]/g, () => ['?', '؟', '•'][Math.floor(t * 14) % 3]);
+    const vo = P(t, a + .5, a + .6) * (stamp ? 1 - P(t, a + 1.35, a + 1.45) : 1); set(val, {o: vo, s: 1 + .04 * Math.sin(t * 4)});
+    if (stamp) { const ks = P(t, a + 1.4, a + 1.65); set(stamp, {s: lerp(2.2, 1, eo(ks)), o: ks}); }
+  }};
+};
+B.quote = async s => {
+  const el = h('div', 'scene'), pl = await media(s.plate, 1080, 1920, 'plate'); el.append(pl);
+  const [gx, gy] = s.glow || [50, 40]; pl.style.transformOrigin = `${gx}% ${gy}%`;
+  const rays = h('div', 'abs', `left:0; top:0; width:1080px; height:1920px; background: radial-gradient(520px 900px at ${gx}% ${gy}%, rgba(255,160,60,.42), rgba(255,140,40,0) 70%); mix-blend-mode: screen`); el.append(rays, h('div', 'shade-b'));
+  const card = h('div', 'abs glass o', 'left:70px; right:70px; top:1000px; padding:44px 54px',
+    `<div class="lbl" style="color:var(--orange); font-weight:800">${rich(s.kicker)}</div><div class="h2" style="margin-top:14px; font-size:68px">${rich(s.quote)}</div>` + (s.by ? `<div class="lbl mut" style="margin-top:20px; font-size:34px">${rich(s.by)}</div>` : ''));
+  el.append(card); FITS.push(() => fit(card.children[1], 260));
+  return {el, anim(t, a, b) {
+    const k = P(t, a, b); pl.style.transform = `scale(${lerp(1.05, 1.2, eio(k))}) rotateY(${lerp(-3, 2, k)}deg)`;
+    rays.style.opacity = .5 + .5 * eo(P(t, a + .3, a + 1.6));
+    set(card, pop(t, a + .5, .6, 120)); const kk = eo(P(t, a + .5, a + 1.1)); add3d(card, `rotateX(${(1 - kk) * -55 + Math.sin(t) * 2}deg) rotateY(${Math.sin(t * .8) * 4}deg)`);
+  }};
+};
+B.points = async s => {
+  const el = h('div', 'scene bg2'); el.append(h('div', 'grid'));
+  const tt = h('div', 'abs h2', 'left:90px; right:90px; top:300px; text-align:center', rich(s.title)); el.append(tt); FITS.push(() => fit(tt, 210));
+  const rows = s.items.slice(0, 3).map((it, i) => { const r = h('div', 'row glass' + (i % 2 ? ' o' : ''), `top:${580 + i * 260}px`,
+      `<div class="badge">${fa(i + 1)}</div><div class="tx">${rich(it)}</div>`); el.append(r); FITS.push(() => fit(r.lastChild, 180)); return r; });
+  return {el, anim(t, a, b) {
+    set(tt, pop(t, a + .05, .5, 70));
+    const step = Math.max(.35, Math.min(1.2, (b - a - 1.2) / rows.length));
+    rows.forEach((r, i) => { const st = a + .45 + i * step; set(r, pop(t, st, .55, 100)); const kk = eo(P(t, st, st + .6));
+      add3d(r, `rotateX(${(1 - kk) * 70}deg) rotateY(${(i % 2 ? -1 : 1) * (1 - kk) * 25 + Math.sin(t + i) * 2}deg)`);
+      r.querySelector('.badge').style.transform = `rotateY(${(1 - kk) * 360}deg)`; });
+  }};
+};
+B.frame = async s => {
+  const el = h('div', 'scene bg1');
+  const bgm = await media(s.img, 1080, 1920, 'plate'); bgm.style.filter = 'blur(46px) brightness(.45) saturate(1.2)'; bgm.style.transform = 'scale(1.15)'; el.append(bgm, h('div', 'grid'));
+  const [, , bw, bh] = s.img.box || [0, 0, 4, 5]; let w = 860, hh = w * bh / bw; if (hh > 1000) { hh = 1000; w = hh * bw / bh; }
+  const card = await media(s.img, Math.round(w), Math.round(hh), 'abs', `left:${(1080 - w) / 2}px; top:${300 + (1000 - hh) / 2}px; border-radius:34px; border:3px solid rgba(16,245,238,.8); box-shadow:0 0 30px rgba(16,245,238,.5), 0 40px 90px rgba(0,0,0,.6)`); el.append(card);
+  const cap = s.caption ? h('div', 'abs chip', 'left:50%; top:1340px; transform:translateX(-50%)', rich(s.caption)) : null; if (cap) el.append(cap);
+  return {el, anim(t, a, b) {
+    const k = P(t, a, b), ke = eo(P(t, a, a + .8));
+    set(card, {s: lerp(.86, 1, ke) * (1 + .04 * eio(k)), o: clamp(ke * 2), y: (1 - ke) * 120}); add3d(card, `rotateY(${(1 - ke) * -40 + Math.sin(t * .8) * 4}deg) rotateX(${(1 - ke) * 20 + Math.cos(t * .7) * 3}deg)`);
+    if (cap) set(cap, pop(t, a + .7, .45, 30));
+  }};
+};
+B.divider = async (s, n) => {
+  const el = h('div', 'scene bg3'); el.append(h('div', 'grid'));
+  const num = h('div', 'abs neono', 'left:0; right:0; top:560px; text-align:center; font-weight:900; font-size:420px; line-height:1; color:var(--orange)', fa(n)); el.append(num);
+  const lab = h('div', 'abs h2', 'left:0; right:0; top:1040px; text-align:center', 'خبر ' + ['اول', 'دوم', 'سوم'][n - 1]); el.append(lab);
+  const tag = s.tag ? h('div', 'abs chip neon', 'left:50%; top:1190px; transform:translateX(-50%)', rich(s.tag)) : null; if (tag) el.append(tag);
+  return {el, anim(t, a) {
+    const k = P(t, a, a + .55); set(num, {s: .3 + .7 * back(k), o: clamp(k * 2)}); add3d(num, `rotateY(${(1 - eo(k)) * 270}deg)`);
+    set(lab, pop(t, a + .2, .4, 50)); if (tag) set(tag, pop(t, a + .35, .4, 30));
+  }};
+};
+B.end = async s => {
+  const el = h('div', 'scene', 'background: radial-gradient(900px 900px at 50% 40%, rgba(16,245,238,.16), #030506 70%)');
+  const lg = h('img', 'abs', 'left:160px; top:330px; width:760px'); lg.src = '/news-reel/assets/m.png';
+  const lg2 = h('img', 'abs', 'left:160px; top:330px; width:760px'); lg2.src = '/news-reel/assets/ai.png';
+  const hd = h('div', 'abs latin', 'left:0; right:0; top:1150px; text-align:center; font-weight:900; font-size:72px', '@meshkani.pro');
+  const ln = h('div', 'abs', 'left:50%; top:1250px; height:4px; width:360px; transform:translateX(-50%); background:var(--cyan); box-shadow:0 0 14px var(--cyan)');
+  const cta = h('div', 'abs h2', 'left:60px; right:60px; top:1290px; text-align:center; font-size:56px; color:#cff7f5', rich(s.text || 'جزئیات کامل در پست‌های صفحه'));
+  el.append(lg, lg2, hd, ln, cta); FITS.push(() => fit(cta, 160));
+  return {el, anim(t, a) {
+    const k = P(t, a, a + .7);
+    set(lg, {s: .85 + .15 * eo(k), o: k, f: `drop-shadow(0 0 ${30 * k + 10 * Math.sin(t * 3)}px rgba(16,245,238,.7))`}); add3d(lg, `rotateY(${(1 - eo(k)) * -70}deg)`);
+    set(lg2, {s: .85 + .15 * eo(k), o: P(t, a + .3, a + .6)}); add3d(lg2, `rotateY(${(1 - eo(k)) * -70}deg)`);
+    set(hd, pop(t, a + .35)); ln.style.width = `${360 * eio(P(t, a + .6, a + 1.1))}px`; set(cta, pop(t, a + .7));
+  }};
+};
+
+// ---------------- particles (seeded, so every frame is repeatable) ----------------
+let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const BOKEH = Array.from({length: 46}, () => ({x: rnd() * 1080, y: rnd() * 1920, r: 14 + rnd() * 60, sp: 8 + rnd() * 26, a: .05 + rnd() * .12, c: rnd() < .7 ? '16,245,238' : '255,122,26', ph: rnd() * 6.3}));
+const SPARK = Array.from({length: 120}, () => ({x: rnd() * 1080, y: rnd() * 1920, r: .8 + rnd() * 2.6, sp: 20 + rnd() * 90, dr: (rnd() - .5) * 30, a: .3 + rnd() * .6, c: rnd() < .75 ? '160,255,250' : '255,170,90', ph: rnd() * 6.3}));
+const BURST = [];
+function particles(t) {
+  const b = $('fx').getContext('2d'); b.clearRect(0, 0, 1080, 1920);
+  for (const p of BOKEH) { const y = ((p.y - t * p.sp) % 2100 + 2100) % 2100 - 90, x = p.x + Math.sin(t * .4 + p.ph) * 30;
+    const g = b.createRadialGradient(x, y, 0, x, y, p.r); g.addColorStop(0, `rgba(${p.c},${p.a * (0.7 + 0.3 * Math.sin(t * 1.3 + p.ph))})`); g.addColorStop(1, `rgba(${p.c},0)`);
+    b.fillStyle = g; b.beginPath(); b.arc(x, y, p.r, 0, 7); b.fill(); }
+  const f = $('fxf').getContext('2d'); f.clearRect(0, 0, 1080, 1920);
+  for (const p of SPARK) { const y = ((p.y - t * p.sp) % 2000 + 2000) % 2000 - 40, x = p.x + Math.sin(t * .9 + p.ph) * p.dr;
+    f.fillStyle = `rgba(${p.c},${p.a * (0.5 + 0.5 * Math.sin(t * 3 + p.ph))})`; f.beginPath(); f.arc(x, y, p.r, 0, 7); f.fill(); }
+  for (const Bu of BURST) { const k = (t - Bu.t) / .9; if (k <= 0 || k >= 1) continue;
+    for (const s of Bu.p) { const d = eo(k) * s.v, x = Bu.x + Math.cos(s.a) * d, y = Bu.y + Math.sin(s.a) * d;
+      f.strokeStyle = `rgba(${s.c},${(1 - k) * .9})`; f.lineWidth = s.w; f.beginPath(); f.moveTo(x, y); f.lineTo(x - Math.cos(s.a) * 26 * (1 - k), y - Math.sin(s.a) * 26 * (1 - k)); f.stroke(); } }
+}
+
+// ---------------- timeline ----------------
+let SPEC, TL, SCN = [], SUBS = [], NEWS = [], END = 60;
+const FITS = [];
+window.ready = (async () => {
+  SPEC = await (await fetch(url('spec.json'))).json();
+  TL = await (await fetch(url('timeline.json'))).json();
+  const L = TL.lines, at = (id, off = 0) => { if (!L[id]) throw new Error('scene refers to unknown line ' + id); return L[id][0] + off; };
+  const root = $('scenes'), nN = SPEC.news.length;
+  for (const [ni, n] of SPEC.news.entries()) {
+    if (ni > 0) { const d = await B.divider({tag: n.tag}, ni + 1); root.append(d.el); SCN.push({...d, w: TL.dividers[ni - 1], news: -1, type: 'divider'}); }
+    const list = [];
+    for (const [si, s] of n.scenes.entries()) {
+      if (!B[s.type]) throw new Error('unknown scene type ' + s.type);
+      const b = await B[s.type](s); root.append(b.el);
+      const t0 = ni === 0 && si === 0 ? START : at(s.at, s.offset || 0);
+      list.push({...b, t0, news: ni, type: s.type});
+    }
+    list.forEach((x, i) => { x.w = [x.t0, i + 1 < list.length ? list[i + 1].t0 : TL.news[ni].end + .35]; });
+    SCN.push(...list);
+    for (const ln of n.lines) SUBS.push({id: ln.id, txt: ln.text.replace(/\[[^\]]*\]\s*/g, '')});
+    NEWS.push({...TL.news[ni], tag: n.tag});
+  }
+  const e = await B.end({text: SPEC.end_text}); root.append(e.el); SCN.push({...e, w: [TL.endcard[0], TL.endcard[1]], news: -1, type: 'end'});
+  if (SPEC.end_line) SUBS.push({id: 'END', txt: SPEC.end_line.replace(/\[[^\]]*\]\s*/g, '')});
+  END = TL.endcard[1];
+  const bar = $('bar'); for (let i = 0; i < nN; i++) bar.append(h('b', '', '', '<i></i>'));
+  for (const s of SCN) BURST.push({t: s.w[0], x: 540, y: 900, p: Array.from({length: 40}, () => ({a: rnd() * 6.283, v: 200 + rnd() * 520, w: 1.5 + rnd() * 2.5, c: rnd() < .7 ? '16,245,238' : '255,150,60'}))});
+  await document.fonts.ready; await Promise.all(['400', '600', '800', '900'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش')));
+  await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('image failed: ' + i.src))));
+  for (const s of SCN) { s.el.style.display = 'block'; s.el.style.opacity = 1; }
+  for (const f of FITS) f();
+  for (const s of SCN) s.el.style.display = 'none';
+  window.START = START; window.DURATION = END; window.SCENES = SCN.map(s => ({t0: s.w[0], t1: s.w[1], news: s.news, type: s.type}));
+  window.ISSUES = ISSUES;
+  seek(START);
+})();
+
+function seek(t) {
+  for (const s of SCN) { const [a, b] = s.w; const al = clamp(Math.min(P(t, a, a + .28), 1 - P(t, b - .06, b + .22)));
+    s.el.style.opacity = al; s.el.style.display = al > 0 ? 'block' : 'none';
+    if (al > 0) { const k = P(t, a, a + .45); s.el.style.transform = `translateZ(${-(1 - eo(k)) * 420}px) rotateX(${(1 - eo(k)) * 14}deg) translateY(${(1 - eo(k)) * 120}px)`; s.anim(t, a, b); } }
+  let fl = 0; for (const s of SCN.slice(1)) fl = Math.max(fl, Math.exp(-Math.pow((t - s.w[0]) / .09, 2)) * .22);
+  $('flash').style.opacity = fl;
+  particles(t);
+  { let a0 = -9; for (const s of SCN) if (t >= s.w[0]) a0 = s.w[0];
+    const k = P(t, a0 + .15, a0 + 1.15); $('streak').style.opacity = k > 0 && k < 1 ? Math.sin(Math.PI * k) * .9 : 0; $('streak').style.left = `${lerp(-500, 1400, eio(k))}px`; }
+  // subtitles follow the line being spoken
+  let cur = ''; for (const s of SUBS) { const w = TL.lines[s.id]; if (w && t >= w[0] - .05 && t <= w[1] + .15) cur = s.txt; }
+  const inNews = SCN.find(s => t >= s.w[0] && t < s.w[1] && s.news >= 0);
+  $('subT').textContent = cur; $('subs').style.opacity = cur && t < TL.endcard[0] ? 1 : 0;
+  // progress: one segment per news; tag chip names the current news
+  [...$('bar').children].forEach((b, i) => { b.firstChild.style.width = `${P(t, NEWS[i].start - .3, NEWS[i].end + .35) * 100}%`; });
+  const tg = $('tag');
+  if (inNews) { const n = NEWS[inNews.news]; tg.innerHTML = `${fa(inNews.news + 1)}/${fa(NEWS.length)} · ${rich(n.tag || '')}`; tg.style.opacity = clamp(P(t, inNews.news ? n.start - .2 : START + .3, (inNews.news ? n.start - .2 : START + .3) + .4)); }
+  else tg.style.opacity = 0;
+}
+window.seek = seek;
+</script>
+</body>
+</html>
