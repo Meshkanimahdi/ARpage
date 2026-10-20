@@ -183,7 +183,9 @@ Use WebSearch/WebFetch, English first, local language if needed:
   (search each fresh field explicitly, e.g. "AI in football", "AI film
   production", "AI restaurant"). Do not pad the list.
 - Open the **primary source** for every finalist with WebFetch. If the network
-  blocks it (proxy 403), confirm the facts in at least 3 independent reputable
+  blocks it (proxy 403 / DNS error), fetch it through Drive instead (workbench
+  `fetch_to_drive(url, <package folder id>, "src-<n>.html")` → download → read the
+  HTML). Only if that fails too, confirm the facts in at least 3 independent reputable
   outlets via WebSearch, attribute to them, and drop any figure they disagree on.
 - Open the **primary source** for every finalist (paper, university, hospital,
   regulator, company newsroom/docs, official report). Use independent reputable
@@ -268,14 +270,19 @@ strongest hook. The NVIDIA post (real CEO likeness) is the model; the Tesla Road
 red car instead of the real white Roadster seen in the viral launch photos) is the mistake not to
 repeat. Abstract topics (a study, a policy, a model release) skip this step.
 
-1. **Find the real photos (3–6).** The run container cannot reach image hosts directly, so:
-   - Official account first: in the workbench `refs = instagram_ref_urls("<brand handle>")`
-     (e.g. `teslamotors`, `nvidia`, `apple`; 1 ScrapeCreators credit) and pick the posts that show the
-     product from the launch/news. Also usable: press-kit or newsroom image URLs found with WebSearch,
-     and widely published launch photos (by the brand or reputable outlets).
-   - Copy them server-side into the package folder: `refs_to_drive([urls], <package folder id>,
-     "ref-<slug>")`, then `GOOGLEDRIVE_DOWNLOAD_FILE` each id and `curl` its `s3url` into `work/ref/`.
-   - Read every reference photo yourself. Keep each photo's source post/page URL in the brief.
+1. **Find the real photos yourself (3–6).** The run container cannot reach most sites or image hosts,
+   but Google Drive can fetch any public URL for you (workbench `fetch_to_drive`):
+   - WebSearch for the launch/news photos (official newsroom or press kit first, then reputable
+     outlets covering the event; queries like "<product> unveiling photos", "<product> press kit").
+   - For each promising page: workbench `fetch_to_drive(page_url, <package folder id>, "page-<n>.html")`,
+     then `GOOGLEDRIVE_DOWNLOAD_FILE` → `curl` the `s3url` to `work/ref/page-<n>.html` →
+     `python3 meshkani-pro/scripts/page_images.py work/ref/page-<n>.html --base <page_url>` lists the
+     page's photos (share image first, with alt text).
+   - Copy the chosen photo URLs into Drive: `refs_to_drive([urls], <package folder id>, "ref-<slug>")`,
+     download each (`GOOGLEDRIVE_DOWNLOAD_FILE` + `curl`) to `work/ref/`, and **Read every one**. Keep
+     only photos of the real object (drop renders by fans, look-alikes, other models); note each
+     photo's page URL in the brief. Prefer frames without big captions or tickers; if a TV-style
+     lower third is on the photo it is still fine as a generation reference.
 2. **Describe the real look** in `work/brief.json → visual_reference`: silhouette and proportions,
    colour and finish, lights, wheels, doors/wings, distinctive parts (e.g. thrusters, rear wing), the
    setting of the viral images (e.g. night launch with smoke and light beams), and what must **not**

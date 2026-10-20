@@ -133,22 +133,19 @@ def public_image_url(file_id):
     return f"https://drive.usercontent.google.com/download?id={file_id}&export=download"
 
 
-def instagram_ref_urls(handle, max_items=12, min_width=900):
-    """Largest image URL of each recent post (carousel items included) of a public Instagram
-    account, e.g. a brand's official account. 1 ScrapeCreators credit per call."""
-    r, e = run_composio_tool("SCRAPECREATORS_LIST_INSTAGRAM_USER_POSTS", {"handle": handle})
-    if e:
-        raise RuntimeError(e)
-    out = []
-    for it in (r.get("data") or {}).get("items", [])[:max_items]:
-        cap = ((it.get("caption") or {}).get("text") or "")[:80]
-        for m in (it.get("carousel_media") or [it]):
-            c = sorted((m.get("image_versions2") or {}).get("candidates", []), key=lambda x: -(x.get("width") or 0))
-            if c and (c[0].get("width") or 0) >= min_width:
-                out.append({"post": "https://www.instagram.com/p/%s/" % it.get("code"), "date": it.get("created_at"),
-                            "caption": cap, "w": c[0]["width"], "h": c[0]["height"], "url": c[0]["url"]})
-    return out
+_UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36",
+       "Accept-Language": "en-US,en;q=0.9"}
 
+
+def fetch_to_drive(url, folder_id, name, mime="text/plain"):
+    """Let Google Drive fetch a URL server-side (the run container cannot reach most sites).
+    Pages: mime text/plain, then GOOGLEDRIVE_DOWNLOAD_FILE + curl the s3url and read it or run
+    scripts/page_images.py on it. Returns the Drive file id; raises on failure."""
+    r, e = run_composio_tool("GOOGLEDRIVE_UPLOAD_FROM_URL", {"source_url": url, "name": name, "parent_folder_id": folder_id,
+                             "mime_type": mime, "source_headers": _UA})
+    if e:
+        raise RuntimeError("%s: %s" % (url, e))
+    return (r.get("data") or {}).get("id")
 
 def refs_to_drive(urls, folder_id, prefix="ref"):
     """Fetch reference photos server-side into Drive (the run container cannot reach image hosts).
@@ -156,9 +153,10 @@ def refs_to_drive(urls, folder_id, prefix="ref"):
     out = []
     for i, u in enumerate(urls, 1):
         name = "%s-%d.jpg" % (prefix, i)
-        r, e = run_composio_tool("GOOGLEDRIVE_UPLOAD_FROM_URL", {"source_url": u, "name": name,
-                                 "parent_folder_id": folder_id, "mime_type": "image/jpeg"})
-        out.append((name, e or (r.get("data") or {}).get("id")))
+        try:
+            out.append((name, fetch_to_drive(u, folder_id, name, "image/jpeg")))
+        except Exception as e:
+            out.append((name, "ERROR " + str(e)[:200]))
     return out
 
 
