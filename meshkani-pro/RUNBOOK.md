@@ -35,8 +35,10 @@ publish twice, never publish late, never publish unverified content.
    the repo: `add_repo` owner `Meshkanimahdi`, repo `ARpage` (read), clone it,
    then `git fetch origin claude/ecstatic-davinci-1lqsug && git checkout FETCH_HEAD`.
    Work from the repo root. Read `meshkani-pro/config.json`.
-2. Load deferred tools with ToolSearch:
-   `select:mcp__Composio__COMPOSIO_SEARCH_TOOLS,mcp__Composio__COMPOSIO_MULTI_EXECUTE_TOOL,mcp__Composio__COMPOSIO_REMOTE_WORKBENCH,mcp__Composio__COMPOSIO_GET_TOOL_SCHEMAS,mcp__Google_Drive__read_file_content,WebSearch,WebFetch`.
+2. Load deferred tools with ToolSearch. The Composio server prefix differs per
+   session (`mcp__Composio__*` or `mcp__<uuid>__*`), so search by keyword:
+   `COMPOSIO_SEARCH_TOOLS COMPOSIO_MULTI_EXECUTE_TOOL COMPOSIO_REMOTE_WORKBENCH COMPOSIO_GET_TOOL_SCHEMAS`
+   (max_results 8), plus `Google Drive read_file_content`, `WebSearch`, `WebFetch`.
 3. Call `COMPOSIO_SEARCH_TOOLS` once with `session: {generate_id: true}` and use
    cases "read and update google sheets values", "upload file to google drive",
    "publish instagram carousel and story". Keep the returned session id for
