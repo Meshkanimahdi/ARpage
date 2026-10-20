@@ -28,12 +28,12 @@ def at(day, hhmm):
 
 
 def slot_info(phase):
-    """Pick the slot whose window contains now: from 90 minutes before the
+    """Pick the slot whose window contains now: from 120 minutes before the
     publish time until the end of the grace period."""
     t = now()
     for slot, s in CONFIG["slots"].items():
         publish = at(t, s["publish_at"])
-        if publish - timedelta(minutes=90) <= t <= publish + GRACE:
+        if publish - timedelta(minutes=120) <= t <= publish + GRACE:
             return {
                 "phase": phase,
                 "slot_key": f"{publish:%Y-%m-%d}|{slot}",

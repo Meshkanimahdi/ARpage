@@ -117,7 +117,7 @@ except one log row `DUPLICATE_RUN_STOPPED`.
 
 ---
 
-## 1. PREPARE phase (starts 11:00 / 20:00 Tehran)
+## 1. PREPARE phase (main 10:30 / 19:30, retry 11:05 / 20:05 Tehran)
 
 Goal: by publish time, a slot JSON with status `READY`, six QA-passed JPEGs in
 Drive and `Ready` rows in the sheet. Keep going only while
@@ -126,9 +126,18 @@ Drive and `Ready` rows in the sheet. Keep going only while
 
 ### 1.1 Preconditions
 1. Setup (§0.1), control (§0.2), lock `__prepare` (§0.4).
-2. Look for the slot file in `slots/`. If it exists with any status other than
-   `FAILED`, stop (already handled). If `FAILED`, you may start over only if
-   no Instagram id was ever recorded in it.
+2. Look for the slot file in `slots/`:
+   - none → continue.
+   - `READY`, `PUBLISHING`, `PUBLISHED`, `SKIPPED_*`, `NEEDS_RECONCILIATION` → stop (already handled).
+   - `FAILED`, or `RESEARCHING / DESIGNING / QA` whose Drive `modifiedTime` is more
+     than 15 minutes old (the earlier run died, e.g. a worker restart) → take it over
+     if no Instagram id was ever recorded in it: reuse anything already finished in
+     it (dossier, QA-passed images), record the takeover in `errors`, continue.
+   - `RESEARCHING / DESIGNING / QA` modified in the last 15 minutes → another run is
+     alive; stop.
+   The scheduled PREPARE runs twice per slot (main run ~1.5 h before publishing,
+   RETRY run ~55 min before). The RETRY run uses lock name `__prepare_retry` and
+   does nothing when the main run is alive or already finished.
 3. Create the slot file with status `RESEARCHING` and `runs.prepare = RUN_ID`.
 
 ### 1.2 History and diversity
