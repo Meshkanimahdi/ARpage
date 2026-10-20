@@ -19,7 +19,7 @@ mixfx.append(add(LOGO_A, 0, 1.0, f"atrim=0:{START+0.5},afade=t=out:st={START-0.2
 for k, (a, b) in tl.items(): mixv.append(add(f'voice/trim/{k}.wav', a, 1.0))
 music = add('sfx/music.mp3', START - 0.3, 0.30, f"afade=t=in:d=0.6,afade=t=out:st={END-START-0.9}:d=1.2,")
 for s in sc['scenes']: mixfx.append(add('sfx/whoosh.mp3', s['t0'] - 0.15, 0.45))
-slide2 = next(s for s in sc['scenes'] if s.get('focus')); mixfx.append(add('sfx/tick.mp3', slide2['t0'] + 0.5, 0.35))
+slide2 = next(s for s in sc['scenes'] if s.get('focus')); mixfx.append(add('sfx/tick.mp3', slide2['t0'] + 0.7, 0.35))
 mixfx.append(add('sfx/hit.mp3', sc['scenes'][-1]['t0'], 0.6))
 f.append(f"{''.join(mixv)}amix=inputs={len(mixv)}:normalize=0,apad=whole_dur={END},asplit=2[voice][key]")
 f.append(f"{music}[key]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=350[duck]")

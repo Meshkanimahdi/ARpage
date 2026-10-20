@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro reel — motion</title>
+<style>
+  @font-face { font-family: Vaz; font-weight: 400; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-400-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 600; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-800-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 900; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: Inter; font-weight: 800; src: url(node_modules/@fontsource/inter/files/inter-latin-800-normal.woff2); }
+  @font-face { font-family: Inter; font-weight: 900; src: url(node_modules/@fontsource/inter/files/inter-latin-900-normal.woff2); }
+  :root { --cyan: #10F5EE; --orange: #FF7A1A; --navy: #0B1A33; --ink: #F4F8FF; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #050A14; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Vaz, sans-serif; color: var(--ink); }
+  .abs { position: absolute; will-change: transform, opacity, filter; }
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .plate { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background-size: cover; background-position: center; }
+  .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(16,245,238,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(16,245,238,.07) 1px, transparent 1px); background-size: 72px 72px; }
+  .shade-b { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,10,20,0) 40%, rgba(5,10,20,.92) 78%); }
+  .h1 { font-weight: 900; font-size: 128px; line-height: 1.12; letter-spacing: -1px; }
+  .h2 { font-weight: 800; font-size: 78px; line-height: 1.2; }
+  .lbl { font-weight: 600; font-size: 40px; }
+  .word { display: inline-block; margin-left: 22px; }
+  .chip { display: inline-flex; align-items: center; gap: 14px; padding: 14px 30px; border-radius: 60px; background: rgba(16,245,238,.12); border: 2px solid rgba(16,245,238,.55); font-weight: 800; font-size: 40px; color: var(--cyan); }
+  .glass { background: rgba(12,26,52,.72); border: 2px solid rgba(255,255,255,.14); border-radius: 36px; box-shadow: 0 30px 80px rgba(0,0,0,.5); backdrop-filter: blur(6px); }
+  .hl { color: var(--orange); }
+  .cy { color: var(--cyan); }
+  .bracket { position: absolute; width: 70px; height: 70px; border: 7px solid var(--cyan); filter: drop-shadow(0 0 10px rgba(16,245,238,.8)); }
+  .tile { position: absolute; width: 440px; height: 360px; border-radius: 30px; overflow: hidden; background: #0d2140; border: 2px solid rgba(255,122,26,.55); box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+  .tile img { width: 440px; height: 300px; object-fit: cover; display: block; }
+  .tile .t { position: absolute; bottom: 0; left: 0; right: 0; height: 92px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(0deg, #0b1a33, rgba(11,26,51,.85)); }
+  .tile .fa { font-weight: 800; font-size: 38px; }
+  .tile .en { font-family: Inter; font-weight: 800; font-size: 22px; color: #9fb4d6; direction: ltr; }
+  #subs { position: absolute; left: 70px; right: 70px; top: 1470px; text-align: center; font-weight: 800; font-size: 50px; line-height: 1.45; color: #fff; text-shadow: 0 4px 18px rgba(0,0,0,.85), 0 0 2px #000; }
+  #subs span { background: rgba(5,10,20,.55); padding: 6px 18px; border-radius: 14px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  #bar { position: absolute; left: 90px; right: 90px; top: 176px; height: 6px; background: rgba(255,255,255,.18); border-radius: 3px; overflow: hidden; }
+  #bar i { position: absolute; right: 0; top: 0; bottom: 0; background: var(--cyan); box-shadow: 0 0 14px var(--cyan); }
+  #flash { position: absolute; inset: 0; background: var(--cyan); opacity: 0; mix-blend-mode: screen; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- S1: robots learn to see and decide -->
+  <div class="scene" id="s1">
+    <div class="plate" id="s1plate" style="background-image:url(plates/story-1-clean.png)"></div>
+    <div class="shade-b"></div>
+    <div class="bracket" id="b1" style="left:960px; top:440px; border-left:0; border-bottom:0"></div>
+    <div class="bracket" id="b2" style="left:960px; top:720px; border-left:0; border-top:0"></div>
+    <div class="bracket" id="b3" style="left:740px; top:440px; border-right:0; border-bottom:0"></div>
+    <div class="bracket" id="b4" style="left:740px; top:720px; border-right:0; border-top:0"></div>
+    <div class="abs chip" id="s1c1" style="left:700px; top:350px">● می‌بینه</div>
+    <div class="abs chip" id="s1c2" style="left:640px; top:820px; color:var(--orange); border-color:rgba(255,122,26,.6); background:rgba(255,122,26,.12)">● تصمیم می‌گیره</div>
+    <div class="abs h1" id="s1t" style="right:90px; top:1110px; width:900px; text-align:right">
+      <span class="word" id="w1">ربات‌ها</span><span class="word hl" id="w2">یاد</span><span class="word hl" id="w3">می‌گیرن</span>
+    </div>
+  </div>
+
+  <!-- S2a: Germany x NVIDIA, declaration -->
+  <div class="scene" id="s2a" style="background: radial-gradient(1200px 900px at 50% 40%, #0f2a52, #050A14)">
+    <div class="grid" id="s2grid"></div>
+    <div class="abs" id="de" style="right:140px; top:520px; width:380px; text-align:center">
+      <div style="display:flex; height:22px; border-radius:11px; overflow:hidden; margin-bottom:26px"><i style="flex:1;background:#111"></i><i style="flex:1;background:#DD0000"></i><i style="flex:1;background:#FFCE00"></i></div>
+      <div class="h2" style="font-size:96px">آلمان</div>
+    </div>
+    <div class="abs" id="x" style="left:500px; top:600px; font-family:Inter; font-weight:900; font-size:90px; color:var(--cyan)">×</div>
+    <div class="abs" id="nv" style="left:120px; top:520px; width:380px; text-align:center">
+      <div style="height:22px; border-radius:11px; background:#76B900; margin-bottom:26px"></div>
+      <div style="font-family:Inter; font-weight:900; font-size:84px; direction:ltr; letter-spacing:2px">NVIDIA</div>
+    </div>
+    <div class="abs chip" id="date" style="left:50%; top:860px; transform:translateX(-50%)">۱۹ اکتبر ۲۰۲۶ · برلین</div>
+    <div class="abs glass" id="doc" style="left:190px; top:1040px; width:700px; height:330px; padding:40px 50px; box-sizing:border-box">
+      <div class="lbl" style="color:#9fb4d6">سند</div>
+      <div class="h2" style="font-size:64px; margin-top:6px">اعلامیهٔ همکاری</div>
+      <svg width="600" height="110" style="position:absolute; left:50px; bottom:26px; direction:ltr" viewBox="0 0 600 110">
+        <path id="sig" d="M20 80 C 70 10, 110 100, 160 50 S 240 20, 270 70 S 360 90, 400 40 S 500 30, 580 66" fill="none" stroke="#10F5EE" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- S2b: physical AI pipeline -->
+  <div class="scene" id="s2b" style="background: radial-gradient(1200px 900px at 50% 45%, #10284d, #050A14)">
+    <div class="grid"></div>
+    <div class="abs h1" id="pt" style="right:90px; left:90px; top:290px; text-align:center; font-size:100px">هوش مصنوعی<br><span class="cy">فیزیکی</span></div>
+    <div class="abs lbl" id="ps" style="right:90px; left:90px; top:560px; text-align:center; color:#b9c8e2; font-size:46px">هوشی که در دنیای واقعی کار می‌کند</div>
+    <img class="abs" id="ic1" src="el/cam.png" style="left:60px; top:760px; width:300px">
+    <img class="abs" id="ic2" src="el/brain.png" style="left:390px; top:760px; width:300px">
+    <img class="abs" id="ic3" src="el/arm.png" style="left:720px; top:760px; width:300px">
+    <div class="abs lbl" id="il1" style="left:60px; top:1080px; width:300px; text-align:center">می‌بیند</div>
+    <div class="abs lbl" id="il2" style="left:390px; top:1080px; width:300px; text-align:center">می‌فهمد</div>
+    <div class="abs lbl" id="il3" style="left:720px; top:1080px; width:300px; text-align:center">انجام می‌دهد</div>
+    <svg class="abs" style="left:0; top:0" width="1080" height="1920"><path id="flow" d="M360 910 L390 910 M690 910 L720 910" stroke="#FF7A1A" stroke-width="8" stroke-linecap="round" fill="none"/></svg>
+    <div class="abs" id="dot" style="width:22px; height:22px; border-radius:50%; background:var(--cyan); box-shadow:0 0 22px var(--cyan); top:899px"></div>
+    <div class="abs glass" id="txt" style="left:50%; top:1230px; transform:translateX(-50%); padding:18px 46px; font-weight:800; font-size:46px; white-space:nowrap">نه فقط <span id="strike" style="position:relative">متن<i id="strk" style="position:absolute; right:-6px; top:50%; height:7px; background:var(--orange); width:0"></i></span></div>
+  </div>
+
+  <!-- S3: four startups -->
+  <div class="scene" id="s3" style="background: radial-gradient(1200px 1000px at 50% 50%, #0f2547, #050A14)">
+    <div class="grid"></div>
+    <div class="abs" id="four" style="right:90px; top:250px; font-weight:900; font-size:260px; line-height:1; color:var(--orange)">۴</div>
+    <div class="abs h2" id="fourT" style="right:300px; top:300px; width:640px">استارتاپ آلمانی<br><span class="lbl" style="color:#b9c8e2">با حمایت انویدیا</span></div>
+    <div class="tile" id="t1" style="right:80px; top:640px"><img src="el/agile.jpg"><div class="t"><div class="fa">ربات‌سازی</div><div class="en">Agile Robots</div></div></div>
+    <div class="tile" id="t2" style="left:80px; top:640px"><img src="el/avelios.jpg"><div class="t"><div class="fa">نرم‌افزار بیمارستان</div><div class="en">Avelios Medical</div></div></div>
+    <div class="tile" id="t3" style="right:80px; top:1040px"><img src="el/mirelo.jpg"><div class="t"><div class="fa">صدای هوشمند ویدیو</div><div class="en">Mirelo</div></div></div>
+    <div class="tile" id="t4" style="left:80px; top:1040px"><img src="el/reflex.jpg"><div class="t"><div class="fa">ماهواره</div><div class="en">Reflex Aerospace</div></div></div>
+  </div>
+
+  <!-- S4: amount unknown -->
+  <div class="scene" id="s4" style="background: radial-gradient(1100px 1000px at 50% 45%, #13213d, #050A14)">
+    <div class="grid"></div>
+    <img class="abs" id="q" src="el/q.png" style="left:330px; top:340px; width:420px">
+    <div class="abs h2" id="amtL" style="left:90px; right:90px; top:1080px; text-align:center">مبلغ سرمایه‌گذاری</div>
+    <div class="abs" id="amt" style="left:90px; right:90px; top:1190px; text-align:center; font-family:Inter; font-weight:900; font-size:120px; direction:ltr; color:var(--cyan); letter-spacing:6px">$ ???</div>
+    <div class="abs" id="stamp" style="left:50%; top:1210px; transform:translateX(-50%) rotate(-8deg); padding:10px 40px; border:7px solid var(--orange); border-radius:18px; color:var(--orange); font-weight:900; font-size:84px; white-space:nowrap">اعلام نشده</div>
+  </div>
+
+  <!-- S5: Merz to German industry -->
+  <div class="scene" id="s5">
+    <div class="plate" id="s5plate" style="background-image:url(plates/story-3-clean.png)"></div>
+    <div class="abs" id="rays" style="left:0; top:0; width:1080px; height:1920px; background: radial-gradient(520px 900px at 69% 45%, rgba(255,160,60,.45), rgba(255,140,40,0) 70%); mix-blend-mode: screen"></div>
+    <div class="abs glass" id="quote" style="left:70px; right:70px; top:1020px; padding:44px 54px">
+      <div class="lbl" style="color:var(--orange); font-weight:800">پیام صدراعظم آلمان به صنعت</div>
+      <div class="h2" style="margin-top:14px; font-size:70px">داده‌های صنعتی را به کار هوش مصنوعی بگیرید</div>
+      <div class="lbl" style="margin-top:20px; color:#b9c8e2; font-size:34px">فریدریش مرتس · اجلاس برلین</div>
+    </div>
+  </div>
+
+  <!-- S6: end card -->
+  <div class="scene" id="s6" style="background: radial-gradient(900px 900px at 50% 40%, rgba(16,245,238,.16), #030506 70%)">
+    <img class="abs" id="lg" src="assets/m.png" style="left:160px; top:330px; width:760px">
+    <img class="abs" id="lg2" src="assets/ai.png" style="left:160px; top:330px; width:760px">
+    <div class="abs" id="hd" style="left:0; right:0; top:1150px; text-align:center; font-family:Inter; font-weight:900; font-size:72px; direction:ltr">@meshkani.pro</div>
+    <div class="abs" id="hdl" style="left:50%; top:1250px; height:4px; width:360px; transform:translateX(-50%); background:var(--cyan); box-shadow:0 0 14px var(--cyan)"></div>
+    <div class="abs h2" id="cta" style="left:0; right:0; top:1290px; text-align:center; font-size:56px; color:#cff7f5">جزئیات کامل در پست امروز</div>
+  </div>
+
+  <div id="flash"></div>
+  <div id="bar"><i id="barI"></i></div>
+  <div id="subs"><span id="subT"></span></div>
+</div>
+<script>
+// Deterministic motion graphic: window.seek(t) sets every element for absolute reel time t.
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const lerp = (a, b, k) => a + (b - a) * k;
+function set(id, o) {     // o: {x,y,s,r,o,b,extra}
+  const e = $(id), base = e.dataset.base ?? (e.dataset.base = e.style.transform || '');
+  e.style.transform = `${base} translate(${o.x || 0}px,${o.y || 0}px) scale(${o.s ?? 1}) rotate(${o.r || 0}deg)`;
+  if (o.o !== undefined) e.style.opacity = o.o;
+  e.style.filter = o.b ? `blur(${o.b}px)` : (o.f || '');
+}
+// pop in: from below, blurred and small -> settled
+const pop = (t, a, d = .5, dist = 60) => { const k = P(t, a, a + d); return {y: (1 - eo(k)) * dist, s: .85 + .15 * back(k), o: clamp(k * 1.6), b: (1 - eo(k)) * 12}; };
+const out = (o, t, a, d = .3) => { const k = P(t, a, a + d); return {...o, o: (o.o ?? 1) * (1 - k), y: (o.y || 0) - k * 40}; };
+
+let T;  // timeline from voice/timeline.json (absolute seconds)
+const SC = {};
+window.ready = (async () => {
+  T = (await (await fetch('voice/timeline.json')).json()).lines;
+  const N = k => T[k];
+  // scene windows, aligned to narration lines
+  SC.s1 = [4.2, N('N2')[0]];
+  SC.s2a = [N('N2')[0], N('N2')[0] + 3.1];
+  SC.s2b = [SC.s2a[1], N('N3')[0]];
+  SC.s3 = [N('N3')[0], N('N4')[0]];
+  SC.s4 = [N('N4')[0], N('N5')[0]];
+  SC.s5 = [N('N5')[0], N('N6')[0]];
+  SC.s6 = [N('N6')[0], N('N6')[1] + 0.6];
+  SUBS = (await (await fetch('voice/script.txt')).text()).trim().split('\n').map(l => { const [id, txt] = l.split('|'); return {id, txt: txt.replace(/\[[^\]]*\]\s*/g, '')}; });
+  window.START = 4.2; window.DURATION = SC.s6[1];
+  await document.fonts.ready; await Promise.all(['400', '600', '800', '900'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش')));
+  await Promise.all([...document.images].map(i => i.decode()));
+  seek(4.2);
+})();
+let SUBS = [];
+
+function sceneAlpha(t, [a, b], fadeIn = .28, fadeOut = .28) {
+  return clamp(Math.min(P(t, a, a + fadeIn), 1 - P(t, b - fadeOut * .2, b + fadeOut * .8)));
+}
+
+function seek(t) {
+  for (const [id, w] of Object.entries(SC)) {
+    const a = sceneAlpha(t, w); const e = $(id); e.style.opacity = a; e.style.display = a > 0 ? 'block' : 'none';
+    // entering scenes slide up slightly (whip feel)
+    const k = P(t, w[0], w[0] + .35); e.style.transform = `translateY(${(1 - eo(k)) * 120}px)`;
+  }
+  // transition flash at each cut
+  let fl = 0; for (const w of Object.values(SC).slice(1)) fl = Math.max(fl, Math.exp(-Math.pow((t - w[0]) / .09, 2)) * .22);
+  $('flash').style.opacity = fl;
+
+  // ---- S1
+  { const [a, b] = SC.s1; const k = P(t, a, b);
+    $('s1plate').style.transform = `scale(${lerp(1.16, 1.04, eio(k))}) translate(${lerp(-20, 10, k)}px, 0)`;
+    ['b1', 'b2', 'b3', 'b4'].forEach((id, i) => { const p = eo(P(t, a + .15 + i * .05, a + .55 + i * .05)); const dx = [1, 1, -1, -1][i] * (1 - p) * 70, dy = [-1, 1, -1, 1][i] * (1 - p) * 70; set(id, {x: dx, y: dy, o: p}); });
+    set('s1c1', pop(t, a + .6)); set('s1c2', pop(t, a + 1.25));
+    set('w1', pop(t, a + .2, .5, 90)); set('w2', pop(t, a + .45, .5, 90)); set('w3', pop(t, a + .6, .5, 90)); }
+  // ---- S2a
+  { const [a] = SC.s2a;
+    $('s2grid').style.transform = `translateY(${-(t - a) * 30}px)`;
+    const kd = eo(P(t, a + .1, a + .7)), kn = eo(P(t, a + .25, a + .85));
+    set('de', {x: (1 - kd) * 300, o: kd}); set('nv', {x: -(1 - kn) * 300, o: kn});
+    set('x', {s: .3 + .7 * back(P(t, a + .7, a + 1.1)), r: (1 - P(t, a + .7, a + 1.1)) * 180, o: P(t, a + .7, a + .9)});
+    set('date', pop(t, a + 1.0, .45, 40));
+    set('doc', pop(t, a + 1.35, .55, 80));
+    const sg = $('sig'), L = sg.getTotalLength(); sg.style.strokeDasharray = L; sg.style.strokeDashoffset = L * (1 - eio(P(t, a + 1.8, a + 2.8))); }
+  // ---- S2b
+  { const [a, b] = SC.s2b;
+    set('pt', pop(t, a + .05, .5, 70)); set('ps', pop(t, a + .35));
+    ['ic1', 'ic2', 'ic3'].forEach((id, i) => { const o = pop(t, a + .55 + i * .45, .5, 90); set(id, {...o, r: Math.sin((t + i) * 1.6) * 2}); set('il' + (i + 1), pop(t, a + .75 + i * .45, .4, 30)); });
+    const fp = P(t, a + 1.6, b - .3), x = lerp(210, 870, fp);
+    set('dot', {x: 0, o: fp > 0 && fp < 1 ? 1 : 0}); $('dot').style.left = `${x - 11}px`; $('dot').style.top = `${899 + Math.sin(fp * Math.PI * 2) * -40}px`;
+    set('txt', pop(t, a + 1.9, .45, 40)); $('strk').style.width = `${eio(P(t, a + 2.5, a + 2.9)) * 110}%`; }
+  // ---- S3
+  { const [a, b] = SC.s3;
+    set('four', {s: .4 + .6 * back(P(t, a + .05, a + .5)), o: P(t, a + .05, a + .25), r: (1 - P(t, a, a + .5)) * -20});
+    set('fourT', pop(t, a + .3));
+    // tiles highlight with the narration: robot, hospital ... satellite
+    const span = b - a;
+    ['t1', 't2', 't3', 't4'].forEach((id, i) => { const st = a + .7 + i * .28; const o = pop(t, st, .5, 120);
+      const focus = [.35, .52, .66, .86][i] * span + a, hl = Math.exp(-Math.pow((t - focus) / .45, 2));
+      set(id, {...o, s: (o.s ?? 1) * (1 + .05 * hl)}); $(id).style.borderColor = `rgba(${hl > .3 ? '16,245,238' : '255,122,26'},${.55 + .45 * hl})`; }); }
+  // ---- S4
+  { const [a] = SC.s4;
+    const k = P(t, a, a + .7); set('q', {y: -(1 - back(k)) * 500, r: (1 - eo(k)) * 40 + Math.sin(t * 2.4) * 3, o: clamp(k * 3)});
+    set('amtL', pop(t, a + .3));
+    const roll = P(t, a + .5, a + 1.3); $('amt').textContent = '$ ' + ['?', '؟', '•'][Math.floor(t * 14) % 3].repeat(3);
+    set('amt', {o: (P(t, a + .5, a + .6)) * (1 - P(t, a + 1.35, a + 1.45))});
+    const ks = P(t, a + 1.4, a + 1.65); set('stamp', {s: lerp(2.2, 1, eo(ks)), o: ks}); }
+  // ---- S5
+  { const [a, b] = SC.s5; const k = P(t, a, b);
+    $('s5plate').style.transform = `scale(${lerp(1.05, 1.22, eio(k))})`; $('s5plate').style.transformOrigin = '69% 45%';
+    $('rays').style.opacity = .5 + .5 * eo(P(t, a + .3, a + 1.6));
+    set('quote', pop(t, a + .5, .6, 120)); }
+  // ---- S6
+  { const [a] = SC.s6; const k = P(t, a, a + .7);
+    set('lg', {s: .85 + .15 * eo(k), o: k, f: `drop-shadow(0 0 ${30 * k}px rgba(16,245,238,.6))`}); set('lg2', {s: .85 + .15 * eo(k), o: P(t, a + .3, a + .6)});
+    set('hd', pop(t, a + .35)); $('hdl').style.width = `${360 * eio(P(t, a + .6, a + 1.1))}px`; set('cta', pop(t, a + .7)); }
+
+  // ---- subtitles follow the narration line being spoken
+  let cur = ''; for (const s of SUBS) { const w = T[s.id]; if (w && t >= w[0] - .05 && t <= w[1] + .15) cur = s.txt; }
+  $('subT').textContent = cur; $('subs').style.opacity = cur && t < SC.s6[0] ? 1 : 0;
+  $('barI').style.width = `${P(t, 4.2, SC.s6[1]) * 100}%`;
+}
+window.seek = seek;
+</script>
+</body>
+</html>
