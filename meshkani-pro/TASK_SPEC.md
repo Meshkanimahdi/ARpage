@@ -33,3 +33,5 @@ Halt and notify on mismatch, restriction, insufficient permission/quota, missing
 4. **Image hosting for Instagram:** final JPEGs are uploaded straight to Drive (resumable session opened through Composio, bytes sent from the run container); Instagram fetches them from a temporary "anyone with link" Drive URL, sharing removed after publishing. Tested 2026-10-20: container status FINISHED.
 5. **Notifications:** the user asked that reporting go to the Google Sheet only (run log), no other channel.
 6. **Caption (2026-10-20):** a clear, accurate summary of the news; source name and date only, no URLs; no closing note about images being real or conceptual (a licensed-photo credit line is still allowed). Hashtags last.
+7. **Field rotation (2026-10-20):** every post from a different field than the previous one, no exception (e.g. never two AI-model posts in a row); fields include food, sports, film, music, health, travel and more (`config.json → sectors`); skip rather than repeat.
+8. **Visual references (2026-10-20):** for specific real products/vehicles/places/people, research real photos first and generate with them as references (RUNBOOK §1.5.1).

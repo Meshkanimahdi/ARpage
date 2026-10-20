@@ -138,9 +138,19 @@ Drive and `Ready` rows in the sheet. Keep going only while
    `source.url`, `source.dedupe_key`.
 3. Read the last 20 feed posts of the account (`INSTAGRAM_GET_IG_USER_MEDIA`,
    fields `id,caption,permalink,timestamp`) as a live check.
-4. Allowed sectors: not the sector of the previous package; no sector already
-   used twice in the last 7 days — unless no other credible news exists (then
-   record the reason in `errors` and later in the story Notes).
+4. Sector rule (user rule, 2026-10-20 — stricter than the original brief):
+   - Every post must come from a **different field than the previous post**; two
+     posts in a row from the same field are **never** allowed, with no exception.
+     Example: two consecutive posts about AI models/releases are forbidden.
+   - Fields are the list in `config.json → sectors` (food, sports, film, music,
+     health, travel, …). "AI models and tools" (new LLMs, chatbots, model
+     releases) is itself one field; use it rarely — the page's focus is AI's
+     concrete effect in everyday fields.
+   - No field more than twice in the last 7 Tehran days; prefer the field used
+     least recently. If no credible current story exists in a fresh field, look
+     in other fresh fields; if still none, skip the slot (`SKIPPED_NO_NEWS`)
+     rather than repeat the previous field.
+   - Write the chosen field at the start of Post Topic and in the bundle state.
 5. Also read `_automation/history/publish-state.json` and `stories-state.json`
    (ids in config: the completed original batch). The never-republish list from the legacy state file (POST-001…POST-010,
    POST-011, the standalone test story) and everything in the sheet is history.
@@ -155,9 +165,9 @@ Use WebSearch/WebFetch, English first, local language if needed:
 > خبر هم‌سطح ترجیح بده. اگر خبر مناسب نیست، خروجی را «خبر مناسب پیدا نشد» قرار بده؛ خبر یا
 > آمار نساز.
 
-- Aim for 15–30 candidates across sectors (medicine/health, automotive/transport,
-  food/agriculture, education, science, energy/climate, robotics/manufacturing,
-  business, art/media, everyday services, public policy). Do not pad the list.
+- Aim for 15–30 candidates across many fields from `config.json → sectors`
+  (search each fresh field explicitly, e.g. "AI in football", "AI film
+  production", "AI restaurant"). Do not pad the list.
 - Open the **primary source** for every finalist (paper, university, hospital,
   regulator, company newsroom/docs, official report). Use independent reputable
   outlets only to confirm and to judge importance.
@@ -232,6 +242,28 @@ news (no celebration look for serious topics).
 Real photos only with checked licence and attribution, never manipulated in a
 way that changes the news content. Generated images of real events, patients,
 cars or products are labelled «تصویر مفهومی» and never presented as evidence.
+
+#### 1.5.1 Visual reference research (user rule, 2026-10-20)
+When the news is about a **specific real thing whose look the audience knows or can
+check** — a named car or vehicle, robot, device, product, building, place or a
+public person — do this before writing any prompt:
+1. Search for 3–6 real photos of it (official press kit/newsroom first, then
+   reputable outlets; WebSearch + WebFetch). Download them to `work/ref/` and
+   look at them yourself.
+2. Write down its real visual features in `work/brief.json` → `visual_reference`:
+   shape/silhouette, proportions, distinctive parts (lights, doors, wheels,
+   logo placement), colours and materials, and anything that must **not** appear
+   (features it does not have). Keep the source URL of every reference photo.
+3. Use them for generation: describe those features precisely in every prompt
+   that shows the object, and pass 1–2 of the clearest reference photos with
+   `--ref work/ref/<file>` so the model matches the real design. The output is
+   still a new design (do not copy the photo's composition or text, no watermark,
+   no logos beyond the product's own badge); if a photo is used **as-is** in the
+   design, its licence must allow it and it gets a credit (§1.5).
+4. QA (§1.7) adds a check: the object in each image must be recognisably the real
+   product (silhouette and key features right, nothing invented). If it does not
+   match, re-generate within the fix budget.
+Abstract topics (a study, a policy, a model release) do not need this step.
 
 ### 1.6 Prompts and generation
 Mother prompt (fill every bracket from the dossier and brief; record each final
