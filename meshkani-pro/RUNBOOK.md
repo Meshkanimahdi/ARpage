@@ -282,15 +282,20 @@ prompt in the slot JSON and the sheet):
 > طراحی خبرهای اخیر فاصله داشته باشد.
 >
 > متن دقیق فارسی زیر را با حروف درست، اتصال صحیح و خوانایی بالا در طراحی ادغام کن:
-> «`[تیتر دقیق]`» و «`[متن کوتاه دقیق]`». پایین تصویر کوچک: «@meshkani.pro» و «`[n] از ۳`».
+> «`[تیتر دقیق]`» و «`[متن کوتاه دقیق]`». `[پست: پایین تصویر کوچک «@meshkani.pro» و «[n] از ۳»]`
 > تیتر، تصویر و متن بخشی از یک صفحه‌آرایی واحد و متناسب با موضوع باشند. متن دیگری نساز.
 > اعداد، نام محصول و ادعا را تغییر نده. ترکیب‌بندی این تصویر با دو تصویر دیگر متفاوت باشد.
 >
 > `[پست: نسبت ۴:۵؛ همهٔ متن‌ها، حتی برچسب‌ها و امضای پایین، دست‌کم ۸٪ از هر چهار لبه فاصله داشته باشند.]`
-> `[استوری: نسبت ۹:۱۶؛ هیچ متنی در ۱۲٪ بالای تصویر و ۱۵٪ پایین تصویر نباشد.]`
+> `[استوری: نسبت ۹:۱۶؛ هیچ متنی در ۱۲٪ بالای تصویر نباشد. پایین‌ترین عنصر تصویر فقط «@meshkani.pro» است، کوچک و دقیقاً وسط‌چین، درست بالای ۱۵٪ پایینی تصویر؛ هیچ متن دیگری پایین‌تر از آن نیاید. شماره‌گذاری (مثل «۱ از ۳») و برچسب «تصویر مفهومی» در استوری نیاید.]`
 > از شبیه‌سازی دکمه یا استیکر تعاملی، نشان دادن صحنهٔ تولیدی به‌عنوان عکس واقعی و عناصر
-> نامربوط به خبر خودداری کن. `[اگر مفهومی است: برچسب کوچک و خوانای «تصویر مفهومی» را در طراحی
-> در نظر بگیر.]`
+> نامربوط به خبر خودداری کن. `[فقط برای پست، اگر مفهومی است: برچسب کوچک و خوانای «تصویر مفهومی» را
+> در طراحی در نظر بگیر.]`
+
+Story layout rule (user, 2026-10-20): stories carry **no** sequence number and
+**no** «تصویر مفهومی» label; the only footer is `@meshkani.pro`, small, exactly
+centred, the lowest element of the image, sitting just above the 280 px bottom
+safe line. QA checks this.
 
 Generate (the six can run in parallel as background jobs):
 
@@ -313,7 +318,8 @@ JSON.
    the story safe zone (230 px top / 280 px bottom), on posts no text (including small
    labels and the @meshkani.pro line) closer than 8% to any edge, fits the news and brief, not
    a near-copy of recent packages, no misleading fake elements, concept label
-   present when needed.
+   present when needed (posts only; stories must have no number and no label, only the
+   centred @meshkani.pro as the lowest element).
 2. Upload the finals to Drive (§1.8 folders) so Drive can OCR them; read each back
    with `mcp__Google_Drive__read_file_content` and compare (Drive often does not
    OCR new files for minutes; if no text comes back after ~2 tries, record
