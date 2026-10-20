@@ -233,6 +233,28 @@ Real photos only with checked licence and attribution, never manipulated in a
 way that changes the news content. Generated images of real events, patients,
 cars or products are labelled «تصویر مفهومی» and never presented as evidence.
 
+#### 1.5.1 Visual reference research (user rule, 2026-10-20)
+When the news is about a **specific real thing whose look the audience knows or can
+check** — a named car or vehicle, robot, device, product, building, place or a
+public person — do this before writing any prompt:
+1. Search for 3–6 real photos of it (official press kit/newsroom first, then
+   reputable outlets; WebSearch + WebFetch). Download them to `work/ref/` and
+   look at them yourself.
+2. Write down its real visual features in `work/brief.json` → `visual_reference`:
+   shape/silhouette, proportions, distinctive parts (lights, doors, wheels,
+   logo placement), colours and materials, and anything that must **not** appear
+   (features it does not have). Keep the source URL of every reference photo.
+3. Use them for generation: describe those features precisely in every prompt
+   that shows the object, and pass 1–2 of the clearest reference photos with
+   `--ref work/ref/<file>` so the model matches the real design. The output is
+   still a new design (do not copy the photo's composition or text, no watermark,
+   no logos beyond the product's own badge); if a photo is used **as-is** in the
+   design, its licence must allow it and it gets a credit (§1.5).
+4. QA (§1.7) adds a check: the object in each image must be recognisably the real
+   product (silhouette and key features right, nothing invented). If it does not
+   match, re-generate within the fix budget.
+Abstract topics (a study, a policy, a model release) do not need this step.
+
 ### 1.6 Prompts and generation
 Mother prompt (fill every bracket from the dossier and brief; record each final
 prompt in the slot JSON and the sheet):
