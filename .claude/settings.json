@@ -15,7 +15,17 @@
       "Bash(bash meshkani-pro/scripts/drive_put.sh *)",
       "Bash(git pull*)",
       "Bash(git fetch*)",
-      "Bash(git checkout*)"
+      "Bash(git checkout*)",
+      "Bash(node news-reel/*)",
+      "Bash(python3 news-reel/*)",
+      "Bash(bash news-reel/setup.sh)",
+      "Bash(ffmpeg *)",
+      "Bash(ffprobe *)",
+      "Bash(curl -sS -o work/*)",
+      "Bash(mkdir -p work/*)",
+      "Bash(cp *)",
+      "Bash(ls *)",
+      "Bash(npm ci --prefix logo-motion*)"
     ]
   }
 }
