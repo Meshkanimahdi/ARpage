@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="fa">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro news reel</title>
+<style>
+  @font-face { font-family: Vazirmatn; font-weight: 700; src: url(node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-700-normal.woff2) format('woff2'); }
+  @font-face { font-family: Inter; font-weight: 700; src: url(node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2) format('woff2'); }
+  html, body { margin: 0; background: #000; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// News part of the reel (after the logo intro). seek(t) renders absolute reel time t.
+// Scenes come from scenes.json so the same renderer can take one or two news bundles.
+const W = 1080, H = 1920, CYAN = '#10F5EE';
+const cv = document.getElementById('c'); cv.width = W; cv.height = H;
+const ctx = cv.getContext('2d');
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const easeInOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const load = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = src; });
+const off = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
+
+let CFG, IMG = {}, blurred = {};
+window.ready = (async () => {
+  CFG = await (await fetch('scenes.json')).json();
+  const names = [...new Set(CFG.scenes.filter(s => s.img).map(s => s.img)), 'm', 'ai'];
+  for (const n of names) IMG[n] = await load(`assets/${n}.${n === 'm' || n === 'ai' ? 'png' : 'jpg'}`);
+  // pre-blur backgrounds for 4:5 slides so they fill the 9:16 frame
+  for (const s of CFG.scenes) if (s.kind === 'slide' && !blurred[s.img]) {
+    const c = off(), g = c.getContext('2d'); const im = IMG[s.img];
+    const k = Math.max(W / im.width, H / im.height) * 1.15;
+    g.filter = 'blur(46px) brightness(0.55) saturate(1.2)';
+    g.drawImage(im, (W - im.width * k) / 2, (H - im.height * k) / 2, im.width * k, im.height * k);
+    blurred[s.img] = c;
+  }
+  await Promise.all([document.fonts.load('700 40px Vazirmatn', 'جزئیات'), document.fonts.load('700 40px Inter')]);
+  window.START = CFG.start; window.DURATION = CFG.end;
+  seek(CFG.start);
+})();
+
+function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+
+function drawStory(s, t) {
+  const p = prog(t, s.t0, s.t1), im = IMG[s.img];
+  const z = 1.02 + 0.07 * easeInOut(p);
+  const dx = (s.pan || 0) * 40 * (p - 0.5), dy = -25 * (p - 0.5);
+  ctx.drawImage(im, (W - W * z) / 2 + dx, (H - H * z) / 2 + dy, W * z, H * z);
+}
+
+function drawSlide(s, t) {
+  const p = prog(t, s.t0, s.t1), im = IMG[s.img];
+  ctx.drawImage(blurred[s.img], 0, 0);
+  // card: 1080x1350 shown at 92% width, floating with a slow push-in
+  let z = 0.9 + 0.05 * easeInOut(p), fx = 0.5, fy = 0.5;
+  if (s.focus) {  // optional camera move toward a region of the slide (fractions of the slide)
+    const f = easeInOut(prog(t, s.t0 + 0.6, s.t1 - 0.2));
+    z = z + (s.focus.zoom - 1) * f; fx = 0.5 + (s.focus.x - 0.5) * f; fy = 0.5 + (s.focus.y - 0.5) * f;
+  }
+  const cw = W * z, ch = cw * im.height / im.width;
+  const cx = W / 2 - (fx - 0.5) * cw, cy = H / 2 - (fy - 0.5) * ch + Math.sin(t * 1.3) * 6;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 60; ctx.shadowOffsetY = 24;
+  roundRect(ctx, cx - cw / 2, cy - ch / 2, cw, ch, 34); ctx.fillStyle = '#000'; ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.clip(); ctx.drawImage(im, cx - cw / 2, cy - ch / 2, cw, ch);
+  ctx.restore();
+  ctx.save(); roundRect(ctx, cx - cw / 2, cy - ch / 2, cw, ch, 34);
+  ctx.strokeStyle = 'rgba(16,245,238,0.35)'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
+}
+
+function drawEnd(s, t) {
+  const p = prog(t, s.t0, s.t0 + 0.9);
+  ctx.fillStyle = '#030506'; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createRadialGradient(W / 2, H * 0.42, 0, W / 2, H * 0.42, 900);
+  g.addColorStop(0, 'rgba(16,245,238,0.16)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const size = 760 * (0.9 + 0.1 * easeOut(p)), x = (W - size) / 2, y = H * 0.40 - size / 2;
+  ctx.save(); ctx.globalAlpha = easeOut(p);
+  ctx.globalCompositeOperation = 'lighter'; ctx.filter = 'blur(30px)'; ctx.globalAlpha *= 0.45; ctx.drawImage(IMG.m, x, y, size, size);
+  ctx.restore();
+  ctx.save(); ctx.globalAlpha = easeOut(p); ctx.drawImage(IMG.m, x, y, size, size); ctx.drawImage(IMG.ai, x, y, size, size); ctx.restore();
+  const pt = easeOut(prog(t, s.t0 + 0.35, s.t0 + 1.2));
+  ctx.save(); ctx.globalAlpha = pt; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = '700 66px Inter'; ctx.fillStyle = '#F2FFFE'; ctx.fillText('@meshkani.pro', W / 2, H * 0.64 + (1 - pt) * 20);
+  ctx.fillStyle = CYAN; ctx.fillRect(W / 2 - 170 * pt, H * 0.64 + 58, 340 * pt, 3);
+  ctx.direction = 'rtl'; ctx.font = '700 46px Vazirmatn'; ctx.fillStyle = '#CFF7F5';
+  ctx.fillText(s.text || 'جزئیات کامل در پست امروز', W / 2, H * 0.64 + 130 + (1 - pt) * 20);
+  ctx.restore();
+}
+
+function drawScene(s, t) {
+  if (s.kind === 'story') drawStory(s, t); else if (s.kind === 'slide') drawSlide(s, t); else drawEnd(s, t);
+}
+
+function seek(t) {
+  ctx.globalAlpha = 1; ctx.filter = 'none'; ctx.globalCompositeOperation = 'source-over';
+  const sc = CFG.scenes; let i = sc.findIndex(s => t >= s.t0 && t < s.t1); if (i < 0) i = sc.length - 1;
+  const s = sc[i], T = 0.32;   // whip transition length
+  const into = t - s.t0;
+  if (i > 0 && into < T) {
+    // whip: previous scene slides up and blurs out, new one slides in from below
+    const k = easeInOut(into / T), prev = sc[i - 1];
+    ctx.save(); ctx.filter = `blur(${18 * k}px)`; ctx.translate(0, -H * 0.35 * k); drawScene(prev, t); ctx.restore();
+    ctx.save(); ctx.globalAlpha = k; ctx.filter = `blur(${18 * (1 - k)}px)`; ctx.translate(0, H * 0.35 * (1 - k)); drawScene(s, t); ctx.restore();
+    ctx.globalAlpha = 1; ctx.filter = 'none';
+    ctx.fillStyle = `rgba(16,245,238,${0.18 * Math.sin(Math.PI * k)})`; ctx.fillRect(0, 0, W, H);
+  } else drawScene(s, t);
+  // top progress line inside the safe zone + small tag
+  const p = prog(t, CFG.start, CFG.end);
+  ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.fillRect(90, 150, W - 180, 6);
+  ctx.fillStyle = CYAN; ctx.shadowColor = CYAN; ctx.shadowBlur = 12; ctx.fillRect(90, 150, (W - 180) * p, 6); ctx.shadowBlur = 0;
+}
+window.seek = seek;
+</script>
+</body>
+</html>
