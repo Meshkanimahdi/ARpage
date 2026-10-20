@@ -3,6 +3,9 @@
 
   finalize.py --kind post|story RAW OUT.jpg     final JPEG + JSON report
   finalize.py --sheet OUT.jpg IMG [IMG ...]      contact sheet for visual review
+  finalize.py --kind K --inset 0.88 RAW OUT.jpg  shrink the design into a frame
+      filled with a blurred, enlarged copy of itself — a fallback when edge text
+      breaks the margin rule and a re-generation did not fix it.
 
 Post: center-crop to 4:5, resize to 1080x1350. Story: 9:16, 1080x1920; also
 writes OUT.safezone.jpg with the top/bottom safe margins drawn, for review only.
@@ -13,7 +16,7 @@ import json
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 CONFIG = json.loads((Path(__file__).resolve().parent.parent / "config.json").read_text())
 IMG = CONFIG["images"]
@@ -33,12 +36,17 @@ def crop_to_ratio(im, w, h):
     return im.crop((0, y, cw, y + nh))
 
 
-def finalize(kind, raw, out):
+def finalize(kind, raw, out, inset=None):
     spec = IMG[kind]
     w, h = spec["final"]
     src = Image.open(raw)
     src_size = src.size
     im = crop_to_ratio(src.convert("RGB"), w, h).resize((w, h), Image.LANCZOS)
+    if inset:
+        bg = im.resize((w, h)).filter(ImageFilter.GaussianBlur(40))
+        small = im.resize((round(w * inset), round(h * inset)), Image.LANCZOS)
+        bg.paste(small, ((w - small.width) // 2, (h - small.height) // 2))
+        im = bg
     out = Path(out)
     out.parent.mkdir(parents=True, exist_ok=True)
     im.save(out, "JPEG", quality=IMG["jpeg_quality"], optimize=True, progressive=False)
@@ -59,6 +67,7 @@ def finalize(kind, raw, out):
         "bytes": len(data),
         "sha256": hashlib.sha256(data).hexdigest(),
         "md5": hashlib.md5(data).hexdigest(),
+        "inset": inset,
         "ok": check.size == (w, h) and check.format == "JPEG" and len(data) < 8_000_000,
     }
     if kind == "story":
@@ -91,6 +100,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--kind", choices=["post", "story"])
     ap.add_argument("--sheet", action="store_true")
+    ap.add_argument("--inset", type=float)
     ap.add_argument("paths", nargs="+")
     a = ap.parse_args()
     if a.sheet:
@@ -98,7 +108,7 @@ def main():
         return 0
     if not a.kind or len(a.paths) != 2:
         ap.error("--kind and RAW OUT are required")
-    r = finalize(a.kind, a.paths[0], a.paths[1])
+    r = finalize(a.kind, a.paths[0], a.paths[1], a.inset)
     print(json.dumps(r, ensure_ascii=False))
     return 0 if r["ok"] else 1
 

@@ -18,13 +18,20 @@ def _px(method, endpoint, body=None, headers=None, params=None):
         payload["parameters"] = p
     if body is not None:
         payload["body"] = body
-    r = requests.post(_BACKEND + "/api/v3/tool_router/internal/proxy_execute",
-                      json=payload, headers={"Content-Type": "application/json"}, timeout=120)
-    r.raise_for_status()
-    d = r.json()
-    if isinstance(d, dict) and d.get("status", 200) >= 400:
-        raise RuntimeError(f"Drive API {d.get('status')}: {str(d.get('data'))[:400]}")
-    return d
+    for attempt in range(6):
+        r = requests.post(_BACKEND + "/api/v3/tool_router/internal/proxy_execute",
+                          json=payload, headers={"Content-Type": "application/json"}, timeout=120)
+        r.raise_for_status()
+        d = r.json()
+        status = d.get("status", 200) if isinstance(d, dict) else 200
+        # Drive's shared per-minute quota answers 403/429 rateLimitExceeded; back off.
+        if status in (403, 429, 500, 503) and ("ate" in str(d.get("data")) or status != 403):
+            time.sleep(5 * (attempt + 1))
+            continue
+        if status >= 400:
+            raise RuntimeError(f"Drive API {status}: {str(d.get('data'))[:400]}")
+        return d
+    raise RuntimeError(f"Drive API {status} after retries: {str(d.get('data'))[:400]}")
 
 
 def _data(d):
@@ -54,6 +61,13 @@ def open_update(file_id, mime="application/json"):
             headers={"X-Upload-Content-Type": mime})
     h = {k.lower(): v for k, v in (d.get("headers") or {}).items()}
     return h["location"]
+
+
+def write_text(file_id, text, mime="application/json"):
+    """Replace a small text/JSON file's content in place (state files)."""
+    return _data(_px("PATCH", f"{_UP}/files/{file_id}?uploadType=media&supportsAllDrives=true",
+                     body=text if isinstance(text, str) else json.dumps(text, ensure_ascii=False),
+                     headers={"Content-Type": mime}))
 
 
 def read_text(file_id):

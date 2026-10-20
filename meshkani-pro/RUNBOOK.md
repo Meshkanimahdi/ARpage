@@ -76,7 +76,8 @@ Read the sheet tab `Automation Control` (range `A1:C10`) with
   "application/json")` for the first write) and
   `bash meshkani-pro/scripts/drive_put.sh work/state.json '<session url>'`.
 - Write the state file after every status change and **immediately** after
-  every Instagram call that returns an id.
+  every Instagram call that returns an id. Faster for JSON state: workbench
+  `write_text(file_id, json_text)` (in-place PATCH).
 
 Slot statuses: `RESEARCHING → DESIGNING → QA → READY → PUBLISHING → PUBLISHED`,
 plus `SKIPPED_LATE`, `SKIPPED_NO_NEWS`, `SKIPPED_KILL_SWITCH`, `FAILED`,
@@ -168,6 +169,9 @@ Use WebSearch/WebFetch, English first, local language if needed:
 - Aim for 15–30 candidates across many fields from `config.json → sectors`
   (search each fresh field explicitly, e.g. "AI in football", "AI film
   production", "AI restaurant"). Do not pad the list.
+- Open the **primary source** for every finalist with WebFetch. If the network
+  blocks it (proxy 403), confirm the facts in at least 3 independent reputable
+  outlets via WebSearch, attribute to them, and drop any figure they disagree on.
 - Open the **primary source** for every finalist (paper, university, hospital,
   regulator, company newsroom/docs, official report). Use independent reputable
   outlets only to confirm and to judge importance.
@@ -307,15 +311,19 @@ JSON.
    RTL order, spacing, contrast, nothing cropped, text really inside the design
    (not an empty background), no extra/invented text, nothing important outside
    the story safe zone (230 px top / 280 px bottom), on posts no text (including small
-   labels and the @meshkani.pro line) closer than ~6% to any edge, fits the news and brief, not
+   labels and the @meshkani.pro line) closer than 8% to any edge, fits the news and brief, not
    a near-copy of recent packages, no misleading fake elements, concept label
    present when needed.
 2. Upload the finals to Drive (§1.8 folders) so Drive can OCR them; read each back
-   with `mcp__Google_Drive__read_file_content` and compare:
+   with `mcp__Google_Drive__read_file_content` and compare (Drive often does not
+   OCR new files for minutes; if no text comes back after ~2 tries, record
+   `ocr: not indexed` and rely on the visual review — never block on OCR):
    write the approved text (title + body) and the OCR text to files and run
    `python3 meshkani-pro/scripts/text_compare.py approved.txt ocr.txt`. OCR is a
    signal; the visual review decides.
-3. Fix loop (max 2 attempts per image): regenerate with `--ref` the failing raw
+3. Fix loop (max 2 attempts per image). Margin-only failures (text too close to an
+   edge or inside the story unsafe zone) may instead be fixed with
+   `finalize.py --inset 0.88`, then re-checked visually. regenerate with `--ref` the failing raw
    image plus a precise correction prompt ("keep everything, only fix the word X
    to Y"), or regenerate from the prompt. Replace the Drive file content with
    `open_update(file_id, "image/jpeg")` so ids stay stable. Still failing →
@@ -364,9 +372,10 @@ JSON.
    - missing file, `FAILED`, `SKIPPED_*` → log and stop.
 3. Daily caps: count `PUBLISHED` posts/stories in today's slot files (+ live
    media of today). Over the cap → stop.
-4. Identity: `INSTAGRAM_GET_USER_INFO` (`account: instagram_beath-billow`) must
-   return username `meshkani.pro`, user_id `17841471767180096`, type
-   `MEDIA_CREATOR`; `INSTAGRAM_GET_IG_USER_CONTENT_PUBLISHING_LIMIT` must leave at
+4. Identity: `INSTAGRAM_GET_USER_INFO` (`account: instagram_beath-billow`, pass
+   `fields: "id,user_id,username,account_type"` — without `fields` the
+   `user_id` is missing) must return username `meshkani.pro`, user_id
+   `17841471767180096`, type `MEDIA_CREATOR`; `INSTAGRAM_GET_IG_USER_CONTENT_PUBLISHING_LIMIT` must leave at
    least 4 publishes. Otherwise `FAILED`, log, stop.
 5. Duplicate guard: list the last 10 feed posts; if one has this slot's caption
    (or was published since `times.ready_at` with the same source URL in the
