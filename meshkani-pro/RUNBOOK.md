@@ -139,7 +139,8 @@ Drive and `Ready` rows in the sheet. Keep going only while
 4. Allowed sectors: not the sector of the previous package; no sector already
    used twice in the last 7 days — unless no other credible news exists (then
    record the reason in `errors` and later in the story Notes).
-5. The never-republish list from the legacy state file (POST-001…POST-010,
+5. Also read `_automation/history/publish-state.json` and `stories-state.json`
+   (ids in config: the completed original batch). The never-republish list from the legacy state file (POST-001…POST-010,
    POST-011, the standalone test story) and everything in the sheet is history.
 
 ### 1.3 Research (live)

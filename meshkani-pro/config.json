@@ -7,11 +7,22 @@
   },
   "timezone": "Asia/Tehran",
   "slots": {
-    "12:00": {"prepare_start": "11:00", "publish_at": "12:00"},
-    "21:00": {"prepare_start": "20:00", "publish_at": "21:00"}
+    "12:00": {
+      "prepare_start": "11:00",
+      "publish_at": "12:00"
+    },
+    "21:00": {
+      "prepare_start": "20:00",
+      "publish_at": "21:00"
+    }
   },
   "grace_minutes": 30,
-  "caps": {"posts_per_slot": 1, "stories_per_slot": 3, "posts_per_day": 2, "stories_per_day": 6},
+  "caps": {
+    "posts_per_slot": 1,
+    "stories_per_slot": 3,
+    "posts_per_day": 2,
+    "stories_per_day": 6
+  },
   "google": {
     "spreadsheet_id": "1V6PkoiYAprKCEvsfT1ThGkKTouldAVWG7SoM1Ejrfyo",
     "tabs": {
@@ -23,11 +34,20 @@
     "instagram_root_folder_id": "1QP2Qyzo_5j3dcLVxwq7hQXfR7Gozjulv",
     "post_images_folder_id": "10o8f4dqZ7cT4_MLZHrluER0eLUlkc7Tn",
     "story_images_folder_id": "1AGGy6FdgvG3Aa1igu38RNN3m7Eb-wmJ0",
-    "automation_folder_id": "",
-    "slots_folder_id": "",
-    "locks_folder_id": "",
+    "automation_folder_id": "1XO1836T9RfIWDp-fWBCa8ZCAjgVsdDM8",
+    "slots_folder_id": "1jQHn346k1fcbGRKktMSH0NrCh_HsR54x",
+    "locks_folder_id": "15mTVnfp8b6qCXHGfJNhyDiZyqiFLMBMI",
     "test_folder_id": "1AFyUX9Pqx8_3evvIFaVvgxaKDmppTFfX",
-    "legacy_state_file_id": "1o9ZRh7JJi8lzmXy5z-yJr16V6Yn_vhYN"
+    "legacy_state_file_id": "1o9ZRh7JJi8lzmXy5z-yJr16V6Yn_vhYN",
+    "packages_folder_id": "1W4hIeu93wrCnQgIRT7hOpg1ICl1Ng6x3",
+    "history_folder_id": "1d4jwSnnajbim5yd8MvEcieTnpdbkfdFD",
+    "history_publish_state_id": "1YESGfTircF0x5PwFKyXjZ9YbLf2fXysR",
+    "history_stories_state_id": "1OdXa_U5HwXm6AXPYyGgXMUtpS59KQOlF",
+    "sheet_ids": {
+      "Carousel Posts": 453399775,
+      "Stories": 906180,
+      "Automation Control": 1584448916
+    }
   },
   "images": {
     "provider": "openrouter",
@@ -35,9 +55,24 @@
     "primary_model": "openai/gpt-image-2.5-sunburst",
     "fallback_model": "openai/gpt-image-2.5-flare",
     "quality": "high",
-    "post": {"request_size": "1088x1360", "fallback_aspect_ratio": "3:4", "final": [1080, 1350]},
-    "story": {"request_size": "1152x2048", "fallback_aspect_ratio": "9:16", "final": [1080, 1920],
-              "safe_top_px": 230, "safe_bottom_px": 280},
+    "post": {
+      "request_size": "1088x1360",
+      "fallback_aspect_ratio": "3:4",
+      "final": [
+        1080,
+        1350
+      ]
+    },
+    "story": {
+      "request_size": "1152x2048",
+      "fallback_aspect_ratio": "9:16",
+      "final": [
+        1080,
+        1920
+      ],
+      "safe_top_px": 230,
+      "safe_bottom_px": 280
+    },
     "max_fix_attempts": 2,
     "jpeg_quality": 92
   },
