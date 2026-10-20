@@ -3,6 +3,9 @@
     "allow": [
       "mcp__e41468ee-3b12-440e-8f9d-d69c05f815db",
       "mcp__Composio",
+      "mcp__e7b5d510-5a28-411c-a878-c827fc8d7380__read_file_content",
+      "mcp__e7b5d510-5a28-411c-a878-c827fc8d7380__search_files",
+      "mcp__e7b5d510-5a28-411c-a878-c827fc8d7380__get_file_metadata",
       "mcp__Google_Drive__read_file_content",
       "mcp__Google_Drive__search_files",
       "mcp__Google_Drive__get_file_metadata",
