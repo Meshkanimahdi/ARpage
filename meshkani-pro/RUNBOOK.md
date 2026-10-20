@@ -197,10 +197,21 @@ slot file. Stories are `POST-NNN-STORY-1..3`.
 
 - Each image: one title line + one short body line (≤ ~12 words each).
 - Persian public text; company/product names and URLs may stay in Latin.
-- Caption: short explanation, `منبع: <name>، <YYYY-MM-DD>` + primary URL, a
-  related question or invitation, the concept-image note when relevant
-  («طراحی و تصاویر مفهومی با کمک هوش مصنوعی.»), and 3–6 hashtags related to the
-  story and sector. Do not guess hashtag popularity.
+- Caption (user rule, 2026-10-20):
+  1. Open with a clear, accurate summary of the news in 3–5 short Persian
+     sentences: what happened, who did it, what is actually new, and the key
+     limit or condition. A reader must understand the news from the caption alone.
+  2. Then one line of practical meaning for the audience and one natural related
+     question or invitation.
+  3. Source line with name and date only: `منبع: <name>، <YYYY-MM-DD>`.
+     **No URLs in the caption** (links are not clickable on Instagram); the URL
+     stays in the sheet and the bundle JSON.
+  4. **No note about whether images are real or conceptual** at the end of the
+     caption (no «طراحی و تصاویر مفهومی با کمک هوش مصنوعی.» or similar). For a
+     licensed real photo, a short credit line `عکس: <owner>، <licence>` is the
+     only image-related text allowed.
+  5. Finish with 3–6 hashtags related to the story and sector. Do not guess
+     hashtag popularity.
 - Forbidden in images and caption: treatment claims, medical advice, growth
   guarantees, virality promises, fake links, fake polls, anything that looks like
   a tappable button or sticker.
