@@ -353,7 +353,8 @@ JSON.
    a near-copy of recent packages, no misleading fake elements, concept label
    present when needed (posts only; stories must have no number and no label, only the
    centred @meshkani.pro as the lowest element). For a physical product: the side-by-side
-   reference check of §1.5.1 step 4 passes.
+   reference check of §1.5.1 step 4 passes. The image fills the whole frame edge to edge: no
+   blurred, mirrored or plain border around a smaller copy of the design (reject if present).
 2. Upload the finals to Drive (§1.8 folders) so Drive can OCR them; read each back
    with `mcp__Google_Drive__read_file_content` and compare (Drive often does not
    OCR new files for minutes; if no text comes back after ~2 tries, record
@@ -361,13 +362,18 @@ JSON.
    write the approved text (title + body) and the OCR text to files and run
    `python3 meshkani-pro/scripts/text_compare.py approved.txt ocr.txt`. OCR is a
    signal; the visual review decides.
-3. Fix loop (max 2 attempts per image). Margin-only failures (text too close to an
-   edge or inside the story unsafe zone) may instead be fixed with
-   `finalize.py --inset 0.88`, then re-checked visually. regenerate with `--ref` the failing raw
-   image plus a precise correction prompt ("keep everything, only fix the word X
-   to Y"), or regenerate from the prompt. Replace the Drive file content with
-   `open_update(file_id, "image/jpeg")` so ids stay stable. Still failing →
-   status `FAILED`, log which image and why, stop (do not publish a partial set).
+3. Fix loop (max 2 attempts per image): regenerate with `--ref` the failing raw image plus a
+   precise correction prompt ("keep everything, only fix the word X to Y"; for margins: "keep the
+   design and the full-bleed image, move every text block inward so it is at least 8% from each
+   edge / outside the story unsafe zone, make the text slightly smaller if needed"), or regenerate
+   from the prompt. Replace the Drive file content with `open_update(file_id, "image/jpeg")` so ids
+   stay stable. Still failing → status `FAILED`, log which image and why, stop (do not publish a
+   partial set).
+   **Never shrink the design into a frame, never add blurred/mirrored borders, never pad**
+   (user rule, 2026-10-20 — the old `--inset 0.88` fallback made POST-012 and POST-013 slides and
+   stories look unfitted with blurred edges; `finalize.py` now refuses `--inset`). Every final image
+   is the model image itself, center-cropped and resized to the exact size, filling the frame
+   edge to edge.
 4. Re-check every claim against the primary source once more (look for
    corrections or denials since research).
 5. File checks from the finalize reports: 3 × 1080×1350 JPEG, 3 × 1080×1920

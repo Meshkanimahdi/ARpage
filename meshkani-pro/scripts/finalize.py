@@ -3,9 +3,10 @@
 
   finalize.py --kind post|story RAW OUT.jpg     final JPEG + JSON report
   finalize.py --sheet OUT.jpg IMG [IMG ...]      contact sheet for visual review
-  finalize.py --kind K --inset 0.88 RAW OUT.jpg  shrink the design into a frame
-      filled with a blurred, enlarged copy of itself — a fallback when edge text
-      breaks the margin rule and a re-generation did not fix it.
+
+The final image always fills the whole frame. Shrinking a design inside a blurred
+copy of itself (the old --inset fallback) is forbidden by the user (2026-10-20):
+it made POST-012 and POST-013 look unfitted, blurred at the edges.
 
 Post: center-crop to 4:5, resize to 1080x1350. Story: 9:16, 1080x1920; also
 writes OUT.safezone.jpg with the top/bottom safe margins drawn, for review only.
@@ -37,16 +38,14 @@ def crop_to_ratio(im, w, h):
 
 
 def finalize(kind, raw, out, inset=None):
+    if inset:
+        sys.exit("--inset is forbidden: the final image must fill the frame. Fix margins by "
+                 "regenerating (RUNBOOK §1.7 step 3).")
     spec = IMG[kind]
     w, h = spec["final"]
     src = Image.open(raw)
     src_size = src.size
     im = crop_to_ratio(src.convert("RGB"), w, h).resize((w, h), Image.LANCZOS)
-    if inset:
-        bg = im.resize((w, h)).filter(ImageFilter.GaussianBlur(40))
-        small = im.resize((round(w * inset), round(h * inset)), Image.LANCZOS)
-        bg.paste(small, ((w - small.width) // 2, (h - small.height) // 2))
-        im = bg
     out = Path(out)
     out.parent.mkdir(parents=True, exist_ok=True)
     im.save(out, "JPEG", quality=IMG["jpeg_quality"], optimize=True, progressive=False)
