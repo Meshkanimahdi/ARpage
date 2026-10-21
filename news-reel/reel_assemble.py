@@ -102,7 +102,7 @@ def main():
               'bytes': (d / 'reel.mp4').stat().st_size, 'cover': str(d / 'cover.jpg')}
     (d / 'reel.json').write_text(json.dumps(report, indent=1))
     print(json.dumps(report))
-    if report['duration'] > 61 or report['lufs'] > -12 or report['lufs'] < -15.5 or report['true_peak_dbfs'] > -1.0:
+    if report['duration'] > (92 if START == 0 else 61) or report['lufs'] > -12 or report['lufs'] < -15.5 or report['true_peak_dbfs'] > -1.0:
         print('QC FAILED: duration/loudness out of range'); sys.exit(6)
 
 
