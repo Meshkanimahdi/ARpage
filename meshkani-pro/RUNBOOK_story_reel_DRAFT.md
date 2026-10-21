@@ -3,7 +3,7 @@
 ## 4. REEL_PREPARE phase (main 21:45, retry 23:15 Tehran) — daily story reel
 
 Goal: by the next morning, slot file `slot_<D+1>_0900.json` (`"kind": "reel"`) with status `READY`, a
-QA-passed 60–70 s story reel MP4 + cover in Drive and a `Ready` row in the `Reels` tab.
+QA-passed 60–90 s story reel MP4 + cover in Drive and a `Ready` row in the `Reels` tab.
 Format (user decision 2026-10-21): **one idea per reel** in the style of the reference reel, the
 on-screen text is the narration word by word — read `news-reel/STORY_SPEC.md` fully. (The two-news
 reel in REEL_SPEC.md is retired.)
@@ -34,14 +34,14 @@ reel in REEL_SPEC.md is retired.)
    no per-element image calls). `python3 news-reel/sprite_sheet.py --dir work/story`; Read the sheet
    previews; regenerate a sheet at most twice. Real products: refs per §1.5.1. Real people: real photos
    (Wikimedia Commons first, `fetch_to_drive` + download), credited.
-3. `node news-reel/story_voice.mjs --dir=work/story` (exit 3 → shorten). 60–70 s.
+3. `node news-reel/story_voice.mjs --dir=work/story` (exit 3 → shorten). 60–90 s.
 
 ### 4.4 Render and QC
 1. `node news-reel/reel_render.mjs --dir=work/story --page=story.html --mode=check`; Read every
    `out/sheet*.jpg`. Fix ISSUES (word mismatch), text overflow, wrong/ugly cut-outs, a visual that does
    not match its sentence, distorted people/products. Max 3 rounds.
 2. `--mode=video` in the background (~15 min), then `python3 news-reel/reel_assemble.py --dir work/story`:
-   `reel.json` must show 55–72 s, −15.5…−12 LUFS, true peak ≤ −1 dBFS; H.264 1080×1920 30 fps + AAC.
+   `reel.json` must show 55–92 s, −15.5…−12 LUFS, true peak ≤ −1 dBFS; H.264 1080×1920 30 fps + AAC.
 3. Extract frames at 1 s, the middle and the end card and Read them; Read `cover.jpg`.
 
 ### 4.5 Storage, caption, sheet

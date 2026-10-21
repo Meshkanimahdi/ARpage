@@ -1,12 +1,11 @@
 // Narration for a story reel with word timings (the on-screen text follows the voice word by word).
-//   node news-reel/story_voice.mjs --dir=work/story [--target=66]
+//   node news-reel/story_voice.mjs --dir=work/story [--tempo=1.2]
 // Reads <dir>/story.json (voice + beats[].text; the spoken text is the beat text without the * and |
-// markup), calls ElevenLabs TTS "with-timestamps" once per beat, trims, fits the tempo so the reel lands
-// at ~60–70 s, and writes <dir>/timeline.json {lines:{id:{start,end,words:[[t0,t1]..]}}, end_start, total, start:0}
+// markup), calls ElevenLabs TTS "with-timestamps" once per beat, trims, applies the fixed brisk tempo (reel 60–90 s), and writes <dir>/timeline.json {lines:{id:{start,end,words:[[t0,t1]..]}}, end_start, total, start:0}
 // plus <dir>/voice/trim/<id>.wav. Key: env Elevenlabs_API_KEY (audio only, never printed).
 import fs from 'node:fs'; import path from 'node:path'; import crypto from 'node:crypto'; import {execFileSync} from 'node:child_process';
 const args = Object.fromEntries(process.argv.slice(2).map(a => a.replace(/^--/, '').split('=')));
-const dir = path.resolve(args.dir), TARGET = +(args.target || 66), MAXTEMPO = 1.2;
+const dir = path.resolve(args.dir), TEMPO = +(args.tempo || 1.2);   // the brisk pace the user approved (2026-10-21); length may run up to 90 s
 const key = process.env.Elevenlabs_API_KEY || process.env.ELEVENLABS_API_KEY;
 if (!key) { console.error('no ElevenLabs key in env'); process.exit(2); }
 const S = JSON.parse(fs.readFileSync(path.join(dir, 'story.json'), 'utf8'));
@@ -47,7 +46,7 @@ for (const b of S.beats) {
 }
 const GAP = .16, FIRST = .3, ENDCARD = 2.4;
 const speech = items.reduce((s, x) => s + x.d + x.pause, 0) + GAP * (items.length - 1);
-let tempo = Math.max(1, Math.min(MAXTEMPO, (FIRST + speech + .5 + ENDCARD) / TARGET));
+const tempo = TEMPO;
 const lines = {}; let t = FIRST;
 for (const [i, x] of items.entries()) {
   if (i) t += GAP + x.pause;
@@ -58,4 +57,4 @@ for (const [i, x] of items.entries()) {
 const end_start = +(t + .5).toFixed(3), total = +(end_start + ENDCARD).toFixed(3);
 fs.writeFileSync(path.join(dir, 'timeline.json'), JSON.stringify({start: 0, lines, end_start, total, endcard: [end_start, total], tempo: +tempo.toFixed(3), voice: S.voice}, null, 1));
 console.log(`timeline: ${total}s (speech ${speech.toFixed(1)}s, tempo ${tempo.toFixed(3)}, ${items.length} beats)`);
-if (total > 75) { console.error('too long: shorten the script (target 60–70 s)'); process.exit(3); }
+if (total > 92) { console.error("too long: shorten the script (max 90 s)"); process.exit(3); }

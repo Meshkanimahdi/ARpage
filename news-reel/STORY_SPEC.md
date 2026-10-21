@@ -1,7 +1,7 @@
 # Daily story reel — format (user decision, 2026-10-21)
 
 Reference the user chose: @mgh.mobin reel «انسان‌ها، گاوهای آینده‌ان؟» (Harari + Musk, 69 s).
-One reel a day at 09:00 Tehran: **one idea**, told as a short story, 60–70 s, one narrator,
+One reel a day at 09:00 Tehran: **one idea**, told as a short story, 60–90 s, one narrator,
 **the on-screen text is exactly the narration, word by word**, in the reference's look. This replaces
 the two-news reel (REEL_SPEC.md is legacy). The neon / particles / 3D rule does not apply to these reels.
 
@@ -15,13 +15,13 @@ the two-news reel (REEL_SPEC.md is legacy). The neon / particles / 3D rule does 
 - Not a repeat of the last 14 reels (Reels tab), and not the same field two reels in a row.
 
 ## Script (story.json → beats)
-- 18–26 beats, one short spoken sentence each (≈2–4 s). The beat `text` is spoken exactly as written:
+- 18–34 beats, one short spoken sentence each (≈2–4 s). The beat `text` is spoken exactly as written:
   `*word*` or `*several words*` = big orange keyword (1–2 per beat), `|` = line break (not spoken).
 - Arc: provocative hook (claim or metaphor) → who said it (name, credential) → the explanation with a
   concrete everyday image → "why?" turn → evidence/second voice → the takeaway → one question to the
   viewer → «جوابتو تو کامنت بنویس». Conversational Persian written for the ear; Latin names written as
   they are said (هینتون، اسپیس‌ایکس).
-- `story_voice.mjs` fits the tempo (≤1.2) to land at 60–70 s; above 75 s it fails → shorten.
+- `story_voice.mjs` keeps the same brisk pace every time (tempo 1.2); above 92 s it fails → shorten.
 
 ## Look (story.html)
 - Two backgrounds that alternate: `paper` (warm off-white, big grey arc, small barcode) and `dark`
