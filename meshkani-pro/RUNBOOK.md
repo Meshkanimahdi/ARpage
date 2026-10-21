@@ -315,22 +315,34 @@ prompt in the slot JSON and the sheet):
 > طراحی خبرهای اخیر فاصله داشته باشد.
 >
 > متن دقیق فارسی زیر را با حروف درست، اتصال صحیح و خوانایی بالا در طراحی ادغام کن:
-> «`[تیتر دقیق]`» و «`[متن کوتاه دقیق]`». `[پست: پایین تصویر کوچک «@meshkani.pro» و «[n] از ۳»]`
+> «`[تیتر دقیق]`» و «`[متن کوتاه دقیق]`». هیچ امضا، آدرس صفحه، شماره یا برچسبی در تصویر ننویس.
 > تیتر، تصویر و متن بخشی از یک صفحه‌آرایی واحد و متناسب با موضوع باشند. متن دیگری نساز.
 > اعداد، نام محصول و ادعا را تغییر نده. ترکیب‌بندی این تصویر با دو تصویر دیگر متفاوت باشد.
 >
-> `[پست: نسبت ۴:۵؛ همهٔ متن‌ها، حتی برچسب‌ها و امضای پایین، دست‌کم ۸٪ از هر چهار لبه فاصله داشته باشند.]`
-> `[استوری: نسبت ۹:۱۶؛ هیچ متنی در ۱۲٪ بالای تصویر نباشد. پایین‌ترین عنصر تصویر فقط «@meshkani.pro» است، کوچک و دقیقاً وسط‌چین، درست بالای ۱۵٪ پایینی تصویر؛ هیچ متن دیگری پایین‌تر از آن نیاید. شماره‌گذاری (مثل «۱ از ۳») و برچسب «تصویر مفهومی» در استوری نیاید.]`
+> `[پست: نسبت ۴:۵؛ تصویر تا لبه‌ها پر باشد؛ تیتر و متن فقط در ستون وسط (حدود ۱۲٪ تا ۸۸٪ عرض) و دست‌کم ۱۰٪ از بالا؛ ۱۸٪ پایین تصویر کاملاً بدون متن بماند (فقط ادامهٔ تصویر).]`
+> `[استوری: نسبت ۹:۱۶؛ تصویر تا لبه‌ها پر باشد؛ هیچ متنی در ۱۳٪ بالا نباشد؛ تیتر و متن در ستون وسط (۱۲٪ تا ۸۸٪ عرض) و بالاتر از ۷۷٪ ارتفاع تمام شوند؛ ۲۳٪ پایین تصویر کاملاً بدون متن بماند. هیچ آدرس صفحه، شماره یا برچسبی ننویس.]`
 > از شبیه‌سازی دکمه یا استیکر تعاملی، نشان دادن صحنهٔ تولیدی به‌عنوان عکس واقعی و عناصر
-> نامربوط به خبر خودداری کن. `[فقط برای پست، اگر مفهومی است: برچسب کوچک و خوانای «تصویر مفهومی» را
-> در طراحی در نظر بگیر.]`
+> نامربوط به خبر خودداری کن.
 
 Story layout rule (user, 2026-10-20): stories carry **no** sequence number and
 **no** «تصویر مفهومی» label; the only footer is `@meshkani.pro`, small, exactly
 centred, the lowest element of the image, sitting just above the 280 px bottom
 safe line. QA checks this.
 
-**Footer lesson (2026-10-21, POST-015/016):** the image model ignores coordinate instructions for the small footer row, so slides repeatedly failed the 8% margin QA. For **posts**: generate the slide *without* any footer row (prompt: nothing in the bottom 18%, no handle/number/label; text column x 130–950 of 1080), then add the footer in code: `node meshkani-pro/scripts/footer_overlay.mjs <slide.jpg> <out.jpg> <n> pill '#<ink-hex>'` (run after `bash news-reel/setup.sh`; places `@meshkani.pro`, `n از ۳` and `تصویر مفهومی` as light pills at x 100–980, bottom edge y=1200). For **stories**: put explicit coordinates in the prompt (no text above y=240; footer centre y=1550; nothing below y=1600; text block between y=1050 and y=1480) and generate two variants per image, then pick the passing one. Measure with PIL/guide lines (8% = 86 px sides, 108 px bottom; story safe lines y=230 and y=1640) before QA.
+**Footers are always added in code, never by the image model** (user rule 2026-10-21 — the model
+ignores coordinates for small footer text; POST-015 cost $2.20 / 42 images and POST-016 doubled its
+stories because of this). After `finalize.py`, run `bash news-reel/setup.sh` once, then:
+- posts: `node meshkani-pro/scripts/footer_overlay.mjs work/final/POST-NNN-slide-n.jpg work/final/POST-NNN-slide-n.jpg <n> pill '#<ink-hex>'`
+  → `@meshkani.pro`, `n از ۳` and `تصویر مفهومی` (concept images) inside the 8% margins;
+- stories: `node meshkani-pro/scripts/footer_overlay.mjs work/final/POST-NNN-STORY-k.jpg work/final/POST-NNN-STORY-k.jpg story <light|dark|pill> '#<ink-hex>'`
+  → only `@meshkani.pro`, centred, bottom edge 12 px above the 280 px safe line (pick `light` text on
+  dark images, `dark`/`pill` on light ones).
+Then QA (§1.7). The image itself stays full-bleed.
+
+**Image budget per bundle (user rule 2026-10-21):** exactly **one generation per image** (no
+variants, no "generate two and pick"). Target ≤ **$0.45** per bundle (6 images + at most 3 fixes);
+hard cap **$0.80** — when the next call would pass it, stop: status `FAILED`, log why, nothing is
+published. Track `cost_usd` per image and the running total in the slot JSON.
 
 Generate (the six can run in parallel as background jobs):
 
@@ -364,13 +376,18 @@ JSON.
    write the approved text (title + body) and the OCR text to files and run
    `python3 meshkani-pro/scripts/text_compare.py approved.txt ocr.txt`. OCR is a
    signal; the visual review decides.
-3. Fix loop (max 2 attempts per image): regenerate with `--ref` the failing raw image plus a
-   precise correction prompt ("keep everything, only fix the word X to Y"; for margins: "keep the
-   design and the full-bleed image, move every text block inward so it is at least 8% from each
-   edge / outside the story unsafe zone, make the text slightly smaller if needed"), or regenerate
-   from the prompt. Replace the Drive file content with `open_update(file_id, "image/jpeg")` so ids
-   stay stable. Still failing → status `FAILED`, log which image and why, stop (do not publish a
-   partial set).
+3. Fix loop — cheapest fix first:
+   - Footer, handle, number or label problems are never a reason to regenerate: re-run
+     `footer_overlay.mjs` on the finalized image.
+   - Only wrong/misspelled Persian text, broken joining, a wrong product look (§1.5.1) or text inside
+     the unsafe zone justifies a new image: one `--ref` edit of the failing raw image with a precise
+     correction prompt ("keep everything, only fix the word X to Y" / "keep the design and the
+     full-bleed image, move the text block up so the bottom 18% has no text"). Max **1 fix per image**,
+     a second only for a Persian-text error. Respect the bundle budget above.
+   - Replace the Drive file content with `open_update(file_id, "image/jpeg")` so ids stay stable.
+     Still failing → status `FAILED`, log which image and why, stop (do not publish a partial set).
+   - A RETRY run that takes over a slot reuses every image that already passed QA (package folder /
+     slot JSON) and regenerates only the failing ones — never a whole new set.
    **Never shrink the design into a frame, never add blurred/mirrored borders, never pad**
    (user rule, 2026-10-20 — the old `--inset 0.88` fallback made POST-012 and POST-013 slides and
    stories look unfitted with blurred edges; `finalize.py` now refuses `--inset`). Every final image
