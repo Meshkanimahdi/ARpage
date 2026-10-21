@@ -330,6 +330,8 @@ Story layout rule (user, 2026-10-20): stories carry **no** sequence number and
 centred, the lowest element of the image, sitting just above the 280 px bottom
 safe line. QA checks this.
 
+**Footer lesson (2026-10-21, POST-015/016):** the image model ignores coordinate instructions for the small footer row, so slides repeatedly failed the 8% margin QA. For **posts**: generate the slide *without* any footer row (prompt: nothing in the bottom 18%, no handle/number/label; text column x 130–950 of 1080), then add the footer in code: `node meshkani-pro/scripts/footer_overlay.mjs <slide.jpg> <out.jpg> <n> pill '#<ink-hex>'` (run after `bash news-reel/setup.sh`; places `@meshkani.pro`, `n از ۳` and `تصویر مفهومی` as light pills at x 100–980, bottom edge y=1200). For **stories**: put explicit coordinates in the prompt (no text above y=240; footer centre y=1550; nothing below y=1600; text block between y=1050 and y=1480) and generate two variants per image, then pick the passing one. Measure with PIL/guide lines (8% = 86 px sides, 108 px bottom; story safe lines y=230 and y=1640) before QA.
+
 Generate (the six can run in parallel as background jobs):
 
 ```
