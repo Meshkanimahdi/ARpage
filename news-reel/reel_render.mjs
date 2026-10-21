@@ -15,7 +15,7 @@ const server = http.createServer((q, r) => { const f = path.join(repo, decodeURI
 const browser = await chromium.launch({executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
 const page = await browser.newPage({viewport: {width: 1080, height: 1920}});
 const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('response', r => r.status() >= 400 && !r.url().endsWith('favicon.ico') && errors.push(`HTTP ${r.status()} ${r.url()}`));
-await page.goto(`http://127.0.0.1:${server.address().port}/news-reel/reel.html?dir=${encodeURIComponent(rel)}`);
+await page.goto(`http://127.0.0.1:${server.address().port}/news-reel/${args.page || 'reel.html'}?dir=${encodeURIComponent(rel)}`);
 try { await page.evaluate(() => window.ready); } catch (e) { errors.push(String(e.message || e)); }
 const issues = await page.evaluate(() => window.ISSUES || ['page did not finish loading']);
 if (errors.length || issues.length) console.log('ISSUES:\n  ' + [...errors, ...issues].join('\n  '));

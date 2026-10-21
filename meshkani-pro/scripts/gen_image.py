@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate (or edit) one image through the OpenRouter Images API.
 
-  gen_image.py --kind post|story --prompt-file P --out raw.png [--ref prev.png] [--model M]
+  gen_image.py --kind post|story|object --prompt-file P --out raw.png [--ref prev.png] [--model M]
 
 Writes the raw model image to --out and a sidecar <out>.json with the model,
 parameters, prompt hash, usage and reported cost. Reads OPENROUTER_API_KEY from
@@ -45,7 +45,7 @@ def data_url(path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--kind", choices=["post", "story"], required=True)
+    ap.add_argument("--kind", choices=["post", "story", "object", "sheet"], required=True)
     ap.add_argument("--prompt-file", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--ref", action="append", default=[], help="reference/edit-source image")
@@ -61,6 +61,8 @@ def main():
     spec = IMG[args.kind]
     base = {"model": args.model, "prompt": prompt, "n": 1, "quality": args.quality,
             "output_format": "png"}
+    if spec.get("background"):          # reel cut-outs: transparent PNG
+        base["background"] = spec["background"]
     if args.ref:
         base["input_references"] = [
             {"type": "image_url", "image_url": {"url": data_url(Path(p))}} for p in args.ref]

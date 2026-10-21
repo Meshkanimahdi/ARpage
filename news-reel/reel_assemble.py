@@ -49,11 +49,15 @@ def music(d, spec, length):
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--dir', required=True); a = ap.parse_args()
     d = Path(a.dir).resolve(); out = d / 'out'
-    spec = json.loads((d / 'spec.json').read_text()); tl = json.loads((d / 'timeline.json').read_text())
+    spec = json.loads(((d / 'spec.json') if (d / 'spec.json').exists() else (d / 'story.json')).read_text())
+    tl = json.loads((d / 'timeline.json').read_text())
     scenes = json.loads((out / 'scenes.json').read_text())
     END = tl['endcard'][1]
+    START = tl.get('start', 4.2)     # 0 = story reel: no logo intro (the logo closes it on the end card)
+    if START == 0:
+        run('ffmpeg', '-y', '-loglevel', 'error', '-i', str(out / 'news.mp4'), '-c:v', 'copy', str(out / 'video.mp4'))
     # video: logo intro (first START+0.3 s) cross-faded into the reel
-    run('ffmpeg', '-y', '-loglevel', 'error', '-i', str(LOGO), '-i', str(out / 'news.mp4'), '-filter_complex',
+    else: run('ffmpeg', '-y', '-loglevel', 'error', '-i', str(LOGO), '-i', str(out / 'news.mp4'), '-filter_complex',
         f"[0:v]fps=30,trim=0:{START + 0.3},setpts=PTS-STARTPTS[a];[1:v]fps=30,setpts=PTS-STARTPTS[b];"
         f"[a][b]xfade=transition=fade:duration=0.3:offset={START}[v]",
         '-map', '[v]', '-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-pix_fmt', 'yuv420p', str(out / 'video.mp4'))
@@ -64,14 +68,19 @@ def main():
         i = len(ins) // 2; ins.extend(['-i', str(path)]); ms = max(0, int(at * 1000))
         f.append(f"[{i}:a]aformat=sample_rates=48000:channel_layouts=stereo,{extra}volume={vol},adelay={ms}|{ms}[s{i}]")
         return f"[s{i}]"
-    fx.append(add(LOGO, 0, 1.0, f"atrim=0:{START + 0.5},afade=t=out:st={START - 0.2}:d=0.7,"))
-    for k, (s, e) in tl['lines'].items():
-        voice.append(add(d / 'voice/trim' / f'{k}.wav', s, 1.0))
+    if START:
+        fx.append(add(LOGO, 0, 1.0, f"atrim=0:{START + 0.5},afade=t=out:st={START - 0.2}:d=0.7,"))
+    for k, v in tl['lines'].items():
+        voice.append(add(d / 'voice/trim' / f'{k}.wav', v['start'] if isinstance(v, dict) else v[0], 1.0))
     m = music(d, spec, END)
-    mus = add(m, START - 0.3, 0.30, f"aloop=loop=-1:size=2147483647,atrim=0:{END - START + 0.6},afade=t=in:d=0.6,afade=t=out:st={END - START - 0.9}:d=1.2,")
+    mus = add(m, max(0, START - 0.3), 0.30 if START else 0.22, f"aloop=loop=-1:size=2147483647,atrim=0:{END - START + 0.6},afade=t=in:d=0.6,afade=t=out:st={END - START - 0.9}:d=1.2,")
+    prev_bg = None
     for s in scenes:
-        fx.append(add(SFX / 'whoosh.mp3', s['t0'] - 0.15, 0.45))
-        if s['type'] in ('grid', 'steps', 'points'):
+        if START == 0:   # story reel: many quick cuts -> soft swish, stronger on a background change
+            fx.append(add(SFX / 'whoosh.mp3', s['t0'] - 0.12, 0.4 if s.get('bg') != prev_bg else 0.14)); prev_bg = s.get('bg')
+        else:
+            fx.append(add(SFX / 'whoosh.mp3', s['t0'] - 0.15, 0.45))
+        if s['type'] in ('grid', 'steps', 'points', 'icon_grid', 'network', 'counter'):
             fx.append(add(SFX / 'tick.mp3', s['t0'] + 0.7, 0.35))
         if s['type'] == 'divider':
             fx.append(add(SFX / 'riser.mp3', s['t0'] - 1.4, 0.35))

@@ -77,7 +77,25 @@
       "safe_bottom_px": 280
     },
     "max_fix_attempts": 2,
-    "jpeg_quality": 92
+    "jpeg_quality": 92,
+    "object": {
+      "request_size": "1024x1024",
+      "fallback_aspect_ratio": "1:1",
+      "final": [
+        1024,
+        1024
+      ],
+      "background": "transparent"
+    },
+    "sheet": {
+      "request_size": "1536x1536",
+      "fallback_aspect_ratio": "1:1",
+      "final": [
+        1536,
+        1536
+      ],
+      "background": "transparent"
+    }
   },
   "sectors": [
     "medicine and health",

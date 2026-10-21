@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro story reel</title>
+<style>
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-700-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: Inter; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-800-normal.woff2); }
+  :root { --o: #FF6A13; --paper: #EDEAE4; --ink: #17171A; --dark: #121214; --mute: #8C8A86; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--dark); }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Vaz, sans-serif; }
+  .bg { position: absolute; inset: 0; opacity: 0; }
+  #paper { background: radial-gradient(1200px 1400px at 50% 45%, #F4F2EE, #E6E2DB 75%, #DAD5CD); }
+  #dark { background: radial-gradient(900px 1100px at 50% 52%, #2A1A12 0%, #17151A 45%, #0E0E10 80%); }
+  #arc { position: absolute; width: 1500px; height: 1500px; left: -600px; top: 260px; border-radius: 50%; border: 70px solid rgba(120,118,114,.16); box-sizing: border-box; }
+  #floor { position: absolute; left: -540px; right: -540px; bottom: 0; height: 900px; transform-origin: 50% 100%; transform: perspective(700px) rotateX(64deg);
+    background-image: linear-gradient(rgba(255,255,255,.07) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,.07) 2px, transparent 2px); background-size: 120px 120px; }
+  #code { position: absolute; left: 70px; top: 120px; opacity: .55; }
+  .beat { position: absolute; inset: 0; display: none; }
+  .txt { position: absolute; left: 70px; right: 70px; top: 150px; display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; column-gap: 18px; row-gap: 0; direction: rtl; text-align: center; }
+  .w { display: inline-block; font-weight: 700; font-size: 58px; line-height: 1.35; white-space: nowrap; will-change: transform, filter, opacity; }
+  .w.k { font-weight: 900; font-size: 132px; line-height: 1.15; color: var(--o); }
+  .w.b { font-weight: 900; }
+  .w.br { flex-basis: 100%; height: 0; }
+  .paper .w { color: var(--ink); } .paper .w.k { color: var(--o); }
+  .dark .w { color: #F3F1EE; } .dark .w.k { color: var(--o); text-shadow: 0 0 26px rgba(255,106,19,.55), 0 0 60px rgba(255,106,19,.25); }
+  .huge .w.k { font-size: 300px; }
+  .vis { position: absolute; left: 0; right: 0; top: 560px; height: 1050px; }
+  .abs { position: absolute; will-change: transform, opacity, filter; }
+  .obj { filter: drop-shadow(0 40px 50px rgba(0,0,0,.28)); }
+  .dark .obj { filter: drop-shadow(0 40px 60px rgba(0,0,0,.6)) drop-shadow(0 0 40px rgba(255,106,19,.12)); }
+  .stamp { padding: 10px 34px; border: 8px solid var(--o); border-radius: 16px; color: var(--o); font-weight: 900; font-size: 76px; white-space: nowrap; background: rgba(18,18,20,.55); }
+  .mark { font-weight: 900; font-size: 110px; color: var(--o); }
+  .card { border-radius: 34px; box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+  .card.d { background: #1C1C20; border: 2px solid rgba(255,255,255,.06); }
+  .card.l { background: #F7F5F1; border: 2px solid rgba(0,0,0,.05); }
+  .person { filter: grayscale(1) contrast(1.08); }
+  .cap { font-weight: 700; font-size: 34px; color: var(--mute); text-align: center; }
+  .ico { width: 170px; height: 170px; border-radius: 30px; display: grid; place-items: center; }
+  .ico svg { width: 84px; height: 84px; }
+  #end { position: absolute; inset: 0; display: none; background: var(--dark); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="bg" id="paper"><div id="arc"></div></div>
+  <div class="bg" id="dark"><div id="floor"></div></div>
+  <svg id="code" width="150" height="44"></svg>
+  <div id="beats"></div>
+  <div id="end"></div>
+</div>
+<script>
+// Story reel in the reference style (paper / dark, one orange accent, word-by-word kinetic type
+// that follows the narration, real-object cut-outs). Data: <dir>/story.json + <dir>/timeline.json
+// (story_voice.mjs writes word times). window.seek(t) renders absolute time t.
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const url = s => s.startsWith('/') ? s : DIR + s;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const lerp = (a, b, k) => a + (b - a) * k;
+const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+function h(tag, cls, style, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (style) e.style.cssText = style; if (html !== undefined) e.innerHTML = html; return e; }
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
+const tf = (e, s) => { e.style.transform = s; };
+const ISSUES = [];
+// appear: blur-to-sharp rise (the reference's focus-pull entrance)
+function appear(e, t, a, d = .35, dy = 26, s0 = .96) { const k = P(t, a, a + d); e.style.opacity = clamp(k * 1.4); e.style.filter = k < 1 ? `blur(${(1 - eo(k)) * 16}px)` : ''; return {y: (1 - eo(k)) * dy, s: lerp(s0, 1, eo(k))}; }
+
+// tiny line icons for icon_grid / network
+const ICON = {
+  bank: '<path d="M8 30h48M12 26h40L32 12 12 26zm4 4v16m10-16v16m12-16v16m10-16v16M8 50h48" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>',
+  doc: '<path d="M18 8h20l10 10v38H18zM38 8v10h10M24 30h18M24 38h18M24 46h12" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>',
+  card: '<rect x="8" y="16" width="48" height="32" rx="5" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M8 26h48M16 40h12" stroke="currentColor" stroke-width="3.5"/>',
+  dollar: '<circle cx="32" cy="32" r="22" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M39 24c-2-3-5-4-8-4-4 0-7 2-7 5 0 8 16 4 16 12 0 3-3 6-8 6-4 0-7-2-9-5M32 16v4m0 24v4" fill="none" stroke="currentColor" stroke-width="3.5"/>',
+  building: '<path d="M16 56V10h32v46M10 56h44M24 18h6m6 0h6M24 28h6m6 0h6M24 38h6m6 0h6M28 56v-8h8v8" fill="none" stroke="currentColor" stroke-width="3.5"/>',
+  user: '<circle cx="32" cy="22" r="10" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M12 54c2-12 10-18 20-18s18 6 20 18" fill="none" stroke="currentColor" stroke-width="3.5"/>',
+  chart: '<path d="M10 54h44M16 46V34m10 12V24m10 22V30m10 16V16" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>',
+  chip: '<rect x="18" y="18" width="28" height="28" rx="4" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M24 10v8m8-8v8m8-8v8M24 46v8m8-8v8m8-8v8M10 24h8m-8 8h8m-8 8h8M46 24h8m-8 8h8m-8 8h8" stroke="currentColor" stroke-width="3.5"/>',
+  heart: '<path d="M32 54S10 40 10 24a11 11 0 0 1 22-3 11 11 0 0 1 22 3c0 16-22 30-22 30z" fill="none" stroke="currentColor" stroke-width="3.5"/>',
+  car: '<path d="M10 40l5-14h34l5 14v10H10zM10 40h44M18 50v4m28-4v4" fill="none" stroke="currentColor" stroke-width="3.5"/><circle cx="20" cy="44" r="3" fill="currentColor"/><circle cx="44" cy="44" r="3" fill="currentColor"/>',
+  book: '<path d="M10 14h18c3 0 4 2 4 4v36c0-2-1-4-4-4H10zM54 14H36c-3 0-4 2-4 4v36c0-2 1-4 4-4h18z" fill="none" stroke="currentColor" stroke-width="3.5"/>',
+};
+const svg = k => `<svg viewBox="0 0 64 64">${ICON[k] || ICON.doc}</svg>`;
+
+// ---------------- visuals: each returns {el, anim(t,a,b)} ----------------
+const V = {};
+const img = (src, w, cls = 'obj', style = '') => { const e = h('img', 'abs ' + cls, `width:${w}px;${style}`); e.src = url(src); return e; };
+V.object = s => {   // one or more cut-outs; optional stamp and floating marks
+  const el = h('div', 'vis'), items = (s.objects || [s]).map((o, i) => {
+    const w = o.w || 640, e = img(o.el.includes('/') ? o.el : 'el/' + o.el + '.png', w);
+    e.style.left = `${(o.x ?? 540) - w / 2}px`; e.style.top = `${o.y ?? 60}px`; el.append(e); return {e, o, i}; });
+  const st = s.stamp ? h('div', 'abs stamp', `left:50%; top:${s.stamp_y || 420}px`, esc(s.stamp)) : null; if (st) el.append(st);
+  const marks = (s.marks ? [[170, 120, -14], [880, 260, 12], [820, 40, 6]] : []).map(([x, y, r]) => { const m = h('div', 'abs mark', `left:${x}px; top:${y}px`, '؟'); el.append(m); return {m, r}; });
+  return {el, anim(t, a, b) {
+    for (const {e, o, i} of items) { const at = a + (o.at || 0) + i * .18, k = P(t, at, at + .5), sp = P(t, a, b);
+      const mv = o.anim === 'slide' ? `translateX(${(1 - eo(k)) * (o.from === 'left' ? -500 : 500)}px)` : `translateY(${(1 - eo(k)) * 60}px)`;
+      tf(e, `${mv} scale(${lerp(o.anim === 'pop' ? .6 : .9, 1, o.anim === 'pop' ? back(k) : eo(k)) * (1 + .05 * sp)}) rotate(${(o.r || 0) + Math.sin(t * 1.3 + i) * (o.float ? 2 : .4)}deg)`);
+      e.style.opacity = clamp(k * 2); }
+    if (st) { const k = P(t, a + (s.stamp_at || 1), a + (s.stamp_at || 1) + .25); tf(st, `translateX(50%) rotate(-9deg) scale(${lerp(2.4, 1, eo(k))})`); st.style.opacity = k; }
+    marks.forEach(({m, r}, i) => { const k = P(t, a + .5 + i * .2, a + .9 + i * .2); tf(m, `translateY(${Math.sin(t * 2 + i) * 14}px) rotate(${r}deg) scale(${back(k)})`); m.style.opacity = k; });
+  }};
+};
+V.person = s => {   // real photo (black & white) with name and role
+  const el = h('div', 'vis'), w = s.w || 560, e = img(s.src, w, 'person card', `left:${540 - w / 2}px; top:${s.y ?? 80}px; border-radius:${s.round ? '50%' : '28px'}; ${s.h ? `height:${s.h}px; object-fit:cover;` : ''}`);
+  const cap = h('div', 'abs cap', `left:0; right:0; top:${(s.y ?? 80) + (s.h || w * 1.1) + 36}px`, `<span style="color:var(--o)">${esc(s.name || '')}</span>${s.role ? ' · ' + esc(s.role) : ''}`);
+  el.append(e, cap);
+  return {el, anim(t, a, b) { const k = P(t, a, a + .55); tf(e, `translateY(${(1 - eo(k)) * 80}px) scale(${lerp(.92, 1, eo(k)) * (1 + .04 * P(t, a, b))})`); e.style.opacity = clamp(k * 2); cap.style.opacity = P(t, a + .4, a + .8); }};
+};
+V.quote = s => {    // dark quote card: «  » + big words + source line
+  const ltr = /^[\s"'“”«»(]*[A-Za-z]/.test(s.quote || ''), el = h('div', 'vis'), c = h('div', 'abs card d', `left:110px; right:110px; top:220px; padding:56px 60px 46px; direction:${ltr ? 'ltr' : 'rtl'}; text-align:${ltr ? 'left' : 'right'}`);
+  c.innerHTML = `<div style="font-family:Inter;font-weight:800;font-size:92px;line-height:.6;color:var(--o)">${ltr ? '“' : '«'}</div><div class="qt" style="font-weight:900;font-size:${ltr ? 66 : 76}px;line-height:1.3;color:#F3F1EE;${ltr ? 'font-family:Inter' : ''};margin-top:24px">${esc(s.quote).replace(/\*([^*]+)\*/g, '<span style="color:var(--o)">$1</span>')}</div><div style="font-family:Inter;font-weight:800;font-size:24px;color:#77757A;margin-top:30px;direction:ltr;text-align:left">${esc(s.source || '')}</div>`;
+  el.append(c); if (s.photo) { const p = img(s.photo, 300, 'person card', 'left:390px; top:-120px; border-radius:50%; height:300px; object-fit:cover'); el.append(p); }
+  return {el, anim(t, a) { const k = P(t, a, a + .5); tf(c, `translateY(${(1 - eo(k)) * 120}px) scale(${lerp(.94, 1, eo(k))})`); c.style.opacity = clamp(k * 2); }};
+};
+V.icon_grid = s => {   // 4x4 icons that turn orange one by one + label + percent
+  const el = h('div', 'vis'), n = 16, keys = s.icons || ['bank', 'building', 'doc', 'card', 'dollar'], cells = [];
+  for (let i = 0; i < n; i++) { const c = h('div', 'abs ico', `left:${145 + (i % 4) * 205}px; top:${(i / 4 | 0) * 205}px; background:#fff; color:#1b1b1b; box-shadow:0 10px 30px rgba(0,0,0,.08)`, svg(keys[i % keys.length])); el.append(c); cells.push(c); }
+  const lab = h('div', 'abs', 'left:145px; right:145px; top:850px; display:flex; justify-content:space-between; font-weight:700; font-size:30px; color:#555', `<span>${esc(s.label || '')}</span><span class="pc" style="font-family:Inter;color:var(--o)"></span>`);
+  const bar = h('div', 'abs', 'left:145px; right:145px; top:900px; height:6px; background:rgba(0,0,0,.1); border-radius:3px'), fill = h('i', '', 'position:absolute; right:0; top:0; bottom:0; background:var(--o); border-radius:3px'); bar.append(fill);
+  el.append(lab, bar); const order = [3, 9, 0, 14, 6, 12, 1, 10, 5, 15, 7, 2, 13, 4, 11, 8], target = s.fill ?? 10;
+  return {el, anim(t, a, b) { const pr = P(t, a + .5, b - .3);
+    cells.forEach((c, i) => { const k = P(t, a + i * .03, a + .3 + i * .03); c.style.opacity = k; tf(c, `scale(${lerp(.7, 1, back(k))})`); });
+    order.slice(0, Math.round(pr * target)).forEach(i => { cells[i].style.background = 'var(--o)'; cells[i].style.color = '#fff'; });
+    order.slice(Math.round(pr * target)).forEach(i => { cells[i].style.background = '#fff'; cells[i].style.color = '#1b1b1b'; });
+    lab.querySelector('.pc').textContent = fa(Math.round(pr * target / 16 * 100)) + '٪'; fill.style.width = `${pr * target / 16 * 100}%`; }};
+};
+V.network = s => {     // centre node + satellites; links light up in turn
+  const el = h('div', 'vis'), R = 380, cx = 540, cy = 470, nodes = s.icons || ['doc', 'dollar', 'card', 'bank', 'building', 'doc', 'user'];
+  const sv = h('div', 'abs', 'left:0; top:0; width:1080px; height:1000px'); sv.innerHTML = `<svg width="1080" height="1000">${nodes.map((_, i) => { const an = -Math.PI / 2 + i * 2 * Math.PI / nodes.length; return `<line x1="${cx}" y1="${cy}" x2="${cx + R * Math.cos(an)}" y2="${cy + R * Math.sin(an)}" stroke="#bbb" stroke-width="4" stroke-dasharray="10 10"/>`; }).join('')}</svg>`;
+  el.append(sv); const lines = [...sv.querySelectorAll('line')];
+  const ns = nodes.map((k, i) => { const an = -Math.PI / 2 + i * 2 * Math.PI / nodes.length, e = h('div', 'abs', `left:${cx + R * Math.cos(an) - 60}px; top:${cy + R * Math.sin(an) - 60}px; width:120px; height:120px; border-radius:50%; background:#fff; display:grid; place-items:center; color:#333; box-shadow:0 8px 24px rgba(0,0,0,.1); border:4px solid #ddd`, `<div style="width:60px;height:60px">${svg(k)}</div>`); el.append(e); return e; });
+  const c = h('div', 'abs', `left:${cx - 110}px; top:${cy - 110}px; width:220px; height:220px; border-radius:50%; background:var(--o); display:grid; place-items:center; font-family:Inter; font-weight:800; font-size:70px; color:#fff; box-shadow:0 0 60px rgba(255,106,19,.5)`, esc(s.center || 'AI')); el.append(c);
+  return {el, anim(t, a, b) { const k = P(t, a, a + .5); tf(c, `scale(${back(k)})`); c.style.opacity = k; const pr = P(t, a + .6, b - .4);
+    ns.forEach((e, i) => { const ki = P(t, a + .15 + i * .07, a + .5 + i * .07); e.style.opacity = ki; tf(e, `scale(${lerp(.5, 1, back(ki))})`); const on = pr * ns.length > i; e.style.borderColor = on ? 'var(--o)' : '#ddd'; e.style.color = on ? 'var(--o)' : '#333'; lines[i].setAttribute('stroke', on ? '#FF6A13' : '#bbb'); }); }};
+};
+V.counter = s => {     // big number counting up + small label
+  const el = h('div', 'vis'), n = h('div', 'abs', 'left:0; right:0; top:200px; text-align:center; font-weight:900; font-size:190px; direction:ltr'), l = h('div', 'abs cap', 'left:0; right:0; top:450px', esc(s.label || ''));
+  el.append(n, l);
+  return {el, anim(t, a, b) { const k = eio(P(t, a + .1, b - .4)); n.textContent = fa(Math.round((s.from || 0) + (s.to - (s.from || 0)) * k).toLocaleString('en-US')) + (s.suffix || ''); n.style.color = 'inherit'; l.style.opacity = P(t, a + .3, a + .7); }};
+};
+V.timeline = s => {    // long grey bar vs tiny orange segment
+  const el = h('div', 'vis'), bar = h('div', 'abs', 'left:90px; right:90px; top:300px; height:34px; border-radius:17px; background:repeating-linear-gradient(90deg,#3a3a40 0 18px,#2c2c31 18px 28px)'), seg = h('div', 'abs', 'left:90px; top:286px; width:12px; height:62px; border-radius:6px; background:var(--o); box-shadow:0 0 24px var(--o)');
+  const la = h('div', 'abs cap', 'right:90px; top:240px; color:#9a9893; font-size:30px', esc(s.long || '')), lb = h('div', 'abs', 'left:60px; top:400px; font-weight:900; font-size:96px; color:var(--o); text-shadow:0 0 30px rgba(255,106,19,.5)', esc(s.short || ''));
+  el.append(bar, seg, la, lb);
+  return {el, anim(t, a) { const k = P(t, a, a + .9); bar.style.clipPath = `inset(0 0 0 ${(1 - eo(k)) * 100}%)`; la.style.opacity = P(t, a + .4, a + .8); const k2 = P(t, a + 1, a + 1.4); seg.style.opacity = k2; tf(seg, `scaleY(${back(k2)})`); lb.style.opacity = P(t, a + 1.3, a + 1.7); }};
+};
+V.ui = s => {          // dark UI card: title + rows (+ optional progress)
+  const el = h('div', 'vis'), c = h('div', 'abs card d', 'left:150px; right:150px; top:520px; padding:40px 46px; color:#EEE');
+  c.innerHTML = `<div style="display:flex;justify-content:space-between;font-weight:900;font-size:38px"><span>${esc(s.title)}</span><span style="color:#666;font-size:26px">${esc(s.meta || '')}</span></div>` +
+    (s.rows || []).map(r => `<div style="display:flex;gap:16px;align-items:center;margin-top:30px;font-weight:700;font-size:32px;color:#bbb"><i style="width:22px;height:22px;border-radius:50%;background:var(--o)"></i>${esc(r)}</div>`).join('') +
+    `<div style="height:10px;border-radius:5px;background:#2a2a30;margin-top:40px;overflow:hidden"><i class="pb" style="display:block;height:100%;width:0;background:var(--o)"></i></div>`;
+  el.append(c); if (s.object) { const o = img('el/' + s.object + '.png', 520, 'obj', 'left:280px; top:20px'); el.prepend(o); s._o = o; }
+  return {el, anim(t, a, b) { const k = P(t, a + .3, a + .8); tf(c, `translateY(${(1 - eo(k)) * 140}px)`); c.style.opacity = k; c.querySelector('.pb').style.width = `${P(t, a + .8, b - .3) * 100}%`;
+    if (s._o) { const ko = P(t, a, a + .5); s._o.style.opacity = ko; tf(s._o, `scale(${lerp(.9, 1, eo(ko))})`); } }};
+};
+V.chart = s => {       // candlestick card that grows left to right
+  const el = h('div', 'vis'), c = h('div', 'abs card d', 'left:110px; right:110px; top:120px; height:520px'), n = 18, bars = [];
+  c.innerHTML = `<div style="position:absolute;left:36px;top:26px;font-family:Inter;font-weight:800;font-size:24px;color:#777">${esc(s.title || 'MARKET · 1D')}</div>`;
+  let v = 300; for (let i = 0; i < n; i++) { const up = Math.sin(i * 1.7) > -.3; v += up ? 14 : -10; const b = h('i', '', `position:absolute; left:${50 + i * 40}px; bottom:${v - 220}px; width:22px; height:${40 + (i % 4) * 16}px; border-radius:4px; background:${up ? 'var(--o)' : '#e9c46a'}`); c.append(b); bars.push(b); }
+  el.append(c); if (s.object) { const o = img('el/' + s.object + '.png', 420, 'obj', 'left:470px; top:460px; transform:rotate(-6deg)'); el.append(o); s._o = o; }
+  return {el, anim(t, a, b) { const k = P(t, a, a + .4); c.style.opacity = k; const pr = P(t, a + .3, b - .3); bars.forEach((x, i) => { x.style.opacity = pr * n > i ? 1 : 0; });
+    if (s._o) { const ko = P(t, a + .6, a + 1.1); s._o.style.opacity = ko; tf(s._o, `rotate(-6deg) translateY(${(1 - eo(ko)) * 120}px)`); } }};
+};
+V.split = s => {       // two cards side by side + "یا" badge
+  const el = h('div', 'vis'), mk = (side, o, dark) => { const c = h('div', `abs card ${dark ? 'd' : 'l'}`, `${side}:70px; top:140px; width:440px; height:640px; overflow:hidden`); const im = img(o.el.includes('/') ? o.el : 'el/' + o.el + '.png', 340, 'obj', 'left:50px; top:50px; max-height:440px; object-fit:contain'); c.append(im);
+    if (o.label) c.append(h('div', 'abs', `left:20px; right:20px; bottom:34px; text-align:center; font-weight:900; font-size:40px; color:${dark ? '#fff' : 'var(--o)'}`, esc(o.label))); el.append(c); return c; };
+  const R = mk('right', s.a, false), L = mk('left', s.b, true), badge = h('div', 'abs', 'left:490px; top:420px; width:100px; height:100px; border-radius:50%; background:var(--o); color:#fff; display:grid; place-items:center; font-weight:900; font-size:46px', 'یا'); el.append(badge);
+  return {el, anim(t, a) { [R, L].forEach((c, i) => { const k = P(t, a + i * .2, a + .5 + i * .2); c.style.opacity = k; tf(c, `translateY(${(1 - eo(k)) * 100}px)`); });
+    const kb = P(t, a + (s.badge_at || 1.2), a + (s.badge_at || 1.2) + .3); badge.style.opacity = kb; tf(badge, `scale(${back(kb)})`); R.style.borderColor = kb > .5 ? 'var(--o)' : ''; }};
+};
+V.none = () => ({el: h('div', 'vis'), anim() {}});
+
+// ---------------- beats ----------------
+let S, TL, BEATS = [], END = 60;
+const FITS = [];
+window.ready = (async () => {
+  S = await (await fetch(url('story.json'))).json();
+  TL = await (await fetch(url('timeline.json'))).json();
+  const root = $('beats');
+  for (const [i, bt] of S.beats.entries()) {
+    const L = TL.lines[bt.line || bt.id]; if (!L) throw new Error('unknown line ' + (bt.line || bt.id));
+    const el = h('div', 'beat ' + (bt.bg || 'paper') + (bt.huge ? ' huge' : ''));
+    const tx = h('div', 'txt'); if (bt.text_top) tx.style.top = bt.text_top + 'px';
+    // words: *x* = big orange keyword, **x** = bold, | = line break; must match the spoken words in order
+    const toks = bt.text.split(/\s+/).filter(Boolean), words = [];
+    let wi = 0;
+    let open = false;
+    for (const tk of toks) {
+      if (tk === '|') { tx.append(h('span', 'w br')); continue; }
+      // *one or more words* = keyword span; punctuation may follow the closing star
+      const starts = tk.startsWith('*'), ends = tk.length > 1 && /\*[،.,!؟?:…»"]*$/.test(tk), k = open || starts;
+      open = ends ? false : (starts ? true : open);
+      const clean = tk.replace(/\*/g, '');
+      const e = h('span', 'w' + (k ? ' k' : ''), '', esc(clean)); tx.append(e);
+      const wt = L.words[wi]; words.push({e, t: wt ? wt[0] : L.start + wi * .25}); wi++;
+    }
+    if (wi !== L.words.length) ISSUES.push(`beat ${i + 1}: ${wi} words on screen, ${L.words.length} spoken`);
+    const v = (V[(bt.visual || {}).type || 'none'] || V.none)(bt.visual || {});
+    el.append(v.el, tx); root.append(el);
+    BEATS.push({el, tx, words, v, bt, a: L.start - .12});
+    FITS.push(() => { let fs = 1; while (tx.scrollHeight > (bt.text_max || 470) && fs > .7) { fs -= .05; tx.querySelectorAll('.w').forEach(w => w.style.fontSize = ''); tx.style.zoom = fs; } });
+  }
+  BEATS.forEach((b, i) => { b.b = i + 1 < BEATS.length ? BEATS[i + 1].a : TL.end_start; });
+  // end card
+  const end = $('end'); END = TL.total;
+  end.innerHTML = `<img id="elogo" src="/news-reel/assets/m.png" style="position:absolute;left:390px;top:640px;width:300px;filter:drop-shadow(0 0 30px rgba(16,245,238,.4))"><div id="eh" style="position:absolute;left:0;right:0;top:1010px;text-align:center;font-family:Inter;font-weight:800;font-size:64px;letter-spacing:12px;color:#fff;direction:ltr">MESHKANI.PRO</div><div id="el" style="position:absolute;left:390px;width:300px;top:1100px;height:5px;background:var(--o)"></div><div id="eq" style="position:absolute;left:0;right:0;top:1140px;text-align:center;font-weight:700;font-size:44px;color:#bbb">${esc(S.end_text || '')}</div>`;
+  // barcode decoration
+  $('code').innerHTML = Array.from({length: 34}, (_, i) => `<rect x="${i * 4.3}" y="0" width="${[1, 2, 1, 3][i % 4]}" height="34" fill="#555"/>`).join('');
+  await document.fonts.ready; await Promise.all(['500', '700', '900'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش')));
+  await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('image failed: ' + i.src))));
+  for (const b of BEATS) { b.el.style.display = 'block'; } for (const f of FITS) f(); for (const b of BEATS) b.el.style.display = 'none';
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  window.SCENES = BEATS.map(b => ({t0: b.a, t1: b.b, type: (b.bt.visual || {}).type || 'text', bg: b.bt.bg || 'paper'})).concat([{t0: TL.end_start, t1: END, type: 'end'}]);
+  seek(0);
+})();
+
+function seek(t) {
+  let cur = BEATS.findIndex(b => t >= b.a && t < b.b); const inEnd = t >= TL.end_start;
+  const bgName = inEnd ? 'dark' : (BEATS[Math.max(0, cur)]?.bt.bg || 'paper');
+  // background swap with a quick blur dissolve at each beat change
+  $('paper').style.opacity = bgName === 'paper' ? 1 : 0; $('dark').style.opacity = bgName === 'dark' ? 1 : 0;
+  $('code').style.opacity = bgName === 'paper' && !inEnd ? .55 : 0;
+  $('arc').style.transform = `rotate(${t * 6}deg)`; $('floor').style.backgroundPosition = `0 ${t * 40}px`;
+  BEATS.forEach((b, i) => {
+    const on = i === cur && !inEnd, outK = P(t, b.b - .18, b.b);
+    b.el.style.display = on ? 'block' : 'none'; if (!on) return;
+    const inK = P(t, b.a, b.a + .22);
+    b.el.style.opacity = Math.min(inK * 1.6, 1 - outK); b.el.style.filter = outK > 0 ? `blur(${outK * 18}px)` : (inK < 1 ? `blur(${(1 - inK) * 10}px)` : '');
+    b.el.style.transform = `scale(${1 + .03 * P(t, b.a, b.b)})`;
+    for (const w of b.words) { const o = appear(w.e, t, w.t - .05, .3, 22); tf(w.e, `translateY(${o.y}px) scale(${o.s})`); }
+    if (b.bt.iris) { const k = P(t, b.a, b.a + .45); b.el.style.clipPath = k < 1 ? `circle(${eio(k) * 1300}px at 540px 900px)` : ''; }
+    b.v.anim(t, b.a, b.b);
+  });
+  const e = $('end'); e.style.display = inEnd ? 'block' : 'none';
+  if (inEnd) { const a = TL.end_start, k = P(t, a, a + .6); $('elogo').style.opacity = k; $('elogo').style.transform = `scale(${lerp(.8, 1, back(k))})`;
+    $('eh').style.opacity = P(t, a + .3, a + .7); $('el').style.transform = `scaleX(${eio(P(t, a + .5, a + 1))})`; $('eq').style.opacity = P(t, a + .8, a + 1.2); }
+}
+window.seek = seek;
+</script>
+</body>
+</html>
