@@ -523,7 +523,7 @@ two-news reel in REEL_SPEC.md is retired.)
    demos, agent case studies, studies, statements; primary sources through Drive when WebFetch is
    blocked, §1.3). Drop rumours and anything you cannot attribute.
 3. Score each for hook strength, broad appeal for a Persian audience, a concrete everyday image, and
-   novelty vs. the last 14 reels. Pick one. Then choose today's **angle** (STORY_SPEC §1), **shape**
+   novelty vs. the last 14 reels. Pick one. Then choose today's **angle** (STORY_SPEC §1, 17 angles — search at least 5 of them), **shape**
    (§2), **look preset** (§4), **voice** (§5) and **tempo** (§6) — each different from yesterday's.
 4. Write `work/story/dossier.json`: idea, who/where/when, primary URL + confirming URLs, exact quote
    (only if confirmed) or paraphrase, allowed claims, field, selection reason.

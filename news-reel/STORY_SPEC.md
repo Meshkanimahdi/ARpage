@@ -16,22 +16,37 @@ previous reel's `story.json`; record today's choices in the slot file → `creat
 ## 1. Angle (what the story is about) — rotate
 Pick today's story from what is trending in AI in the last 24–72 h (several independent outlets,
 platform buzz, big launches, viral demos, notable statements, new studies). Verify it like news
-(RUNBOOK §1.3). Angles, never the same two days in a row:
+(RUNBOOK §1.3). Search the angles below widely — run a few searches in at least 5 different angles
+every day (e.g. "AI <angle keyword> this week", "AI startup shut down", "AI game viral") before
+choosing. Never the same angle two days in a row, and no angle more than twice in 7 days.
 
-| # | Angle | Example hook |
-|---|---|---|
-| A | AI vs. the real world: what it changes in jobs, money, daily life | «اگه می‌خوای شغلت امن بمونه…» |
-| B | **Agents doing real work**: an AI agent that ran a task, a team, a shop, research, code — how and what it means | «یه ایجنت، کار یه تیم پنج‌نفره رو تو یه شب انجام داد.» |
-| C | A launch / demo everyone is talking about — what it really can and cannot do | «همه دارن این ویدیو رو دست‌به‌دست می‌کنن…» |
-| D | Science, health, climate: a concrete result | «یه هوش مصنوعی تو چند ساعت چیزی پیدا کرد که…» |
-| E | Money and business: who wins, who loses | «این شرکت با یه تصمیم…» |
-| F | Society, risk, ethics, safety — without fear-mongering | «مشکل ربات قاتل نیست…» |
-| G | Useful: one thing the viewer can do with AI today | «این کار رو امروز امتحان کن…» |
-| H | Myth vs. fact | «همه فکر می‌کنن… ولی…» |
+| # | Angle | What to look for | Example hook |
+|---|---|---|---|
+| A | Work and jobs | jobs that change or disappear, new skills, hiring, layoffs | «اگه می‌خوای شغلت امن بمونه…» |
+| B | **Agents doing real work** | an AI agent that ran a task, a team, a shop, research, code | «یه ایجنت، کار یه تیم پنج‌نفره رو تو یه شب انجام داد.» |
+| C | Launches and viral demos | the new model/app/gadget everyone shares — what it really can and cannot do | «همه دارن این ویدیو رو دست‌به‌دست می‌کنن…» |
+| D | Entertainment and games | AI in games, NPCs, game studios, streaming, music charts, film, celebrities, deepfake trends | «این شخصیت بازی، دیالوگش رو خودش می‌سازه.» |
+| E | Creative work | AI art, design, music, writing, photography, advertising — and the artists' reaction | «این آهنگ رو هیچ آدمی نساخته…» |
+| F | Food and nutrition | recipes, restaurants, food apps, farming-to-plate, food waste | «آشپز این رستوران… یه الگوریتمه.» |
+| G | Health and diet | AI in diet planning, fitness, sleep, diagnosis, wearables — reported results only, with limits; **never medical or diet advice** | «یه اپ گفت چی بخوری… و نتیجه‌اش این شد.» |
+| H | Failed and struggling startups | big AI startups that shut down, burned money, pivoted or overpromised — what went wrong | «یه میلیارد دلار جمع کردن… و تعطیل شدن.» |
+| I | Money and business | who wins, who loses, big deals, prices, investments | «این شرکت با یه تصمیم…» |
+| J | Science and space | discoveries, research speed, materials, climate, space | «یه هوش مصنوعی تو چند ساعت چیزی پیدا کرد که…» |
+| K | Everyday life and home | phones, cars, shopping, travel, dating, kids, education, smart home | «گوشیت از امروز این کار رو بدون تو می‌کنه.» |
+| L | Society, law, risk, ethics, safety | rules, lawsuits, scams, privacy, misinformation — without fear-mongering | «مشکل ربات قاتل نیست…» |
+| M | Women and AI | women founders and creators, women's health tech, safety, work | «اونی که این ابزار رو ساخت…» |
+| N | Sports | training, referees, scouting, injuries, fan experience | «داور این بازی… دوربین بود.» |
+| O | Useful today | one thing the viewer can do with AI today (only real, available tools) | «این کار رو امروز امتحان کن…» |
+| P | Myth vs. fact | a popular belief about AI, and what is actually true | «همه فکر می‌کنن… ولی…» |
+| Q | Weird and surprising | odd, funny, unexpected AI stories that are real and verified | «باورت نمی‌شه این کار رو به هوش مصنوعی سپردن…» |
 
 - A named person/podcast/interview is **optional** — use it only when the person *is* the story.
   At most 2 of any 7 reels may be built around one person's quote.
-- Women-focused topics (women at work, health, safety, creators, founders) get a female narrator.
+- Health/diet and food stories: report what was found and its limits (sample, who ran it, not
+  peer-reviewed…), add «این توصیهٔ پزشکی نیست» in the caption, never tell people what to eat or take.
+- Failed-startup stories: facts only (funding, dates, official statements, reputable reporting); no
+  mocking of named people, no speculation presented as fact.
+- Women-focused topics get a female narrator.
 - Do not repeat a story, company or person used in the last 14 reels.
 
 ## 2. Story shape — rotate (never the same two days in a row)
