@@ -10,9 +10,9 @@ const repo = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
 const args = Object.fromEntries(process.argv.slice(2).map(a => a.replace(/^--/, '').split('=')));
 const dir = path.resolve(args.dir), rel = '/' + path.relative(repo, dir) + '/', out = path.join(dir, 'out');
 fs.mkdirSync(out, {recursive: true});
-const mime = {'.png': 'image/png', '.json': 'application/json', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.html': 'text/html', '.js': 'text/javascript', '.woff2': 'font/woff2', '.webp': 'image/webp'};
+const mime = {'.png': 'image/png', '.json': 'application/json', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.woff': 'font/woff', '.woff2': 'font/woff2', '.webp': 'image/webp'};
 const server = http.createServer((q, r) => { const f = path.join(repo, decodeURIComponent(q.url.split('?')[0])); fs.readFile(f, (e, d) => { if (e) { r.writeHead(404); r.end(); return; } r.writeHead(200, {'Content-Type': mime[path.extname(f).toLowerCase()] || 'application/octet-stream'}); r.end(d); }); }).listen(0);
-const browser = await chromium.launch({executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+const browser = await chromium.launch({executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist']});
 const page = await browser.newPage({viewport: {width: 1080, height: 1920}});
 const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('response', r => r.status() >= 400 && !r.url().endsWith('favicon.ico') && errors.push(`HTTP ${r.status()} ${r.url()}`));
 await page.goto(`http://127.0.0.1:${server.address().port}/news-reel/${args.page || 'reel.html'}?dir=${encodeURIComponent(rel)}`);

@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="fa"><head><meta charset="utf-8">
+<title>meshkani.pro promo</title>
+<!-- Page promo reel (30 s, 9:16): beat-synced 3D kinetic type in the @ai.withphil lyric-video language,
+     navy + light-green palette. Rendered with news-reel/reel_render.mjs --page=promo.html (window.seek(t)). -->
+<style>
+  html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#08113a}
+  canvas{position:absolute;inset:0}
+  #hud{position:absolute;inset:0;pointer-events:none;font-family:Inter;color:var(--c,#0b1640)}
+  .lab{position:absolute;font:600 22px Inter;letter-spacing:.18em;white-space:nowrap;opacity:.85}
+  .fa{font-family:Vazirmatn;letter-spacing:0;direction:rtl}
+  .br{position:absolute;width:46px;height:46px;border:3px solid currentColor}
+  #end{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;opacity:0}
+  #end .logo{width:250px;height:250px;border-radius:64px;background:#0b1640;display:flex;align-items:center;justify-content:center;box-shadow:0 24px 60px rgba(11,22,64,.35)}
+  #end .logo i{display:block;width:170px;height:170px;background:#c6f432;-webkit-mask:url(assets/m.png) center/contain no-repeat;mask:url(assets/m.png) center/contain no-repeat}
+  #end .handle{font:900 86px Inter;color:#0b1640;letter-spacing:-.01em}
+  #end .pill{font:900 78px Lalezar;color:#0b1640;background:#c6f432;padding:6px 70px 0;border-radius:90px;border:5px solid #0b1640;box-shadow:0 12px 0 #0b1640}
+  #end .sub{font:800 44px Vazirmatn;color:#0b1640;direction:rtl}
+  #end .panel{position:absolute;left:90px;right:90px;top:520px;bottom:600px;border-radius:70px;background:rgba(238,245,230,.72);backdrop-filter:blur(14px);border:3px solid rgba(11,22,64,.25);z-index:-1}
+</style>
+</head><body>
+<div id="hud"></div>
+<div id="end"><div class="panel"></div><div class="logo"><i></i></div><div class="pill">فالو کن</div><div class="handle">@meshkani.pro</div><div class="sub">هر روز، همه‌ی خبرهای ترند هوش مصنوعی</div></div>
+<script type="importmap">{"imports":{"three":"/logo-motion/node_modules/three/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+window.ISSUES = []; window.START = 0; window.DURATION = 30.5;
+const W = 1080, H = 1920, FS = '/logo-motion/node_modules/@fontsource/';
+const NAVY = '#0b1640', NAVY2 = '#17296b', LIME = '#c6f432', LIME2 = '#e6fbb0', PAPER = '#eef5e6', WHITE = '#ffffff';
+const BEAT = 60 / 123.95, PH = 0.48, bt = k => PH + k * BEAT;   // beat grid measured from music.mp3
+
+// ---------- fonts ----------
+const AR = 'U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200E,U+FB50-FDFF,U+FE70-FEFC', LA = 'U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2212';
+const FONTS = [['Lalezar', 'lalezar', [400], 1], ['Changa', 'changa', [800], 1], ['Markazi', 'markazi-text', [700], 1], ['Vazirmatn', 'vazirmatn', [800, 900], 1],
+  ['Ruqaa', 'aref-ruqaa', [700], 1], ['Inter', 'inter', [600, 800, 900], 0]];
+let css = '';
+for (const [fam, dir, ws, ar] of FONTS) for (const w of ws) {
+  if (ar) css += `@font-face{font-family:"${fam}";font-weight:${w};src:url(${FS}${dir}/files/${dir}-arabic-${w}-normal.woff2);unicode-range:${AR}}`;
+  css += `@font-face{font-family:"${fam}";font-weight:${w};src:url(${FS}${dir}/files/${dir}-latin-${w}-normal.woff2);unicode-range:${LA}}`;
+  if (fam === 'Inter') css += `@font-face{font-family:"Inter";font-style:italic;font-weight:${w};src:url(${FS}inter/files/inter-latin-${w}-italic.woff2)}`;
+}
+document.head.insertAdjacentHTML('beforeend', `<style>${css}</style>`);
+
+// ---------- helpers ----------
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const sm = x => { x = clamp(x); return x * x * (3 - 2 * x); };
+const eo = x => 1 - Math.pow(1 - clamp(x), 3);
+const eox = x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(x));
+const back = x => { x = clamp(x); const c = 2.2; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const pop = (t, t0, d = .32) => t < t0 ? 0 : back((t - t0) / d);
+const ramp = (t, a, b) => sm((t - a) / (b - a));
+function keys(t, ks) { if (t <= ks[0][0]) return ks[0][1]; for (let i = 1; i < ks.length; i++) if (t <= ks[i][0]) { const [a, va] = ks[i - 1], [b, vb] = ks[i]; const k = sm((t - a) / (b - a)); return Array.isArray(va) ? va.map((v, j) => lerp(v, vb[j], k)) : lerp(va, vb, k); } return ks[ks.length - 1][1]; }
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const kick = (t, beats, k = 10) => beats.reduce((s, b) => s + (t >= b ? Math.exp(-(t - b) * k) : 0), 0);
+const isFa = s => /[؀-ۿ]/.test(s);
+
+function tex(c, rep) { const x = new THREE.CanvasTexture(c); x.colorSpace = THREE.SRGBColorSpace; x.anisotropy = 8; if (rep) { x.wrapS = THREE.RepeatWrapping; } return x; }
+// one line of text -> canvas.  fill/stroke null to skip; bg = rounded box colour
+function textCanvas(txt, o = {}) {
+  const size = o.size || 220, font = `${o.italic ? 'italic ' : ''}${o.weight || 400} ${size}px "${o.font || 'Lalezar'}"`;
+  const c = document.createElement('canvas'), x = c.getContext('2d'); x.font = font;
+  const m = x.measureText(txt), pad = (o.pad ?? .22) * size, st = o.stroke || 0;
+  c.width = Math.ceil(m.width + pad * 2 + st * 2); c.height = Math.ceil(size * (o.lh || 1.55) + st * 2);
+  x.font = font; x.textAlign = 'center'; x.textBaseline = 'middle'; if (isFa(txt)) x.direction = 'rtl';
+  if (o.bg) { x.fillStyle = o.bg; const r = o.radius ?? size * .18; x.beginPath(); x.roundRect(st / 2 + 2, st / 2 + 2, c.width - st - 4, c.height - st - 4, r); x.fill();
+    if (o.bgStroke) { x.lineWidth = o.bgStroke; x.strokeStyle = o.bgStrokeColor || NAVY; x.stroke(); } }
+  const y = c.height / 2 + size * (o.dy ?? (isFa(txt) ? .1 : .04));
+  if (st) { x.lineJoin = 'round'; x.lineWidth = st; x.strokeStyle = o.strokeColor || NAVY; x.strokeText(txt, c.width / 2, y); }
+  if (o.fill !== null) { x.fillStyle = o.fill || WHITE; x.fillText(txt, c.width / 2, y); }
+  return c;
+}
+// extruded word: stack of alpha-tested layers (face + gradient sides).  width in world units
+function block(txt, o) {
+  const w = o.w, sil = textCanvas(txt, {...o, fill: WHITE, stroke: o.stroke ? o.stroke : 0, strokeColor: WHITE, bg: o.bg ? WHITE : null, bgStroke: 0});
+  const faceC = o.faceCanvas ? textCanvas(txt, o) : null, h = w * sil.height / sil.width;
+  const g = new THREE.Group(), geo = new THREE.PlaneGeometry(w, h), N = o.layers || 16, depth = (o.depth ?? .28) * h, st = tex(sil);
+  const s1 = new THREE.Color(o.side || NAVY), s2 = new THREE.Color(o.side2 || o.side || NAVY);
+  for (let i = N; i >= 1; i--) {
+    const m = new THREE.MeshBasicMaterial({map: st, color: s1.clone().lerp(s2, i / N), alphaTest: .5, side: THREE.DoubleSide});
+    const p = new THREE.Mesh(geo, m); p.position.z = -depth * i / N; g.add(p);
+  }
+  const face = new THREE.Mesh(geo, new THREE.MeshBasicMaterial(faceC ? {map: tex(faceC), alphaTest: .5, side: THREE.DoubleSide} : {map: st, color: o.face || LIME, alphaTest: .5, side: THREE.DoubleSide}));
+  g.add(face); g.userData = {w, h, face}; return g;
+}
+const add = (p, o, pos = [0, 0, 0], rot = [0, 0, 0], s = 1) => { o.position.set(...pos); o.rotation.set(...rot); o.scale.setScalar(s); p.add(o); return o; };
+function lines(pts, color, opacity = 1) { const g = new THREE.BufferGeometry().setFromPoints(pts.map(p => new THREE.Vector3(...p)));
+  return new THREE.LineSegments(g, new THREE.LineBasicMaterial({color, transparent: opacity < 1, opacity, depthWrite: false})); }
+function circle(r, color, opacity = 1, seg = 128, dash = 0) { const pts = []; for (let i = 0; i < seg; i++) { if (dash && i % 2) continue; const a = i / seg * Math.PI * 2, b = (i + 1) / seg * Math.PI * 2; pts.push([Math.cos(a) * r, 0, Math.sin(a) * r], [Math.cos(b) * r, 0, Math.sin(b) * r]); } return lines(pts, color, opacity); }
+function sparkTex(col) { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'); x.fillStyle = col; x.beginPath();
+  for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2, r = i % 2 ? 9 : 62; x.lineTo(64 + Math.cos(a) * r, 64 + Math.sin(a) * r); } x.fill(); return tex(c); }
+
+// environment: grid floor, fisheye sphere grid, construction circles, crosshairs, sparkles
+function env(scene, dark, o = {}) {
+  const ln = dark ? LIME : NAVY, op = dark ? .32 : .2; scene.background = new THREE.Color(dark ? '#08113a' : PAPER);
+  const fl = o.floor ?? -4, pts = [];
+  for (let i = -30; i <= 30; i++) { pts.push([i * 1.5, fl, -45], [i * 1.5, fl, 45], [-45, fl, i * 1.5], [45, fl, i * 1.5]); }
+  scene.add(lines(pts, ln, op));
+  const sp = [], R = 60;   // lat/long sphere: reads as a fisheye grid after the barrel pass
+  for (let la = -80; la <= 80; la += 10) for (let lo = 0; lo < 360; lo += 5) { const a = la * Math.PI / 180, b = lo * Math.PI / 180, c = (lo + 5) * Math.PI / 180;
+    sp.push([R * Math.cos(a) * Math.cos(b), R * Math.sin(a), R * Math.cos(a) * Math.sin(b)], [R * Math.cos(a) * Math.cos(c), R * Math.sin(a), R * Math.cos(a) * Math.sin(c)]); }
+  for (let lo = 0; lo < 360; lo += 10) for (let la = -80; la < 80; la += 5) { const b = lo * Math.PI / 180, a = la * Math.PI / 180, c = (la + 5) * Math.PI / 180;
+    sp.push([R * Math.cos(a) * Math.cos(b), R * Math.sin(a), R * Math.cos(a) * Math.sin(b)], [R * Math.cos(c) * Math.cos(b), R * Math.sin(c), R * Math.cos(c) * Math.sin(b)]); }
+  scene.add(lines(sp, ln, op * .8));
+  const g = new THREE.Group(); scene.add(g);
+  (o.circles || [[0, fl + .01, 0, 5], [0, fl + .01, 0, 7.5]]).forEach(([x, y, z, r], i) => { const c = circle(r, ln, op * 1.6, 160, i % 2); c.position.set(x, y, z); g.add(c); });
+  g.add(lines([[-40, 0, -6], [40, 0, -6], [0, -30, -6], [0, 30, -6], [-30, -30, -8], [30, 30, -8]], ln, op * 1.3));
+  const r = rng(o.seed || 3), st = sparkTex(dark ? LIME : NAVY), sparks = [];
+  for (let i = 0; i < 26; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({map: st, transparent: true, depthWrite: false})); s.position.set((r() - .5) * 18, (r() - .5) * 20, -2 - r() * 10); s.userData.ph = r() * 9; s.userData.s = .15 + r() * .35; scene.add(s); sparks.push(s); }
+  return t => sparks.forEach(s => { const k = .5 + .5 * Math.sin(t * 3 + s.userData.ph); s.scale.setScalar(s.userData.s * (.4 + k)); s.material.opacity = .35 + .65 * k; });
+}
+
+// ---------- scenes ----------
+const cam = new THREE.PerspectiveCamera(50, W / H, .05, 400);
+const look = (p, t, roll = 0, fov = 50) => { cam.position.set(...p); cam.up.set(Math.sin(roll), Math.cos(roll), 0); cam.lookAt(...t); cam.fov = fov; cam.updateProjectionMatrix(); };
+const SC = [];
+function scene(name, t0, t1, build, hud = {}) { SC.push({name, t0, t1, build, hud}); }
+
+// A: "every piece of news you need to know" — stacked 3D block words
+scene('words', 0, bt(10), () => {
+  const s = mkScene(), tick = env(s, false, {floor: -5.5, circles: [[0, -5.49, 0, 4], [0, -5.49, 0, 6.5], [0, -5.49, 0, 9]]});
+  const W1 = add(s, block('هر', {font: 'Lalezar', w: 4.2, faceCanvas: 1, fill: PAPER, stroke: 26, strokeColor: NAVY, side: NAVY2, side2: NAVY, depth: .32}), [-.6, 3.6, 0], [0, .25, .06]);
+  const W2 = add(s, block('خبری', {font: 'Lalezar', w: 6.2, face: LIME, side: NAVY, depth: .3}), [.2, 1.25, .5], [0, -.18, -.04]);
+  const W3 = add(s, block('که', {font: 'Changa', weight: 800, size: 160, w: 1.9, bg: NAVY, faceCanvas: 1, fill: LIME, side: NAVY, depth: .18, radius: 30}), [2.6, -.45, 1.2], [0, -.3, .12]);
+  const W4 = add(s, block('باید', {font: 'Lalezar', w: 5, face: NAVY, side: LIME, side2: '#7d9e1a', depth: .34}), [-.7, -.9, .3], [0, .2, -.05]);
+  const W5 = add(s, block('بدونی', {font: 'Lalezar', w: 6.6, face: LIME, side: NAVY, depth: .34}), [.3, -3.2, .9], [0, -.22, .03]);
+  const pole = lines([[-2.6, -5.5, -.5], [-2.6, 4.8, -.5], [2.9, -5.5, -1], [2.9, 2.2, -1]], NAVY, .5); s.add(pole);
+  const items = [[W1, bt(-1) + .02], [W2, bt(1)], [W3, bt(3)], [W4, bt(4)], [W5, bt(6)]];
+  return (lt, t) => {
+    tick(t); items.forEach(([o, a]) => { const k = pop(t, a, .34); o.scale.setScalar(Math.max(.001, k)); o.rotation.x = (1 - clamp(k)) * -1.1; });
+    const ty = keys(t, [[0, 3.4], [1.3, 3.2], [1.9, 1.4], [2.8, .2], [3.7, -.9], [4.4, -1.6], [5.3, -.4]]);
+    const ang = keys(t, [[0, -.55], [5.3, .62]]) + .06 * Math.sin(t * 2.1), rad = keys(t, [[0, 9], [2.2, 11.5], [4.4, 13.5], [5.3, 7]]);
+    const z = kick(t, items.map(i => i[1])) * 2.2;
+    const up = ramp(t, bt(8.7), bt(10)) * 9;
+    look([Math.sin(ang) * rad, ty + 1.2 + up * .4, Math.cos(ang) * rad], [0, ty + up, 0], .07 * Math.sin(t * 1.3) - ramp(t, bt(8.7), bt(10)) * .5, 52 - z);
+  };
+}, {dark: 0, labels: [['tl', 'AI NEWS · 124 BPM · 30 SEC · 9:16'], ['r', '+۲۴/۷', bt(6)]]});
+
+// B: giant 3D "AI" with a ruler — round-the-clock coverage
+scene('ai', bt(10), bt(18), () => {
+  const s = mkScene(), tick = env(s, false, {floor: 0, seed: 9, circles: [[0, .01, 0, 4.5], [0, .01, 0, 6.2], [0, .01, 0, 8]]});
+  const A = add(s, block('A', {font: 'Inter', weight: 900, size: 300, w: 4.6, pad: .06, lh: 1.08, dy: .06, face: LIME, side: NAVY2, side2: NAVY, depth: .5, layers: 28}), [-1.9, 2.75, 0]);
+  const I = add(s, block('I', {font: 'Inter', weight: 900, size: 300, w: 1.55, pad: .08, lh: 1.08, dy: .06, face: LIME, side: NAVY2, side2: NAVY, depth: 1.45, layers: 30}), [1.75, 2.75, 0]);
+  const rc = document.createElement('canvas'); rc.width = 180; rc.height = 1400; const x = rc.getContext('2d');
+  x.fillStyle = PAPER; x.fillRect(0, 0, 180, 1400); x.fillStyle = NAVY; x.font = '800 54px Inter'; x.textAlign = 'center';
+  for (let i = 0; i <= 96; i++) { const y = 40 + i * 13.3, L = i % 4 ? 38 : 70; x.fillRect(0, y, L, 4); x.fillRect(180 - L, y, L, 4); }
+  for (let i = 0; i <= 24; i += 4) x.fillText(String(24 - i).padStart(2, '0'), 90, 40 + i * 4 * 13.3 + 18);
+  const ruler = new THREE.Mesh(new THREE.PlaneGeometry(.55, 4.3), new THREE.MeshBasicMaterial({map: tex(rc)})); ruler.position.set(1.75, 2.75, .02); s.add(ruler);
+  const cc = textCanvas('۲۴/۷', {font: 'Vazirmatn', weight: 900, size: 120, bg: NAVY, fill: LIME, pad: .35, lh: 1.5, radius: 26});
+  const cnt = add(s, new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.5 * cc.height / cc.width), new THREE.MeshBasicMaterial({map: tex(cc), transparent: true})), [1.75, 5.55, .3]);
+  const T1 = add(s, block('۲۴ ساعته', {font: 'Lalezar', w: 4.4, face: NAVY, side: LIME, side2: '#7d9e1a', depth: .3}), [-.6, 1.3, 3.4], [0, .25, .05]);
+  const T2 = add(s, block('هر روز هفته', {font: 'Changa', weight: 800, size: 160, w: 4.2, bg: LIME, faceCanvas: 1, fill: NAVY, side: NAVY, depth: .14, radius: 40}), [.2, .2, 3.9], [0, -.2, -.05]);
+  const orb = [circle(3.4, NAVY, .55), circle(3.8, NAVY, .35, 128, 1)]; orb.forEach((o, i) => { o.position.y = .8 + i * .3; s.add(o); });
+  return (lt, t) => {
+    tick(t); [[T1, bt(13)], [T2, bt(15)]].forEach(([o, a]) => { const k = pop(t, a, .34); o.scale.setScalar(Math.max(.001, k)); o.rotation.x = (1 - clamp(k)) * -1.2; });
+    cnt.scale.setScalar(Math.max(.001, pop(t, bt(11.5)))); orb.forEach((o, i) => o.rotation.y = t * (i ? -.5 : .7));
+    const L = clamp(lt / (bt(17) - bt(10)));
+    const ang = lerp(.95, -.5, sm(L)), rad = keys(lt, [[0, 4.2], [1.6, 8], [3.2, 11.5]]), y = keys(lt, [[0, .5], [1.9, 3], [3.2, 2.4]]);
+    const dive = ramp(t, bt(17), bt(18));   // dive into the lime face at the end
+    const p = [Math.sin(ang) * rad * (1 - dive * .82) + dive * 1.75, y + dive * .4, Math.cos(ang) * rad * (1 - dive * .82) + dive * .3];
+    look(p, [lerp(0, 1.75, dive), keys(lt, [[0, 5], [1.9, 3], [3.2, 2.6]]), 0], .12 * Math.sin(lt * 1.7) - .2 * (1 - sm(L)), 54 - kick(t, [bt(11.5), bt(13), bt(15)]) * 2.5);
+  };
+}, {dark: 0, labels: [['tl', 'MESHKANI.PRO · LIVE FEED'], ['bl', 'COVERAGE · 24H · 7D'], ['r', '+۲۴ ساعت', bt(13)]]});
+
+// C: spinning ring stack — every corner of AI, one band per beat
+const BANDS = [['مدل‌های جدید', 'Lalezar', 400], ['ایجنت‌ها', 'Changa', 800], ['ابزارهای هوش مصنوعی', 'Markazi', 700], ['استارتاپ‌ها', 'Lalezar', 400, 1],
+  ['بازی و سرگرمی', 'Changa', 800], ['سلامت و تغذیه', 'Markazi', 700], ['کسب‌وکار', 'Lalezar', 400], ['هنر و خلاقیت', 'Changa', 800]];
+scene('rings', bt(18), bt(29), () => {
+  const s = mkScene(), tick = env(s, true, {floor: -5, seed: 5, circles: [[0, -4.99, 0, 5], [0, -4.99, 0, 8]]});
+  const R = 3.1, HB = .62, GAP = .86, bands = [];
+  BANDS.forEach(([txt, font, weight, outline], i) => {
+    const y = 3 - i * GAP, mk = hi => { const c = textCanvas(txt + '   ✦   ', {font, weight, size: 150, pad: .1, lh: 1.45, bg: hi ? LIME : (i % 2 ? NAVY2 : '#0d1b4d'), radius: 0,
+      fill: hi ? NAVY : (outline ? null : (i % 3 === 2 ? WHITE : LIME)), stroke: outline && !hi ? 6 : 0, strokeColor: LIME}); const tx = tex(c, 1); tx.repeat.x = Math.max(1, Math.round(2 * Math.PI * R / (HB * c.width / c.height))); return tx; };
+    const lo = mk(0), hi = mk(1);
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(R, R, HB, 128, 1, true), new THREE.MeshBasicMaterial({map: lo, side: THREE.DoubleSide}));
+    m.position.y = y; s.add(m); const e1 = circle(R + .02, LIME, .9), e2 = circle(R + .02, LIME, .9); e1.position.y = y + HB / 2; e2.position.y = y - HB / 2; s.add(e1, e2);
+    bands.push({m, lo, hi, y, dir: i % 2 ? -1 : 1});
+  });
+  const lc = textCanvas('AI NEWS · LIVE · RING 08 · LOOP · MESHKANI.PRO ·  ', {font: 'Inter', weight: 800, size: 80, pad: .05, lh: 1.3, fill: LIME}), ltx = tex(lc, 1); ltx.repeat.x = 6;
+  const lab = [];
+  for (let i = 0; i < 7; i++) { const m = new THREE.Mesh(new THREE.CylinderGeometry(R * .985, R * .985, .14, 128, 1, true), new THREE.MeshBasicMaterial({map: ltx, transparent: true, side: THREE.DoubleSide, depthWrite: false})); m.position.y = 3 - i * GAP - GAP / 2; s.add(m); lab.push(m); }
+  const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 96; const cx = cv.getContext('2d'); cx.fillStyle = '#0d1b4d'; cx.fillRect(0, 0, 1024, 96); cx.strokeStyle = LIME; cx.lineWidth = 10;
+  for (let i = 0; i < 16; i++) { cx.beginPath(); cx.moveTo(i * 64 + 14, 18); cx.lineTo(i * 64 + 44, 48); cx.lineTo(i * 64 + 14, 78); cx.stroke(); }
+  const chev = tex(cv, 1); chev.repeat.x = 5;
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(R, R, .32, 128, 1, true), new THREE.MeshBasicMaterial({map: chev, side: THREE.DoubleSide})); top.position.y = 3.75; s.add(top);
+  const bot = top.clone(); bot.position.y = 3 - 7 * GAP - .75; s.add(bot);
+  // equalizer city around the rings
+  const r = rng(11), N = 70, box = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({color: '#1a2f78'}), N), bx = [];
+  for (let i = 0; i < N; i++) { const a = r() * Math.PI * 2, d = 9 + r() * 9; bx.push([Math.cos(a) * d, Math.sin(a) * d, .5 + r() * .9, r() * 9]); } s.add(box);
+  const dm = new THREE.Object3D(), beats = BANDS.map((_, i) => bt(20 + i));
+  return (lt, t) => {
+    tick(t); const be = kick(t, beats.concat([bt(18), bt(19), bt(28)]), 7);
+    bx.forEach(([x, z, w, ph], i) => { const h = 1.5 + 5 * (.5 + .5 * Math.sin(t * 4 + ph)) * (.6 + .4 * be); dm.position.set(x, -5 + h / 2, z); dm.scale.set(w, h, w); dm.updateMatrix(); box.setMatrixAt(i, dm.matrix); }); box.instanceMatrix.needsUpdate = true;
+    let cur = -1; beats.forEach((b, i) => { if (t >= b) cur = i; });
+    bands.forEach((b, i) => { const on = i === cur && t < bt(27.6); b.m.material.map = on ? b.hi : b.lo; b.m.rotation.y = t * .55 * b.dir + (on ? .25 * (1 - eo((t - beats[i]) / .4)) * b.dir : 0); b.m.scale.set(on ? 1.06 : 1, on ? 1.12 : 1, on ? 1.06 : 1); });
+    lab.forEach((m, i) => m.rotation.y = -t * .3 * (i % 2 ? 1 : -1)); top.rotation.y = t * .8; bot.rotation.y = -t * .8;
+    const fy = cur < 0 ? 4.5 : bands[cur].y, intro = ramp(t, bt(18), bt(20)), outro = ramp(t, bt(27), bt(29));
+    const yy = lerp(9, fy + .5, intro), ang = t * .45 + 1.2, rad = lerp(.3, 7.6, intro) + outro * 6;
+    look([Math.sin(ang) * rad, lerp(yy, -1.5, outro), Math.cos(ang) * rad], [0, lerp(lerp(-2, fy, intro), 1, outro), 0], .18 * Math.sin(t * 1.2), 56 - kick(t, beats) * 3);
+  };
+}, {dark: 1, labels: [['tl', 'SPIN UP · RING 08 · LOOP'], ['bl', 'ALL THINGS AI']]});
+
+// D: break — "when a story..."
+scene('when', bt(29), bt(31), () => {
+  const s = mkScene(), tick = env(s, true, {floor: -3, seed: 21});
+  const c1 = add(s, block('وقتی', {font: 'Markazi', weight: 700, size: 200, w: 4.6, bg: LIME, faceCanvas: 1, fill: NAVY, side: NAVY, side2: '#5c7a10', depth: .16, radius: 20}), [-.4, .8, 0], [0, .3, -.06]);
+  const c2 = add(s, block('یه خبر', {font: 'Changa', weight: 800, size: 170, w: 4.2, bg: WHITE, faceCanvas: 1, fill: NAVY, side: LIME, depth: .16, radius: 36}), [.6, -1.1, .9], [0, -.25, .08]);
+  return (lt, t) => { tick(t);
+    [[c1, bt(29)], [c2, bt(30)]].forEach(([o, a]) => { const k = pop(t, a, .3); o.scale.setScalar(Math.max(.001, k)); o.rotation.z = (1 - clamp(k)) * .6; });
+    look([lerp(-2.5, 1.5, lt / .97), lerp(1.2, -.2, lt / .97), lerp(8.5, 5.6, eo(lt / .97))], [0, lerp(.6, -.4, lt / .97), 0], -.12 + lt * .15, 52); };
+}, {dark: 1, labels: []});
+
+// E: drop — ransom-note pieces
+scene('ransom', bt(31), bt(35), () => {
+  const s = mkScene(), tick = env(s, true, {floor: -5, seed: 31});
+  const P = [['ترند', 'Lalezar', 400, LIME, NAVY, 4.6, [0, 2.6, 0], -.08, bt(31)], ['میشه،', 'Changa', 800, WHITE, NAVY, 4, [.3, .55, .5], .07, bt(32)],
+    ['#AI', 'Inter', 900, NAVY2, LIME, 2.6, [-1.5, -1.3, .9], -.12, bt(33)], ['LIVE', 'Inter', 900, LIME, NAVY, 2.4, [1.4, -1.6, .4], .1, bt(33.5)], ['داغ', 'Lalezar', 400, WHITE, NAVY, 2.8, [-.1, -3.3, .7], .05, bt(34)]];
+  const its = P.map(([txt, font, weight, bg, fg, w, pos, rz, at]) => [add(s, block(txt, {font, weight, size: 190, w, bg, faceCanvas: 1, fill: fg, side: bg === NAVY2 ? '#050c2a' : NAVY, depth: .12, radius: 10, lh: 1.35}), pos, [0, 0, rz]), at, rz]);
+  const sticks = lines([[-4, 3.8, -1], [4, -4.5, -1], [3.2, 4.5, -1.5], [-3.6, -3, -1.5], [-5, .3, -2], [5, -.4, -2]], WHITE, .7); s.add(sticks);
+  return (lt, t) => { tick(t);
+    its.forEach(([o, a, rz]) => { const k = pop(t, a, .26); o.scale.setScalar(Math.max(.001, k)); o.rotation.z = rz + (1 - clamp(k)) * 1.2; o.position.z = (o.userData.z0 ??= o.position.z) + (1 - clamp(k)) * 3; });
+    const ang = Math.sin(lt * .9) * .35; look([Math.sin(ang) * 10, .2 + lt * .2, Math.cos(ang) * 10], [0, -.2, 0], .1 * Math.sin(lt * 2), 54 - kick(t, P.map(p => p[8])) * 3); };
+}, {dark: 1, labels: [['tl', 'BREAKING · AI · NOW'], ['r', '۱ دقیقه پیش', bt(32)]]});
+
+// F: a pen writes "we cover it the same moment"
+scene('pen', bt(35), bt(43), () => {
+  const s = mkScene(), tick = env(s, false, {floor: -6, seed: 41, circles: [[0, -5.99, 0, 5], [0, -5.99, 0, 8]]});
+  const card = new THREE.Group(); s.add(card); card.rotation.set(-.12, .22, .04);
+  const gc = document.createElement('canvas'); gc.width = 1024; gc.height = 1365; const g = gc.getContext('2d');
+  g.fillStyle = '#fbfdf7'; g.fillRect(0, 0, 1024, 1365); g.strokeStyle = 'rgba(11,22,64,.16)'; g.lineWidth = 2;
+  for (let x = 0; x <= 1024; x += 64) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 1365); g.stroke(); } for (let y = 0; y <= 1365; y += 64) { g.beginPath(); g.moveTo(0, y); g.lineTo(1024, y); g.stroke(); }
+  g.strokeStyle = 'rgba(11,22,64,.5)'; g.lineWidth = 4; g.strokeRect(10, 10, 1004, 1345);
+  card.add(new THREE.Mesh(new THREE.PlaneGeometry(6, 8), new THREE.MeshBasicMaterial({map: tex(gc)})));
+  const sh = new THREE.Mesh(new THREE.PlaneGeometry(6, 8), new THREE.MeshBasicMaterial({color: NAVY, transparent: true, opacity: .18})); sh.position.set(.25, -.25, -.05); card.add(sh);
+  const wc = document.createElement('canvas'); wc.width = 1024; wc.height = 1365; const wx = wc.getContext('2d'), wt = tex(wc);
+  const wm = new THREE.Mesh(new THREE.PlaneGeometry(6, 8), new THREE.MeshBasicMaterial({map: wt, transparent: true})); wm.position.z = .01; card.add(wm);
+  const LINES = [['ما همون', 400, 230, bt(35.3), bt(37.2)], ['لحظه', 640, 250, bt(37.4), bt(38.8)], ['پوشش', 890, 250, bt(39), bt(40.6)], ['میدیم', 1120, 250, bt(40.8), bt(42.2)]];
+  const meas = LINES.map(([txt, y, size]) => { wx.font = `700 ${size}px Ruqaa`; const w = wx.measureText(txt).width; return [512 + w / 2, 512 - w / 2]; });
+  const note = add(card, block('AI', {font: 'Inter', weight: 900, size: 150, w: 1.4, bg: LIME, faceCanvas: 1, fill: NAVY, side: '#8fb51c', depth: .05, radius: 6, pad: .5, lh: 2}), [-2.3, 3.1, .05], [0, 0, -.18]);
+  const pen = new THREE.Group(); card.add(pen);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(.13, .13, 2.6, 32), new THREE.MeshBasicMaterial({color: NAVY})); body.position.y = 1.55; pen.add(body);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(.14, .14, .55, 32), new THREE.MeshBasicMaterial({color: LIME})); cap.position.y = 2.75; pen.add(cap);
+  const tip = new THREE.Mesh(new THREE.ConeGeometry(.13, .38, 32), new THREE.MeshBasicMaterial({color: '#e9d8b6'})); tip.rotation.x = Math.PI; tip.position.y = .07; pen.add(tip);
+  const nib = new THREE.Mesh(new THREE.ConeGeometry(.04, .12, 16), new THREE.MeshBasicMaterial({color: NAVY})); nib.rotation.x = Math.PI; nib.position.y = -.1; pen.add(nib);
+  pen.rotation.set(.5, 0, -.55);
+  return (lt, t) => {
+    tick(t); wx.clearRect(0, 0, 1024, 1365); wx.textAlign = 'center'; wx.textBaseline = 'alphabetic'; wx.direction = 'rtl';
+    let px = 760, py = 400;
+    LINES.forEach(([txt, y, size, a, b], i) => {
+      const k = clamp((t - a) / (b - a)); if (k <= 0) return; const [x0, x1] = meas[i], edge = lerp(x0, x1, k);
+      wx.save(); wx.beginPath(); wx.rect(edge, 0, 1024 - edge, 1365); wx.clip(); wx.font = `700 ${size}px Ruqaa`; wx.fillStyle = i < 2 ? NAVY : '#1f3a99'; wx.fillText(txt, 512, y); wx.restore();
+      if (k < 1) { px = edge; py = y - size * (.25 + .18 * Math.sin(t * 38)); } else if (t < (LINES[i + 1]?.[3] ?? 1e9)) { px = x1; py = y - size * .2; }
+    });
+    const sq = clamp((t - bt(42.2)) / (bt(43) - bt(42.2)));   // lime squiggle under the last line
+    if (sq > 0) { wx.strokeStyle = '#8fc21a'; wx.lineWidth = 16; wx.lineCap = 'round'; wx.beginPath(); for (let i = 0; i <= 60 * sq; i++) { const x = 820 - i * 10; wx.lineTo(x, 1210 + Math.sin(i * .45) * 18); } wx.stroke(); px = 820 - 600 * sq; py = 1200; }
+    const st = pop(t, bt(41.5)); if (st > 0) { wx.save(); wx.translate(860, 760); wx.scale(st, st); wx.fillStyle = LIME; wx.strokeStyle = NAVY; wx.lineWidth = 6; wx.beginPath();
+      for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2 - Math.PI / 2, r = i % 2 ? 26 : 62; wx.lineTo(Math.cos(a) * r, Math.sin(a) * r); } wx.closePath(); wx.fill(); wx.stroke(); wx.restore(); }
+    wt.needsUpdate = true; note.scale.setScalar(Math.max(.001, pop(t, bt(36))));
+    pen.position.set((px / 1024 - .5) * 6, (.5 - py / 1365) * 8, .08);
+    const L = clamp(lt / (bt(43) - bt(35))), ang = lerp(-.45, .35, sm(L)), rad = lerp(12.5, 9.5, sm(L)), fy = lerp(1.8, -1.4, sm(L));
+    look([Math.sin(ang) * rad + 1, fy + 1, Math.cos(ang) * rad], [lerp(.4, 0, L), fy * .8, 0], .06 * Math.sin(lt * 1.4), 50);
+  };
+}, {dark: 0, labels: [['tl', 'LIVE NOTES · AI DESK'], ['bl', 'WRITTEN IN REAL TIME']]});
+
+// G: chips multiply and explode
+const CHIPS = ['خبر فوری', 'مدل جدید', 'ایجنت', 'ابزار جدید', 'ترند', '#AI', 'استارتاپ', 'سلامت', 'بازی', 'رباتیک', 'آپدیت', 'GPT', 'Claude', 'Gemini', 'تصویر', 'ویدیو'];
+scene('chips', bt(43), bt(47), () => {
+  const s = mkScene(), tick = env(s, true, {floor: -6, seed: 51}); const r = rng(77), chips = [];
+  const styles = [[LIME, NAVY], [WHITE, NAVY], [NAVY2, LIME], ['#0d1b4d', WHITE]];
+  const geos = CHIPS.map((txt, i) => { const [bg, fg] = styles[i % 4]; const c = textCanvas(txt, {font: isFa(txt) ? 'Vazirmatn' : 'Inter', weight: 900, size: 110, bg, fill: fg, pad: .55, lh: 1.7, radius: 95, bgStroke: bg === '#0d1b4d' ? 8 : 0, bgStrokeColor: LIME}); return [tex(c), c.width / c.height]; });
+  const waves = [[bt(43), 1], [bt(44), 4], [bt(45), 10], [bt(46), 22]];
+  for (const [at, n] of waves) for (let i = 0; i < n; i++) {
+    const k = chips.length % CHIPS.length, [tx, asp] = geos[k], w = chips.length ? .9 + r() * 1.1 : 3.6;
+    const g = new THREE.Group(); const m = new THREE.MeshBasicMaterial({map: tx, alphaTest: .5, side: THREE.DoubleSide});
+    g.add(new THREE.Mesh(new THREE.PlaneGeometry(w, w / asp), m)); const b = new THREE.Mesh(new THREE.PlaneGeometry(w, w / asp), new THREE.MeshBasicMaterial({map: tx, color: '#030820', alphaTest: .5, side: THREE.DoubleSide})); b.position.set(.04, -.06, -.06); g.add(b);
+    s.add(g); const a = r() * Math.PI * 2, e = (r() - .5) * 2.2, d = chips.length ? 1.6 + r() * 3.4 : 0;
+    chips.push({g, at, to: [Math.cos(a) * d * .9, Math.sin(a) * d * 1.25, e * 1.6], spin: (r() - .5) * 2, rz: (r() - .5) * .5, v: .4 + r() * 1.3});
+  }
+  const dots = textCanvas('•••', {font: 'Inter', weight: 900, size: 160, bg: WHITE, fill: '#8fc21a', pad: .5, lh: 1.4, radius: 80});
+  const ty = add(s, new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4 * dots.height / dots.width), new THREE.MeshBasicMaterial({map: tex(dots), alphaTest: .5})), [1.2, -1.6, 1.4], [0, 0, .1]);
+  return (lt, t) => {
+    tick(t); const boom = ramp(t, bt(46), bt(47));
+    chips.forEach(c => { const k = eox((t - c.at) / .45); c.g.visible = t >= c.at; if (!c.g.visible) return;
+      const out = 1 + boom * 2.6 * c.v + Math.max(0, t - c.at) * .15; c.g.position.set(c.to[0] * k * out, c.to[1] * k * out, c.to[2] * k + boom * c.v * 3);
+      c.g.rotation.set(Math.sin(t * 2 + c.spin) * .3 * k, c.spin * t * .8 * k, c.rz); c.g.scale.setScalar(Math.max(.001, pop(t, c.at, .3))); });
+    ty.scale.setScalar(Math.max(.001, pop(t, bt(44.5)) * (1 - boom))); ty.position.y = -1.6 + .08 * Math.sin(t * 20);
+    look([Math.sin(lt * .5) * 2, Math.cos(lt * .7) * .6, lerp(9, 3.2, eo(boom))], [0, 0, 0], .15 * Math.sin(lt * 1.6) + boom * .3, 54 - kick(t, waves.map(w => w[0])) * 3);
+  };
+}, {dark: 1, labels: [['tl', 'NEWS FEED · ×42'], ['bl', 'TRENDING NOW']]});
+
+// H: logo title in a circular frame
+scene('title', bt(47), bt(53), () => {
+  const s = mkScene(), tick = env(s, false, {floor: -5, seed: 61, circles: [[0, -4.99, 0, 5], [0, -4.99, 0, 7]]});
+  const disk = new THREE.Mesh(new THREE.CircleGeometry(4.25, 128), new THREE.MeshBasicMaterial({color: LIME2})); disk.position.z = -.6; s.add(disk);
+  [4.45, 4.75].forEach((r, i) => { const c = circle(r, NAVY, i ? .4 : .8, 180, i); c.rotation.x = Math.PI / 2; c.position.z = -.58; s.add(c); });
+  const L = 'MESHKANI'.split(''), lw = .98, letters = L.map((ch, i) => add(s, block(ch, {font: 'Inter', weight: 900, size: 260, w: ch === 'I' ? .38 : (ch === 'M' ? .95 : .8), pad: .04, lh: 1.08, dy: .06, face: NAVY, side: '#3d55b8', side2: NAVY, depth: .45, layers: 18}), [0, 0, 0]));
+  let x0 = 0; const xs = letters.map(l => { const w = l.userData.w * .93; const c = x0 + w / 2; x0 += w; return c; }); xs.forEach((x, i) => letters[i].userData.x = x - x0 / 2);
+  const pro = add(s, block('.PRO', {font: 'Inter', weight: 900, italic: 1, size: 200, w: 2.5, faceCanvas: 1, fill: LIME, stroke: 22, strokeColor: NAVY, side: NAVY, depth: .3}), [1.6, -1.25, .4], [0, 0, .12]);
+  const cause = add(s, block('هر روز', {font: 'Markazi', weight: 700, size: 170, w: 1.9, face: NAVY, side: NAVY2, depth: .15}), [-2.15, 1.65, .2], [0, 0, -.08]);
+  const subC = textCanvas('اخبار ترند هوش مصنوعی', {font: 'Vazirmatn', weight: 900, size: 120, bg: NAVY, fill: LIME, pad: .35, lh: 1.55, radius: 80});
+  const sub = add(s, new THREE.Mesh(new THREE.PlaneGeometry(5.6, 5.6 * subC.height / subC.width), new THREE.MeshBasicMaterial({map: tex(subC), alphaTest: .5})), [0, -2.65, .5]);
+  const lc = document.createElement('canvas'); lc.width = lc.height = 512; const lg = lc.getContext('2d'); const img = window.LOGO;
+  lg.drawImage(img, 0, 0, 512, 512); lg.globalCompositeOperation = 'source-in'; lg.fillStyle = NAVY; lg.fillRect(0, 0, 512, 512);
+  const logo = add(s, new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.9), new THREE.MeshBasicMaterial({map: tex(lc), alphaTest: .4})), [0, 2.55, .2]);
+  return (lt, t) => {
+    tick(t); letters.forEach((l, i) => { const a = bt(47.5 + i * .5), k = clamp((t - a) / .34), b = k < 1 ? 1 - Math.pow(1 - k, 2) : 1;
+      const bounce = k >= 1 ? Math.exp(-(t - a - .34) * 9) * Math.abs(Math.sin((t - a - .34) * 22)) * .35 : 0;
+      l.visible = t >= a; l.position.set(l.userData.x, lerp(4.5, .15, b) + bounce, .2); l.rotation.set(0, (1 - b) * 1.4, (1 - b) * (i % 2 ? .5 : -.5)); });
+    logo.scale.setScalar(Math.max(.001, pop(t, bt(47.2), .4))); logo.rotation.y = (1 - clamp(pop(t, bt(47.2), .4))) * 2;
+    cause.scale.setScalar(Math.max(.001, pop(t, bt(48)))); pro.scale.setScalar(Math.max(.001, pop(t, bt(51.5), .3))); sub.scale.setScalar(Math.max(.001, pop(t, bt(52), .3)));
+    const L2 = clamp(lt / (bt(53) - bt(47))); look([lerp(-3.2, .6, eo(L2)), lerp(-1.8, .3, eo(L2)), lerp(9, 13.8, eo(L2))], [0, .1, 0], lerp(-.25, .03, eo(L2)), 52 - kick(t, [bt(47.2), bt(51.5), bt(52)]) * 2.5);
+  };
+}, {dark: 0, brackets: 1, labels: [['bl', 'AI NEWS · DAILY · 30 SEC · 9:16'], ['tl', 'MESHKANI.PRO']]});
+
+// I: the title explodes into bouncing primitives, then the follow card
+scene('boom', bt(53), 30.5, () => {
+  const s = mkScene(), tick = env(s, false, {floor: 0, seed: 71, circles: []});
+  s.add(new THREE.HemisphereLight('#ffffff', '#8fa0c8', 2.2)); const dl = new THREE.DirectionalLight('#ffffff', 2.4); dl.position.set(4, 9, 6); s.add(dl);
+  const stripe = (a, b) => { const c = document.createElement('canvas'); c.width = 64; c.height = 256; const x = c.getContext('2d'); for (let i = 0; i < 8; i++) { x.fillStyle = i % 2 ? a : b; x.fillRect(0, i * 32, 64, 32); } const tt = tex(c, 1); tt.wrapT = THREE.RepeatWrapping; tt.repeat.set(1, 3); return tt; };
+  const mats = [new THREE.MeshLambertMaterial({color: NAVY}), new THREE.MeshLambertMaterial({color: LIME}), new THREE.MeshLambertMaterial({color: WHITE}), new THREE.MeshLambertMaterial({color: '#2a47b8'}),
+    new THREE.MeshLambertMaterial({map: stripe(NAVY, WHITE)}), new THREE.MeshLambertMaterial({map: stripe(LIME, NAVY)})];
+  const star = new THREE.Shape(); for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2, r = i % 2 ? .2 : .5; i ? star.lineTo(Math.cos(a) * r, Math.sin(a) * r) : star.moveTo(r, 0); }
+  const geos = [[new THREE.SphereGeometry(.5, 40, 24), .5], [new THREE.TorusGeometry(.42, .17, 20, 48), .59], [new THREE.ConeGeometry(.42, .9, 32), .45], [new THREE.BoxGeometry(.8, .8, .8), .45],
+    [new THREE.OctahedronGeometry(.55), .5], [new THREE.ExtrudeGeometry(star, {depth: .22, bevelEnabled: false}), .5], [new THREE.CylinderGeometry(.35, .35, .7, 32), .4]];
+  const r = rng(99), O = [], FR = 60, DUR = 30.5 - bt(53) + .1, G = -20;
+  for (let i = 0; i < 64; i++) {
+    const gi = Math.floor(r() * geos.length), [geo, rad] = geos[gi], sc = .55 + r() * (i < 6 ? 1.6 : .9), m = mats[gi === 1 || gi === 0 ? Math.floor(r() * 6) : Math.floor(r() * 4)];
+    const mesh = new THREE.Mesh(geo, m); mesh.scale.setScalar(sc); s.add(mesh);
+    let p = [(r() - .5) * 2, 1.5 + r() * 2, (r() - .5) * 1.5], v = [(r() - .5) * 13, 5 + r() * 9, (r() - .5) * 10]; const w = [(r() - .5) * 9, (r() - .5) * 9, (r() - .5) * 9], tr = [];
+    const R0 = rad * sc; let rot = [0, 0, 0];
+    for (let f = 0; f <= DUR * FR; f++) { for (let k = 0; k < 4; k++) { const dt = 1 / FR / 4; v[1] += G * dt; p = p.map((x, j) => x + v[j] * dt); rot = rot.map((x, j) => x + w[j] * dt);
+        if (p[1] < R0) { p[1] = R0; v[1] = Math.abs(v[1]) * .55; v[0] *= .82; v[2] *= .82; w.forEach((_, j) => w[j] *= .8); }
+        const d = Math.hypot(p[0], p[2]); if (d > 7.5) { p[0] *= 7.5 / d; p[2] *= 7.5 / d; v[0] *= -.5; v[2] *= -.5; } }
+      tr.push([...p, ...rot]); }
+    const ring = circle(R0 * 1.25, NAVY, .35, 64); s.add(ring); O.push({mesh, tr, ring});
+  }
+  const fl = new THREE.Mesh(new THREE.CircleGeometry(9, 96), new THREE.MeshBasicMaterial({color: '#e1ecd5'})); fl.rotation.x = -Math.PI / 2; fl.position.y = -.005; s.add(fl);
+  return (lt, t) => {
+    tick(t); const f = Math.min(Math.floor(lt * FR), O[0].tr.length - 1);
+    O.forEach(o => { const [x, y, z, a, b, c] = o.tr[f]; o.mesh.position.set(x, y, z); o.mesh.rotation.set(a, b, c); o.ring.position.set(x, .01, z); });
+    const ang = .4 + lt * .22, rad = lerp(7, 12.5, eo(lt / 2.2));
+    look([Math.sin(ang) * rad, lerp(1.4, 3.4, eo(lt / 2.5)), Math.cos(ang) * rad], [0, lerp(2.2, 1.1, eo(lt / 2)), 0], .05 * Math.sin(lt * 1.5), 54 - kick(t, [bt(53)]) * 4);
+  };
+}, {dark: 0, labels: [['tl', 'MESHKANI.PRO'], ['bl', 'FOLLOW FOR DAILY AI']]});
+
+// ---------- post: fisheye barrel, chromatic aberration, whip blur, flash, grain, vignette ----------
+const renderer = new THREE.WebGLRenderer({antialias: false, preserveDrawingBuffer: true}); renderer.setPixelRatio(1); renderer.setSize(W, H);
+document.body.prepend(renderer.domElement);
+const rt = new THREE.WebGLRenderTarget(W, H, {samples: 4, type: THREE.HalfFloatType});
+const post = new THREE.ShaderMaterial({uniforms: {tex: {value: rt.texture}, k: {value: .14}, blur: {value: 0}, dir: {value: new THREE.Vector2(0, 1)}, flash: {value: 0}, fcol: {value: new THREE.Color(LIME)}, seed: {value: 0}, ca: {value: .004}},
+  vertexShader: 'varying vec2 vUv; void main(){vUv=uv; gl_Position=vec4(position.xy,0.,1.);}',
+  fragmentShader: `uniform sampler2D tex; uniform float k, blur, flash, seed, ca; uniform vec2 dir; uniform vec3 fcol; varying vec2 vUv;
+    vec2 barrel(vec2 uv, float s){ vec2 c=(uv-.5)*vec2(.5625,1.); float r2=dot(c,c); float n=1.+k*(.5625*.5625+1.)*.25; c*=(1.+k*r2)/n*s; return c/vec2(.5625,1.)+.5; }
+    float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233))+seed)*43758.5453); }
+    void main(){ vec3 col=vec3(0.); for(int i=0;i<9;i++){ float o=(float(i)/8.-.5)*blur; vec2 d=dir*o;
+        col.r+=texture2D(tex, barrel(vUv,1.+ca)+d).r; col.g+=texture2D(tex, barrel(vUv,1.)+d).g; col.b+=texture2D(tex, barrel(vUv,1.-ca)+d).b; }
+      col/=9.; vec2 c=vUv-.5; col*=1.-.32*dot(c,c)*1.6; col=mix(col,fcol,flash); col+=(h(vUv*1000.)-.5)*.035; gl_FragColor=linearToOutputTexel(vec4(col,1.)); }`});
+const pq = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), post), ps = new THREE.Scene(); ps.add(pq); const oc = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+// ---------- HUD (DOM, crisp, kept clear of the Instagram UI) ----------
+const hud = document.getElementById('hud'), endEl = document.getElementById('end');
+function drawHud(sc, t) {
+  const c = sc.hud.dark ? LIME : NAVY; hud.style.setProperty('--c', c); let h = '';
+  for (const [pos, txt, at] of sc.hud.labels || []) { if (at && t < at) continue; const fa = isFa(txt) ? ' fa' : '';
+    const st = pos === 'tl' ? 'left:70px;top:250px' : pos === 'bl' ? 'left:70px;bottom:330px' : 'right:70px;top:300px;font-size:40px;font-weight:800';
+    h += `<div class="lab${fa}" style="${st};opacity:${(at ? clamp((t - at) / .2) : 1) * .85}">${txt}</div>`; }
+  if (sc.hud.brackets) for (const [x, y, bs] of [['left:110px', 'top:470px', 'border-right:0;border-bottom:0'], ['right:110px', 'top:470px', 'border-left:0;border-bottom:0'], ['left:110px', 'bottom:520px', 'border-right:0;border-top:0'], ['right:110px', 'bottom:520px', 'border-left:0;border-top:0']]) h += `<div class="br" style="${x};${y};${bs}"></div>`;
+  hud.innerHTML = h;
+  const e = clamp((t - bt(57)) / .35); endEl.style.opacity = e; endEl.style.transform = `scale(${.86 + .14 * back((t - bt(57)) / .45)})`;
+  hud.style.opacity = 1 - e;
+}
+
+// ---------- boot / seek ----------
+window.ready = (async () => {
+  const F = [['400 10px Lalezar', 'خبر'], ['800 10px Changa', 'خبر'], ['700 10px Markazi', 'خبر'], ['900 10px Vazirmatn', 'خبر۲۴'], ['800 10px Vazirmatn', 'خبر'], ['700 10px Ruqaa', 'خبر'], ['900 10px Inter', 'AI'], ['800 10px Inter', 'AI'], ['600 10px Inter', 'AI'], ['italic 900 10px Inter', 'PRO'], ['700 10px Ruqaa', 'PRO']];
+  await Promise.all(F.map(([f, s]) => document.fonts.load(f, s)));
+  for (const [f, s] of F) if (!document.fonts.check(f, s)) ISSUES.push('font not loaded: ' + f);
+  window.LOGO = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => no(new Error('logo')); i.src = 'assets/m.png'; });
+  for (const sc of SC) { sc.update = sc.build(); CUR[sc.name] = LAST; }
+  window.SCENES = SC.map(s => ({t0: +s.t0.toFixed(3), t1: +s.t1.toFixed(3), type: s.name, bg: s.hud.dark ? 'dark' : 'paper'}));
+})();
+// cuts: whip direction + flash colour
+const CUTS = SC.slice(1).map((s, i) => ({t: s.t0, dir: [[0, 1], [1, .3], [0, -1], [1, 0], [-.3, 1], [1, 0], [0, 1], [0, -1]][i % 8], flash: s.name === 'ransom' || s.name === 'boom' ? .9 : 0}));
+window.seek = t => {
+  const sc = SC.find(s => t >= s.t0 && t < s.t1) || SC[SC.length - 1];
+  // the build() closure owns its scene: grab it via a tiny registry
+  sc.update(t - sc.t0, t);
+  let blur = 0, flash = 0, dir = [0, 1];
+  for (const c of CUTS) { const d = t - c.t, w = Math.exp(-(d * d) / (2 * .045 * .045)); if (w > .01 && w * .09 > blur) { blur = w * .09; dir = c.dir; } if (d >= 0 && d < .25 && c.flash) flash = Math.max(flash, c.flash * (1 - d / .25)); }
+  const fin = clamp((t - 30.1) / .4);
+  post.uniforms.blur.value = blur; post.uniforms.dir.value.set(...dir).normalize(); post.uniforms.flash.value = Math.max(flash, 0); post.uniforms.seed.value = Math.floor(t * 30) % 97;
+  renderer.setRenderTarget(rt); renderer.render(CUR[sc.name], cam); renderer.setRenderTarget(null); renderer.render(ps, oc);
+  drawHud(sc, t); document.body.style.filter = fin ? `brightness(${1 - fin})` : '';
+};
+const CUR = {};
+let LAST = null; function mkScene() { return LAST = new THREE.Scene(); }
+</script>
+</body></html>
