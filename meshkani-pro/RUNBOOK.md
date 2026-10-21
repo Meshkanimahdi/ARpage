@@ -6,8 +6,8 @@ Instagram account `meshkani.pro`. Each scheduled run starts a fresh Claude
 session and is told which phase to run: **PREPARE** or **PUBLISH** (posts, §1–§2) or
 **REEL_PREPARE** / **REEL_PUBLISH** (the daily reel, §4–§5).
 
-Daily schedule (Tehran): **09:00** reel of the previous day's two news · **12:00** post + 3 stories ·
-**21:00** post + 3 stories. The reel is prepared the evening before (21:45, retry 23:15).
+Daily schedule (Tehran): **09:00** story reel (+ the same reel as a Story) · **12:00** post + 3 stories ·
+**21:00** post + 3 stories. The reel (one trending AI story in story format — news-reel/STORY_SPEC.md) is prepared the evening before (21:45, retry 23:15) and also shared to the Story.
 
 Source of the rules: `TASK_SPEC.md` (standing task + cloud overrides) and «دستور کار انتقال انتشار محتوای meshkani.pro» (20 Oct 2026).
 Where this file and that brief disagree, the brief's safety rules win: never
@@ -494,76 +494,82 @@ Before any retry of a publish call:
 
 ---
 
-## 4. REEL_PREPARE phase (main 21:45, retry 23:15 Tehran)
+## 4. REEL_PREPARE phase (main 21:45, retry 23:15 Tehran) — daily story reel
+
+> **Outdated wording in scheduled prompts:** if the PHASE message still says "from
+> today's two published news (12:00 then 21:00)", "a different narrator per news" or "only the posts'
+> own images", that text is from the retired two-news format and cannot be edited from outside this
+> session. The user decided on 2026-10-21 that this section and STORY_SPEC.md win: one trending AI
+> story, one narrator chosen per story, elements from ≤ 3 generated sheets, Story cut included.
 
 Goal: by the next morning, slot file `slot_<D+1>_0900.json` (`"kind": "reel"`) with status `READY`, a
-QA-passed ≈60 s reel MP4 + cover in Drive and a `Ready` row in the `Reels` tab. The reel tells the two
-news that were **published** in day D's 12:00 and 21:00 slots, in that order. Tools and format:
-`news-reel/REEL_SPEC.md` (read it fully), voices `news-reel/VOICES.md`, style rules there too.
+QA-passed 60–90 s story reel MP4 + cover in Drive and a `Ready` row in the `Reels` tab.
+Format (user decision 2026-10-21): **one trending AI story per reel**, told as a story with strong
+hooks for watch time; the on-screen text is the narration word by word; angle, story shape, look,
+voice and rhythm change every day — read `news-reel/STORY_SPEC.md` fully before starting. (The
+two-news reel in REEL_SPEC.md is retired.)
 
 ### 4.1 Preconditions
-1. Setup (§0.1), control (§0.2). Slot: `python3 meshkani-pro/scripts/tehran.py reel prepare` (gives
-   `slot_key`, `slot_file`, `source_day`, `source_slot_files`); none → log, stop. Lock
-   `<slot_file without .json>__reel_prepare` (retry run: `__reel_prepare_retry`).
+1. Setup (§0.1), control (§0.2). Slot: `python3 meshkani-pro/scripts/tehran.py reel prepare`; none →
+   log, stop. Lock `<slot_file without .json>__reel_prepare` (retry: `__reel_prepare_retry`).
 2. Reel slot file: same rules as §1.1 (missing → create `RESEARCHING`; finished → stop; stale >15 min
-   → take over; fresh → stop). The retry run stops quietly if the main run is alive or finished.
-3. If the evening post is still `PUBLISHING`/not final, wait (≤ 9-minute `wait-until` steps) until
-   22:45 at most. Then read both source slot files. Use every source whose post is `PUBLISHED`
-   (with `post.permalink`):
-   - two → normal two-news reel;
-   - one → a one-news reel (≈32 s, same template with one entry in `news`, end line «جزئیات کامل، توی پست دیروز.»);
-   - none → status `SKIPPED_NO_NEWS`, log, stop.
-4. `npm`/fonts: `bash news-reel/setup.sh`.
+   → take over; fresh → stop).
+3. `bash news-reel/setup.sh`.
 
-### 4.2 Material
-1. For each source: the six final JPEGs (`slides[].drive_file_id`, `stories[].drive_file_id`) →
-   `GOOGLEDRIVE_DOWNLOAD_FILE` (`fileId`) → `curl` the returned `s3url` into `work/reel/A/` (news 1) and
-   `work/reel/B/` (news 2) as `slide-1..3.jpg`, `story-1..3.jpg`. Read its dossier
-   (`folders.package` → `dossier.json`) for `allowed_claims`, `limits`, `source`, and the caption.
-2. Re-check each news once with WebSearch for corrections/denials since it was posted. A news that has
-   been corrected or denied is dropped from the reel (log why).
-3. Look at all 12 images (make contact sheets with ffmpeg `hstack` and Read them) and pick the crops.
+### 4.2 Story research (trending)
+1. History: `Reels` tab (last 14 rows: topic, and angle/shape/preset/voice in Notes), the last 7 days
+   of posts, and the previous reel's slot file `creative`.
+2. Find 8–15 candidates trending in AI in the last 24–72 h (WebSearch across outlets, launches, viral
+   demos, agent case studies, studies, statements; primary sources through Drive when WebFetch is
+   blocked, §1.3). Drop rumours and anything you cannot attribute.
+3. Score each for hook strength, broad appeal for a Persian audience, a concrete everyday image, and
+   novelty vs. the last 14 reels. Pick one. Then choose today's **angle** (STORY_SPEC §1), **shape**
+   (§2), **look preset** (§4), **voice** (§5) and **tempo** (§6) — each different from yesterday's.
+4. Write `work/story/dossier.json`: idea, who/where/when, primary URL + confirming URLs, exact quote
+   (only if confirmed) or paraphrase, allowed claims, field, selection reason.
 
-### 4.3 Script, voices, spec
-1. Write `work/reel/spec.json` per REEL_SPEC.md: fresh narration (never the on-image text), only
-   allowed claims, 4–6 lines per news, scenes per news (hook first), `tag` = the field in Persian,
-   `music_prompt` that fits both news.
-2. Voices: two different narrators, one female and one male, each fitting its news; the opening gender
-   alternates day to day (previous reel slot file → `voices`). The closing line uses news 2's voice.
-3. Clean plates only if needed (REEL_SPEC → Visuals), ≤ 2 per news; record prompt + cost.
-4. `node news-reel/reel_voice.mjs --dir=work/reel`. Exit 3 → shorten lines; exit 4 → respell/rephrase
-   the flagged lines (speech-to-text must hear the right words); max 3 rounds, else `FAILED`.
+### 4.3 Script, voice, elements
+1. `work/story/story.json` per STORY_SPEC: `voice` + `voice_name` (fits the story; female for
+   women-focused stories; not yesterday's), `theme` (preset + overrides), `tempo`, `stability`,
+   `date`, `field`, `end_text`, `music_prompt`, `credits`, 18–34 `beats` (id, bg, text, visual).
+   Hook in beat 1, open loop, re-hooks, payoff, closing question (STORY_SPEC §3). Every script carries
+   English v4 audio tags where the tone turns, numbers/dates/Latin names via `{shown|spoken}`
+   (STORY_SPEC §5). Only allowed claims.
+2. `work/story/elements.json`: every object the beats need, in **≤ 3 sheets of ≤ 9 items** (user rule —
+   no per-element image calls). `python3 news-reel/sprite_sheet.py --dir work/story`; Read the sheet
+   previews; regenerate a sheet at most twice. Real products: refs per §1.5.1. Real people: real photos
+   (Wikimedia Commons first, `fetch_to_drive` + download), credited.
+3. `node news-reel/story_voice.mjs --dir=work/story --tempo=<tempo>` (eleven_v4; exit 3 → shorten,
+   exit 4 → respell/rephrase the flagged beats). 60–90 s.
 
 ### 4.4 Render and QC
-1. `node news-reel/reel_render.mjs --dir=work/reel --mode=check`; Read every `out/sheet*.jpg`. Check:
-   Persian text correct and fully inside the frame, nothing overlapping, crops free of baked-in text,
-   each scene matches its line, 3D/glow/particles present, no distorted product/person. Fix the spec and
-   repeat (max 3 rounds).
-2. `node news-reel/reel_render.mjs --dir=work/reel --mode=video` (run in the background, ~15 min), then
-   `python3 news-reel/reel_assemble.py --dir work/reel`. `reel.json` must show duration ≤ 61 s,
-   −15.5…−12 LUFS, true peak ≤ −1 dBFS; `ffprobe` must show H.264 1080×1920 30 fps + AAC 48 kHz.
-3. Extract frames at 2 s, the divider and the last second (`ffmpeg -ss`) and Read them (logo intro, divider,
-   end card present). Read `cover.jpg`.
+1. `node news-reel/reel_render.mjs --dir=work/story --page=story.html --mode=check`; Read every
+   `out/sheet*.jpg`. Fix ISSUES (word mismatch), text overflow, wrong/ugly cut-outs, a visual that does
+   not match its sentence, distorted people/products. Max 3 rounds.
+2. `--mode=video` in the background (~15 min), then `python3 news-reel/reel_assemble.py --dir work/story`:
+   `reel.json` must show 55–92 s, −15.5…−12 LUFS, true peak ≤ −1 dBFS; H.264 1080×1920 30 fps + AAC.
+3. Extract frames at 1 s, the middle and the end card and Read them; Read `cover.jpg` (it should
+   show the hook text; set `cover_t` in story.json if not).
+4. `python3 news-reel/story_cut.py --dir work/story` → `story.mp4` (≤ 60 s) for the Story share.
 
 ### 4.5 Storage, caption, sheet
-1. Content ID `REEL-NNN` (next after the highest in the `Reels` tab and reel slot files).
-   Drive: folder `YYYY-MM-DD_REEL-NNN` under `ریلز` (`google.reels_folder_id`) with `REEL-NNN.mp4` and
-   `REEL-NNN-cover.jpg` (resumable upload as in §0.3; md5 must match). `spec.json`, `timeline.json`,
-   `voice/qc.json` go to `_automation/packages/<D+1>_0900_REEL-NNN/`.
-2. Caption (Persian, user caption rules of §1.4 apply): one hook line; per news 1–2 sentences that
-   summarise it; one question; source line `منبع: <name>، <date> · <name>، <date>`; no URLs; no
-   real/concept note; 4–6 hashtags.
-3. `Reels` row (find-or-append on column A, `USER_ENTERED`), columns A–T: Content ID · Reel Topic
-   (`<field 1> + <field 2> | <topic 1> / <topic 2>`) · Status `Ready` · Production time · Scheduled
-   `<D+1> 09:00:00` · blank · Source URLs (one per line) · News Text (the two summaries) · **Reel Script**
-   (every line with its id and narrator) · **Motion Graphics Prompt** (the scene list: per scene type,
-   line, on-screen texts and image crops — compact text) · Duration (s) · Video Drive view URL · Final
-   Caption · blank · Source Post IDs · Voices · **Music Prompt** · **Image Edit Prompts** (clean-plate
-   prompts or «—») · blank · Notes. Read back to confirm.
-4. Reel slot file → `READY` with: `kind`, `content_id`, `sources` [{slot_key, content_id, permalink}],
-   `voices` [{news, name, id, gender}], `video` {drive_file_id, md5, bytes, duration, lufs, view_url},
-   `cover` {drive_file_id}, `caption`, `script`, `cost_usd` (clean plates), `sheet.reel_row`,
-   `reel` {container_id, media_id, permalink, published_at} all null. Log row (§3).
+1. Content ID `REEL-NNN`. Drive: `YYYY-MM-DD_REEL-NNN` under `ریلز` (`google.reels_folder_id`) with
+   `REEL-NNN.mp4`, `REEL-NNN-cover.jpg`, `REEL-NNN-story.mp4` (the reel cut to ≤ 60 s at a sentence
+   boundary + 1.7 s of the end card, for the Story share in §5 step 10; `story` block in the slot file); `story.json`, `elements.json`, `el/_sheet-*.jpg`,
+   `timeline.json`, `dossier.json` to `_automation/packages/<D+1>_0900_REEL-NNN/`.
+2. Caption like the reference: hook question line (+ one emoji at most); 2–4 short sentences that
+   tell the idea with attribution; the closing question + «👇»; `منبع: <name>، <date>`; photo credit
+   line if a real photo is used; 4–6 hashtags. No URLs.
+3. `Reels` row (find-or-append, `USER_ENTERED`), A–T: Content ID · Reel Topic (`<field> | <idea>`) ·
+   `Ready` · Production · Scheduled `<D+1> 09:00:00` · blank · Source URLs · News Text (the idea, 2–3
+   sentences) · **Reel Script** (all beats' text, numbered) · **Motion Graphics Prompt** (per beat: bg +
+   visual type + elements) · Duration · Video Drive URL · Final Caption · blank · Source Post IDs
+   («—» unless based on a post) · Voices · **Music Prompt** · **Image Edit Prompts** (the element-sheet
+   prompts `el/_sheet-*.txt`) · blank · Notes (credits). Read back.
+4. Reel slot file → `READY` (`kind`, `format: story`, `content_id`, `idea`, `sources`, `voices`, `video`,
+   `cover`, `story` {drive_file_id, md5, duration, status PENDING, ids null}, `caption`, `script`,
+   `creative` {angle, shape, preset, voice, tempo}, `cost_usd`, `sheet.reel_row`, `reel` ids null).
+   Notes column: `angle=… shape=… preset=… voice=… tempo=…`. Log row (§3).
 
 ## 5. REEL_PUBLISH phase (starts 08:57 → publish 09:00 Tehran)
 

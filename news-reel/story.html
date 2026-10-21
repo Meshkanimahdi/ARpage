@@ -8,7 +8,20 @@
   @font-face { font-family: Vaz; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-700-normal.woff2); }
   @font-face { font-family: Vaz; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
   @font-face { font-family: Inter; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-800-normal.woff2); }
-  :root { --o: #FF6A13; --paper: #EDEAE4; --ink: #17171A; --dark: #121214; --mute: #8C8A86; }
+  @font-face { font-family: Lalezar; font-weight: 400; src: url(/logo-motion/node_modules/@fontsource/lalezar/files/lalezar-arabic-400-normal.woff2); }
+  @font-face { font-family: Kufi; font-weight: 400; src: url(/logo-motion/node_modules/@fontsource/noto-kufi-arabic/files/noto-kufi-arabic-arabic-400-normal.woff2); }
+  @font-face { font-family: Kufi; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/noto-kufi-arabic/files/noto-kufi-arabic-arabic-700-normal.woff2); }
+  @font-face { font-family: Kufi; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/noto-kufi-arabic/files/noto-kufi-arabic-arabic-900-normal.woff2); }
+  @font-face { font-family: Markazi; font-weight: 400; src: url(/logo-motion/node_modules/@fontsource/markazi-text/files/markazi-text-arabic-400-normal.woff2); }
+  @font-face { font-family: Markazi; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/markazi-text/files/markazi-text-arabic-700-normal.woff2); }
+  @font-face { font-family: Reem; font-weight: 400; src: url(/logo-motion/node_modules/@fontsource/reem-kufi/files/reem-kufi-arabic-400-normal.woff2); }
+  @font-face { font-family: Reem; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/reem-kufi/files/reem-kufi-arabic-700-normal.woff2); }
+  @font-face { font-family: Messiri; font-weight: 400; src: url(/logo-motion/node_modules/@fontsource/el-messiri/files/el-messiri-arabic-400-normal.woff2); }
+  @font-face { font-family: Messiri; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/el-messiri/files/el-messiri-arabic-700-normal.woff2); }
+  @font-face { font-family: Changa; font-weight: 400; src: url(/logo-motion/node_modules/@fontsource/changa/files/changa-arabic-400-normal.woff2); }
+  @font-face { font-family: Changa; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/changa/files/changa-arabic-700-normal.woff2); }
+  @font-face { font-family: Changa; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/changa/files/changa-arabic-800-normal.woff2); }
+  :root { --fd: Vaz; --ft: Vaz; --o: #FF6A13; --paper: #EDEAE4; --ink: #17171A; --dark: #121214; --mute: #8C8A86; }
   html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--dark); }
   #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Vaz, sans-serif; }
   .bg { position: absolute; inset: 0; opacity: 0; }
@@ -20,11 +33,22 @@
   #code { position: absolute; left: 70px; top: 120px; opacity: .55; }
   .beat { position: absolute; inset: 0; display: none; }
   .txt { position: absolute; left: 70px; right: 70px; top: 150px; display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; column-gap: 18px; row-gap: 0; direction: rtl; text-align: center; }
-  .w { display: inline-block; font-weight: 700; font-size: 58px; line-height: 1.35; white-space: nowrap; will-change: transform, filter, opacity; }
-  .w.k { font-weight: 900; font-size: 132px; line-height: 1.15; color: var(--o); }
+  .w { display: inline-block; font-family: var(--ft), Vaz; font-weight: 700; font-size: 58px; line-height: 1.35; white-space: nowrap; will-change: transform, filter, opacity; }
+  .w.k { font-family: var(--fd), Vaz; font-weight: 900; font-size: 132px; line-height: 1.15; color: var(--o); }
   .w.b { font-weight: 900; }
   .w.br { flex-basis: 100%; height: 0; }
-  .paper .w { color: var(--ink); } .paper .w.k { color: var(--o); }
+  .paper .w { color: var(--ink); } .paper .w.k { color: var(--kl, var(--o)); }
+  .lightaccent .paper .w.k { background: linear-gradient(transparent 58%, var(--o) 58%, var(--o) 92%, transparent 92%); padding: 0 8px; }
+  .accent .w { color: var(--ink); } .accent .w.k { color: #fff; text-shadow: 0 6px 30px rgba(0,0,0,.25); }
+  #accentbg { background: var(--o); }
+  .mono .obj, .mono .person { filter: grayscale(1) contrast(1.12) drop-shadow(0 40px 50px rgba(0,0,0,.3)); }
+  .minimal #arc, .minimal #floor, .minimal #code { display: none; }
+  .deco { position: absolute; font-family: Inter; font-weight: 800; font-size: 22px; letter-spacing: 4px; opacity: .45; direction: ltr; }
+  #ticker { position: absolute; left: 0; right: 0; bottom: 150px; height: 56px; overflow: hidden; display: none; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor; opacity: .5; }
+  #ticker div { position: absolute; white-space: nowrap; font-weight: 900; font-size: 34px; line-height: 56px; direction: rtl; }
+  .busy #ticker { display: block; }
+  #dots { position: absolute; inset: 0; display: none; background-image: radial-gradient(currentColor 1.6px, transparent 1.6px); background-size: 36px 36px; opacity: .08; }
+  .busy #dots { display: block; }
   .dark .w { color: #F3F1EE; } .dark .w.k { color: var(--o); text-shadow: 0 0 26px rgba(255,106,19,.55), 0 0 60px rgba(255,106,19,.25); }
   .huge .w.k { font-size: 300px; }
   .vis { position: absolute; left: 0; right: 0; top: 560px; height: 1050px; }
@@ -47,6 +71,11 @@
 <div id="stage">
   <div class="bg" id="paper"><div id="arc"></div></div>
   <div class="bg" id="dark"><div id="floor"></div></div>
+  <div class="bg" id="accentbg"></div>
+  <div id="dots"></div>
+  <div class="deco" id="dTL" style="left:70px; top:80px"></div><div class="deco" id="dTR" style="right:70px; top:80px"></div>
+  <div class="deco" id="dBL" style="left:70px; bottom:90px"></div><div class="deco" id="dBR" style="right:70px; bottom:90px"></div>
+  <div id="ticker"><div id="tick"></div></div>
   <svg id="code" width="150" height="44"></svg>
   <div id="beats"></div>
   <div id="end"></div>
@@ -182,23 +211,44 @@ const FITS = [];
 window.ready = (async () => {
   S = await (await fetch(url('story.json'))).json();
   TL = await (await fetch(url('timeline.json'))).json();
+  // theme: fonts, palette, colour/mono, minimal/normal/busy (varies reel to reel — STORY_SPEC "Looks")
+  const PRESETS = {   // STORY_SPEC §4 — a preset fills the theme; explicit theme fields override it
+    'paper-ember': {font_display: 'Vaz', font_text: 'Vaz', accent: '#FF6A13', mode: 'color', density: 'normal'},
+    'mono-press': {font_display: 'Markazi', font_text: 'Vaz', accent: '#E0242B', paper: '#FAFAF8', ink: '#111', dark: '#0C0C0C', mode: 'mono', density: 'minimal'},
+    'acid-pop': {font_display: 'Lalezar', font_text: 'Changa', accent: '#E8FF3C', paper: '#EFEFED', ink: '#0D0D0D', dark: '#0B0B0C', mode: 'color', density: 'busy'},
+    'neon-night': {font_display: 'Changa', font_text: 'Vaz', accent: '#10F5EE', paper: '#E9F1F7', ink: '#07101E', dark: 'radial-gradient(900px 1100px at 50% 52%, #10204A, #070B1A 70%)', mode: 'color', density: 'busy'},
+    'clinic-calm': {font_display: 'Kufi', font_text: 'Vaz', accent: '#0FB5A6', paper: '#F7FAFA', ink: '#122', dark: '#0E1A1C', mode: 'color', density: 'minimal'},
+    'terminal': {font_display: 'Changa', font_text: 'Vaz', accent: '#00E676', paper: '#EEF2EE', ink: '#0A0F0A', dark: '#050805', mode: 'mono', density: 'busy'},
+    'warm-story': {font_display: 'Messiri', font_text: 'Vaz', accent: '#D2643C', paper: '#F3E9DC', ink: '#3A2418', dark: '#24150F', mode: 'color', density: 'minimal'},
+    'royal-tech': {font_display: 'Reem', font_text: 'Vaz', accent: '#F2C14E', paper: '#F1ECF7', ink: '#1A0F33', dark: 'radial-gradient(900px 1100px at 50% 52%, #2A1660, #140B2E 70%)', mode: 'color', density: 'normal'}};
+  const th = Object.assign({}, PRESETS[(S.theme || {}).preset] || {}, S.theme || {}), rs = document.documentElement.style;
+  for (const [k, v] of Object.entries({'--o': th.accent, '--paper': th.paper, '--ink': th.ink, '--dark': th.dark, '--fd': th.font_display, '--ft': th.font_text})) if (v) rs.setProperty(k, v);
+  if (th.paper) $('paper').style.background = th.paper; if (th.dark) $('dark').style.background = th.dark;
+  document.body.classList.add(th.mode || 'color', th.density || 'normal');
+  { // a light accent (e.g. acid yellow) is unreadable on paper: keywords become ink with an accent marker band
+    const c = (th.accent || '#FF6A13').replace('#', ''), [r, g, b] = [0, 2, 4].map(i => parseInt(c.slice(i, i + 2), 16)), lum = (.299 * r + .587 * g + .114 * b) / 255;
+    if (lum > .62) { document.body.classList.add('lightaccent'); rs.setProperty('--kl', th.ink || '#111'); } }
+  if (th.density === 'busy') { $('dTL').textContent = 'MESHKANI.PRO'; $('dTR').textContent = (S.date || '').replace(/-/g, '.'); $('dBL').textContent = 'AI · ' + (S.field || 'STORY').toUpperCase();
+    $('tick').textContent = (S.ticker || S.beats.flatMap(b => (b.text.match(/\*[^*]+\*/g) || []).map(x => x.replace(/\*/g, '')))).join('   •   ').repeat(3); }
   const root = $('beats');
   for (const [i, bt] of S.beats.entries()) {
     const L = TL.lines[bt.line || bt.id]; if (!L) throw new Error('unknown line ' + (bt.line || bt.id));
     const el = h('div', 'beat ' + (bt.bg || 'paper') + (bt.huge ? ' huge' : ''));
     const tx = h('div', 'txt'); if (bt.text_top) tx.style.top = bt.text_top + 'px';
     // words: *x* = big orange keyword, **x** = bold, | = line break; must match the spoken words in order
-    const toks = bt.text.split(/\s+/).filter(Boolean), words = [];
-    let wi = 0;
-    let open = false;
+    // tokens: [tag] (spoken delivery, hidden) · | (break) · {shown|spoken} · *keyword spans* · words
+    const toks = bt.text.match(/\{[^}]*\}|\[[^\]]*\]|\S+/g) || [], words = [];
+    let wi = 0, open = false;
     for (const tk of toks) {
+      if (tk.startsWith('[')) continue;
       if (tk === '|') { tx.append(h('span', 'w br')); continue; }
-      // *one or more words* = keyword span; punctuation may follow the closing star
-      const starts = tk.startsWith('*'), ends = tk.length > 1 && /\*[،.,!؟?:…»"]*$/.test(tk), k = open || starts;
+      let shown = tk, n = 1;
+      const g = tk.match(/^\{([^|}]*)\|([^}]*)\}(.*)$/);
+      if (g) { shown = g[1] + g[3]; n = g[2].trim().split(/\s+/).length; }
+      const starts = shown.startsWith('*'), ends = shown.length > 1 && /\*[،.,!؟?:…»"]*$/.test(shown), k = open || starts;
       open = ends ? false : (starts ? true : open);
-      const clean = tk.replace(/\*/g, '');
-      const e = h('span', 'w' + (k ? ' k' : ''), '', esc(clean)); tx.append(e);
-      const wt = L.words[wi]; words.push({e, t: wt ? wt[0] : L.start + wi * .25}); wi++;
+      const e = h('span', 'w' + (k ? ' k' : ''), '', esc(shown.replace(/\*/g, ''))); tx.append(e);
+      const wt = L.words[wi]; words.push({e, t: wt ? wt[0] : L.start + wi * .25}); wi += n;
     }
     if (wi !== L.words.length) ISSUES.push(`beat ${i + 1}: ${wi} words on screen, ${L.words.length} spoken`);
     const v = (V[(bt.visual || {}).type || 'none'] || V.none)(bt.visual || {});
@@ -224,7 +274,9 @@ function seek(t) {
   let cur = BEATS.findIndex(b => t >= b.a && t < b.b); const inEnd = t >= TL.end_start;
   const bgName = inEnd ? 'dark' : (BEATS[Math.max(0, cur)]?.bt.bg || 'paper');
   // background swap with a quick blur dissolve at each beat change
-  $('paper').style.opacity = bgName === 'paper' ? 1 : 0; $('dark').style.opacity = bgName === 'dark' ? 1 : 0;
+  $('paper').style.opacity = bgName === 'paper' ? 1 : 0; $('dark').style.opacity = bgName === 'dark' ? 1 : 0; $('accentbg').style.opacity = bgName === 'accent' ? 1 : 0;
+  const lightBg = bgName !== 'dark'; for (const id of ['dTL', 'dTR', 'dBL', 'dBR', 'ticker', 'dots']) $(id).style.color = lightBg ? (bgName === 'accent' ? '#111' : 'var(--ink)') : '#eee';
+  $('tick').style.transform = `translateX(${(t * 90) % 2400 - 1200}px)`; $('dBR').textContent = cur >= 0 ? `${fa(String(cur + 1).padStart(2, '0'))}/${fa(BEATS.length)}` : '';
   $('code').style.opacity = bgName === 'paper' && !inEnd ? .55 : 0;
   $('arc').style.transform = `rotate(${t * 6}deg)`; $('floor').style.backgroundPosition = `0 ${t * 40}px`;
   BEATS.forEach((b, i) => {

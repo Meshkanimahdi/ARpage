@@ -1,6 +1,6 @@
 # Narration voices (ElevenLabs, Persian)
 
-Rule (user, 2026-10-20): alternate gender every reel — one reel female, the next male —
+Story reels (2026-10-21): the voice is chosen per story from the 9-voice table in STORY_SPEC.md §5. Older rule (user, 2026-10-20): alternate gender every reel — one reel female, the next male —
 and pick the voice whose tone fits the news.
 
 | Voice | id | Gender | Fits |
@@ -12,7 +12,7 @@ and pick the voice whose tone fits the news.
 
 Log the voice used in the reel's slot JSON (`reel.voice`) so the next reel switches gender.
 
-## Motion style rule (all motion graphics: reels, logo motion, future videos)
+## Motion style rule (logo motion and other videos; for the daily story reel it is one optional look — see STORY_SPEC.md §4)
 Every motion graphic uses the full effects set:
 - 3D: scene entrances with translateZ + rotateX, rotateY flips for icons/tiles/logos, rotateX tilts for cards. Give each scene its own `perspective` and do not use `preserve-3d` on scene containers (it slices intersecting planes).
 - Glowing lights: neon text glow, pulsing drop-shadow glows, a diagonal light streak after each cut.
