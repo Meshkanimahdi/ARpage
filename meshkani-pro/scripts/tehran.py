@@ -5,8 +5,7 @@
   tehran.py slot prepare|publish     which slot this run serves, with deadlines (JSON)
   tehran.py wait-until HH:MM         block until that Tehran time today (max 9 minutes)
   tehran.py check-deadline SLOTKEY   exit 0 if still inside the publish window, 3 if late
-  tehran.py reel prepare|publish     which daily reel this run serves (JSON): the reel published
-                                     at 09:00 covers the posts of the previous Tehran day
+  tehran.py reel prepare|publish     which daily story reel (09:00 or 15:00) this run serves (JSON)
 """
 import json
 import sys
@@ -54,30 +53,36 @@ def slot_info(phase):
 
 
 def reel_info(phase):
-    """prepare: from 21:30 the reel for tomorrow 09:00; before 08:30 the reel for today 09:00.
-    publish: today's 09:00 reel, from 07:00 until the end of the grace period."""
+    """Daily story reels at 09:00 and 15:00 (config reel.slots).
+    prepare: 21:30-23:59 -> tomorrow 09:00; 00:00-08:30 -> today 09:00; 12:30-14:30 -> today 15:00.
+    publish: the reel whose time is within 120 min before .. grace after now."""
     r, t = CONFIG["reel"], now()
-    publish_today = at(t, r["publish_at"])
-    if phase == "prepare":
-        if t >= at(t, "21:30"):
-            publish = publish_today + timedelta(days=1)
-        elif t <= publish_today - timedelta(minutes=30):
-            publish = publish_today
-        else:
-            publish = None
-    else:
-        publish = publish_today if publish_today - timedelta(minutes=120) <= t <= publish_today + GRACE else None
+    publish = None
+    for slot, s in r["slots"].items():
+        p_today = at(t, slot)
+        w0, w1 = (at(t, x) for x in s["prepare_window"])
+        if phase == "prepare":
+            if w0 <= w1 and w0 <= t <= w1:
+                publish = p_today
+            elif w0 > w1:            # window crosses midnight: evening prepares tomorrow's reel
+                if t >= w0:
+                    publish = p_today + timedelta(days=1)
+                elif t <= w1:
+                    publish = p_today
+        elif p_today - timedelta(minutes=120) <= t <= p_today + GRACE:
+            publish = p_today
+        if publish:
+            break
     if publish is None:
         return {"phase": phase, "slot_key": None, "now_tehran": t.isoformat(timespec="seconds"),
                 "error": "No reel window is open now."}
-    src = publish - timedelta(days=1)
+    hhmm = f"{publish:%H:%M}"
     return {
         "phase": phase, "kind": "reel",
-        "slot_key": f"{publish:%Y-%m-%d}|{r['publish_at']}",
-        "slot_file": f"slot_{publish:%Y-%m-%d}_{r['publish_at'].replace(':', '')}.json",
-        "date": f"{publish:%Y-%m-%d}", "slot": r["publish_at"],
-        "source_day": f"{src:%Y-%m-%d}",
-        "source_slot_files": [f"slot_{src:%Y-%m-%d}_{s.replace(':', '')}.json" for s in CONFIG["slots"]],
+        "slot_key": f"{publish:%Y-%m-%d}|{hhmm}",
+        "slot_file": f"slot_{publish:%Y-%m-%d}_{hhmm.replace(':', '')}.json",
+        "date": f"{publish:%Y-%m-%d}", "slot": hhmm,
+        "other_reel_today": [f"slot_{publish:%Y-%m-%d}_{x.replace(':', '')}.json" for x in r["slots"] if x != hhmm],
         "now_tehran": t.isoformat(timespec="seconds"),
         "publish_at": publish.isoformat(timespec="seconds"),
         "deadline": (publish + GRACE).isoformat(timespec="seconds"),

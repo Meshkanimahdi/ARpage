@@ -6,8 +6,10 @@ Instagram account `meshkani.pro`. Each scheduled run starts a fresh Claude
 session and is told which phase to run: **PREPARE** or **PUBLISH** (posts, §1–§2) or
 **REEL_PREPARE** / **REEL_PUBLISH** (the daily reel, §4–§5).
 
-Daily schedule (Tehran): **09:00** story reel (+ the same reel as a Story) · **12:00** post + 3 stories ·
-**21:00** post + 3 stories. The reel (one trending AI story in story format — news-reel/STORY_SPEC.md) is prepared the evening before (21:45, retry 23:15) and also shared to the Story.
+Daily schedule (Tehran, user 2026-10-21): **09:00** story reel · **12:00** post + 3 stories ·
+**15:00** story reel · **21:00** post + 3 stories. Each reel (one trending AI story — news-reel/STORY_SPEC.md)
+is also shared to the Story. The 09:00 reel is prepared the evening before (21:45, retry 23:15); the
+15:00 reel the same day (12:45, retry 13:45).
 
 Source of the rules: `TASK_SPEC.md` (standing task + cloud overrides) and «دستور کار انتقال انتشار محتوای meshkani.pro» (20 Oct 2026).
 Where this file and that brief disagree, the brief's safety rules win: never
@@ -19,8 +21,8 @@ publish twice, never publish late, never publish unverified content.
 
 - Time zone is `Asia/Tehran` everywhere. Get times only from
   `python3 meshkani-pro/scripts/tehran.py`.
-- Slots: `12:00` and `21:00` (posts), `09:00` (reel). Slot key format `YYYY-MM-DD|HH:MM`.
-- Per slot at most 1 post + 3 stories; per Tehran day at most 2 posts + 6 post stories + 1 reel + 1 reel story (cap 7 stories).
+- Slots: `12:00` and `21:00` (posts), `09:00` and `15:00` (reels). Slot key format `YYYY-MM-DD|HH:MM`.
+- Per slot at most 1 post + 3 stories; per Tehran day at most 2 posts + 6 post stories + 2 reels + 2 reel stories (cap 8 stories).
 - Publish window: from the slot time until slot time + 30 minutes. After that the
   slot is `SKIPPED_LATE`. A missed slot is never caught up later.
 - Never print, log or write to the sheet: API keys, Drive upload-session URLs,
@@ -513,7 +515,7 @@ Before any retry of a publish call:
 
 ---
 
-## 4. REEL_PREPARE phase (main 21:45, retry 23:15 Tehran) — daily story reel
+## 4. REEL_PREPARE phase — daily story reels (09:00 reel: main 21:45, retry 23:15 the evening before · 15:00 reel: main 12:45, retry 13:45)
 
 > **Outdated wording in scheduled prompts:** if the PHASE message still says "from
 > today's two published news (12:00 then 21:00)", "a different narrator per news" or "only the posts'
@@ -536,6 +538,9 @@ two-news reel in REEL_SPEC.md is retired.)
 3. `bash news-reel/setup.sh`.
 
 ### 4.2 Story research (trending)
+0. Two reels a day: the 15:00 reel must differ from the same day's 09:00 reel (read its slot file
+   `creative` + topic) in story, angle, shape, look preset and voice (prefer the other gender), and the
+   09:00 reel from the previous day's 15:00 reel. Never the same story twice in a day.
 1. History: `Reels` tab (last 14 rows: topic, and angle/shape/preset/voice in Notes), the last 7 days
    of posts, and the previous reel's slot file `creative`.
 2. Find 8–15 candidates trending in AI in the last 24–72 h (WebSearch across outlets, launches, viral
@@ -580,7 +585,7 @@ two-news reel in REEL_SPEC.md is retired.)
    tell the idea with attribution; the closing question + «👇»; `منبع: <name>، <date>`; photo credit
    line if a real photo is used; 4–6 hashtags. No URLs.
 3. `Reels` row (find-or-append, `USER_ENTERED`), A–T: Content ID · Reel Topic (`<field> | <idea>`) ·
-   `Ready` · Production · Scheduled `<D+1> 09:00:00` · blank · Source URLs · News Text (the idea, 2–3
+   `Ready` · Production · Scheduled `<date> <09:00|15:00>:00` · blank · Source URLs · News Text (the idea, 2–3
    sentences) · **Reel Script** (all beats' text, numbered) · **Motion Graphics Prompt** (per beat: bg +
    visual type + elements) · Duration · Video Drive URL · Final Caption · blank · Source Post IDs
    («—» unless based on a post) · Voices · **Music Prompt** · **Image Edit Prompts** (the element-sheet
@@ -590,15 +595,15 @@ two-news reel in REEL_SPEC.md is retired.)
    `creative` {angle, shape, preset, voice, tempo}, `cost_usd`, `sheet.reel_row`, `reel` ids null).
    Notes column: `angle=… shape=… preset=… voice=… tempo=…`. Log row (§3).
 
-## 5. REEL_PUBLISH phase (starts 08:57 → publish 09:00 Tehran)
+## 5. REEL_PUBLISH phase (starts 08:57 → 09:00, and 14:57 → 15:00 Tehran)
 
 1. Setup (§0.1), control (§0.2), slot `tehran.py reel publish`, lock `__reel_publish`.
 2. Reel slot file by status: `READY` → continue; `RESEARCHING…QA` → wait like §2.1; `PUBLISHING` /
    `NEEDS_RECONCILIATION` → reconcile only (§2.5 rules, container status + latest media); `PUBLISHED`
    → stop; missing / `FAILED` / `SKIPPED_*` → log, stop.
-3. Cap: no other reel published today (slot files + live media). Identity and publishing limit as §2.1
+3. Cap: at most 2 reels a day and never two for the same slot (slot files + live media). Identity and publishing limit as §2.1
    (limit ≥ 1). Duplicate guard: last 10 media — a REELS item with this caption → record it, done.
-4. `tehran.py wait-until 09:00`; `check-deadline <slot_key>` must exit 0. `DRY_RUN` → stop here.
+4. `tehran.py wait-until <slot>` (09:00 or 15:00); `check-deadline <slot_key>` must exit 0. `DRY_RUN` → stop here.
 5. `share_public` the MP4 and the cover. Re-check Kill Switch. `INSTAGRAM_POST_IG_USER_MEDIA` with
    `ig_user_id`, `media_type: REELS`, `video_url: public_image_url(video_id)`, `cover_url:
    public_image_url(cover_id)`, `caption` (raw `#`), `share_to_feed: true` → save `reel.container_id`,
@@ -627,7 +632,7 @@ two-news reel in REEL_SPEC.md is retired.)
 
 ## 3. Reporting — sheet tab `Automation Log`
 
-Append one row per phase end and per error (reel phases: Slot `YYYY-MM-DD|09:00`, Phase `REEL_PREPARE`/`REEL_PUBLISH`, cost column = clean-plate cost), columns A–H:
+Append one row per phase end and per error (reel phases: Slot `YYYY-MM-DD|09:00` or `|15:00`, Phase `REEL_PREPARE`/`REEL_PUBLISH`, cost column = clean-plate cost), columns A–H:
 `Logged At (Tehran) | Slot | Phase | Status | Content ID | Details | Image Cost (USD) | Run ID`.
 Details are short, plain Persian or English, no secrets or temporary links.
 No other notification channel is used.

@@ -21,8 +21,8 @@
     "posts_per_slot": 1,
     "stories_per_slot": 3,
     "posts_per_day": 2,
-    "stories_per_day": 7,
-    "note": "6 post stories + 1 reel story (2026-10-21)"
+    "stories_per_day": 8,
+    "note": "6 post stories + 2 reel stories (2026-10-21)"
   },
   "google": {
     "spreadsheet_id": "1V6PkoiYAprKCEvsfT1ThGkKTouldAVWG7SoM1Ejrfyo",
@@ -122,34 +122,31 @@
     "AI models and tools"
   ],
   "reel": {
-    "publish_at": "09:00",
-    "prepare_main": "21:45",
-    "prepare_retry": "23:15",
-    "grace_minutes": 30,
-    "source": "the posts published in the previous Tehran day's 12:00 and 21:00 slots, in that order",
-    "max_seconds": 60.5,
-    "per_news_speech_budget_s": 26,
-    "max_clean_plates_per_news": 2,
-    "caps": {
-      "reels_per_day": 1
+    "slots": {
+      "09:00": {
+        "prepare_window": [
+          "21:30",
+          "08:30"
+        ],
+        "prepare_main": "21:45 (previous day)",
+        "prepare_retry": "23:15 (previous day)"
+      },
+      "15:00": {
+        "prepare_window": [
+          "12:30",
+          "14:30"
+        ],
+        "prepare_main": "12:45",
+        "prepare_retry": "13:45"
+      }
     },
-    "voices": {
-      "female": [
-        {
-          "name": "Niloofar",
-          "id": "N7wuKHXQQ5fKd75noieq"
-        },
-        {
-          "name": "Setareh",
-          "id": "8Ebkg5uUcbSbeqGucAoR"
-        }
-      ],
-      "male": [
-        {
-          "name": "Hooman",
-          "id": "XzieuK0bwYWT9Kl1LhLs"
-        }
-      ]
+    "publish_at": "09:00",
+    "grace_minutes": 30,
+    "format": "story reel (news-reel/STORY_SPEC.md)",
+    "max_seconds": 92,
+    "caps": {
+      "reels_per_day": 2,
+      "reel_stories_per_day": 2
     }
   }
 }

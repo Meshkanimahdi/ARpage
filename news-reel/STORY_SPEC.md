@@ -1,6 +1,6 @@
 # Daily story reel — creative and production spec (user decisions, 2026-10-21)
 
-**Goal:** one reel every day at 09:00 Tehran that grabs attention in the first second, keeps people
+**Goal:** two reels every day, at 09:00 and 15:00 Tehran (user 2026-10-21), each grabbing attention in the first second, keeps people
 watching to the end (watch time, completion, rewatches) and makes them comment — built from a
 **trending, verified AI story** and told as a short story. 60–90 s, one narrator, **the on-screen text
 is the narration, word by word**. Approved reference: REEL-002 (Hinton, «لوله‌کش شو»), inspired by
@@ -8,7 +8,7 @@ is the narration, word by word**. Approved reference: REEL-002 (Hinton, «لول
 neon/particles/3D rule of VOICES.md is no longer mandatory — it is one of the looks below.
 
 **Never the same reel twice:** every reel varies its *angle*, *story shape*, *look*, *voice* and
-*rhythm*. Before writing, read the last 7 rows of the `Reels` tab (columns B, P, Notes) and the
+*rhythm* — also between the two reels of the same day. Before writing, read the last 7 rows of the `Reels` tab (columns B, P, Notes) and the
 previous reel's `story.json`; record today's choices in the slot file → `creative` and in Notes.
 
 ---
