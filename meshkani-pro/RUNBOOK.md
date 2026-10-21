@@ -20,7 +20,7 @@ publish twice, never publish late, never publish unverified content.
 - Time zone is `Asia/Tehran` everywhere. Get times only from
   `python3 meshkani-pro/scripts/tehran.py`.
 - Slots: `12:00` and `21:00` (posts), `09:00` (reel). Slot key format `YYYY-MM-DD|HH:MM`.
-- Per slot at most 1 post + 3 stories; per Tehran day at most 2 posts + 6 stories + 1 reel.
+- Per slot at most 1 post + 3 stories; per Tehran day at most 2 posts + 6 post stories + 1 reel + 1 reel story (cap 7 stories).
 - Publish window: from the slot time until slot time + 30 minutes. After that the
   slot is `SKIPPED_LATE`. A missed slot is never caught up later.
 - Never print, log or write to the sheet: API keys, Drive upload-session URLs,
@@ -585,7 +585,18 @@ news that were **published** in day D's 12:00 and 21:00 slots, in that order. To
 8. Verify `INSTAGRAM_GET_IG_MEDIA` (`id,permalink,timestamp,media_product_type,media_type,username,caption`):
    `REELS`, right username, caption matches. Save permalink/time → `PUBLISHED`.
 9. `Reels` row: Status `Published`, Actual Publish time, Published Post URL, Instagram Media ID.
-   `unshare_public` both files. Log row.
+10. **Reel as a Story** (when the slot file has `story.drive_file_id`; user rule 2026-10-21: every reel is
+    also shared to the Story). Right after the reel is verified: re-check Kill Switch; `share_public`
+    the story MP4; `INSTAGRAM_POST_IG_USER_MEDIA` with `media_type: STORIES`, `video_url:
+    public_image_url(story_id)` → save `story.container_id` (`CONTAINER_CREATED`); poll
+    `INSTAGRAM_GET_POST_STATUS` until `FINISHED` (max ~8 min); `INSTAGRAM_POST_IG_USER_MEDIA_PUBLISH`
+    → `story.media_id`; verify `INSTAGRAM_GET_IG_MEDIA` (`media_product_type` `STORY`, username);
+    save permalink, published_at, expires_at (+24 h), `PUBLISHED`. Stories accept 3–60 s video: the
+    story file is the reel cut to ≤ 60 s at a sentence boundary + the end card (REEL_PREPARE makes it:
+    `REEL-NNN-story.mp4`). A failed story never re-publishes the reel. Add a `Stories` row (Story ID
+    `REEL-NNN-STORY`, Parent `REEL-NNN`, Sequence 1, Published, times, Media ID, Parent Post URL =
+    the reel permalink, Expires At).
+11. `unshare_public` every shared file. Log row.
 
 ---
 

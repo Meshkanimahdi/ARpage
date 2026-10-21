@@ -11,6 +11,7 @@ if [ -z "$mime" ]; then
     *.jpg|*.jpeg) mime=image/jpeg ;;
     *.png) mime=image/png ;;
     *.json) mime=application/json ;;
+    *.mp4) mime=video/mp4 ;;
     *) mime=application/octet-stream ;;
   esac
 fi

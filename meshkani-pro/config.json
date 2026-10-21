@@ -21,7 +21,8 @@
     "posts_per_slot": 1,
     "stories_per_slot": 3,
     "posts_per_day": 2,
-    "stories_per_day": 6
+    "stories_per_day": 7,
+    "note": "6 post stories + 1 reel story (2026-10-21)"
   },
   "google": {
     "spreadsheet_id": "1V6PkoiYAprKCEvsfT1ThGkKTouldAVWG7SoM1Ejrfyo",

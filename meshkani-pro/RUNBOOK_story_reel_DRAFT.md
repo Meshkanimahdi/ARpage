@@ -46,7 +46,8 @@ reel in REEL_SPEC.md is retired.)
 
 ### 4.5 Storage, caption, sheet
 1. Content ID `REEL-NNN`. Drive: `YYYY-MM-DD_REEL-NNN` under `ریلز` (`google.reels_folder_id`) with
-   `REEL-NNN.mp4`, `REEL-NNN-cover.jpg`; `story.json`, `elements.json`, `el/_sheet-*.jpg`,
+   `REEL-NNN.mp4`, `REEL-NNN-cover.jpg`, `REEL-NNN-story.mp4` (the reel cut to ≤ 60 s at a sentence
+   boundary + 1.7 s of the end card, for the Story share in §5 step 10; `story` block in the slot file); `story.json`, `elements.json`, `el/_sheet-*.jpg`,
    `timeline.json`, `dossier.json` to `_automation/packages/<D+1>_0900_REEL-NNN/`.
 2. Caption like the reference: hook question line (+ one emoji at most); 2–4 short sentences that
    tell the idea with attribution; the closing question + «👇»; `منبع: <name>، <date>`; photo credit
