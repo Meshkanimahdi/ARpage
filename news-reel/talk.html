@@ -53,10 +53,26 @@
   #end .heart{width:150px;height:150px;background:var(--terra);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-8-5.3-8-11a4.6 4.6 0 0 1 8-3 4.6 4.6 0 0 1 8 3c0 5.7-8 11-8 11z'/%3E%3C/svg%3E") center/contain no-repeat}
   #end .ha{font:600 56px Vaz;direction:ltr;color:var(--gold)}
   #end .cta{font:800 40px Vaz;color:var(--cream);background:var(--ink);padding:12px 36px 15px;border-radius:40px}
+  /* layout "full" (plan.layout): the speaker fills the screen; two frosted panels sit exactly over the source's
+     burned-in graphics (top) and captions (bottom) and carry our own element/chapter and karaoke captions */
+  #glassT,#glassB,#chapbig{display:none}
+  .full #card{left:0;top:0;width:1080px;height:1920px;border-radius:0;box-shadow:none}
+  .full #card img{width:1080px;height:1920px;transform-origin:50% 21%}
+  .full #card .vig{background:linear-gradient(rgba(0,0,0,.22),transparent 14%,transparent 78%,rgba(0,0,0,.3))}
+  .full #glassT{display:block;position:absolute;left:44px;right:44px;top:146px;height:468px;border-radius:46px;backdrop-filter:blur(40px) saturate(1.1);-webkit-backdrop-filter:blur(40px);background:rgba(248,245,238,.74);box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),0 24px 60px rgba(0,0,0,.16)}
+  .full #glassB{display:block;position:absolute;left:44px;right:44px;top:1356px;height:276px;border-radius:46px;backdrop-filter:blur(30px) saturate(1.1);-webkit-backdrop-filter:blur(30px);background:rgba(250,247,241,.66);box-shadow:inset 0 0 0 2px rgba(255,255,255,.6),0 24px 60px rgba(0,0,0,.18)}
+  .full #cap{top:1356px;height:276px;left:80px;right:80px}
+  .full #cap b{font-size:70px} .full #cap b.k{font-size:90px}
+  .full #prog{top:78px;background:rgba(255,255,255,.4)}
+  .full #chap{display:none}
+  .full #chapbig{display:block;position:absolute;left:60px;right:60px;top:250px;height:330px;display:flex;align-items:center;justify-content:center;font:400 120px Lalezar;color:var(--ink);text-align:center}
+  .full .el{width:300px;height:300px}
+  .full .qc{top:700px}
 </style></head><body>
 <div id="bg"><div class="blob" style="width:700px;height:700px;background:#e6cf9f;left:-200px;top:1100px"></div><div class="blob" style="width:600px;height:600px;background:#c9d3bd;right:-200px;top:-100px"></div><div id="grain"></div></div>
 <div id="prog"><i></i></div><div id="chap"><span></span></div>
 <div id="card"><img id="v"><div class="vig"></div></div>
+<div id="glassT"></div><div id="glassB"></div><div id="chapbig"></div>
 <div id="els"></div>
 <div id="qcs"></div>
 <div id="scene"><div class="ring"></div><div class="big"><img></div><div class="ttl"></div><div class="tag"><span></span></div></div>
@@ -71,7 +87,7 @@ const $ = s => document.querySelector(s);
 window.ISSUES = []; window.START = 0;
 let P, PH = [], ELS = [], QCS = [];
 window.ready = (async () => {
-  P = await (await fetch(DIR + 'plan.json')).json(); window.DURATION = P.dur;
+  P = await (await fetch(DIR + 'plan.json')).json(); window.DURATION = P.dur; const FULL = P.layout === 'full'; if (FULL) document.body.classList.add('full');
   await Promise.all(['900 70px Vaz', '800 30px Vaz', '400 70px Lalezar', '700 70px Markazi', '600 30px Vaz'].map(f => document.fonts.load(f, f.includes('600') ? '@abc' : 'سلام')));
   // caption phrases: break on punctuation, a pause, or 4 words
   let cur = [];
@@ -83,7 +99,8 @@ window.ready = (async () => {
   for (const e of P.els) { const d = document.createElement('div'); d.className = 'el'; d.innerHTML = `<img src="${DIR}el/${e.id}.png">`;
     const l = document.createElement('div'); l.className = 'lab'; l.textContent = e.label;
     if (e.side === 'l') { d.style.left = '20px'; l.style.left = '60px'; } else { d.style.right = '20px'; l.style.right = '60px'; }
-    d.style.top = '790px'; l.style.top = '1125px'; $('#els').append(d, l); ELS.push([e, d, l]); }
+    if (FULL) { d.style.top = '262px'; l.style.top = '548px'; d.style.left = '390px'; d.style.right = ''; d.style.top = '228px'; l.style.left = l.style.right = ''; l.style.top = '540px'; l.style.left = '50%'; l.style.marginLeft = '0'; l.dataset.c = 1; }
+    else { d.style.top = '790px'; l.style.top = '1125px'; } $('#els').append(d, l); ELS.push([e, d, l]); }
   for (const c of P.cards) { const d = document.createElement('div'); d.className = 'qc ' + c.kind;
     d.innerHTML = (c.kind === 'quote' ? '<div class="q">”</div>' : '') + `<div class="t">${c.text.replace('|', '<br>')}</div><div class="s">${c.sub}</div>`; $('#qcs').append(d); QCS.push([c, d]); }
   await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('img ' + i.src))));
@@ -93,17 +110,20 @@ window.ready = (async () => {
 let lastSc = null;
 window.seek = async t => {
   // speaker frame
-  const v = $('#v'), src = `${DIR}frames/${String(Math.min(Math.floor(t * 30 + 1e-6), 99999)).padStart(5, '0')}.jpg`;
+  const v = $('#v'), src = `${DIR}${P.frames || 'frames'}/${String(Math.min(Math.floor(t * 30 + 1e-6), 99999)).padStart(5, '0')}.jpg`;
   if (!v.src.endsWith(src)) { v.src = src; await v.decode().catch(() => {}); }
   // punch-ins: alternate 1.0 / 1.13 at each sentence start, slow push in between
   let zi = 0; P.zoom.forEach((z, i) => { if (t >= z) zi = i; });
-  const base = zi % 2 ? 1.1 : 1.0, push = (t - P.zoom[zi]) * .006;
+  const FULL = P.layout === 'full', base = zi % 2 ? (FULL ? 1.06 : 1.1) : 1.0, push = (t - P.zoom[zi]) * (FULL ? .003 : .006);
   v.style.transform = `scale(${base + push}) translate(${zi % 2 ? (zi % 4 === 1 ? 10 : -10) : 0}px,0)`;
   // scenes (full screen) hide the card
   const sc = P.scenes.find(s => t >= s.t0 - .3 && t < s.t1 + .3);
   let so = 0; if (sc) so = Math.min(sm((t - sc.t0 + .3) / .35), sm((sc.t1 + .3 - t) / .35));
   const card = $('#card'), endk = sm((t - P.end) / .5), cardIn = back(t / .5);
-  card.style.transform = `scale(${(.6 + .4 * cardIn) * (1 - so * .15) * (1 - endk * .2)}) translateY(${so * 120}px)`; card.style.opacity = (1 - so) * (1 - endk);
+  if (FULL) { card.style.transform = ''; card.style.opacity = 1 - endk; for (const g of ['#glassT', '#glassB']) $(g).style.opacity = (1 - so) * (1 - endk);
+    const anyEl = ELS.some(([e]) => t >= e.t0 - .1 && t < e.t1 + .2), cb = $('#chapbig'); let chn = P.chapters[0]; P.chapters.forEach(c => { if (t >= c[0]) chn = c; });
+    cb.textContent = chn[1]; cb.style.opacity = (anyEl ? 0 : 1) * (1 - so) * (1 - endk); cb.style.transform = `scale(${.85 + .15 * back((t - chn[0]) / .45)})`; }
+  else card.style.transform = `scale(${(.6 + .4 * cardIn) * (1 - so * .15) * (1 - endk * .2)}) translateY(${so * 120}px)`; if (!FULL) card.style.opacity = (1 - so) * (1 - endk);
   const S = $('#scene'); S.style.opacity = so;
   if (sc) { if (lastSc !== sc) { lastSc = sc; S.querySelector('.big img').src = DIR + 'el/' + sc.el + '.png'; await S.querySelector('.big img').decode().catch(() => {});
       S.querySelector('.ttl').innerHTML = sc.title.split('|').map(l => l.split(' ').map(w => `<span>${w}</span>`).join(' ')).join('<br>'); S.querySelector('.tag span').textContent = sc.tag; }
@@ -115,7 +135,7 @@ window.seek = async t => {
   for (const [e, d, l] of ELS) { const k = inout(t, e.t0, e.t1, .45); d.style.opacity = clamp(k * 3) * (1 - so); l.style.opacity = d.style.opacity;
     const f = Math.sin((t - e.t0) * 2.2) * 10, dir = e.side === 'l' ? -1 : 1;
     d.style.transform = `translateY(${(1 - k) * 160 + f}px) scale(${.4 + .6 * k}) rotate(${dir * (1 - k) * 25 + Math.sin(t * 1.6) * 3}deg)`;
-    const lk = inout(t, e.t0 + .25, e.t1, .35); l.style.transform = `scale(${lk}) rotate(${dir * 4}deg)`; }
+    const lk = inout(t, e.t0 + .25, e.t1, .35); l.style.transform = (l.dataset.c ? 'translateX(-50%) ' : '') + `scale(${lk}) rotate(${dir * 4}deg)`; }
   // quote / bubble cards
   for (const [c, d] of QCS) { const k = inout(t, c.t0, c.t1, .4); d.style.opacity = clamp(k * 3); d.style.transform = `scale(${.75 + .25 * k}) rotate(${(1 - k) * -6}deg)`; }
   // captions (karaoke): current phrase, spoken words full, active word with a gold marker
@@ -125,13 +145,13 @@ window.seek = async t => {
       const p = back((t - w.s + .05) / .22); b.style.opacity = on ? 1 : .28; b.style.transform = `translateY(${on ? (1 - p) * 26 : 10}px) scale(${on ? .9 + .1 * p : .92})`;
       b.style.color = so > .5 ? (w.k ? '#e0b765' : '#f3eee6') : ''; b.querySelector('.m').style.transform = `scaleX(${act ? sm((t - w.s) / .18) : (on ? 1 : 0)})`;
       b.querySelector('.m').style.opacity = act ? 1 : .0; });
-    cap.style.top = so > .5 ? '1400px' : '1170px'; cap.style.opacity = 1 - endk; }
+    cap.style.top = FULL ? (so > .5 ? '1380px' : '1356px') : (so > .5 ? '1400px' : '1170px'); cap.style.opacity = 1 - endk; }
   else cap.innerHTML = '';
   // header
   $('#prog i').style.width = (t / P.dur * 100) + '%';
   let ch = P.chapters[0]; P.chapters.forEach(c => { if (t >= c[0]) ch = c; });
   const cs = $('#chap span'); cs.textContent = ch[1]; const ck = back((t - ch[0]) / .4); cs.style.transform = `scale(${ck})`;
-  $('#chap').style.opacity = 1 - endk;
+  $('#chap').style.opacity = (1 - endk) * (FULL ? 1 - so : 1);
   // end card
   const E = $('#end'); E.style.opacity = endk; [...E.children].forEach((c, i) => { const p = back((t - P.end - .2 - i * .18) / .45); c.style.transform = `translateY(${(1 - p) * 60}px) scale(${.7 + .3 * p})`; c.style.opacity = clamp((t - P.end - .2 - i * .18) / .2); });
 };
