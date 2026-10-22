@@ -574,7 +574,7 @@ two-news reel in REEL_SPEC.md is retired.)
    exit 4 → respell/rephrase the flagged beats). 60–90 s.
 
 ### 4.4 Render and QC
-1. `node news-reel/reel_render.mjs --dir=work/story --page=<flow.html|line.html|story.html> --mode=check` (the engine chosen for
+1. `node news-reel/reel_render.mjs --dir=work/story --page=<kinetic.html|flow.html|line.html|story.html> --mode=check` (the engine chosen for
    this reel, STORY_SPEC §8.0 — vary it reel to reel); Read every
    `out/sheet*.jpg`. Fix ISSUES (word mismatch), text overflow, wrong/ugly cut-outs, a visual that does
    not match its sentence, distorted people/products. Max 3 rounds.

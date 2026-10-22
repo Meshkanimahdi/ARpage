@@ -181,9 +181,9 @@ wireframe…
 ### 8.0 Engines, style rotation and motion craft (user rules 2026-10-22 — read before designing any reel)
 The user rejected the collage look ("cut-outs and icons that just slide around look childish"). Reference:
 the viral @ensan.besham reel (2.3M views) — glowing line-art explainers. **No fixed style (user rule 2026-10-22): every reel gets
-its own style.** Three engines: **`flow.html`** (one morphing actor of light, below) and **`line.html`** (glowing line-art explainer, below) and **`story.html`** (looks
+its own style.** Four engines: **`kinetic.html`** (agency kinetic type + UI, below), **`flow.html`** (one morphing actor of light, below) and **`line.html`** (glowing line-art explainer, below) and **`story.html`** (looks
 in §4: paper-ember, mono-press, acid-pop, neon-night, maxi-pop, soft-ui …). Choose engine + look per story;
-never the same engine *and* look two reels in a row; across a week use all three engines and at least 4 looks.
+never the same engine *and* look two reels in a row; across a week use at least three of the four engines and at least 4 looks.
 The motion craft below (smooth expo easing, continuous movement, things that visibly happen, lead visual
 filling the frame, no empty or frozen frames, no toy-like bouncing) applies to **every** engine and look.
 - **One continuous canvas.** Each beat is a station on a big world; the camera travels to the next
@@ -203,6 +203,19 @@ filling the frame, no empty or frozen frames, no toy-like bouncing) applies to *
   (plain background works best; crop to the subject first) → `lineart` visual. Credit the photo.
 
 `story.json` for line.html: `{motion: {theme: {bg, line, acc, accents?}}, beats: [{id, text, head?, visual}], end_text}`.
+**kinetic.html — agency kinetic typography + UI** (user references 2026-10-22: @arpit_clipsyk Dbc1KrKh2wV,
+@olafmotion DbSpdwSsdnF, @mgulifes DM-pomvI6AM). Light gradient pages and dark pages alternate (`bg: "dark"`).
+`story.json`: `{kinetic: {theme: {light, dark, ink, acc}}, beats: [{id, text, bg?, visual}], end_text}`; the
+`text` may contain `[icon:lucide-name]` tokens, shown as icon tiles inside the typed line and not spoken.
+Types: `type` (the narration typed with a cursor, icons inside the words, `*accent*` marker — the signature
+move; use it for every 2nd–3rd beat), `whip` (`word`: one giant word that flies in with motion blur), `pills`
+(`items`: glass pills sliding, a search lens turning each on — lists, pipelines), `kpi` (`label`, `from`,
+`to`, `prefix`, `suffix`, `decimals`, `delta`, `points`: a dark card whose number climbs while its chart draws),
+`stack` (`images`, `head`: real photos / screenshots as tilted 3D layers), `route` (`cards[{img, title, sub,
+tag}]`: photo cards joined by a route line that draws), `zoom` (`icon`, `head`: an icon tile that zooms through
+the camera into the next beat — a match cut). Non-`type` beats show the narration as a caption that lights up
+word by word. Vary `theme` per reel (yellow/black is the reference; also lime/ink, coral/navy, ice/violet).
+
 **flow.html — one actor that never cuts** (user references 2026-10-22: @louis_rlee DeKOzQRouIf, motion by
 Claude in code; @topintownagency Dd8tGxYugym). A single point of light grows into each beat's form, lives
 through the beat, and collapses back to a point that becomes the next form; bloom, lens streak, particle
