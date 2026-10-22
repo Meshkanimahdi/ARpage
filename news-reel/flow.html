@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro flow reel</title>
+<!-- Flow engine (STORY_SPEC §8.0): ONE glowing actor that keeps transforming from beat to beat — a spark that
+     ripples, a ring of particles with trails, a flower, a star, a glossy card, concentric arcs with runners, a
+     spring chain of pills, an infinity loop, liquid blobs, an orbit of chips over a neon waveform, a glass prompt
+     bar — always collapsing to a point of light and re-forming, never cutting. One line of text under it.
+     References: @louis_rlee (DeKOzQRouIf) and @topintownagency (Dd8tGxYugym). Data: story.json + timeline.json. -->
+<style>
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-700-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-700-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: Markazi; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/markazi-text/files/markazi-text-arabic-700-normal.woff2); }
+  @font-face { font-family: Inter; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); }
+  :root { --bg: #050404; --ink: #F4EEE8; --a1: #FFB547; --a2: #FF3D6E; --lbg: #F4EEE8; --link: #1A1412; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Vaz; }
+  canvas { position: absolute; inset: 0; }
+  #iris { position: absolute; inset: 0; background: radial-gradient(circle at 50% 70%, #fff, var(--lbg) 60%); clip-path: circle(0px at 540px 960px); }
+  #svgl { position: absolute; inset: 0; overflow: visible; }
+  #line { position: absolute; left: 70px; right: 70px; top: 1290px; text-align: center; font-weight: 500; font-size: 54px; line-height: 1.5; color: var(--ink); direction: rtl; }
+  #line span { display: inline-block; margin: 0 7px; will-change: filter, opacity, transform; }
+  #line span.k { font-family: Markazi, Vaz; font-weight: 700; font-size: 68px; background: linear-gradient(90deg, var(--a2), var(--a1)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .light #line { color: var(--link); }
+  #top { position: absolute; left: 0; right: 0; top: 150px; text-align: center; font: 600 30px Inter, Vaz; color: rgba(244,238,232,.7); letter-spacing: .5px; direction: rtl; }
+  .light #top { color: rgba(26,20,18,.6); }
+  .card { position: absolute; left: 190px; width: 700px; height: 260px; top: 700px; border-radius: 40px; background: linear-gradient(105deg, var(--a2), var(--a1)); box-shadow: 0 0 60px rgba(255,90,90,.45), inset 0 2px 0 rgba(255,255,255,.45), inset 0 -20px 40px rgba(0,0,0,.18); display: flex; align-items: center; gap: 30px; padding: 0 50px; box-sizing: border-box; color: #fff; transform-style: preserve-3d; }
+  .card b { font-size: 64px; font-weight: 700; } .card i { font-style: normal; font-size: 30px; opacity: .8; display: block; }
+  .card::after { content: ''; position: absolute; left: 20px; right: 20px; top: 100%; height: 160px; margin-top: 18px; border-radius: 40px; background: inherit; opacity: .18; filter: blur(14px); transform: scaleY(-1); -webkit-mask: linear-gradient(transparent 30%, #000); }
+  .pill { position: absolute; padding: 18px 34px 20px; border-radius: 40px; font-weight: 700; font-size: 38px; white-space: nowrap; color: #fff; background: #1D1715; box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.18); }
+  .pill.hot { background: linear-gradient(105deg, var(--a2), var(--a1)); }
+  .chip { position: absolute; padding: 8px 20px 10px; border-radius: 30px; font-weight: 700; font-size: 26px; white-space: nowrap; color: #fff; background: linear-gradient(105deg, var(--a2), var(--a1)); box-shadow: 0 0 24px rgba(255,80,80,.55); }
+  .glass { position: absolute; left: 120px; width: 840px; top: 760px; height: 190px; border-radius: 46px; background: rgba(20,18,28,.55); backdrop-filter: blur(20px); box-shadow: 0 0 0 3px transparent, 0 0 50px rgba(120,120,255,.35); }
+  .glass::before { content: ''; position: absolute; inset: -3px; border-radius: 49px; padding: 3px; background: conic-gradient(from var(--ga, 0deg), #4FA3FF, #A86BFF, #FF5C8A, #FFB547, #4FA3FF); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; filter: drop-shadow(0 0 10px #A86BFF); }
+  .glass .ty { position: absolute; right: 50px; left: 50px; top: 36px; font-weight: 500; font-size: 36px; color: #E8E6F5; direction: rtl; white-space: nowrap; overflow: hidden; }
+  .glass .row { position: absolute; left: 40px; right: 40px; bottom: 30px; display: flex; justify-content: space-between; align-items: center; direction: ltr; }
+  .glass .row span { font: 600 24px Inter; color: #B9B6CC; border: 2px solid #444; border-radius: 22px; padding: 6px 16px; }
+  .glass .row i { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #A86BFF, #FF5C8A); display: block; box-shadow: 0 0 20px #A86BFF; }
+  #end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; opacity: 0; }
+  #end img { width: 230px; filter: drop-shadow(0 0 34px rgba(16,245,238,.6)); }
+  #end .h { font: 600 52px Inter; letter-spacing: 10px; color: #fff; direction: ltr; }
+  #end .q { font-weight: 700; font-size: 44px; color: #DDD; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="cv" width="1080" height="1920"></canvas>
+  <div id="iris"></div>
+  <canvas id="cv2" width="1080" height="1920"></canvas>
+  <svg id="svgl" width="1080" height="1920"><defs>
+    <filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="22" result="b"/><feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 28 -11" result="g"/><feComposite in="SourceGraphic" in2="g" operator="atop"/></filter>
+    <radialGradient id="gloss" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FFE2B0"/><stop offset=".45" stop-color="var(--a1)"/><stop offset="1" stop-color="var(--a2)"/></radialGradient>
+  </defs><g id="blobs" filter="url(#goo)"></g><g id="links"></g></svg>
+  <div id="dom"></div>
+  <div id="top"></div>
+  <div id="line"></div>
+  <div id="end"><img src="/news-reel/assets/m.png"><div class="h">MESHKANI.PRO</div><div class="q"></div></div>
+</div>
+<script src="/logo-motion/node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const url = s => s.startsWith('/') ? s : DIR + s;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), P = (t, a, b) => clamp((t - a) / (b - a)), lerp = (a, b, k) => a + (b - a) * k;
+const E = {o: gsap.parseEase('expo.out'), io: gsap.parseEase('expo.inOut'), p3: gsap.parseEase('power3.out'), s: gsap.parseEase('sine.inOut'), bk: gsap.parseEase('back.out(1.2)')};
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
+function h(tag, cls, style, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (style) e.style.cssText = style; if (html !== undefined) e.innerHTML = html; return e; }
+const NS = 'http://www.w3.org/2000/svg'; function sv(tag, at, p) { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); if (p) p.append(e); return e; }
+const cv = $('cv'), x = cv.getContext('2d'), cv2 = $('cv2'), x2 = cv2.getContext('2d');
+const CX = 540, CY = 900, ISSUES = [];
+let C1 = '#FFB547', C2 = '#FF3D6E', INK = '#F4EEE8';
+const mix = (k) => { const a = [C1, C2].map(c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16))); return `rgb(${a[0].map((v, i) => Math.round(lerp(v, a[1][i], k))).join(',')})`; };
+
+// ---- light primitives (additive) ----
+function glow(c, X, Y, r, col, a = 1) { const g = c.createRadialGradient(X, Y, 0, X, Y, r); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); c.globalAlpha = a; c.fillStyle = g; c.fillRect(X - r, Y - r, 2 * r, 2 * r); c.globalAlpha = 1; }
+function spark(c, X, Y, s, col, a = 1) { glow(c, X, Y, 60 * s, col, .55 * a); glow(c, X, Y, 18 * s, '#fff', a); }
+function streak(c, X, Y, w, a) { const g = c.createLinearGradient(X - w, Y, X + w, Y); g.addColorStop(0, 'rgba(255,180,90,0)'); g.addColorStop(.5, `rgba(255,220,170,${a})`); g.addColorStop(1, 'rgba(255,180,90,0)'); c.fillStyle = g; c.fillRect(X - w, Y - 3, 2 * w, 6); }
+function trail(c, f, t, n, dt, size, colK) { for (let k = n; k >= 0; k--) { const [X, Y] = f(t - k * dt); const a = 1 - k / (n + 1); c.globalAlpha = a * .9; c.fillStyle = mix(colK); c.beginPath(); c.arc(X, Y, size * (.35 + .65 * a), 0, 7); c.fill(); } c.globalAlpha = 1; const [X, Y] = f(t); spark(c, X, Y, size / 9, mix(colK)); }
+function stroke(c, pts, w, col, a = 1, blur = 14) { c.save(); c.globalAlpha = a; c.strokeStyle = col; c.lineWidth = w; c.lineCap = 'round'; c.lineJoin = 'round'; c.shadowColor = col; c.shadowBlur = blur; c.beginPath(); pts.forEach(([X, Y], i) => i ? c.lineTo(X, Y) : c.moveTo(X, Y)); c.stroke(); c.restore(); }
+
+// ---- forms: draw(t, k_in, k_out, beat) at the actor's place; k_in 0→1 after the dot, k_out 1→0 before the next ----
+const F = {};
+F.spark = (t, a, k, o, b) => {   // a drop falls, hits, ripples, flares with a lens streak
+  const fall = P(t, a - .2, a + .45), y = lerp(CY - 520, CY, E.p3(fall));
+  if (fall < 1) { trail(x2, tt => [CX, lerp(CY - 520, CY, E.p3(P(tt, a - .2, a + .45)))], t, 10, .016, 9, 0); return; }
+  for (let i = 0; i < 4; i++) { const r = P(t, a + .45 + i * .18, a + 1.8 + i * .18); if (r <= 0 || r >= 1) continue; x2.save(); x2.globalAlpha = (1 - r) * .8 * o; x2.strokeStyle = mix(.2 + i * .15); x2.lineWidth = 3; x2.shadowColor = C1; x2.shadowBlur = 12; x2.beginPath(); x2.ellipse(CX, CY + 40, 60 + r * 420, (60 + r * 420) * .16, 0, 0, 7); x2.stroke(); x2.restore(); }
+  const fl = E.o(P(t, a + .45, a + .9)) * o, pul = 1 + .08 * Math.sin(t * 5); spark(x2, CX, CY, (1.4 + 1.6 * fl) * pul, C1, o); streak(x2, CX, CY, 420 * fl, .9 * fl);
+  glow(x2, CX, CY + 60, 300 * fl, C1, .12 * fl);
+};
+const ringPt = (t, i, n, R, wob, ph = 0) => { const an = i / n * Math.PI * 2 + t * .9 + ph, r = R * (1 + wob * Math.sin(5 * an - t * 2)); return [CX + Math.cos(an) * r, CY + Math.sin(an) * r]; };
+F.ring = (t, a, k, o, b) => {   // particles orbiting with trails; optional number in the middle (counts up); `wobble` turns it into a flower
+  const n = b.n || 7, R = 240 * E.o(k), wob = (b.form === 'flower' ? .18 : 0) * P(t, a + .5, a + 1.3);
+  x2.save(); x2.globalAlpha = .5 * o; x2.strokeStyle = mix(.4); x2.lineWidth = 3; x2.shadowColor = C1; x2.shadowBlur = 16; x2.beginPath();
+  for (let s = 0; s <= 160; s++) { const [X, Y] = ringPt(t, s, 160, R, wob); s ? x2.lineTo(X, Y) : x2.moveTo(X, Y); } x2.stroke(); x2.restore();
+  for (let i = 0; i < n; i++) trail(x2, tt => ringPt(tt, i, n, R, wob), t, 9, .02, 9 * o, i / n);
+  if (b.count != null) { const v = Math.round(b.count * E.p3(P(t, a + .2, a + 1.6))); x2.save(); x2.globalAlpha = o; x2.fillStyle = INK; x2.font = '700 150px Vaz'; x2.textAlign = 'center'; x2.textBaseline = 'middle'; x2.shadowColor = C1; x2.shadowBlur = 30; x2.fillText(String(v).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]) + (b.suffix || ''), CX, CY + 8); x2.restore(); }
+};
+F.flower = F.ring;
+F.star = (t, a, k, o, b) => {   // an asterisk of light that breathes
+  const s = E.bk(k) * o, r = 70 * s; glow(x2, CX, CY, 260 * s, C1, .35); x2.save(); x2.translate(CX, CY); x2.rotate(t * .4);
+  for (let i = 0; i < 6; i++) { x2.rotate(Math.PI / 3); stroke(x2, [[0, 0], [0, -r]], 16 * s, '#FFF1D6', 1, 26); } x2.restore();
+};
+F.arcs = (t, a, k, o, b) => {   // concentric half-rings drawing up from a base line; dots run along them with trails
+  const n = b.n || 6, base = CY + 220; stroke(x2, [[CX - 460, base], [CX + 460, base]], 2, mix(.3), o * E.o(k));
+  for (let i = 0; i < n; i++) { const R = 120 + i * 62, kk = E.o(P(t, a + i * .08, a + .9 + i * .08)), pts = [];
+    for (let s = 0; s <= 80 * kk; s++) { const an = Math.PI + s / 80 * Math.PI; pts.push([CX + Math.cos(an) * R, base + Math.sin(an) * R]); }
+    if (pts.length > 1) stroke(x2, pts, 2.5, mix(i / n), .7 * o);
+    if (kk >= 1) trail(x2, tt => { const an = Math.PI + (((tt - a) * (.22 + i * .05) + i * .13) % 1) * Math.PI; return [CX + Math.cos(an) * R, base + Math.sin(an) * R]; }, t, 8, .03, 8 * o, i / n); }
+  (b.labels || []).forEach((l, i) => { const e = DOMS[b._i].lab[i]; if (e) { e.style.opacity = o * P(t, a + .9 + i * .2, a + 1.2 + i * .2); } });
+};
+F.infinity = (t, a, k, o, b) => {   // a lemniscate drawn by a glowing head with a long gradient tail
+  const L = tt => { const u = (tt - a) * 1.1 * Math.PI, d = 1 + Math.sin(u) ** 2; return [CX + 330 * Math.cos(u) / d, CY + 330 * Math.sin(u) * Math.cos(u) / d]; };
+  const pts = []; for (let s = 0; s < 60; s++) pts.push(L(t - s * .02)); for (let s = 1; s < pts.length; s++) stroke(x2, [pts[s - 1], pts[s]], 9 * (1 - s / 60), mix(s / 60), o * (1 - s / 60), 20);
+  if (P(t, a, a + 1.9) >= 1) { const all = []; for (let s = 0; s <= 200; s++) all.push(L(a + s / 200 / 1.1 * 2)); stroke(x2, all, 3, mix(.5), .35 * o); }
+  spark(x2, ...L(t), 1.3, C1, o);
+};
+F.blob = (t, a, k, o, b) => {   // liquid blobs that merge and split (svg goo); glossy
+  const g = $('blobs'); g.style.opacity = o; const n = 4;
+  for (let i = 0; i < n; i++) { const c = g.children[i], an = t * (.8 + i * .3) + i * 2, d = (i ? 150 + 50 * Math.sin(t * 1.3 + i) : 0) * E.o(k);
+    c.setAttribute('cx', CX + Math.cos(an) * d); c.setAttribute('cy', CY + Math.sin(an * 1.2) * d * 1.2); c.setAttribute('r', (i ? 80 + 25 * Math.sin(t * 2 + i) : 190) * E.bk(k)); }
+};
+F.chain = (t, a, k, o, b) => {   // pills hanging on springy ropes, swaying; the active one turns hot as it is reached
+  const D = DOMS[b._i], pills = D.pills, pts = [];
+  pills.forEach((p, i) => { const at = a + .15 + i * .45, kk = E.o(P(t, at, at + .6)), sw = Math.sin(t * 1.6 + i * 1.7) * 26 * kk;
+    const X = 540 + (i % 2 ? 170 : -170) + sw, Y = 520 + i * 260 + Math.cos(t * 1.3 + i) * 10; p.style.left = (X - p.offsetWidth / 2) + 'px'; p.style.top = (Y - 40) + 'px';
+    p.style.opacity = kk * o; p.style.transform = `scale(${lerp(.6, 1, kk)}) rotate(${sw * .08}deg)`; p.classList.toggle('hot', t > at + .3); pts.push([X, Y, kk]); });
+  const L = $('links'); while (L.children.length < pills.length - 1) sv('path', {fill: 'none', 'stroke-width': 4, 'stroke-linecap': 'round'}, L);
+  [...L.children].forEach((pa, i) => { const A = pts[i], B = pts[i + 1]; if (!B) { pa.style.opacity = 0; return; } const sag = 90 + 30 * Math.sin(t * 2 + i), m = (A[1] + B[1]) / 2;
+    pa.setAttribute('d', `M${A[0]} ${A[1] + 40} C ${A[0]} ${m + sag}, ${B[0]} ${m - sag}, ${B[0]} ${B[1] - 40}`); pa.setAttribute('stroke', i % 2 ? C1 : C2); pa.style.opacity = o * B[2];
+    const len = pa.getTotalLength(); pa.style.strokeDasharray = len; pa.style.strokeDashoffset = len * (1 - B[2]); pa.style.filter = `drop-shadow(0 0 8px ${C2})`; });
+};
+F.orbit = (t, a, k, o, b) => {   // a hub with orbiting chips on rings, over a pulsing neon waveform
+  const kk = E.o(k); for (let i = 1; i <= 3; i++) { x2.save(); x2.globalAlpha = .35 * o * kk; x2.strokeStyle = '#FFF'; x2.lineWidth = 1.5; x2.beginPath(); x2.arc(CX, CY - 60, 130 * i * kk, 0, 7); x2.stroke(); x2.restore(); }
+  glow(x2, CX, CY - 60, 220, C2, .45 * o); spark(x2, CX, CY - 60, 1.6 * kk, C2, o);
+  const D = DOMS[b._i]; D.chips.forEach((c, i) => { const R = 130 * (1 + i % 3), an = t * (.5 - (i % 3) * .1) + i * 2.1; c.style.left = (CX + Math.cos(an) * R * kk - c.offsetWidth / 2) + 'px'; c.style.top = (CY - 60 + Math.sin(an) * R * kk - 22) + 'px'; c.style.opacity = o * P(t, a + .3 + i * .12, a + .6 + i * .12); });
+  const pts = []; for (let s = 0; s <= 120; s++) { const X = s / 120 * 1080, env = Math.exp(-(((X - 540) / 300) ** 2)); pts.push([X, CY + 330 - env * 130 * Math.abs(Math.sin(X / 60 - t * 4)) * kk]); } stroke(x2, pts, 6, C2, o, 30); stroke(x2, pts, 2, '#fff', o * .8, 4);
+};
+F.prompt = (t, a, k, o, b) => {   // glass prompt bar with a glowing gradient border that types the beat's prompt and tilts
+  const D = DOMS[b._i], g = D.glass, kk = E.o(k), ty = b.prompt || '', n = Math.round(P(t, a + .4, a + .4 + ty.length * .045) * ty.length);
+  g.style.opacity = o; g.style.transform = `perspective(1400px) rotateX(${(1 - kk) * 40 + Math.sin(t * .8) * 4}deg) rotateY(${Math.sin(t * .6) * 8}deg) scale(${lerp(.7, 1, kk)})`; g.style.setProperty('--ga', `${t * 90}deg`);
+  D.ty.textContent = ty.slice(0, n) + (Math.floor(t * 2.5) % 2 ? '|' : ''); glow(x2, CX, 860, 520, '#7A5CFF', .18 * o);
+};
+F.card = (t, a, k, o, b) => {   // a glossy gradient card that swings in, tilts in 3D, and folds to a line on exit
+  const D = DOMS[b._i], c = D.card, kk = E.o(k), fold = 1 - o; c.style.opacity = Math.min(1, kk * 2) * (fold < .9 ? 1 : 0);
+  c.style.transform = `perspective(1400px) rotateY(${(1 - kk) * -50 + Math.sin(t * .7) * 6 + fold * 70}deg) rotateX(${Math.sin(t * .5) * 4}deg) scale(${lerp(.4, 1, kk)}) scaleY(${1 - fold * .95})`;
+  glow(x2, CX, 830, 500, C2, .2 * o);
+};
+F.wave = (t, a, k, o, b) => { const kk = E.o(k); for (let j = 0; j < 3; j++) { const pts = []; for (let s = 0; s <= 140; s++) { const X = s / 140 * 1080; pts.push([X, CY + Math.sin(X / (90 + j * 30) - t * (2 + j)) * 120 * kk * Math.exp(-(((X - 540) / 360) ** 2))]); } stroke(x2, pts, 5 - j, mix(j / 2), o * (1 - j * .25), 24); } };
+
+// ---- build ----
+let S, TL, B = [], DOMS = [], END = 60;
+window.ready = (async () => {
+  S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json();
+  const th = Object.assign({bg: '#050404', ink: '#F4EEE8', a1: '#FFB547', a2: '#FF3D6E', light: '#F4EEE8'}, (S.flow || {}).theme || {}), rs = document.documentElement.style;
+  rs.setProperty('--bg', th.bg); rs.setProperty('--ink', th.ink); rs.setProperty('--a1', th.a1); rs.setProperty('--a2', th.a2); rs.setProperty('--lbg', th.light); C1 = th.a1; C2 = th.a2; INK = th.ink;
+  $('top').textContent = (S.flow || {}).top || '';
+  for (let i = 0; i < 4; i++) sv('circle', {fill: 'url(#gloss)'}, $('blobs'));
+  for (const [i, bt] of S.beats.entries()) {
+    const L = TL.lines[bt.line || bt.id]; if (!L) throw new Error('unknown line ' + bt.id); const v = Object.assign({form: 'spark'}, bt.visual || {}); v._i = i;
+    if (!F[v.form]) ISSUES.push(`beat ${bt.id}: unknown form ${v.form}`);
+    const D = {}, dom = $('dom');
+    if (v.form === 'card') { D.card = h('div', 'card', '', `<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg><div><b>${esc(v.title || '')}</b><i>${esc(v.sub || '')}</i></div>`); D.card.style.opacity = 0; dom.append(D.card); }
+    if (v.form === 'chain') D.pills = (v.steps || []).map(s => { const p = h('div', 'pill', 'opacity:0', esc(s)); dom.append(p); return p; });
+    if (v.form === 'orbit') D.chips = (v.chips || []).map(s => { const c = h('div', 'chip', 'opacity:0', esc(s)); dom.append(c); return c; });
+    if (v.form === 'prompt') { D.glass = h('div', 'glass', 'opacity:0', '<div class="ty"></div><div class="row"><span>＋ Attach</span><span>Mic ●</span><i></i></div>'); D.ty = D.glass.querySelector('.ty'); dom.append(D.glass); }
+    if (v.form === 'arcs') D.lab = (v.labels || []).map((s, k) => { const e = h('div', 'chip', `opacity:0; left:${540 - 260 + k * 170}px; top:${CY + 250}px`, esc(s)); dom.append(e); return e; });
+    DOMS.push(D);
+    // the on-screen line = the spoken words (karaoke blur-in); *word* = gradient serif accent
+    const toks = bt.text.replace(/\[[^\]]*\]/g, '').replace(/\|/g, ' ').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/); let open = false;
+    const words = toks.map((w, k) => { const st = w.startsWith('*'), en = /\*[،.,!؟?:…»"]*$/.test(w) && w.length > 1, kk = open || st; open = en ? false : (st ? true : open); return {w: w.replace(/\*/g, ''), k: kk, t: (L.words[k] || [L.start + k * .3])[0]}; });
+    if (words.length !== L.words.length) ISSUES.push(`beat ${bt.id}: ${words.length} words shown, ${L.words.length} spoken`);
+    B.push({bt, v, a: L.start, words, light: bt.bg === 'light'});
+  }
+  B.forEach((b, i) => b.b = i + 1 < B.length ? B[i + 1].a : TL.end_start);
+  END = TL.total; $('end').querySelector('.q').textContent = S.end_text || '';
+  await document.fonts.ready; await Promise.all(['500', '700'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش'))); await document.fonts.load('700 40px Markazi', 'آزمایش');
+  await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('image failed'))));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  window.SCENES = B.map(b => ({t0: b.a - .3, t1: b.b - .3, type: b.v.form, bg: b.light ? 'light' : 'dark'})).concat([{t0: TL.end_start, t1: END, type: 'end'}]);
+  seek(0);
+})();
+
+function seek(t) {
+  if (!B.length) return;
+  x.globalCompositeOperation = 'source-over'; x.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg'); x.fillRect(0, 0, 1080, 1920);
+  x2.clearRect(0, 0, 1080, 1920); x2.globalCompositeOperation = 'lighter';
+  let i = 0; B.forEach((b, k) => { if (t >= b.a - .35) i = k; }); const b = B[i], inEnd = t >= TL.end_start;
+  // background: dark, or a light page revealed by an iris from the actor
+  const lightK = b.light ? E.io(P(t, b.a - .35, b.a + .3)) : (B[i - 1] && B[i - 1].light ? 1 - E.io(P(t, b.a - .35, b.a + .1)) : 0);
+  $('iris').style.clipPath = `circle(${lightK * 2300}px at ${CX}px ${CY}px)`; document.body.classList.toggle('light', lightK > .5);
+  x2.globalCompositeOperation = lightK > .5 ? 'source-over' : 'lighter';
+  // ambient: slow warm haze + a few dust motes
+  glow(x, CX, CY, 900, C2, .06); for (let d = 0; d < 26; d++) { const X = (d * 397 + t * (8 + d % 5)) % 1080, Y = (d * 733 - t * (14 + d % 7) + 1920 * 9) % 1920; glow(x, X, Y, 4 + d % 3, '#FFE6C8', .25); }
+  // the actor: in each beat it grows out of a point (0.45 s), lives, then collapses back to a point (0.35 s)
+  for (const D of DOMS) { if (D.card) D.card.style.opacity = 0; (D.pills || []).forEach(p => p.style.opacity = 0); (D.chips || []).forEach(c => c.style.opacity = 0); if (D.glass) D.glass.style.opacity = 0; (D.lab || []).forEach(e => e.style.opacity = 0); }
+  $('blobs').style.opacity = 0; [...$('links').children].forEach(p => p.style.opacity = 0);
+  if (!inEnd) { const k = P(t, b.a - .05, b.a + .55), o = 1 - E.io(P(t, b.b - .4, b.b - .05));
+    const dot = Math.max(1 - k, 1 - o); if (dot > .02) spark(x2, CX, CY, 1.2 * dot, C1, dot);   // the handoff point of light
+    if (b.v.form !== 'spark' || t >= b.a - .2) F[b.v.form](t, b.a, k, o, b.v);
+    // the line
+    const ln = $('line'); if (ln._b !== b) { ln._b = b; ln.innerHTML = b.words.map(w => `<span class="${w.k ? 'k' : ''}">${esc(w.w)}</span>`).join(' '); }
+    [...ln.children].forEach((sp, j) => { const w = b.words[j], q = E.o(P(t, w.t - .08, w.t + .3)); sp.style.opacity = q * o; sp.style.filter = q < 1 ? `blur(${(1 - q) * 14}px)` : ''; sp.style.transform = `translateY(${(1 - q) * 16}px)`; });
+    $('line').style.top = (b.v.line_y || 1290) + 'px'; }
+  else $('line').innerHTML = '';
+  $('top').style.opacity = inEnd ? 0 : .9;
+  const e = $('end'), ek = P(t, TL.end_start, TL.end_start + .7); e.style.opacity = ek; if (ek > 0) spark(x2, CX, 700, 2 * (1 - ek), C1, 1 - ek);
+}
+window.seek = seek;
+</script>
+</body>
+</html>

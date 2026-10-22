@@ -181,9 +181,9 @@ wireframe…
 ### 8.0 Engines, style rotation and motion craft (user rules 2026-10-22 — read before designing any reel)
 The user rejected the collage look ("cut-outs and icons that just slide around look childish"). Reference:
 the viral @ensan.besham reel (2.3M views) — glowing line-art explainers. **No fixed style (user rule 2026-10-22): every reel gets
-its own style.** Two engines: **`line.html`** (glowing line-art explainer, below) and **`story.html`** (looks
+its own style.** Three engines: **`flow.html`** (one morphing actor of light, below) and **`line.html`** (glowing line-art explainer, below) and **`story.html`** (looks
 in §4: paper-ember, mono-press, acid-pop, neon-night, maxi-pop, soft-ui …). Choose engine + look per story;
-never the same engine *and* look two reels in a row; across a week use both engines and at least 4 looks.
+never the same engine *and* look two reels in a row; across a week use all three engines and at least 4 looks.
 The motion craft below (smooth expo easing, continuous movement, things that visibly happen, lead visual
 filling the frame, no empty or frozen frames, no toy-like bouncing) applies to **every** engine and look.
 - **One continuous canvas.** Each beat is a station on a big world; the camera travels to the next
@@ -203,6 +203,21 @@ filling the frame, no empty or frozen frames, no toy-like bouncing) applies to *
   (plain background works best; crop to the subject first) → `lineart` visual. Credit the photo.
 
 `story.json` for line.html: `{motion: {theme: {bg, line, acc, accents?}}, beats: [{id, text, head?, visual}], end_text}`.
+**flow.html — one actor that never cuts** (user references 2026-10-22: @louis_rlee DeKOzQRouIf, motion by
+Claude in code; @topintownagency Dd8tGxYugym). A single point of light grows into each beat's form, lives
+through the beat, and collapses back to a point that becomes the next form; bloom, lens streak, particle
+trails, glossy gradients, an iris that opens a light page for one beat, one line of text under the actor
+(the narration, words blurring in as spoken, `*accent*` in a gradient serif). Use it for stories with a
+clear flow or a few big ideas; 8–16 beats. `story.json`: `{flow: {theme: {bg, ink, a1, a2, light}, top: "small
+label"}, beats: [{id, text, bg?: "light", visual: {form, …}}], end_text}`. Forms: `spark` (falls, ripples,
+flares — a strong opener), `ring` (`n` particles orbiting, optional `count` that counts up + `suffix`),
+`flower` (the ring bending into petals), `star`, `prompt` (glass bar with a glowing gradient border typing
+`prompt` — for agents / chatbots), `card` (glossy gradient card, `title`, `sub`, swings in, folds out),
+`arcs` (concentric half-rings with runners; `labels`), `chain` (`steps` pills on springy ropes — processes),
+`orbit` (hub + orbiting `chips` over a neon waveform — ecosystems, teams), `infinity` (loops, cycles),
+`blob` (liquid blobs merging and splitting — flow, fluid, blending), `wave`. Vary the palette per reel
+(`a1`/`a2`: warm amber/rose, cyan/violet, lime/teal, gold/white…); never two flow reels with the same colours.
+
 Line visuals (all coordinates in a 1080-wide station, y 0–1350):
 `icons` (`items[{icon, label, sub, acc}]`, `focus`), `flow` (`hub{icon,label}`, `nodes[{icon,label}]`, `side`
 [left, right] arc labels, `dir`), `quote` (`text` with `*words*` to circle, `source`, `at[]` circle times),
