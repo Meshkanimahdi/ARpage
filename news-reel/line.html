@@ -32,7 +32,7 @@
   .num { position: absolute; font-family: Inter, Vaz; font-weight: 800; color: var(--line); direction: ltr; text-shadow: 0 0 30px rgba(255,255,255,.45); display: flex; justify-content: center; }
   .dg { display: inline-block; overflow: hidden; height: 1.05em; position: relative; }
   .dg span { display: block; line-height: 1.05em; }
-  .para { position: absolute; left: 70px; right: 70px; font-weight: 500; font-size: 56px; line-height: 1.75; color: #8E8E93; text-align: right; }
+  .para { position: absolute; left: 60px; right: 60px; font-weight: 500; font-size: 66px; line-height: 1.7; color: #8E8E93; text-align: right; }
   .para .on { color: var(--line); }
   .para mark { background: none; color: var(--line); position: relative; }
   .pill { position: absolute; border: 2.5px solid var(--line); border-radius: 60px; padding: 10px 30px 14px; font-weight: 900; font-size: 38px; white-space: nowrap; box-shadow: 0 0 22px rgba(255,255,255,.25), inset 0 0 18px rgba(255,255,255,.12); text-shadow: 0 0 14px rgba(255,255,255,.4); }
@@ -129,15 +129,15 @@ V.flow = async (st, g, s, a) => {       // a hub on top, nodes on a ground line 
     dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y); dot.style.opacity = t < at ? 0 : Math.sin(k * Math.PI); });
 };
 V.quote = async (st, g, s, a) => {      // the source sentence in grey; key words get hand-drawn circles + numbered badges
-  const p = h('div', 'para', `top:${s.y || 380}px`); const words = s.text.split(/\s+/), marks = [];
+  const p = h('div', 'para', `top:${s.y || 470}px`); const words = s.text.split(/\s+/), marks = [];
   p.innerHTML = words.map((w, i) => `<span data-i="${i}">${esc(w.replace(/\*/g, ''))}</span>`).join(' ');
   st.append(fadeUp(p, a + .05, .5));
-  if (s.source) st.append(fadeUp(h('div', 'lab s', `left:70px; right:70px; text-align:right; top:${(s.y || 380) + 470}px`, '— ' + esc(s.source)), a + .4));
+  if (s.source) st.append(fadeUp(h('div', 'lab s', `left:70px; right:70px; text-align:right; top:${(s.y || 470) + 560}px`, '— ' + esc(s.source)), a + .4));
   return {after: () => { const pr = st.getBoundingClientRect(); let n = 0;   // after layout: measure the starred words
     words.forEach((w, i) => { if (!w.startsWith('*')) return; const sp = p.querySelector(`[data-i="${i}"]`), r = sp.getBoundingClientRect(), z = 1;
       const x = (r.left - pr.left) / z, y = (r.top - pr.top) / z - 24, w2 = r.width / z, h2 = r.height / z, at = (s.at && s.at[n] != null) ? a + s.at[n] : a + .8 + n * .6; n++;
       scribble(g, x, y, w2, h2, at, n % 2 ? 'var(--acc)' : 'var(--line)'); sp.classList.add('k'); marks.push({sp, at});
-      const b = h('div', 'pill' + (n % 2 ? ' a' : ''), `left:${x + w2 - 20}px; top:${y - 52}px; padding:2px 14px 4px; font-size:24px`, fa(n)); st.append(fadeUp(b, at + .35, .3, 10)); }); },
+      const b = h('div', 'pill' + (n % 2 ? ' a' : ''), `left:${x - 34}px; top:${y - 40}px; padding:2px 14px 4px; font-size:24px`, fa(n)); st.append(fadeUp(b, at + .35, .3, 10)); }); },
     upd: t => marks.forEach(({sp, at}) => { sp.style.color = t > at ? '#fff' : ''; sp.style.textShadow = t > at ? '0 0 16px rgba(255,255,255,.6)' : ''; })};
 };
 V.counter = async (st, g, s, a) => {    // odometer digits rolling into place + a gauge ring that draws to `ring` %
@@ -154,7 +154,7 @@ V.counter = async (st, g, s, a) => {    // odometer digits rolling into place + 
     arc.setAttribute('stroke-dashoffset', C * (1 - k * (s.ring ?? 100) / 100)); };
 };
 V.bars = async (st, g, s, a) => {       // labelled rows whose bars fill with glowing heads; values count
-  const rows = s.rows || [], y0 = s.y || 460, gap = 230, upd = [];
+  const rows = s.rows || [], y0 = s.y || 560, gap = 240, upd = [];
   for (const [i, r] of rows.entries()) { const y = y0 + i * gap, at = a + .2 + i * .3;
     if (r.icon) await iconAt(g, r.icon, 950, y - 60, 90, at, {w: 2.2});
     st.append(fadeUp(h('div', 'lab', `right:${r.icon ? 180 : 70}px; top:${y - 90}px; font-size:46px; font-weight:900`, esc(r.label)), at));
@@ -276,13 +276,14 @@ function seek(t) {
   const b = BEATS[i], prev = BEATS[Math.max(0, i - 1)], m = i === 0 ? 1 : E.io(P(t, b.a - .45, b.a + .3));
   // camera: travel prev → current with a pull-back in the middle, then a slow push while the beat is read
   const pull = Math.sin(Math.PI * m) * .16, hold = P(t, b.a + .3, (BEATS[i + 1] || {a: TL.end_start}).a - .45);
-  const z = (1 - pull) * (1 + .035 * E.s(hold)), cx = lerp(prev.x, b.x, m) + Math.sin(t * .35) * 6, cy = lerp(prev.y, b.y, m) + Math.cos(t * .3) * 6;
+  const z = (1 - pull) * (1 + .06 * E.s(hold)), cx = lerp(prev.x, b.x, m) + Math.sin(t * .35) * 6, cy = lerp(prev.y, b.y, m) + Math.cos(t * .3) * 6;
   setCam(cx, cy, z);
   const blur = Math.sin(Math.PI * m) * (i ? 3.5 : 0); $('world').style.filter = blur > .2 ? `blur(${blur}px)` : '';
   // drawing state
   for (const d of DRAW) { const k = P(t, d.a, d.a + d.d);
     if (d.fade) { const e = E.o(k); d.el.style.opacity = e; d.el.style.transform = `translateY(${(1 - e) * d.fade}px)`; d.el.style.filter = k < 1 ? `blur(${(1 - e) * 10}px)` : ''; }
     else if (d.len) { d.el.style.strokeDashoffset = d.len * (1 - E.p3(k)); d.el.style.opacity = k > 0 ? 1 : 0; } }
+  for (const [k, bb] of BEATS.entries()) { const g = bb.st.querySelector('svg.d'); if (g) g.style.transform = `translateY(${Math.sin(t * .9 + k) * 8}px) scale(${1 + .012 * Math.sin(t * .7 + k)})`; }
   for (const bb of BEATS) { if (bb.upd) bb.upd(t); if (bb.rail && bb.head) { const L = bb.rail.getTotalLength(), k = E.io(P(t, bb.a - .55, bb.a + .2)), pt = bb.rail.getPointAtLength(L * k); bb.head.setAttribute('cx', pt.x); bb.head.setAttribute('cy', pt.y); bb.head.style.opacity = k > 0 && k < 1 ? 1 : 0; bb.rail.style.opacity = lerp(.7, .18, P(t, bb.a + .4, bb.a + 1.2)); } }
   // captions: the current beat's words; spoken = bright, current = glow, upcoming = dim
   const inEnd = t >= TL.end_start, cap = $('cap');
