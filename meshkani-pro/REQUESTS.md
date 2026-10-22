@@ -9,10 +9,11 @@ file `creative.request` which request you followed. Requests for past slots are 
   collections, virtual try-on and AI stylists, AI models in campaigns / on the runway, trend forecasting,
   fashion brands' AI moves. Pick the strongest *verified* story trending in the last 72 h; if nothing big,
   widen to the last 14 days (still verified, dated in the caption). Angle: creative work (STORY_SPEC §1).
-- **Look: maximalist, mandatory (the user's choice for this reel).** Engine `story.html`, `theme.preset =
-  "maxi-pop"`, density busy, `story.badge` e.g. «AI × مد». Elements: 2–3 sprite sheets in a maximalist
-  fashion-editorial collage style (glossy, saturated, patterns, sequins, texture); real brands / products /
-  people only from real photos (RUNBOOK §1.5.1). Motion craft of STORY_SPEC §8.0 still applies: smooth
-  expo easing, overlapping layers in constant gentle motion, every beat visibly changes, nothing frozen.
+- **Look: maximalist — PENDING the user's reference (2026-10-22 19:10).** The user rejected the
+  `maxi-pop` sample as childish (stickers, checkerboards, sunbursts, shapes). Do NOT use `maxi-pop` or any
+  sprite-sheet collage for this reel. The exact look will be written here from the reference the user is
+  sending. If this line still says PENDING when the run starts: engine `line.html` with
+  `motion.theme = {bg: "#07060B", accents: ["#FF2E93", "#00E5FF", "#FFE14D", "#B388FF", "#7CFF4F"]}`, real
+  runway / campaign photos traced with `lineart.py` (credited), STORY_SPEC §8.0 motion craft.
 - **Voice: female**, warm and energetic (STORY_SPEC §5 table), v4 tags.
 - Everything else as usual: word-level sync, 60–90 s, reel + Story share at 09:00.
