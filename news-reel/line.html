@@ -252,7 +252,7 @@ window.ready = (async () => {
       drawOn(p, a - .55, .75); BEATS[i].rail = p; const hd = sv('circle', {r: 9, fill: '#fff', filter: 'url(#glowA)'}, rails); BEATS[i].head = hd; }
   }
   // captions: every spoken word of every beat, karaoke style
-  const cap = $('cap'); for (const b of BEATS) { const L = TL.lines[b.bt.line || b.bt.id]; const toks = b.bt.text.replace(/\[[^\]]*\]/g, '').replace(/\|/g, ' ').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/); let open = false;
+  const cap = $('cap'); for (const b of BEATS) { const L = TL.lines[b.bt.line || b.bt.id]; const toks = b.bt.text.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/\|/g, ' ').trim().split(/\s+/); let open = false;
     b.words = toks.map((w, k) => { const st = w.startsWith('*'), en = /\*[،.,!؟?:…»"]*$/.test(w) && w.length > 1, kk = open || st; open = en ? false : (st ? true : open); return {w: w.replace(/\*/g, ''), k: kk, t: (L.words[k] || [L.start + k * .3])[0], e: (L.words[k] || [0, L.start + k * .3 + .3])[1]}; });
     if (b.words.length !== L.words.length) ISSUES.push(`beat ${b.bt.id}: ${b.words.length} caption words, ${L.words.length} spoken`); }
   $('dots').innerHTML = S.beats.map(() => '<i></i>').join('');

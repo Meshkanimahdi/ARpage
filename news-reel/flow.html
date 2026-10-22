@@ -168,7 +168,7 @@ window.ready = (async () => {
     if (v.form === 'arcs') D.lab = (v.labels || []).map((s, k) => { const e = h('div', 'chip', `opacity:0; left:${540 - 260 + k * 170}px; top:${CY + 250}px`, esc(s)); dom.append(e); return e; });
     DOMS.push(D);
     // the on-screen line = the spoken words (karaoke blur-in); *word* = gradient serif accent
-    const toks = bt.text.replace(/\[[^\]]*\]/g, '').replace(/\|/g, ' ').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/); let open = false;
+    const toks = bt.text.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/\|/g, ' ').trim().split(/\s+/); let open = false;
     const words = toks.map((w, k) => { const st = w.startsWith('*'), en = /\*[،.,!؟?:…»"]*$/.test(w) && w.length > 1, kk = open || st; open = en ? false : (st ? true : open); return {w: w.replace(/\*/g, ''), k: kk, t: (L.words[k] || [L.start + k * .3])[0]}; });
     if (words.length !== L.words.length) ISSUES.push(`beat ${bt.id}: ${words.length} words shown, ${L.words.length} spoken`);
     B.push({bt, v, a: L.start, words, light: bt.bg === 'light'});

@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro atelier reel</title>
+<!-- Atelier engine (STORY_SPEC §8.0): photoreal maximalist sets explored by one continuous camera, with a layer of
+     light and glass where the AI acts — a spark that falls into the set, a glass prompt typing inside a mirror,
+     a scan of light, particles orbiting a mannequin, sizes on glass pills, a paper hang tag whose number climbs,
+     liquid glossy blobs, springy pill chains on an iris-opened light page, typewriter lines with icons.
+     Combines maxi-photo + flow + kinetic. Data: story.json (beats[].visual) + timeline.json + el/*.png. -->
+<style>
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-800-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-800-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: Vaz; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-500-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: Lalezar; src: url(/logo-motion/node_modules/@fontsource/lalezar/files/lalezar-arabic-400-normal.woff2); }
+  @font-face { font-family: Markazi; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/markazi-text/files/markazi-text-arabic-700-normal.woff2); }
+  @font-face { font-family: Inter; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-800-normal.woff2); }
+  :root { --a1: #FFB547; --a2: #FF2E93; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #120708; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Vaz; }
+  .set { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0; will-change: transform, opacity, filter; }
+  .set img { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }
+  .poster { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: Lalezar, Vaz; color: #151012; line-height: 1.02; direction: rtl; }
+  .poster .pk { color: #E8197D; } .poster span { display: block; }
+  #shade { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(20,6,10,.35), rgba(12,4,6,.82)); opacity: 0; }
+  #light { position: absolute; inset: 0; background: radial-gradient(circle at 50% 75%, #FFFFFF, #FBEFE9 55%, #F6DCE3); clip-path: circle(0px at 540px 900px); }
+  canvas { position: absolute; inset: 0; }
+  #ov { position: absolute; inset: 0; }
+  .glass { position: absolute; left: 110px; width: 860px; height: 200px; border-radius: 50px; background: rgba(25,12,22,.5); backdrop-filter: blur(22px) saturate(1.3); box-shadow: 0 0 60px rgba(255,80,160,.35); }
+  .glass::before { content: ''; position: absolute; inset: -3px; border-radius: 53px; padding: 3px; background: conic-gradient(from var(--ga, 0deg), #FF2E93, #FFB547, #7BE0FF, #B98CFF, #FF2E93); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; filter: drop-shadow(0 0 12px #FF2E93); }
+  .glass .ty { position: absolute; right: 48px; left: 48px; top: 34px; font-weight: 500; font-size: 40px; color: #FBEFF5; white-space: nowrap; overflow: hidden; }
+  .glass .row { position: absolute; left: 34px; right: 40px; bottom: 26px; display: flex; justify-content: space-between; align-items: center; }
+  .glass .btn { font-weight: 800; font-size: 34px; color: #1A0A12; background: linear-gradient(105deg, #FFB547, #FF2E93); border-radius: 40px; padding: 8px 30px 12px; box-shadow: 0 0 30px rgba(255,46,147,.7); }
+  .glass .ic2 { width: 54px; height: 54px; border-radius: 50%; border: 2px solid rgba(255,255,255,.4); display: grid; place-items: center; }
+  .glass svg { width: 28px; height: 28px; stroke: #fff; }
+  .type { position: absolute; left: 70px; right: 70px; top: 740px; text-align: center; font-weight: 900; font-size: 92px; line-height: 1.3; color: #fff; text-shadow: 0 6px 40px rgba(0,0,0,.45); }
+  .type .k { font-family: Markazi, Vaz; font-weight: 700; font-size: 1.14em; background: linear-gradient(90deg, var(--a2), var(--a1)); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 0 18px rgba(255,46,147,.55)); }
+  .ic { display: inline-flex; align-items: center; justify-content: center; width: 1.05em; height: 1.05em; border-radius: .28em; background: linear-gradient(135deg, var(--a2), var(--a1)); vertical-align: -.2em; margin: 0 .12em; box-shadow: 0 0 34px rgba(255,46,147,.6); }
+  .ic svg { width: 60%; height: 60%; stroke: #fff; }
+  .cur { display: inline-block; width: .07em; height: .9em; background: #fff; vertical-align: -.1em; margin: 0 .05em; }
+  .whip { position: absolute; left: -300px; right: -300px; top: 760px; text-align: center; font: 900 260px/1 Inter; color: #fff; white-space: nowrap; text-shadow: 0 0 60px rgba(255,46,147,.6); }
+  .pill { position: absolute; height: 150px; min-width: 150px; padding: 0 44px; box-sizing: border-box; border-radius: 80px; display: flex; align-items: center; justify-content: center; font: 800 70px Inter; color: #fff; background: rgba(30,12,24,.45); backdrop-filter: blur(16px); border: 2px solid rgba(255,255,255,.35); box-shadow: inset 0 2px 0 rgba(255,255,255,.4), 0 20px 50px rgba(0,0,0,.35); }
+  .pill.on { background: linear-gradient(105deg, var(--a2), var(--a1)); border-color: transparent; box-shadow: 0 0 60px rgba(255,46,147,.7); }
+  .tag { position: absolute; width: 470px; height: 640px; background: linear-gradient(170deg, #FFF8EC, #F3E3CC); border-radius: 30px 30px 40px 40px; box-shadow: 0 50px 100px rgba(0,0,0,.45), inset 0 2px 0 #fff; transform-origin: 50% -80px; color: #1A0E0A; text-align: center; }
+  .tag::before { content: ''; position: absolute; left: 50%; top: 40px; width: 46px; height: 46px; margin-left: -23px; border-radius: 50%; background: #120708; box-shadow: inset 0 2px 4px rgba(0,0,0,.6); }
+  .tag .str { position: absolute; left: 50%; bottom: 100%; width: 3px; height: 400px; margin-bottom: -60px; background: linear-gradient(#0000, #D9B26A); }
+  .tag .lb { position: absolute; left: 0; right: 0; top: 130px; font-weight: 800; font-size: 40px; }
+  .tag .v { position: absolute; left: 0; right: 0; top: 200px; font: 900 190px/1 Vaz; direction: ltr; background: linear-gradient(90deg, var(--a2), var(--a1)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tag .s { position: absolute; left: 0; right: 0; top: 420px; font-weight: 500; font-size: 32px; color: #6B5040; }
+  .tag .br { position: absolute; left: 60px; right: 60px; bottom: 60px; height: 70px; background: repeating-linear-gradient(90deg, #1A0E0A 0 4px, #0000 4px 9px, #1A0E0A 9px 11px, #0000 11px 17px); opacity: .8; }
+  .chainp { position: absolute; padding: 22px 44px 26px; border-radius: 50px; font-weight: 800; font-size: 46px; white-space: nowrap; color: #fff; background: #1E1216; box-shadow: 0 16px 36px rgba(60,10,30,.3); }
+  .chainp.hot { background: linear-gradient(105deg, var(--a2), var(--a1)); }
+  .bword { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font: 400 170px Lalezar; color: #fff; text-shadow: 0 8px 40px rgba(120,0,40,.5); }
+  #cap { position: absolute; left: 70px; right: 70px; top: 1400px; padding: 22px 34px 28px; border-radius: 60px; background: rgba(255,255,255,.17); backdrop-filter: blur(26px) saturate(1.4); box-shadow: inset 0 0 0 2px rgba(255,255,255,.4), 0 24px 60px rgba(0,0,0,.3); text-align: center; font-weight: 900; font-size: 50px; line-height: 1.45; color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,.45); }
+  #cap span { display: inline-block; margin: 0 6px; } #cap .k { color: #FFE14D; }
+  .lightp #cap { background: rgba(30,12,20,.08); color: #1E1216; text-shadow: none; box-shadow: inset 0 0 0 2px rgba(30,12,20,.12); } .lightp #cap .k { color: #E8197D; }
+  #end { position: absolute; inset: 0; opacity: 0; background: radial-gradient(circle at 50% 45%, #2A0A18, #0C0306 70%); }
+  #end .q { position: absolute; left: 70px; right: 70px; top: 620px; text-align: center; font-weight: 900; font-size: 84px; line-height: 1.35; color: #fff; }
+  #end .q .k { font-family: Markazi, Vaz; background: linear-gradient(90deg, var(--a2), var(--a1)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  #end .fl { position: absolute; left: 50%; top: 1080px; transform: translateX(-50%); display: flex; align-items: center; gap: 22px; padding: 18px 46px 22px 22px; border-radius: 80px; background: #fff; color: #120708; font: 800 52px Vaz; box-shadow: 0 0 80px rgba(255,46,147,.6); direction: ltr; white-space: nowrap; }
+  #end .fl img { width: 86px; height: 86px; border-radius: 50%; background: #0B1640; padding: 10px; box-sizing: border-box; }
+  #end .h { position: absolute; left: 0; right: 0; top: 1300px; text-align: center; font: 800 44px Inter; letter-spacing: 8px; color: rgba(255,255,255,.75); direction: ltr; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="sets"></div>
+  <div id="shade"></div>
+  <div id="light"></div>
+  <canvas id="cv" width="1080" height="1920"></canvas>
+  <svg id="sv" width="1080" height="1920" style="position:absolute;inset:0;overflow:visible"><defs>
+    <filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="22" result="b"/><feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 28 -11" result="g"/><feComposite in="SourceGraphic" in2="g" operator="atop"/></filter>
+    <radialGradient id="gl" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#FFE7C2"/><stop offset=".45" stop-color="#FFB547"/><stop offset="1" stop-color="#FF2E93"/></radialGradient>
+  </defs><g id="blobs" filter="url(#goo)"></g><g id="ropes"></g></svg>
+  <div id="ov"></div>
+  <div id="cap"></div>
+  <div id="end"><div class="q"></div><div class="fl"><img src="/news-reel/assets/m.png">Follow · @meshkani.pro</div><div class="h">MESHKANI.PRO</div></div>
+</div>
+<script src="/logo-motion/node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const url = s => s.startsWith('/') ? s : DIR + s;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), P = (t, a, b) => clamp((t - a) / (b - a)), lerp = (a, b, k) => a + (b - a) * k;
+const E = {o: gsap.parseEase('expo.out'), io: gsap.parseEase('expo.inOut'), p3: gsap.parseEase('power3.out'), p4i: gsap.parseEase('power4.in'), s: gsap.parseEase('sine.inOut')};
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
+const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+function h(tag, cls, style, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (style) e.style.cssText = style; if (html !== undefined) e.innerHTML = html; return e; }
+const NS = 'http://www.w3.org/2000/svg'; function svg(tag, at, p) { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); if (p) p.append(e); return e; }
+const cv = $('cv'), x = cv.getContext('2d'), ISSUES = [], ICON = {};
+async function icon(n) { if (!ICON[n]) { const r = await fetch(`/logo-motion/node_modules/lucide-static/icons/${n}.svg`); ICON[n] = r.ok ? (await r.text()).replace(/stroke-width="2"/, 'stroke-width="2.4"') : (ISSUES.push('icon missing ' + n), ''); } return ICON[n]; }
+function glow(X, Y, r, col, a = 1) { const g = x.createRadialGradient(X, Y, 0, X, Y, r); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); x.globalAlpha = a; x.fillStyle = g; x.fillRect(X - r, Y - r, 2 * r, 2 * r); x.globalAlpha = 1; }
+function spark(X, Y, s, a = 1) { glow(X, Y, 70 * s, '#FF5FA8', .5 * a); glow(X, Y, 22 * s, '#FFF4E0', a); }
+function streak(X, Y, w, a) { const g = x.createLinearGradient(X - w, Y, X + w, Y); g.addColorStop(0, 'rgba(255,120,180,0)'); g.addColorStop(.5, `rgba(255,236,210,${a})`); g.addColorStop(1, 'rgba(255,120,180,0)'); x.fillStyle = g; x.fillRect(X - w, Y - 3, 2 * w, 6); }
+const COLS = ['#FF2E93', '#FF6FB1', '#FFB547', '#FFD27A', '#B98CFF'];
+
+let S, TL, B = [], SETS = {}, END = 60, cam = null;
+// camera: [x, y, z] = image point (1080x1920 frame coords) shown at the screen point (540, 860), zoom z
+const toScreen = (c, px, py) => [540 + (px - c[0]) * c[2], 860 + (py - c[1]) * c[2]];
+function camAt(b, t) { const prev = b.prevCam || b.cam, k = E.io(P(t, b.a - .35, b.a + .55)), drift = 1 + .035 * E.s(P(t, b.a + .55, b.b));
+  const z = lerp(prev[2], b.cam[2], k) * drift, cx = lerp(prev[0], b.cam[0], k), cy = lerp(prev[1], b.cam[1], k);
+  // keep the image covering the frame
+  const minx = 540 / z, maxx = 1080 - 540 / z, miny = 860 / z, maxy = 1920 - 1060 / z; return [clamp(cx, minx, Math.max(minx, maxx)), clamp(cy, miny, Math.max(miny, maxy)), z]; }
+
+window.ready = (async () => {
+  S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json();
+  for (const [i, bt] of S.beats.entries()) {
+    const L = TL.lines[bt.id]; if (!L) throw new Error('unknown line ' + bt.id); const v = bt.visual || {};
+    const raw = bt.text.replace(/\[(?!icon:)[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/\|/g, ' ').trim().split(/\s+/); let open = false, wi = 0; const shown = [];
+    for (const w of raw) { const ic = w.match(/^\[icon:([\w-]+)\]$/); if (ic) { shown.push({icon: ic[1], t: (L.words[wi] || [L.start])[0] - .05}); continue; }
+      const st = w.startsWith('*'), en = /\*[،.,!؟?:…»"]*$/.test(w) && w.length > 1, k = open || st; open = en ? false : (st ? true : open);
+      shown.push({w: w.replace(/\*/g, ''), k, t: (L.words[wi] || [L.start + wi * .3])[0]}); wi++; }
+    if (wi !== L.words.length) ISSUES.push(`beat ${bt.id}: ${wi} words shown, ${L.words.length} spoken`);
+    B.push({bt, v, i, a: L.start - .1, shown, img: v.img, cam: v.cam || [540, 960, 1], fx: v.fx || 'none'});
+  }
+  B.forEach((b, i) => { b.b = i + 1 < B.length ? B[i + 1].a : TL.end_start; const p = B[i - 1]; b.prevCam = p && p.img === b.img ? p.cam : (p ? null : null); });
+  // sets (one per image); posters live inside their set so they move with the camera
+  for (const b of B) if (b.img && !SETS[b.img]) { const s = h('div', 'set'); const im = h('img'); im.src = url(b.img); s.append(im); $('sets').append(s); SETS[b.img] = s; }
+  for (const b of B) if (b.v.poster) { const [px, py, pw, ph] = b.v.poster, p = h('div', 'poster', `left:${px}px; top:${py}px; width:${pw}px; height:${ph}px; opacity:0`);
+    p.innerHTML = b.v.poster_text.split('|').map(l => `<span>${esc(l).replace(/\*([^*]+)\*/g, '<b class="pk" style="font-weight:400">$1</b>')}</span>`).join(''); SETS[b.img].append(p); b.posterEl = p; }
+  // overlays
+  const ov = $('ov');
+  for (const b of B) { const v = b.v;
+    if (b.fx === 'prompt') { b.g = h('div', 'glass', `top:${v.y || 780}px; opacity:0`, `<div class="ty"></div><div class="row"><div class="ic2">${await icon('image-plus')}</div><div class="btn">${esc(v.button || 'امتحان کن')}</div></div>`); ov.append(b.g); }
+    if (b.fx === 'type') { b.tp = h('div', 'type', 'display:none'); ov.append(b.tp); b.toks = [];
+      for (const w of b.shown) { if (w.icon) { const s = h('span', 'ic', '', await icon(w.icon)); b.tp.append(s, ' '); b.toks.push({e: s, t: w.t, icon: 1}); } else { const s = h('span', w.k ? 'k' : ''); b.tp.append(s, ' '); b.toks.push({e: s, t: w.t, w: w.w}); } }
+      b.cur = h('span', 'cur'); b.tp.append(b.cur); }
+    if (b.fx === 'whip') { b.wp = h('div', 'whip', 'display:none', esc(v.word)); ov.append(b.wp); }
+    if (b.fx === 'pills') b.ps = (v.items || []).map(s => { const p = h('div', 'pill', 'display:none', esc(s)); ov.append(p); return p; });
+    if (b.fx === 'tag') { b.tg = h('div', 'tag', `left:${v.x ?? 305}px; top:${v.y ?? 520}px; display:none`, `<div class="str"></div><div class="lb">${esc(v.label || '')}</div><div class="v"></div><div class="s">${esc(v.sub || '')}</div><div class="br"></div>`); ov.append(b.tg); }
+    if (b.fx === 'chain') b.cp = (v.steps || []).map(s => { const p = h('div', 'chainp', 'display:none', esc(s)); ov.append(p); return p; });
+    if (b.fx === 'blob') { b.bw = h('div', 'bword', 'display:none', esc(v.word || '')); ov.append(b.bw); }
+  }
+  for (let i = 0; i < 5; i++) svg('circle', {fill: 'url(#gl)'}, $('blobs'));
+  END = TL.total; $('end').querySelector('.q').innerHTML = esc(S.end_text || '').replace(/(آینه‌ی هوش مصنوعی)/, '<span class="k">$1</span>');
+  await document.fonts.ready; await Promise.all(['500', '800', '900'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش'))); await document.fonts.load('40px Lalezar', 'آزمایش'); await document.fonts.load('700 40px Markazi', 'آزمایش'); await document.fonts.load('800 40px Inter', 'AI');
+  await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('image failed: ' + i.src))));
+  // fit poster text
+  for (const b of B) if (b.posterEl) { const p = b.posterEl, [, , w, hh] = b.v.poster; p.style.opacity = 1; let fs = Math.min(w * .3, 220); p.style.fontSize = fs + 'px'; SETS[b.img].style.display = 'block';
+    while (([...p.children].reduce((q, c) => q + c.offsetHeight, 0) > hh * .86 || [...p.children].some(c => c.scrollWidth > w * .9)) && fs > 30) { fs -= 4; p.style.fontSize = fs + 'px'; } p.style.opacity = 0; }
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  window.SCENES = B.map(b => ({t0: b.a - .2, t1: b.b - .2, type: b.fx, bg: b.img ? 'photo' : 'light'})).concat([{t0: TL.end_start, t1: END, type: 'end'}]);
+  seek(0);
+})();
+
+function seek(t) {
+  if (!B.length) return;
+  x.clearRect(0, 0, 1080, 1920); x.globalCompositeOperation = 'lighter';
+  let i = 0; B.forEach((b, k) => { if (t >= b.a - .35) i = k; }); const b = B[i], inEnd = t >= TL.end_start, v = b.v;
+  // ---- the set: same image → the camera travels; new image → a focus-pull dissolve ----
+  const curImg = b.img || (B.slice(0, i).reverse().find(q => q.img) || {}).img, prevImg = (B[i - 1] || {}).img;
+  for (const [src, s] of Object.entries(SETS)) {
+    let op = 0; if (src === curImg) op = b.img && prevImg && prevImg !== b.img ? E.o(P(t, b.a - .35, b.a + .25)) : 1; if (src === prevImg && prevImg !== curImg) op = Math.max(op, 1 - P(t, b.a - .35, b.a + .25));
+    s.style.display = op > 0 ? 'block' : 'none'; s.style.opacity = op;
+    const owner = src === curImg ? b : B[i - 1]; if (owner && owner.cam) { const c = owner === b ? camAt(b, t) : camAt(B[i - 1], t); s.style.transform = `translate(${540 - c[0] * c[2]}px, ${860 - c[1] * c[2]}px) scale(${c[2]})`; if (owner === b) cam = c; }
+    const pull = src === curImg && prevImg && prevImg !== b.img ? 1 - P(t, b.a - .35, b.a + .25) : 0; s.style.filter = pull > .02 ? `blur(${pull * 14}px)` : ''; }
+  for (const q of B) if (q.posterEl) { const on = q === b || (q.img === b.img && B.indexOf(q) < i && q.v.poster_keep); const k = E.o(P(t, q.a + .1, q.a + .7)); q.posterEl.style.opacity = on ? k : (q === B[i - 1] ? 1 - P(t, b.a - .3, b.a) : 0);
+    [...q.posterEl.children].forEach((c, j) => { const kk = E.o(P(t, q.a + .15 + j * .18, q.a + .6 + j * .18)); c.style.filter = kk < 1 ? `blur(${(1 - kk) * 12}px)` : ''; c.style.transform = `translateY(${(1 - kk) * 30}px)`; c.style.opacity = on ? kk : 1; }); }
+  // shade for overlay beats, light page for `light` beats
+  const dimTo = v.dim ?? ({type: .78, whip: .7, pills: .55, tag: .45, blob: .6, prompt: .3}[b.fx] || 0), dimFrom = B[i - 1] ? (B[i - 1].v.dim ?? ({type: .78, whip: .7, pills: .55, tag: .45, blob: .6, prompt: .3}[B[i - 1].fx] || 0)) : 0;
+  $('shade').style.opacity = lerp(dimFrom, dimTo, E.io(P(t, b.a - .3, b.a + .2)));
+  const lk = v.light ? E.io(P(t, b.a - .3, b.a + .35)) : (B[i - 1] && B[i - 1].v.light ? 1 - E.io(P(t, b.a - .3, b.a + .2)) : 0);
+  $('light').style.clipPath = `circle(${lk * 2300}px at 540px 900px)`; document.body.classList.toggle('lightp', lk > .5);
+  if (lk > .5) x.globalCompositeOperation = 'source-over';
+  // ---- overlays ----
+  for (const q of B) { if (q.g) q.g.style.opacity = 0; if (q.tp) q.tp.style.display = 'none'; if (q.wp) q.wp.style.display = 'none'; (q.ps || []).forEach(p => p.style.display = 'none'); if (q.tg) q.tg.style.display = 'none'; (q.cp || []).forEach(p => p.style.display = 'none'); if (q.bw) q.bw.style.display = 'none'; }
+  $('blobs').style.opacity = 0; [...$('ropes').children].forEach(r => r.style.opacity = 0);
+  const out = 1 - E.io(P(t, b.b - .35, b.b - .02));
+  if (!inEnd) FX[b.fx] && FX[b.fx](b, t, out);
+  // ambient sparkle dust
+  for (let d = 0; d < 22; d++) { const X = (d * 397 + t * (9 + d % 5)) % 1080, Y = (d * 733 - t * (16 + d % 7) + 1920 * 9) % 1920; glow(X, Y, 3 + d % 3, '#FFE6F0', lk > .5 ? 0 : .35); }
+  // ---- caption pill (the narration, word by word) for every beat that is not typed ----
+  const cap = $('cap');
+  if (!inEnd && b.fx !== 'type') { if (cap._b !== b) { cap._b = b; cap.innerHTML = b.shown.filter(w => !w.icon).map(w => `<span class="${w.k ? 'k' : ''}">${esc(w.w)}</span>`).join(' '); }
+    const ws = b.shown.filter(w => !w.icon); [...cap.children].forEach((s, j) => { const k = E.o(P(t, ws[j].t - .08, ws[j].t + .25)); s.style.opacity = .3 + .7 * k; s.style.transform = `translateY(${(1 - k) * 8}px)`; });
+    cap.style.opacity = out * E.o(P(t, b.a - .2, b.a + .2)); }
+  else { cap.style.opacity = 0; cap._b = null; }
+  // ---- end card ----
+  const e = $('end'), ek = P(t, TL.end_start - .1, TL.end_start + .5); e.style.opacity = ek;
+  if (ek > 0) { const q = e.querySelector('.q'), n = Math.round(P(t, TL.end_start + .2, TL.end_start + 1.4) * q.textContent.length); q.style.clipPath = `inset(0 0 0 ${100 - n / q.textContent.length * 100}%)`;
+    const fl = e.querySelector('.fl'), k = E.o(P(t, TL.end_start + 1.2, TL.end_start + 1.8)); fl.style.opacity = k; fl.style.transform = `translateX(-50%) scale(${lerp(.7, 1, k)})`;
+    x.globalCompositeOperation = 'lighter'; for (let j = 0; j < 3; j++) { const an = t * 1.4 + j * 2.1; spark(540 + Math.cos(an) * 330, 1130 + Math.sin(an) * 80, 1.4, k); } }
+}
+
+const FX = {};
+FX.none = () => {};
+FX.spark = (b, t, o) => {   // a drop of light falls into the set, ripples, flares with a lens streak
+  const [X, Y] = b.v.at ? toScreen(cam, ...b.v.at) : [540, 860], fall = P(t, b.a - .2, b.a + .4);
+  if (fall < 1) { for (let k = 10; k >= 0; k--) { const f = E.p3(P(t - k * .018, b.a - .2, b.a + .4)); x.globalAlpha = (1 - k / 11) * .9; spark(X, lerp(Y - 600, Y, f), .6); } x.globalAlpha = 1; return; }
+  for (let j = 0; j < 4; j++) { const r = P(t, b.a + .4 + j * .17, b.a + 1.7 + j * .17); if (r <= 0 || r >= 1) continue; x.save(); x.globalAlpha = (1 - r) * .85 * o; x.strokeStyle = COLS[j]; x.lineWidth = 3; x.shadowColor = '#FF2E93'; x.shadowBlur = 14; x.beginPath(); x.ellipse(X, Y + 20, 40 + r * 380, (40 + r * 380) * .2, 0, 0, 7); x.stroke(); x.restore(); }
+  const fl = E.o(P(t, b.a + .4, b.a + .9)) * o; spark(X, Y, 1.2 + 1.6 * fl * (1 + .08 * Math.sin(t * 6)), o); streak(X, Y, 460 * fl, .85 * fl);
+};
+FX.poster = (b, t, o) => { const [X, Y] = toScreen(cam, b.v.poster[0] + b.v.poster[2], b.v.poster[1]); spark(X, Y, .9 * o, o * E.o(P(t, b.a + .2, b.a + .6))); };
+FX.prompt = (b, t, o) => {  // a glass prompt bar with a moving gradient border types inside the mirror; the button pulses
+  const g = b.g, k = E.o(P(t, b.a - .05, b.a + .55)), ty = b.v.prompt || '', n = Math.round(P(t, b.a + .45, b.a + .45 + ty.length * .05) * ty.length);
+  g.style.opacity = k * o; g.style.transform = `perspective(1400px) rotateX(${(1 - k) * 35 + Math.sin(t * .8) * 3}deg) scale(${lerp(.75, 1, k)})`; g.style.setProperty('--ga', `${t * 110}deg`);
+  g.querySelector('.ty').textContent = ty.slice(0, n) + (Math.floor(t * 2.6) % 2 ? '|' : ''); const bt = g.querySelector('.btn'), pk = P(t, b.a + .5 + ty.length * .05, b.b); bt.style.transform = `scale(${1 + .08 * Math.sin(pk * 12) * (pk > 0 ? 1 : 0)})`;
+  glow(540, (b.v.y || 780) + 100, 600, '#FF2E93', .16 * o);
+};
+FX.scan = (b, t, o) => {    // a band of light sweeps down the mirror: the AI renders the outfit
+  const r = b.v.region ? [toScreen(cam, b.v.region[0], b.v.region[1]), toScreen(cam, b.v.region[0] + b.v.region[2], b.v.region[1] + b.v.region[3])] : [[200, 200], [880, 1300]];
+  const k = ((t - b.a) * .55) % 1, Y = lerp(r[0][1], r[1][1], E.s(k)); const g = x.createLinearGradient(0, Y - 90, 0, Y + 90); g.addColorStop(0, 'rgba(255,46,147,0)'); g.addColorStop(.5, `rgba(255,190,230,${.55 * o})`); g.addColorStop(1, 'rgba(255,46,147,0)');
+  x.fillStyle = g; x.fillRect(r[0][0], Y - 90, r[1][0] - r[0][0], 180); streak((r[0][0] + r[1][0]) / 2, Y, (r[1][0] - r[0][0]) / 2, .9 * o);
+  for (let j = 0; j < 14; j++) { const px = r[0][0] + ((j * 97 + t * 40) % (r[1][0] - r[0][0])), py = Y - 60 + (j * 53 % 120); spark(px, py, .25, o * .8); }
+};
+FX.type = (b, t, o) => {    // the narration typed over a dimmed set, icons pop inside the words
+  b.tp.style.display = 'block'; b.tp.style.opacity = o; b.tp.style.filter = o < 1 ? `blur(${(1 - o) * 14}px)` : ''; let last = null;
+  b.toks.forEach(q => { const k = P(t, q.t - .05, q.t + .25); if (q.icon) { q.e.style.transform = `scale(${E.o(k)}) rotate(${(1 - E.o(k)) * -20}deg)`; q.e.style.opacity = k > 0 ? 1 : 0; } else q.e.textContent = q.w.slice(0, Math.round(k * q.w.length)); if (k > 0) last = q; });
+  b.cur.style.opacity = Math.floor(t * 2.6) % 2 ? 1 : 0; if (last) last.e.after(b.cur);
+};
+FX.whip = (b, t, o) => { const w = b.wp; w.style.display = 'block'; const k = E.o(P(t, b.a - .05, b.a + .5)), out = E.p4i(P(t, b.b - .35, b.b)), X = (1 - k) * 1000 - out * 1000;
+  w.style.transform = `translateX(${X}px) scale(${1 + .05 * P(t, b.a, b.b)})`; w.style.filter = `blur(${Math.abs(X) / 36}px)`; w.style.opacity = Math.min(1, k * 2); };
+FX.ring = (b, t, o) => {    // particles with trails orbit the mannequin in a tilted ellipse: the digital twin is being built
+  const [X, Y] = toScreen(cam, ...b.v.at), R = (b.v.r || 300) * E.o(P(t, b.a, b.a + .9)), n = 9;
+  const pt = (tt, j) => { const an = j / n * 6.283 + tt * 1.3; return [X + Math.cos(an) * R, Y + Math.sin(an) * R * .32 + Math.sin(tt * .9 + j) * 220]; };
+  for (let j = 0; j < n; j++) { for (let k = 12; k >= 0; k--) { const [px, py] = pt(t - k * .02, j); x.globalAlpha = (1 - k / 13) * o * .9; glow(px, py, 9, COLS[j % 5], 1); } x.globalAlpha = 1; spark(...pt(t, j), .55, o); }
+  for (let j = 0; j < 3; j++) { x.save(); x.globalAlpha = .35 * o; x.strokeStyle = COLS[j]; x.lineWidth = 2; x.beginPath(); x.ellipse(X, Y - 200 + j * 200, R, R * .3, 0, 0, 7); x.stroke(); x.restore(); }
+};
+FX.pills = (b, t, o) => {   // size pills slide in on glass; the active one lights up as the sentence moves
+  const n = b.ps.length, act = Math.min(n - 1, Math.floor(P(t, b.a + .3, b.b - .3) * n)), W = 190;
+  b.ps.forEach((p, j) => { p.style.display = 'flex'; const k = E.o(P(t, b.a + j * .1, b.a + .6 + j * .1)); p.style.left = (540 - (n * W) / 2 + j * W + (1 - k) * 600) + 'px'; p.style.top = (760 + Math.sin(t * 1.5 + j) * 8) + 'px';
+    p.style.opacity = k * o; p.classList.toggle('on', j === act); p.style.transform = `scale(${j === act ? 1.12 : .95})`; });
+};
+FX.tag = (b, t, o) => {     // a paper hang tag swings in on its string; the number on it climbs
+  const g = b.tg; g.style.display = 'block'; const k = E.o(P(t, b.a - .05, b.a + .7)), sw = Math.sin(t * 2.1) * 4 * (1 - P(t, b.a + .7, b.a + 3)) + (1 - k) * -40;
+  g.style.opacity = Math.min(1, k * 2) * o; g.style.transform = `translateY(${(1 - k) * -500}px) rotate(${sw}deg)`;
+  const val = Math.round(b.v.to * E.p3(P(t, b.a + .4, b.a + 1.6))); g.querySelector('.v').textContent = '+' + fa(val) + '٪';
+};
+FX.chain = (b, t, o) => {   // the light page: pills hang on springy ropes and turn hot one by one
+  const pts = []; b.cp.forEach((p, j) => { p.style.display = 'block'; const at = b.a + .2 + j * .4, k = E.o(P(t, at, at + .6)), sw = Math.sin(t * 1.6 + j * 1.7) * 26 * k, X = 540 + (j % 2 ? 180 : -180) + sw, Y = 520 + j * 260;
+    p.style.left = (X - p.offsetWidth / 2) + 'px'; p.style.top = (Y - 46) + 'px'; p.style.opacity = k * o; p.style.transform = `scale(${lerp(.6, 1, k)}) rotate(${sw * .08}deg)`; p.classList.toggle('hot', t > at + .35); pts.push([X, Y, k]); });
+  const R = $('ropes'); while (R.children.length < 4) svg('path', {fill: 'none', 'stroke-width': 5, 'stroke-linecap': 'round'}, R);
+  [...R.children].forEach((pa, j) => { const A = pts[j], C = pts[j + 1]; if (!C) { pa.style.opacity = 0; return; } const sag = 90 + 30 * Math.sin(t * 2 + j), m = (A[1] + C[1]) / 2;
+    pa.setAttribute('d', `M${A[0]} ${A[1] + 46} C ${A[0]} ${m + sag}, ${C[0]} ${m - sag}, ${C[0]} ${C[1] - 46}`); pa.setAttribute('stroke', j % 2 ? '#FFB547' : '#FF2E93'); pa.style.opacity = o * C[2];
+    const len = pa.getTotalLength(); pa.style.strokeDasharray = len; pa.style.strokeDashoffset = len * (1 - C[2]); });
+};
+FX.blob = (b, t, o) => {    // glossy liquid blobs merge and split around one word
+  const g = $('blobs'); g.style.opacity = o; const k = E.o(P(t, b.a - .05, b.a + .7));
+  [...g.children].forEach((c, j) => { const an = t * (.7 + j * .3) + j * 2, d = (j ? 170 + 60 * Math.sin(t * 1.3 + j) : 0) * k; c.setAttribute('cx', 540 + Math.cos(an) * d); c.setAttribute('cy', 880 + Math.sin(an * 1.2) * d); c.setAttribute('r', (j ? 85 + 25 * Math.sin(t * 2 + j) : 230) * k); });
+  const w = b.bw; w.style.display = 'block'; const kw = E.o(P(t, b.a + .3, b.a + .9)); w.style.opacity = kw * o; w.style.filter = kw < 1 ? `blur(${(1 - kw) * 14}px)` : ''; w.style.transform = `scale(${lerp(.8, 1, kw)})`;
+};
+window.seek = seek;
+</script>
+</body>
+</html>

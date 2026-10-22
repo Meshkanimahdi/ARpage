@@ -19,9 +19,9 @@ const MODEL = 'eleven_v4';
 const vdir = path.join(dir, 'voice'); fs.mkdirSync(path.join(vdir, 'trim'), {recursive: true});
 const sh = (c, a) => execFileSync(c, a, {encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe']});
 const sq = t => t.replace(/\s+/g, ' ').trim();
-const withTags = t => sq(t.replace(/\{([^|}]*)\|([^}]*)\}/g, '$2').replace(/\*/g, '').replace(/\s*\|\s*/g, ' '));
+const withTags = t => sq(t.replace(/\[icon:[^\]]*\]/g, '').replace(/\{([^|}]*)\|([^}]*)\}/g, '$2').replace(/\*/g, '').replace(/\s*\|\s*/g, ' '));
 const plain = t => sq(withTags(t).replace(/\[[^\]]*\]/g, ''));
-const shownText = t => sq(t.replace(/\{([^|}]*)\|([^}]*)\}/g, '$1').replace(/\[[^\]]*\]/g, '').replace(/\*/g, '').replace(/\s*\|\s*/g, ' '));   // STT often writes numbers as digits
+const shownText = t => sq(t.replace(/\[icon:[^\]]*\]/g, '').replace(/\{([^|}]*)\|([^}]*)\}/g, '$1').replace(/\[[^\]]*\]/g, '').replace(/\*/g, '').replace(/\s*\|\s*/g, ' '));   // STT often writes numbers as digits
 const norm = s => s.replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]).replace(/[ً-ٰٟ‌\s.,،؛:!?؟«»"'()\-–—…]/g, '').replace(/ي/g, 'ی').replace(/ك/g, 'ک');
 function sim(a, b) { a = norm(a); b = norm(b); const m = a.length, n = b.length; if (!m || !n) return 0;
   let p = Array.from({length: n + 1}, (_, j) => j);
