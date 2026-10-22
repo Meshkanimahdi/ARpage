@@ -565,7 +565,7 @@ two-news reel in REEL_SPEC.md is retired.)
    English v4 audio tags where the tone turns, numbers/dates/Latin names via `{shown|spoken}`
    (STORY_SPEC §5). Only allowed claims.
 2. Line engine: real photos of people/products → `python3 news-reel/lineart.py` into `work/story/el/*.svg`;
-   no image generation is needed. Only for the collage engine (story.html):
+   no image generation is needed. For story.html looks:
    `work/story/elements.json`: every object the beats need, in **≤ 3 sheets of ≤ 9 items** (user rule —
    no per-element image calls). `python3 news-reel/sprite_sheet.py --dir work/story`; Read the sheet
    previews; regenerate a sheet at most twice. Real products: refs per §1.5.1. Real people: real photos
@@ -574,8 +574,8 @@ two-news reel in REEL_SPEC.md is retired.)
    exit 4 → respell/rephrase the flagged beats). 60–90 s.
 
 ### 4.4 Render and QC
-1. `node news-reel/reel_render.mjs --dir=work/story --page=line.html --mode=check` (default engine, STORY_SPEC §8.0;
-   `story.html` only for collage / soft-ui); Read every
+1. `node news-reel/reel_render.mjs --dir=work/story --page=<line.html|story.html> --mode=check` (the engine chosen for
+   this reel, STORY_SPEC §8.0 — vary it reel to reel); Read every
    `out/sheet*.jpg`. Fix ISSUES (word mismatch), text overflow, wrong/ugly cut-outs, a visual that does
    not match its sentence, distorted people/products. Max 3 rounds.
 2. `--mode=video` in the background (run it with a timeout of at least 60 min), then `python3 news-reel/reel_assemble.py --dir work/story`:

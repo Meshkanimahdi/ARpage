@@ -5,16 +5,14 @@ look, shape) — never the safety, fact-checking, source, budget or publishing r
 file `creative.request` which request you followed. Requests for past slots are ignored.
 
 ## Reel 2026-10-23 09:00 (prepared 2026-10-22 21:45, user request 2026-10-22)
-- **Topic area:** the role of AI in fashion and style — design, collections, virtual try-on, AI models on
-  the runway / in campaigns, trend forecasting, fashion brands' AI moves. Pick the strongest *verified*
-  story trending in the last 72 h; if nothing big, widen to the last 14 days (still verified, dated in the
-  caption). Angle: creative work (STORY_SPEC §1).
-- **Look: maximalist colour + professional motion, mandatory** (updated 2026-10-22 18:30: the user now
-  rejects collage cut-outs). Engine `line.html` (STORY_SPEC §8.0), `motion.theme = {bg: "#07060B",
-  accents: ["#FF2E93", "#00E5FF", "#FFE14D", "#7CFF4F", "#B388FF"]}` — a different neon accent per station
-  with drifting colour glows. Fashion visuals as glowing line art: real runway / campaign photos traced
-  with `lineart.py` (credited), Lucide icons (`shirt`, `scissors`, `gem`, `camera`, `sparkles`, `ruler`,
-  `shopping-bag`, `palette`), `counter` / `chart` / `compare` / `flow` for the numbers and the
-  human-vs-AI tension. No sprite-sheet collage for this reel.
-- Voice: energetic; a female voice fits if the story is about women's fashion (STORY_SPEC §5).
-- Everything else as usual: v4 tags, word-level sync, 60–90 s, reel + Story share at 09:00.
+- **Topic area:** the role of AI in fashion and style, told so it appeals to women — design and
+  collections, virtual try-on and AI stylists, AI models in campaigns / on the runway, trend forecasting,
+  fashion brands' AI moves. Pick the strongest *verified* story trending in the last 72 h; if nothing big,
+  widen to the last 14 days (still verified, dated in the caption). Angle: creative work (STORY_SPEC §1).
+- **Look: maximalist, mandatory (the user's choice for this reel).** Engine `story.html`, `theme.preset =
+  "maxi-pop"`, density busy, `story.badge` e.g. «AI × مد». Elements: 2–3 sprite sheets in a maximalist
+  fashion-editorial collage style (glossy, saturated, patterns, sequins, texture); real brands / products /
+  people only from real photos (RUNBOOK §1.5.1). Motion craft of STORY_SPEC §8.0 still applies: smooth
+  expo easing, overlapping layers in constant gentle motion, every beat visibly changes, nothing frozen.
+- **Voice: female**, warm and energetic (STORY_SPEC §5 table), v4 tags.
+- Everything else as usual: word-level sync, 60–90 s, reel + Story share at 09:00.

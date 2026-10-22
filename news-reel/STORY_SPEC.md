@@ -163,11 +163,14 @@ wireframe…
 
 ## 8. Visuals per beat
 
-### 8.0 Engine and motion craft (user rule 2026-10-22 — read before designing any reel)
+### 8.0 Engines, style rotation and motion craft (user rules 2026-10-22 — read before designing any reel)
 The user rejected the collage look ("cut-outs and icons that just slide around look childish"). Reference:
-the viral @ensan.besham reel (2.3M views) — glowing line-art explainers. Default renderer from now on is
-**`news-reel/line.html`** (`--page=line.html`); `story.html` only when the request or the story clearly
-needs photo cut-outs or a soft-ui product comparison.
+the viral @ensan.besham reel (2.3M views) — glowing line-art explainers. **No fixed style (user rule 2026-10-22): every reel gets
+its own style.** Two engines: **`line.html`** (glowing line-art explainer, below) and **`story.html`** (looks
+in §4: paper-ember, mono-press, acid-pop, neon-night, maxi-pop, soft-ui …). Choose engine + look per story;
+never the same engine *and* look two reels in a row; across a week use both engines and at least 4 looks.
+The motion craft below (smooth expo easing, continuous movement, things that visibly happen, lead visual
+filling the frame, no empty or frozen frames, no toy-like bouncing) applies to **every** engine and look.
 - **One continuous canvas.** Each beat is a station on a big world; the camera travels to the next
   station (pull back → diagonal move with motion blur → push in) along a glowing rail that draws itself.
   No hard slide changes, no empty frames, no element "popping" with bounce easing.
