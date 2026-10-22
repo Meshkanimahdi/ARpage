@@ -17,7 +17,7 @@ file `creative.request` which request you followed. Requests for past slots are 
   fabric rolls, mirrored dressing room, runway backstage with racks of sequinned gowns, boutique with a
   virtual-try-on mirror screen, mood-board wall, a laptop / tablet showing colourful AI pattern designs;
   2–3 beats per image with the camera travelling between details. Poster headlines on beats 1, the
-  turning point and the ending. Approved test frame: `work/mxtest` (scene `work/mxphoto/s1.png` may be
+  turning point and the ending. Approved test scene: `news-reel/assets/maxi-studio-1.png` (blank poster box [331, 284, 443, 580]; may be
   reused for the hook). No flat stickers / sunbursts / checkerboard shapes, no sprite-sheet collage.
 - **Voice: female**, warm and energetic (STORY_SPEC §5 table), v4 tags.
 - Everything else as usual: word-level sync, 60–90 s, reel + Story share at 09:00.
