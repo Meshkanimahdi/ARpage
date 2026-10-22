@@ -9,8 +9,12 @@ file `creative.request` which request you followed. Requests for past slots are 
   the runway / in campaigns, trend forecasting, fashion brands' AI moves. Pick the strongest *verified*
   story trending in the last 72 h; if nothing big, widen to the last 14 days (still verified, dated in the
   caption). Angle: creative work (STORY_SPEC §1).
-- **Look: maximalist, mandatory.** `theme.preset = "maxi-pop"`, density busy, `story.badge` e.g. «AI × مد».
-  Elements sheet(s) in the maximalist fashion-editorial collage style (STORY_SPEC §4); at least one beat
-  with 2–3 overlapping objects; real products / brands / people only from real photos (RUNBOOK §1.5.1).
+- **Look: maximalist colour + professional motion, mandatory** (updated 2026-10-22 18:30: the user now
+  rejects collage cut-outs). Engine `line.html` (STORY_SPEC §8.0), `motion.theme = {bg: "#07060B",
+  accents: ["#FF2E93", "#00E5FF", "#FFE14D", "#7CFF4F", "#B388FF"]}` — a different neon accent per station
+  with drifting colour glows. Fashion visuals as glowing line art: real runway / campaign photos traced
+  with `lineart.py` (credited), Lucide icons (`shirt`, `scissors`, `gem`, `camera`, `sparkles`, `ruler`,
+  `shopping-bag`, `palette`), `counter` / `chart` / `compare` / `flow` for the numbers and the
+  human-vs-AI tension. No sprite-sheet collage for this reel.
 - Voice: energetic; a female voice fits if the story is about women's fashion (STORY_SPEC §5).
 - Everything else as usual: v4 tags, word-level sync, 60–90 s, reel + Story share at 09:00.

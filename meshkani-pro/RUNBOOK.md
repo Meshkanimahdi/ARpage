@@ -564,7 +564,9 @@ two-news reel in REEL_SPEC.md is retired.)
    Hook in beat 1, open loop, re-hooks, payoff, closing question (STORY_SPEC §3). Every script carries
    English v4 audio tags where the tone turns, numbers/dates/Latin names via `{shown|spoken}`
    (STORY_SPEC §5). Only allowed claims.
-2. `work/story/elements.json`: every object the beats need, in **≤ 3 sheets of ≤ 9 items** (user rule —
+2. Line engine: real photos of people/products → `python3 news-reel/lineart.py` into `work/story/el/*.svg`;
+   no image generation is needed. Only for the collage engine (story.html):
+   `work/story/elements.json`: every object the beats need, in **≤ 3 sheets of ≤ 9 items** (user rule —
    no per-element image calls). `python3 news-reel/sprite_sheet.py --dir work/story`; Read the sheet
    previews; regenerate a sheet at most twice. Real products: refs per §1.5.1. Real people: real photos
    (Wikimedia Commons first, `fetch_to_drive` + download), credited.
@@ -572,10 +574,11 @@ two-news reel in REEL_SPEC.md is retired.)
    exit 4 → respell/rephrase the flagged beats). 60–90 s.
 
 ### 4.4 Render and QC
-1. `node news-reel/reel_render.mjs --dir=work/story --page=story.html --mode=check`; Read every
+1. `node news-reel/reel_render.mjs --dir=work/story --page=line.html --mode=check` (default engine, STORY_SPEC §8.0;
+   `story.html` only for collage / soft-ui); Read every
    `out/sheet*.jpg`. Fix ISSUES (word mismatch), text overflow, wrong/ugly cut-outs, a visual that does
    not match its sentence, distorted people/products. Max 3 rounds.
-2. `--mode=video` in the background (~15 min), then `python3 news-reel/reel_assemble.py --dir work/story`:
+2. `--mode=video` in the background (run it with a timeout of at least 60 min), then `python3 news-reel/reel_assemble.py --dir work/story`:
    `reel.json` must show 55–92 s, −15.5…−12 LUFS, true peak ≤ −1 dBFS; H.264 1080×1920 30 fps + AAC.
 3. Extract frames at 1 s, the middle and the end card and Read them; Read `cover.jpg` (it should
    show the hook text; set `cover_t` in story.json if not).

@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro motion reel</title>
+<!-- Motion engine (STORY_SPEC §8b): glowing line-art explainers on one continuous canvas.
+     Every beat is a "station" on a large world; the camera travels between stations (pull back → move → push in)
+     along a glowing rail that draws itself, so nothing ever cuts to an unrelated slide. Visuals are drawn, not
+     pasted: line icons draw on, connectors carry pulses, words get hand-drawn circles, numbers roll, bars fill.
+     Data: <dir>/story.json + <dir>/timeline.json (story_voice.mjs). Deterministic: window.seek(t) only. -->
+<style>
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-700-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-700-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: Inter; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); }
+  @font-face { font-family: Inter; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-800-normal.woff2); }
+  @font-face { font-family: Lalezar; src: url(/logo-motion/node_modules/@fontsource/lalezar/files/lalezar-arabic-400-normal.woff2); }
+  :root { --bg: #050507; --line: #EDEDED; --acc: #FFD166; --dim: #6B6B70; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Vaz, sans-serif; color: var(--line); background: var(--bg); }
+  #orbs { position: absolute; inset: 0; }
+  #orbs i { position: absolute; width: 900px; height: 900px; border-radius: 50%; filter: blur(160px); opacity: 0; }
+  #world { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+  .st { position: absolute; width: 1080px; height: 1500px; }
+  .st svg.d { position: absolute; left: 0; top: 0; overflow: visible; }
+  .head { position: absolute; left: 70px; right: 70px; top: 120px; text-align: center; font-weight: 900; font-size: 64px; line-height: 1.25; color: var(--line); text-shadow: 0 0 22px rgba(255,255,255,.35); }
+  .head b { color: var(--acc); text-shadow: 0 0 26px var(--acc); font-weight: 900; }
+  .lab { position: absolute; font-weight: 700; font-size: 34px; white-space: nowrap; color: var(--line); text-shadow: 0 0 14px rgba(255,255,255,.3); }
+  .lab.s { font-size: 26px; color: #BDBDC2; font-weight: 500; }
+  .lab.a { color: var(--acc); text-shadow: 0 0 18px var(--acc); }
+  .num { position: absolute; font-family: Inter, Vaz; font-weight: 800; color: var(--line); direction: ltr; text-shadow: 0 0 30px rgba(255,255,255,.45); display: flex; justify-content: center; }
+  .dg { display: inline-block; overflow: hidden; height: 1.05em; position: relative; }
+  .dg span { display: block; line-height: 1.05em; }
+  .para { position: absolute; left: 70px; right: 70px; font-weight: 500; font-size: 56px; line-height: 1.75; color: #8E8E93; text-align: right; }
+  .para .on { color: var(--line); }
+  .para mark { background: none; color: var(--line); position: relative; }
+  .pill { position: absolute; border: 2.5px solid var(--line); border-radius: 60px; padding: 10px 30px 14px; font-weight: 900; font-size: 38px; white-space: nowrap; box-shadow: 0 0 22px rgba(255,255,255,.25), inset 0 0 18px rgba(255,255,255,.12); text-shadow: 0 0 14px rgba(255,255,255,.4); }
+  .pill.a { border-color: var(--acc); color: var(--acc); box-shadow: 0 0 26px var(--acc), inset 0 0 18px rgba(255,255,255,.1); }
+  .box { position: absolute; border: 2.5px solid rgba(237,237,237,.9); border-radius: 28px; box-shadow: 0 0 26px rgba(255,255,255,.18), inset 0 0 30px rgba(255,255,255,.05); }
+  #cap { position: absolute; left: 80px; right: 80px; top: 1475px; text-align: center; font-weight: 700; font-size: 40px; line-height: 1.5; direction: rtl; }
+  #cap span { color: #4A4A50; transition: none; }
+  #cap span.p { color: #D8D8DC; }
+  #cap span.c { color: #fff; text-shadow: 0 0 18px rgba(255,255,255,.8); }
+  #cap span.k.p, #cap span.k.c { color: var(--acc); text-shadow: 0 0 18px var(--acc); }
+  #dots { position: absolute; left: 0; right: 0; top: 1418px; display: flex; justify-content: center; gap: 14px; }
+  #dots i { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #777; box-sizing: border-box; }
+  #dots i.on { background: #fff; border-color: #fff; box-shadow: 0 0 12px #fff; }
+  #dust { position: absolute; inset: 0; pointer-events: none; }
+  #dust i { position: absolute; border-radius: 50%; background: #fff; }
+  #grain { position: absolute; inset: 0; opacity: .06; mix-blend-mode: screen; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='SEED'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  #vig { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0,0,0,.65)); pointer-events: none; }
+  #end { position: absolute; inset: 0; opacity: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; background: var(--bg); }
+  #end img { width: 260px; filter: drop-shadow(0 0 30px rgba(16,245,238,.6)); }
+  #end .h { font-family: Inter; font-weight: 800; font-size: 60px; letter-spacing: 12px; color: #fff; direction: ltr; text-shadow: 0 0 24px rgba(255,255,255,.5); }
+  #end .q { font-weight: 700; font-size: 46px; color: #CFCFD4; }
+  .maxi #cap span.c { color: var(--acc); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="orbs"><i id="o1"></i><i id="o2"></i></div>
+  <div id="world"></div>
+  <div id="dust"></div>
+  <div id="vig"></div>
+  <div id="dots"></div>
+  <div id="cap"></div>
+  <div id="end"><img src="/news-reel/assets/m.png"><div class="h">MESHKANI.PRO</div><div class="q"></div></div>
+  <div id="grain"></div>
+</div>
+<script src="/logo-motion/node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const url = s => s.startsWith('/') ? s : DIR + s;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
+const E = {o: gsap.parseEase('expo.out'), io: gsap.parseEase('expo.inOut'), p3: gsap.parseEase('power3.out'), p2io: gsap.parseEase('power2.inOut'), s: gsap.parseEase('sine.inOut')};
+const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
+function h(tag, cls, style, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (style) e.style.cssText = style; if (html !== undefined) e.innerHTML = html; return e; }
+const NS = 'http://www.w3.org/2000/svg';
+function sv(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.append(e); return e; }
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const ISSUES = [];
+
+// ---- drawing primitives: everything that appears is drawn on (stroke-dashoffset) or fades up through a blur ----
+const DRAW = [];   // {el, len, a, d}
+function drawOn(el, a, d = .8) { DRAW.push({el, a, d, len: 0}); return el; }
+function fadeUp(el, a, d = .45, dy = 24) { DRAW.push({el, a, d, fade: dy}); return el; }
+let ICONS = {};
+async function icon(name) { if (!ICONS[name]) { const r = await fetch(`/logo-motion/node_modules/lucide-static/icons/${name}.svg`); if (!r.ok) { ISSUES.push('icon missing: ' + name); ICONS[name] = '<circle cx="12" cy="12" r="9"/>'; } else ICONS[name] = (await r.text()).replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, ''); } return ICONS[name]; }
+// a lucide icon drawn on inside group g at (x,y) with size s; strokes keep a constant visual width
+async function iconAt(g, name, x, y, s, a, opt = {}) {
+  const gi = sv('g', {transform: `translate(${x - s / 2},${y - s / 2}) scale(${s / 24})`, fill: 'none', stroke: opt.color || 'var(--line)', 'stroke-width': (opt.w || 2.6) * 24 / s, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', filter: `url(#${opt.acc ? 'glowA' : 'glow'})`}, g);
+  gi.innerHTML = await icon(name); [...gi.children].forEach((c, i) => drawOn(c, a + i * .06, opt.d || .9)); return gi;
+}
+// a hand-drawn ellipse around a box (x,y,w,h), slightly overshooting like a marker stroke
+function scribble(g, x, y, w, hh, a, color = 'var(--line)') {
+  const cx = x + w / 2, cy = y + hh / 2, rx = w / 2 + 22, ry = hh / 2 + 16, pts = [];
+  for (let i = 0; i <= 64; i++) { const t = i / 64, an = -2.6 + t * Math.PI * 2.18, wob = 1 + .04 * Math.sin(t * 9); pts.push(`${(cx + Math.cos(an) * rx * wob).toFixed(1)},${(cy + Math.sin(an) * ry * wob - t * 6).toFixed(1)}`); }
+  return drawOn(sv('polyline', {points: pts.join(' '), fill: 'none', stroke: color, 'stroke-width': 3.5, 'stroke-linecap': 'round', filter: 'url(#glow)'}, g), a, .55);
+}
+
+// ---- visuals: build(station, svg, beat, a) — absolute times; return an optional per-frame updater ----
+const V = {};
+V.icons = async (st, g, s, a) => {      // 1–4 big line icons with labels; optional accent on one
+  const it = s.items || [], n = it.length, gap = 1080 / (n + 1), y = s.y || 560, size = n === 1 ? 380 : n === 2 ? 300 : 230;
+  for (const [i, o] of it.entries()) { const x = 1080 - gap * (i + 1), at = a + (o.at ?? .15 + i * .35);
+    await iconAt(g, o.icon, x, y, size, at, {acc: o.acc || s.focus === i, color: o.acc || s.focus === i ? 'var(--acc)' : null});
+    if (o.label) st.append(fadeUp(h('div', 'lab' + (o.acc || s.focus === i ? ' a' : ''), `left:${x - 300}px; width:600px; text-align:center; top:${y + size / 2 + 40}px`, esc(o.label)), at + .45));
+    if (o.sub) st.append(fadeUp(h('div', 'lab s', `left:${x - 300}px; width:600px; text-align:center; top:${y + size / 2 + 92}px`, esc(o.sub)), at + .6)); }
+};
+V.flow = async (st, g, s, a) => {       // a hub on top, nodes on a ground line below, curved links with travelling pulses
+  const nodes = s.nodes || [], n = nodes.length, hy = 430, ny = 1010, hub = s.hub;
+  if (hub) { await iconAt(g, hub.icon, 540, hy, 230, a + .1, {acc: true, color: 'var(--acc)'}); st.append(fadeUp(h('div', 'lab a', `left:240px; width:600px; text-align:center; top:${hy + 150}px`, esc(hub.label)), a + .5)); }
+  drawOn(sv('line', {x1: 90, y1: ny + 110, x2: 990, y2: ny + 110, stroke: 'var(--line)', 'stroke-width': 2, opacity: .6, filter: 'url(#glow)'}, g), a + .2, .9);
+  const pulses = [];
+  for (const [i, o] of nodes.entries()) { const x = 140 + i * (800 / Math.max(1, n - 1)), at = a + .5 + i * .18;
+    await iconAt(g, o.icon, x, ny, n > 5 ? 110 : 160, at, {w: 2.4});
+    if (o.label) st.append(fadeUp(h('div', 'lab', `left:${x - 150}px; width:300px; text-align:center; top:${ny + 130}px; font-size:32px`, esc(o.label)), at + .3));
+    if (hub && s.links !== false) { const p = sv('path', {d: `M${x} ${ny - 80} C ${x} ${hy + 260}, 540 ${ny - 260}, 540 ${hy + 140}`, fill: 'none', stroke: 'var(--line)', 'stroke-width': 2, opacity: .55, 'stroke-dasharray': '6 10'}, g);
+      drawOn(p, at + .4, .7); const dot = sv('circle', {r: 7, fill: 'var(--acc)', filter: 'url(#glowA)'}, g); pulses.push({p, dot, ph: i * .37, at: at + .9, up: s.dir !== 'down'}); } }
+  if (s.side) for (const [k, sd] of s.side.entries()) {   // labelled arc arrows on the sides (e.g. «مالیات», «نفت»)
+    const x = k ? 980 : 100, p = sv('path', {d: `M${x} ${ny + 60} Q ${x + (k ? 40 : -40)} ${(ny + hy) / 2}, ${540 + (k ? 130 : -130)} ${hy - 60}`, fill: 'none', stroke: 'var(--line)', 'stroke-width': 2.4, filter: 'url(#glow)'}, g);
+    drawOn(p, a + 1 + k * .4, 1); st.append(fadeUp(h('div', 'lab s', `${k ? 'right' : 'left'}:20px; top:${(ny + hy) / 2 - 20}px`, esc(sd)), a + 1.4 + k * .4)); }
+  return t => pulses.forEach(({p, dot, ph, at, up}) => { const L = p.getTotalLength(), k = ((t - at) * .45 + ph) % 1, pt = p.getPointAtLength((up ? k : 1 - k) * L);
+    dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y); dot.style.opacity = t < at ? 0 : Math.sin(k * Math.PI); });
+};
+V.quote = async (st, g, s, a) => {      // the source sentence in grey; key words get hand-drawn circles + numbered badges
+  const p = h('div', 'para', `top:${s.y || 380}px`); const words = s.text.split(/\s+/), marks = [];
+  p.innerHTML = words.map((w, i) => `<span data-i="${i}">${esc(w.replace(/\*/g, ''))}</span>`).join(' ');
+  st.append(fadeUp(p, a + .05, .5));
+  if (s.source) st.append(fadeUp(h('div', 'lab s', `left:70px; right:70px; text-align:right; top:${(s.y || 380) + 470}px`, '— ' + esc(s.source)), a + .4));
+  return {after: () => { const pr = st.getBoundingClientRect(); let n = 0;   // after layout: measure the starred words
+    words.forEach((w, i) => { if (!w.startsWith('*')) return; const sp = p.querySelector(`[data-i="${i}"]`), r = sp.getBoundingClientRect(), z = 1;
+      const x = (r.left - pr.left) / z, y = (r.top - pr.top) / z - 24, w2 = r.width / z, h2 = r.height / z, at = (s.at && s.at[n] != null) ? a + s.at[n] : a + .8 + n * .6; n++;
+      scribble(g, x, y, w2, h2, at, n % 2 ? 'var(--acc)' : 'var(--line)'); sp.classList.add('k'); marks.push({sp, at});
+      const b = h('div', 'pill' + (n % 2 ? ' a' : ''), `left:${x + w2 - 20}px; top:${y - 52}px; padding:2px 14px 4px; font-size:24px`, fa(n)); st.append(fadeUp(b, at + .35, .3, 10)); }); },
+    upd: t => marks.forEach(({sp, at}) => { sp.style.color = t > at ? '#fff' : ''; sp.style.textShadow = t > at ? '0 0 16px rgba(255,255,255,.6)' : ''; })};
+};
+V.counter = async (st, g, s, a) => {    // odometer digits rolling into place + a gauge ring that draws to `ring` %
+  const cy = s.y || 640, R = 300, txt = (s.prefix || '') + String(s.to) + (s.suffix || '');
+  const ring = sv('circle', {cx: 540, cy, r: R, fill: 'none', stroke: '#2A2A2E', 'stroke-width': 10}, g);
+  const arc = sv('circle', {cx: 540, cy, r: R, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 10, 'stroke-linecap': 'round', transform: `rotate(-90 540 ${cy})`, filter: 'url(#glowA)'}, g);
+  for (let i = 0; i < 60; i++) { const an = i / 60 * Math.PI * 2, r1 = R + 26, r2 = R + (i % 5 ? 36 : 50); drawOn(sv('line', {x1: 540 + Math.cos(an) * r1, y1: cy + Math.sin(an) * r1, x2: 540 + Math.cos(an) * r2, y2: cy + Math.sin(an) * r2, stroke: 'var(--line)', 'stroke-width': 2, opacity: .5}, g), a + i * .008, .3); }
+  const num = h('div', 'num', `left:0; right:0; top:${cy - 120}px; font-size:${txt.length > 6 ? 150 : 200}px`); const cols = [];
+  for (const ch of txt) { if (/\d/.test(ch)) { const d = h('span', 'dg'), col = h('span', ''); col.innerHTML = Array.from({length: 20}, (_, k) => `<span>${fa(k % 10)}</span>`).join(''); d.append(col); num.append(d); cols.push({col, v: +ch}); } else num.append(h('span', '', '', esc(ch))); }
+  st.append(fadeUp(num, a + .1, .35, 10));
+  if (s.label) st.append(fadeUp(h('div', 'lab', `left:0; right:0; text-align:center; top:${cy + R + 80}px`, esc(s.label)), a + .6));
+  const C = 2 * Math.PI * R; arc.setAttribute('stroke-dasharray', C);
+  return t => { const k = E.p3(P(t, a + .2, a + 1.6)); cols.forEach(({col, v}, i) => { const kk = E.o(P(t, a + .2 + i * .1, a + 1.5 + i * .1)); col.style.transform = `translateY(${-(10 + v) * kk * 1.05}em)`; });
+    arc.setAttribute('stroke-dashoffset', C * (1 - k * (s.ring ?? 100) / 100)); };
+};
+V.bars = async (st, g, s, a) => {       // labelled rows whose bars fill with glowing heads; values count
+  const rows = s.rows || [], y0 = s.y || 460, gap = 230, upd = [];
+  for (const [i, r] of rows.entries()) { const y = y0 + i * gap, at = a + .2 + i * .3;
+    if (r.icon) await iconAt(g, r.icon, 950, y - 60, 90, at, {w: 2.2});
+    st.append(fadeUp(h('div', 'lab', `right:${r.icon ? 180 : 70}px; top:${y - 90}px; font-size:46px; font-weight:900`, esc(r.label)), at));
+    drawOn(sv('rect', {x: 90, y: y, width: 900, height: 34, rx: 17, fill: 'none', stroke: '#444', 'stroke-width': 2}, g), at, .5);
+    const f = sv('rect', {x: 90, y: y, width: 0, height: 34, rx: 17, fill: r.acc ? 'var(--acc)' : 'var(--line)', filter: `url(#${r.acc ? 'glowA' : 'glow'})`}, g);
+    const v = h('div', 'lab' + (r.acc ? ' a' : ''), `left:90px; top:${y - 80}px; font-family:Inter,Vaz; font-size:56px; font-weight:800`); st.append(v);
+    upd.push(t => { const k = E.o(P(t, at + .3, at + 1.4)); f.setAttribute('width', 900 * k * r.value / 100); v.textContent = (r.text ?? fa(Math.round(r.value * k)) + '٪'); v.style.opacity = P(t, at + .3, at + .5); }); }
+  return t => upd.forEach(u => u(t));
+};
+V.people = async (st, g, s, a) => {     // a grid of person icons; `light` count lights up in turn, `focus` one glows big
+  const n = s.n || 24, cols = s.cols || 6, size = 112, gx = 165, x0 = 540 + (cols - 1) * gx / 2, y0 = s.y || 400, cells = [];
+  for (let i = 0; i < n; i++) { const x = x0 - (i % cols) * gx, y = y0 + Math.floor(i / cols) * 175; cells.push(await iconAt(g, s.icon || 'user-round', x, y, size, a + .05 + i * .025, {w: 2.4, d: .5})); }
+  if (s.label) st.append(fadeUp(h('div', 'lab', `left:0; right:0; text-align:center; top:${y0 + Math.ceil(n / cols) * 175 + 10}px; font-size:42px`, esc(s.label)), a + .7));
+  return t => cells.forEach((c, i) => { const lit = (s.focus === i && t > a + (s.focus_at || 1.2)) || (s.light && i < Math.round(P(t, a + .8, a + 2.2) * s.light));
+    c.setAttribute('stroke', lit ? 'var(--acc)' : 'var(--line)'); c.setAttribute('filter', `url(#${lit ? 'glowA' : 'glow'})`); c.style.opacity = s.focus != null && !lit && t > a + (s.focus_at || 1.2) ? .35 : 1; });
+};
+V.compare = async (st, g, s, a) => {    // two columns; rows draw a check or a cross on each side
+  const L = s.left, R = s.right, rows = s.rows || [], y0 = s.y || 520;
+  st.append(fadeUp(h('div', 'pill', `right:110px; top:${y0 - 150}px`, esc(R.title)), a + .1), fadeUp(h('div', 'pill a', `left:110px; top:${y0 - 150}px`, esc(L.title)), a + .25));
+  drawOn(sv('line', {x1: 540, y1: y0 - 120, x2: 540, y2: y0 + rows.length * 130, stroke: '#555', 'stroke-width': 2}, g), a + .2, .8);
+  for (const [i, r] of rows.entries()) { const y = y0 + i * 130, at = a + .5 + i * .35;
+    st.append(fadeUp(h('div', 'lab', `left:0; right:0; text-align:center; top:${y - 26}px; font-size:30px; color:#AAA`, esc(r.label)), at));
+    for (const [side, ok] of [[1, r.r], [0, r.l]]) await iconAt(g, ok ? 'check' : 'x', side ? 800 : 280, y, 70, at + .2, {acc: ok && !side, color: ok ? (side ? 'var(--line)' : 'var(--acc)') : '#77777C'}); }
+};
+V.chart = async (st, g, s, a) => {      // a line chart that draws left→right with a glowing head and an end value
+  const pts = s.points || [10, 14, 12, 22, 30, 28, 46, 70, 100], W = 860, Hh = 520, x0 = 110, y0 = (s.y || 380) + Hh, mx = Math.max(...pts);
+  for (let i = 0; i <= 4; i++) drawOn(sv('line', {x1: x0, y1: y0 - i * Hh / 4, x2: x0 + W, y2: y0 - i * Hh / 4, stroke: '#2C2C30', 'stroke-width': 2}, g), a + i * .05, .5);
+  const xy = pts.map((v, i) => [x0 + i * W / (pts.length - 1), y0 - v / mx * Hh]);
+  const d = xy.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const area = sv('path', {d: d + ` L ${x0 + W} ${y0} L ${x0} ${y0} Z`, fill: 'url(#gradA)', opacity: 0}, g);
+  const line = drawOn(sv('path', {d, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 5, 'stroke-linejoin': 'round', filter: 'url(#glowA)'}, g), a + .3, 1.6);
+  const head = sv('circle', {r: 12, fill: '#fff', filter: 'url(#glowA)'}, g), val = h('div', 'lab a', 'font-family:Inter,Vaz; font-size:44px'); st.append(val);
+  if (s.label) st.append(fadeUp(h('div', 'lab s', `left:${x0}px; top:${y0 + 30}px`, esc(s.label)), a + .4));
+  return t => { const k = E.p2io(P(t, a + .3, a + 1.9)), L = line.getTotalLength(), pt = line.getPointAtLength(L * k); head.setAttribute('cx', pt.x); head.setAttribute('cy', pt.y);
+    area.setAttribute('opacity', .55 * P(t, a + 1.2, a + 2)); val.style.left = (pt.x - 120) + 'px'; val.style.top = (pt.y - 90) + 'px'; val.textContent = s.value || ''; val.style.opacity = P(t, a + 1.7, a + 2); };
+};
+V.timeline = async (st, g, s, a) => {   // a horizontal line with dated nodes that light up in order
+  const ev = s.events || [], y = s.y || 700, n = ev.length;
+  drawOn(sv('line', {x1: 80, y1: y, x2: 1000, y2: y, stroke: 'var(--line)', 'stroke-width': 3, filter: 'url(#glow)'}, g), a + .1, 1);
+  const dots = ev.map((e, i) => { const x = 1000 - 60 - i * (840 / Math.max(1, n - 1)), at = a + .5 + i * .45, c = sv('circle', {cx: x, cy: y, r: 16, fill: 'var(--bg)', stroke: 'var(--line)', 'stroke-width': 3}, g);
+    st.append(fadeUp(h('div', 'lab a', `left:${x - 150}px; width:300px; text-align:center; top:${y - (i % 2 ? -50 : 110)}px; font-family:Inter,Vaz`, esc(e.date)), at),
+      fadeUp(h('div', 'lab s', `left:${x - 160}px; width:320px; text-align:center; white-space:normal; top:${y + (i % 2 ? 110 : 50)}px`, esc(e.label)), at + .15)); return {c, at}; });
+  return t => dots.forEach(({c, at}) => { const on = t > at; c.setAttribute('fill', on ? 'var(--acc)' : 'var(--bg)'); c.setAttribute('filter', on ? 'url(#glowA)' : ''); });
+};
+V.word = async (st, g, s, a) => {       // one huge glowing word (or number) + a thin sweep underline
+  const w = h('div', '', `position:absolute; left:0; right:0; top:${s.y || 520}px; text-align:center; font-family:${s.font || 'Lalezar'},Vaz; font-size:${s.size || 220}px; line-height:1.1; color:#fff; text-shadow:0 0 40px rgba(255,255,255,.55), 0 0 90px var(--acc)`, esc(s.text));
+  st.append(fadeUp(w, a + .05, .5, 40)); drawOn(sv('line', {x1: 220, y1: (s.y || 520) + (s.size || 220) * 1.25, x2: 860, y2: (s.y || 520) + (s.size || 220) * 1.25, stroke: 'var(--acc)', 'stroke-width': 4, filter: 'url(#glowA)'}, g), a + .45, .7);
+  if (s.sub) st.append(fadeUp(h('div', 'lab s', `left:0; right:0; text-align:center; top:${(s.y || 520) + (s.size || 220) * 1.4}px; font-size:34px`, esc(s.sub)), a + .7));
+};
+V.lineart = async (st, g, s, a) => {    // a traced line drawing (svg from news-reel/lineart.mjs) drawn on with glow
+  const txt = await (await fetch(url(s.src))).text(), m = txt.match(/viewBox="([^"]+)"/), vb = (m ? m[1] : '0 0 1000 1000').split(/\s+/).map(Number);
+  const sc = Math.min((s.w || 760) / vb[2], (s.h || 980) / vb[3]), w = vb[2] * sc, gg = sv('g', {transform: `translate(${540 - w / 2},${s.y || 240}) scale(${sc})`, fill: 'none', stroke: 'var(--line)', 'stroke-width': 1.6 / sc, filter: 'url(#glow)'}, g);
+  gg.innerHTML = txt.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+  const paths = [...gg.querySelectorAll('path')]; paths.forEach(p => { p.removeAttribute('fill'); p.setAttribute('fill', 'none'); });
+  paths.forEach((p, i) => drawOn(p, a + .1 + i / paths.length * (s.draw || 1.6), .8));
+  if (s.label) st.append(fadeUp(h('div', 'lab', `left:0; right:0; text-align:center; top:${(s.y || 240) + vb[3] * sc + 30}px; font-size:40px`, esc(s.label)), a + 1));
+  if (s.sub) st.append(fadeUp(h('div', 'lab s', `left:0; right:0; text-align:center; top:${(s.y || 240) + vb[3] * sc + 90}px`, esc(s.sub)), a + 1.2));
+};
+V.ui = async (st, g, s, a) => {         // a glowing outline card: title, rows with icons, a value column, a "?" or total that lands last
+  const y0 = s.y || 380, rows = s.rows || [], box = h('div', 'box', `left:150px; right:150px; top:${y0}px; height:${130 + rows.length * 110}px`); st.append(fadeUp(box, a + .05, .45, 30));
+  st.append(fadeUp(h('div', 'lab', `right:200px; top:${y0 + 38}px; font-size:40px; font-weight:900`, esc(s.title)), a + .25));
+  drawOn(sv('line', {x1: 190, y1: y0 + 112, x2: 890, y2: y0 + 112, stroke: '#555', 'stroke-width': 2}, g), a + .35, .6);
+  for (const [i, r] of rows.entries()) { const y = y0 + 150 + i * 110, at = a + .5 + i * (s.step || .45);
+    if (r.icon) await iconAt(g, r.icon, 850, y + 22, 50, at, {w: 2.2});
+    st.append(fadeUp(h('div', 'lab', `right:${r.icon ? 260 : 200}px; top:${y}px`, esc(r.label)), at), fadeUp(h('div', 'lab' + (r.acc ? ' a' : ''), `left:200px; top:${y}px; font-family:Inter,Vaz`, esc(r.value)), at + .2)); }
+};
+V.none = async () => {};
+
+// ---- build ----
+let S, TL, BEATS = [], END = 60, UPD = [];
+window.ready = (async () => {
+  S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json();
+  const th = Object.assign({bg: '#050507', line: '#EDEDED', acc: '#FFD166'}, (S.motion || {}).theme || {}), rs = document.documentElement.style;
+  rs.setProperty('--bg', th.bg); rs.setProperty('--line', th.line); rs.setProperty('--acc', th.acc);
+  const ACCS = th.accents || null; if (ACCS) document.body.classList.add('maxi');
+  $('grain').style.backgroundImage = $('grain').style.backgroundImage;   // static grain; seed varies per frame below
+  const world = $('world'), r = rng(7);
+  // station layout: a gentle zigzag going down the canvas, so every camera move is a diagonal travel
+  const POS = S.beats.map((_, i) => [i === 0 ? 0 : (i % 2 ? 1 : -1) * (360 + (i % 3) * 120), i * 1650]);
+  const rails = sv('svg', {width: 4000, height: POS.length * 1650 + 2000, style: 'position:absolute; left:-1400px; top:0; overflow:visible'}); world.append(rails);
+  const defs = sv('defs', {}, rails);
+  defs.innerHTML = `<filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glowA" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="gradA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${th.acc}" stop-opacity=".5"/><stop offset="1" stop-color="${th.acc}" stop-opacity="0"/></linearGradient>`;
+  for (const [i, bt] of S.beats.entries()) {
+    const L = TL.lines[bt.line || bt.id]; if (!L) throw new Error('unknown line ' + (bt.line || bt.id));
+    const a = L.start, [x, y] = POS[i], st = h('div', 'st', `left:${x}px; top:${y}px`); world.append(st);
+    const g = sv('svg', {class: 'd', width: 1080, height: 1500}, st);
+    if (ACCS) st.style.setProperty('--acc', ACCS[i % ACCS.length]);
+    if (bt.head) st.append(fadeUp(h('div', 'head', '', esc(bt.head).replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>')), a - .05, .5, 30));
+    const vis = bt.visual || {}, f = await (V[vis.type || 'none'] || V.none)(st, g, vis, a + (vis.delay || 0));
+    BEATS.push({bt, a, x, y, st, after: f && f.after, upd: typeof f === 'function' ? f : f && f.upd});
+    // the rail from the previous station: a glowing path the camera follows
+    if (i > 0) { const [px, py] = POS[i - 1], p = sv('path', {d: `M${px + 540 + 1400} ${py + 1290} C ${px + 540 + 1400} ${py + 1650}, ${x + 540 + 1400} ${y - 400}, ${x + 540 + 1400} ${y + 60}`, fill: 'none', stroke: 'var(--line)', 'stroke-width': 2.4, opacity: .7, filter: 'url(#glow)'}, rails);
+      drawOn(p, a - .55, .75); BEATS[i].rail = p; const hd = sv('circle', {r: 9, fill: '#fff', filter: 'url(#glowA)'}, rails); BEATS[i].head = hd; }
+  }
+  // captions: every spoken word of every beat, karaoke style
+  const cap = $('cap'); for (const b of BEATS) { const L = TL.lines[b.bt.line || b.bt.id]; const toks = b.bt.text.replace(/\[[^\]]*\]/g, '').replace(/\|/g, ' ').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/); let open = false;
+    b.words = toks.map((w, k) => { const st = w.startsWith('*'), en = /\*[،.,!؟?:…»"]*$/.test(w) && w.length > 1, kk = open || st; open = en ? false : (st ? true : open); return {w: w.replace(/\*/g, ''), k: kk, t: (L.words[k] || [L.start + k * .3])[0], e: (L.words[k] || [0, L.start + k * .3 + .3])[1]}; });
+    if (b.words.length !== L.words.length) ISSUES.push(`beat ${b.bt.id}: ${b.words.length} caption words, ${L.words.length} spoken`); }
+  $('dots').innerHTML = S.beats.map(() => '<i></i>').join('');
+  // dust
+  const dust = $('dust'); for (let k = 0; k < 70; k++) { const d = h('i', '', `width:${1 + r() * 3.5}px; height:${1 + r() * 3.5}px; opacity:${.15 + r() * .45}; filter:blur(${r() < .3 ? 2 : 0}px)`); d.dataset.x = r() * 1080; d.dataset.y = r() * 1920; d.dataset.v = 8 + r() * 30; d.dataset.p = r() * 9; dust.append(d); }
+  if (ACCS) { $('o1').style.background = ACCS[0]; $('o2').style.background = ACCS[1 % ACCS.length]; }
+  END = TL.total; $('end').querySelector('.q').textContent = S.end_text || '';
+  await document.fonts.ready; await Promise.all(['500', '700', '900'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش'))); await document.fonts.load('40px Lalezar', 'آزمایش');
+  await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('image failed: ' + i.src))));
+  seek(0); for (const b of BEATS) if (b.after) { setCam(b.x, b.y, 1); b.after(); }
+  for (const d of DRAW) if (!d.fade) { try { d.len = d.el.getTotalLength ? d.el.getTotalLength() : 0; } catch (e) { d.len = 0; } if (d.len) { d.el.style.strokeDasharray = d.len; } }
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  window.SCENES = BEATS.map((b, i) => ({t0: b.a - .2, t1: i + 1 < BEATS.length ? BEATS[i + 1].a - .2 : TL.end_start, type: (b.bt.visual || {}).type || 'text', bg: 'dark'})).concat([{t0: TL.end_start, t1: END, type: 'end'}]);
+  seek(0);
+})();
+
+function setCam(x, y, z) { $('world').style.transform = `translate(${540 - (x + 540) * z}px, ${(1920 * .43) - (y + 640) * z}px) scale(${z})`; }
+function seek(t) {
+  if (!BEATS.length) return;
+  let i = 0; BEATS.forEach((b, k) => { if (t >= b.a - .45) i = k; });
+  const b = BEATS[i], prev = BEATS[Math.max(0, i - 1)], m = i === 0 ? 1 : E.io(P(t, b.a - .45, b.a + .3));
+  // camera: travel prev → current with a pull-back in the middle, then a slow push while the beat is read
+  const pull = Math.sin(Math.PI * m) * .16, hold = P(t, b.a + .3, (BEATS[i + 1] || {a: TL.end_start}).a - .45);
+  const z = (1 - pull) * (1 + .035 * E.s(hold)), cx = lerp(prev.x, b.x, m) + Math.sin(t * .35) * 6, cy = lerp(prev.y, b.y, m) + Math.cos(t * .3) * 6;
+  setCam(cx, cy, z);
+  const blur = Math.sin(Math.PI * m) * (i ? 3.5 : 0); $('world').style.filter = blur > .2 ? `blur(${blur}px)` : '';
+  // drawing state
+  for (const d of DRAW) { const k = P(t, d.a, d.a + d.d);
+    if (d.fade) { const e = E.o(k); d.el.style.opacity = e; d.el.style.transform = `translateY(${(1 - e) * d.fade}px)`; d.el.style.filter = k < 1 ? `blur(${(1 - e) * 10}px)` : ''; }
+    else if (d.len) { d.el.style.strokeDashoffset = d.len * (1 - E.p3(k)); d.el.style.opacity = k > 0 ? 1 : 0; } }
+  for (const bb of BEATS) { if (bb.upd) bb.upd(t); if (bb.rail && bb.head) { const L = bb.rail.getTotalLength(), k = E.io(P(t, bb.a - .55, bb.a + .2)), pt = bb.rail.getPointAtLength(L * k); bb.head.setAttribute('cx', pt.x); bb.head.setAttribute('cy', pt.y); bb.head.style.opacity = k > 0 && k < 1 ? 1 : 0; bb.rail.style.opacity = lerp(.7, .18, P(t, bb.a + .4, bb.a + 1.2)); } }
+  // captions: the current beat's words; spoken = bright, current = glow, upcoming = dim
+  const inEnd = t >= TL.end_start, cap = $('cap');
+  if (cap._b !== b) { cap._b = b; cap.innerHTML = b.words.map(w => `<span class="${w.k ? 'k' : ''}">${esc(w.w)}</span>`).join(' '); }
+  [...cap.children].forEach((sp, k) => { const w = b.words[k]; sp.classList.toggle('p', t >= w.t); sp.classList.toggle('c', t >= w.t && t < w.e + .08); });
+  cap.style.opacity = $('dots').style.opacity = inEnd ? 0 : P(t, b.a - .3, b.a);
+  [...$('dots').children].forEach((d, k) => d.className = k === i ? 'on' : '');
+  // atmosphere
+  [...$('dust').children].forEach(d => { const y = (+d.dataset.y - t * d.dataset.v) % 1920; d.style.transform = `translate(${+d.dataset.x + Math.sin(t * .5 + +d.dataset.p) * 20}px, ${y < 0 ? y + 1920 : y}px)`; });
+  if (document.body.classList.contains('maxi')) { const ACC = getComputedStyle(b.st).getPropertyValue('--acc'); $('o1').style.background = ACC; $('o1').style.opacity = .22; $('o1').style.transform = `translate(${-200 + Math.sin(t * .3) * 120}px, ${900 + Math.cos(t * .25) * 140}px)`;
+    $('o2').style.opacity = .15; $('o2').style.transform = `translate(${400 + Math.cos(t * .2) * 100}px, ${-200 + Math.sin(t * .3) * 120}px)`; rsAcc(ACC); }
+  $('grain').style.backgroundPosition = `${(Math.floor(t * 24) * 37) % 220}px ${(Math.floor(t * 24) * 53) % 220}px`;
+  const e = $('end'), ek = P(t, TL.end_start, TL.end_start + .6); e.style.opacity = ek; e.style.transform = `scale(${lerp(1.04, 1, E.o(ek))})`;
+}
+function rsAcc(c) { $('cap').style.setProperty('--acc', c); }
+window.seek = seek;
+</script>
+</body>
+</html>

@@ -162,6 +162,41 @@ wireframe…
 - Only verified facts from `dossier.json`; quotes only when confirmed; attribute claims.
 
 ## 8. Visuals per beat
+
+### 8.0 Engine and motion craft (user rule 2026-10-22 — read before designing any reel)
+The user rejected the collage look ("cut-outs and icons that just slide around look childish"). Reference:
+the viral @ensan.besham reel (2.3M views) — glowing line-art explainers. Default renderer from now on is
+**`news-reel/line.html`** (`--page=line.html`); `story.html` only when the request or the story clearly
+needs photo cut-outs or a soft-ui product comparison.
+- **One continuous canvas.** Each beat is a station on a big world; the camera travels to the next
+  station (pull back → diagonal move with motion blur → push in) along a glowing rail that draws itself.
+  No hard slide changes, no empty frames, no element "popping" with bounce easing.
+- **Things are drawn, not pasted.** Line icons (Lucide, 1,500+) and line art draw on stroke by stroke with
+  a soft glow; connectors carry travelling pulses; key words in a quoted sentence get a hand-drawn circle
+  and a numbered badge; numbers roll like an odometer; gauges, bars and charts fill with glowing heads;
+  a person grid lights one figure.
+- **Easing:** expo/power3 out for arrivals, expo in-out for camera moves; never back/elastic. Readable
+  landing → fast exit. A slow 3–4% push on every hold; dust particles and film grain for depth.
+- **Hierarchy:** one lead visual filling 60–85% of the station, one small headline (`head`, with
+  `*accent*`), small karaoke captions at the bottom + section dots. 1–2 reading targets at a time.
+- **Colour:** dark base (`motion.theme.bg`), white glowing lines, one accent (`acc`) for what matters;
+  or a palette (`accents: [...]`, one per station, with drifting colour glows) for a maximalist reel.
+- Real people / products as line art: a real photo → `python3 news-reel/lineart.py photo.jpg el/x.svg`
+  (plain background works best; crop to the subject first) → `lineart` visual. Credit the photo.
+
+`story.json` for line.html: `{motion: {theme: {bg, line, acc, accents?}}, beats: [{id, text, head?, visual}], end_text}`.
+Line visuals (all coordinates in a 1080-wide station, y 0–1350):
+`icons` (`items[{icon, label, sub, acc}]`, `focus`), `flow` (`hub{icon,label}`, `nodes[{icon,label}]`, `side`
+[left, right] arc labels, `dir`), `quote` (`text` with `*words*` to circle, `source`, `at[]` circle times),
+`counter` (`to`, `prefix`, `suffix`, `label`, `ring` %), `bars` (`rows[{label, icon, value 0–100, text, acc}]`),
+`people` (`n`, `cols`, `icon`, `focus`, `focus_at`, `light`, `label`), `compare` (`left{title}`, `right{title}`,
+`rows[{label, l, r}]` true/false), `chart` (`points[]`, `value`, `label`), `timeline` (`events[{date,label}]`),
+`word` (`text`, `sub`, `size`, `font`), `ui` (`title`, `rows[{icon,label,value,acc}]`), `lineart` (`src` svg,
+`w`, `h`, `label`, `sub`, `draw` seconds), `none`. Icon names: lucide.dev (e.g. `brain-circuit`, `shirt`,
+`scissors`, `gem`, `camera`, `landmark`, `server`, `shield-alert`, `user-round`, `trending-up`).
+Every beat must visibly *produce* something (a line drawn, a number landing, a word circled).
+
+### 8.1 story.html visuals (collage engine — secondary)
 Types: `object` (1–3 cut-outs; `anim` pop/slide, `float`, `stamp`, `marks`), `person` (real photo,
 b/w card, name + role), `quote` (card + source, optional round photo), `icon_grid`, `network`,
 `counter`, `timeline`, `ui` (app card), `chart`, `split` (A «یا» B), `none`;
@@ -185,8 +220,8 @@ Drive), never a generated likeness; credit in the caption.
 bash news-reel/setup.sh
 python3 news-reel/sprite_sheet.py --dir work/story
 node news-reel/story_voice.mjs  --dir=work/story [--tempo=1.2]        # exit 3 too long, 4 unclear speech
-node news-reel/reel_render.mjs  --dir=work/story --page=story.html --mode=check   # Read out/sheet*.jpg
-node news-reel/reel_render.mjs  --dir=work/story --page=story.html --mode=video   # background, ~15 min
+node news-reel/reel_render.mjs  --dir=work/story --page=line.html --mode=check    # Read out/sheet*.jpg (story.html for collage)
+node news-reel/reel_render.mjs  --dir=work/story --page=line.html --mode=video    # background, timeout ≥ 60 min
 python3 news-reel/reel_assemble.py --dir work/story                    # reel.mp4 + cover.jpg + reel.json
 python3 news-reel/story_cut.py     --dir work/story                    # story.mp4 (≤ 60 s) for the Story share
 ```
