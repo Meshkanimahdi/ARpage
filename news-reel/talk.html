@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="fa"><head><meta charset="utf-8">
+<title>talking-head re-edit</title>
+<!-- Talking-head re-edit (1080x1920): the speaker in a card (cropped clear of the source's burned-in text),
+     karaoke captions from word timings, cut-out elements and quote cards tied to the speech, full-screen
+     scenes over the source's own b-roll.  Data: <dir>/plan.json + <dir>/frames/%05d.jpg + <dir>/el/*.png.
+     Render: node news-reel/reel_render.mjs --dir=work/x --page=talk.html --mode=video -->
+<style>
+  @font-face{font-family:Vaz;font-weight:500;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2)}
+  @font-face{font-family:Vaz;font-weight:800;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-800-normal.woff2)}
+  @font-face{font-family:Vaz;font-weight:900;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2)}
+  @font-face{font-family:Vaz;font-weight:600;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-600-normal.woff2);unicode-range:U+0000-00FF}
+  @font-face{font-family:Lalezar;src:url(/logo-motion/node_modules/@fontsource/lalezar/files/lalezar-arabic-400-normal.woff2)}
+  @font-face{font-family:Markazi;font-weight:700;src:url(/logo-motion/node_modules/@fontsource/markazi-text/files/markazi-text-arabic-700-normal.woff2)}
+  :root{--cream:#f3eee6;--ink:#22201d;--gold:#b8893b;--sage:#7e9474;--terra:#c4664a;--navy:#1d2a44}
+  html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:var(--cream);font-family:Vaz;direction:rtl}
+  #bg{position:absolute;inset:0;overflow:hidden}
+  .blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55}
+  #grain{position:absolute;inset:0;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+  #prog{position:absolute;top:96px;left:80px;right:80px;height:8px;border-radius:8px;background:rgba(34,32,29,.12);overflow:hidden}
+  #prog i{position:absolute;inset:0 auto 0 0;background:var(--gold);border-radius:8px}
+  #chap{position:absolute;top:132px;left:0;right:0;text-align:center}
+  #chap span{display:inline-block;font:800 34px Vaz;color:var(--cream);background:var(--ink);padding:10px 30px 12px;border-radius:40px}
+  #card{position:absolute;left:60px;top:228px;width:960px;height:880px;border-radius:46px;overflow:hidden;background:#111;
+    box-shadow:0 30px 70px rgba(34,32,29,.28),0 0 0 7px #fff;transform-origin:50% 50%}
+  #card img{position:absolute;left:0;top:0;width:960px;height:880px;object-fit:cover;transform-origin:50% 28%}
+  #card .vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,transparent 60%,rgba(0,0,0,.25))}
+  #cap{position:absolute;left:70px;right:70px;top:1170px;height:340px;display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:4px 18px;line-height:1.25}
+  #cap b{font:900 76px Vaz;color:var(--ink);position:relative;padding:0 6px;isolation:isolate}
+  #cap b.k{font:400 98px Lalezar;color:var(--terra)}
+  #cap b .m{position:absolute;left:-4px;right:-4px;bottom:8px;height:42%;background:rgba(184,137,59,.38);border-radius:10px;z-index:-1;transform-origin:100% 50%}
+  .el{position:absolute;width:330px;height:330px;display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 22px 26px rgba(34,32,29,.3))}
+  .el img{max-width:100%;max-height:100%}
+  .lab{position:absolute;font:800 36px Vaz;color:var(--cream);background:var(--ink);padding:8px 26px 11px;border-radius:30px;white-space:nowrap;box-shadow:0 8px 0 var(--gold)}
+  .qc{position:absolute;left:100px;right:100px;top:390px;height:560px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:40px;text-align:center}
+  .qc.quote{background:var(--cream);box-shadow:0 30px 60px rgba(0,0,0,.3);border:4px solid var(--gold)}
+  .qc.quote .t{font:700 108px/1.08 Markazi;color:var(--ink)}
+  .qc.quote .q{font:400 200px/0.6 Markazi;color:var(--gold);height:90px}
+  .qc .s{margin-top:22px;font:800 34px Vaz;color:var(--gold)}
+  .qc.bubble{background:#fff;box-shadow:0 30px 60px rgba(0,0,0,.3)}
+  .qc.bubble:after{content:'';position:absolute;bottom:-46px;right:180px;border:30px solid transparent;border-top:46px solid #fff;border-right-width:0}
+  .qc.bubble .t{font:900 76px/1.3 Vaz;color:var(--terra)}
+  #scene{position:absolute;inset:0;background:var(--navy);opacity:0}
+  #scene .ring{position:absolute;left:50%;top:640px;width:760px;height:760px;margin:-380px 0 0 -380px;border-radius:50%;border:3px dashed rgba(243,238,230,.25)}
+  #scene .big{position:absolute;left:0;right:0;top:300px;height:640px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 30px 40px rgba(0,0,0,.45))}
+  #scene .big img{max-height:600px;max-width:640px}
+  #scene .ttl{position:absolute;left:60px;right:60px;top:1000px;text-align:center;font:400 112px/1.15 Lalezar;color:var(--cream)}
+  #scene .ttl span{display:inline-block}
+  #scene .tag{position:absolute;left:0;right:0;top:1290px;text-align:center}
+  #scene .tag span{font:800 36px Vaz;color:var(--navy);background:var(--gold);padding:8px 28px 11px;border-radius:30px}
+  #end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;opacity:0;background:var(--cream)}
+  #end .h{font:400 150px Lalezar;color:var(--ink)}
+  #end .heart{width:150px;height:150px;background:var(--terra);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-8-5.3-8-11a4.6 4.6 0 0 1 8-3 4.6 4.6 0 0 1 8 3c0 5.7-8 11-8 11z'/%3E%3C/svg%3E") center/contain no-repeat}
+  #end .ha{font:600 56px Vaz;direction:ltr;color:var(--gold)}
+  #end .cta{font:800 40px Vaz;color:var(--cream);background:var(--ink);padding:12px 36px 15px;border-radius:40px}
+</style></head><body>
+<div id="bg"><div class="blob" style="width:700px;height:700px;background:#e6cf9f;left:-200px;top:1100px"></div><div class="blob" style="width:600px;height:600px;background:#c9d3bd;right:-200px;top:-100px"></div><div id="grain"></div></div>
+<div id="prog"><i></i></div><div id="chap"><span></span></div>
+<div id="card"><img id="v"><div class="vig"></div></div>
+<div id="els"></div>
+<div id="qcs"></div>
+<div id="scene"><div class="ring"></div><div class="big"><img></div><div class="ttl"></div><div class="tag"><span></span></div></div>
+<div id="cap"></div>
+<div id="end"><div class="heart"></div><div class="h">مراقب خودت باش</div><div class="cta">سیوش کن و برای کسی که لازمش داره بفرست</div><div class="ha"></div></div>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir');
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), sm = x => { x = clamp(x); return x * x * (3 - 2 * x); };
+const back = x => { x = clamp(x); const c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const inout = (t, a, b, d = .35) => Math.min(back((t - a) / d), clamp((b - t) / .25));
+const $ = s => document.querySelector(s);
+window.ISSUES = []; window.START = 0;
+let P, PH = [], ELS = [], QCS = [];
+window.ready = (async () => {
+  P = await (await fetch(DIR + 'plan.json')).json(); window.DURATION = P.dur;
+  await Promise.all(['900 70px Vaz', '800 30px Vaz', '400 70px Lalezar', '700 70px Markazi', '600 30px Vaz'].map(f => document.fonts.load(f, f.includes('600') ? '@abc' : 'سلام')));
+  // caption phrases: break on punctuation, a pause, or 4 words
+  let cur = [];
+  P.words.forEach((w, i) => { cur.push(w); const nx = P.words[i + 1];
+    if (!nx || /[،.؟?!]$/.test(w.w) || cur.length >= 4 || nx.s - w.e > .32) { PH.push(cur); cur = []; } });
+  PH.forEach((p, i) => { p.t0 = p[0].s - .08; p.t1 = PH[i + 1] ? PH[i + 1][0].s - .08 : P.dur; });
+  const norm = s => s.replace(/[،.؟?!«»]/g, '');
+  PH.forEach(p => p.forEach(w => w.k = P.key.includes(norm(w.w))));
+  for (const e of P.els) { const d = document.createElement('div'); d.className = 'el'; d.innerHTML = `<img src="${DIR}el/${e.id}.png">`;
+    const l = document.createElement('div'); l.className = 'lab'; l.textContent = e.label;
+    if (e.side === 'l') { d.style.left = '20px'; l.style.left = '60px'; } else { d.style.right = '20px'; l.style.right = '60px'; }
+    d.style.top = '790px'; l.style.top = '1125px'; $('#els').append(d, l); ELS.push([e, d, l]); }
+  for (const c of P.cards) { const d = document.createElement('div'); d.className = 'qc ' + c.kind;
+    d.innerHTML = (c.kind === 'quote' ? '<div class="q">”</div>' : '') + `<div class="t">${c.text.replace('|', '<br>')}</div><div class="s">${c.sub}</div>`; $('#qcs').append(d); QCS.push([c, d]); }
+  await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('img ' + i.src))));
+  $('#end .ha').textContent = P.handle;
+  window.SCENES = PH.map(p => ({t0: +p.t0.toFixed(2), t1: +p.t1.toFixed(2), type: 'phrase', bg: 'paper'}));
+})();
+let lastSc = null;
+window.seek = async t => {
+  // speaker frame
+  const v = $('#v'), src = `${DIR}frames/${String(Math.min(Math.floor(t * 30 + 1e-6), 99999)).padStart(5, '0')}.jpg`;
+  if (!v.src.endsWith(src)) { v.src = src; await v.decode().catch(() => {}); }
+  // punch-ins: alternate 1.0 / 1.13 at each sentence start, slow push in between
+  let zi = 0; P.zoom.forEach((z, i) => { if (t >= z) zi = i; });
+  const base = zi % 2 ? 1.1 : 1.0, push = (t - P.zoom[zi]) * .006;
+  v.style.transform = `scale(${base + push}) translate(${zi % 2 ? (zi % 4 === 1 ? 10 : -10) : 0}px,0)`;
+  // scenes (full screen) hide the card
+  const sc = P.scenes.find(s => t >= s.t0 - .3 && t < s.t1 + .3);
+  let so = 0; if (sc) so = Math.min(sm((t - sc.t0 + .3) / .35), sm((sc.t1 + .3 - t) / .35));
+  const card = $('#card'), endk = sm((t - P.end) / .5), cardIn = back(t / .5);
+  card.style.transform = `scale(${(.6 + .4 * cardIn) * (1 - so * .15) * (1 - endk * .2)}) translateY(${so * 120}px)`; card.style.opacity = (1 - so) * (1 - endk);
+  const S = $('#scene'); S.style.opacity = so;
+  if (sc) { if (lastSc !== sc) { lastSc = sc; S.querySelector('.big img').src = DIR + 'el/' + sc.el + '.png'; await S.querySelector('.big img').decode().catch(() => {});
+      S.querySelector('.ttl').innerHTML = sc.title.split('|').map(l => l.split(' ').map(w => `<span>${w}</span>`).join(' ')).join('<br>'); S.querySelector('.tag span').textContent = sc.tag; }
+    const sp = [...S.querySelectorAll('.ttl span')], k = (t - sc.t0) / (sc.t1 - sc.t0);
+    sp.forEach((s, i) => { const a = i / sp.length * .55, p = back((k - a) / .12); s.style.transform = `translateY(${(1 - p) * 60}px) scale(${.6 + .4 * p})`; s.style.opacity = clamp((k - a) / .06); });
+    const b = S.querySelector('.big'); b.style.transform = `translateY(${Math.sin(t * 2) * 14}px) rotate(${Math.sin(t * 1.3) * 3}deg) scale(${.7 + .3 * back((t - sc.t0) / .5)})`;
+    S.querySelector('.ring').style.transform = `rotate(${t * 12}deg)`; S.querySelector('.tag').style.opacity = clamp((k - .3) / .1); }
+  // elements + labels
+  for (const [e, d, l] of ELS) { const k = inout(t, e.t0, e.t1, .45); d.style.opacity = clamp(k * 3) * (1 - so); l.style.opacity = d.style.opacity;
+    const f = Math.sin((t - e.t0) * 2.2) * 10, dir = e.side === 'l' ? -1 : 1;
+    d.style.transform = `translateY(${(1 - k) * 160 + f}px) scale(${.4 + .6 * k}) rotate(${dir * (1 - k) * 25 + Math.sin(t * 1.6) * 3}deg)`;
+    const lk = inout(t, e.t0 + .25, e.t1, .35); l.style.transform = `scale(${lk}) rotate(${dir * 4}deg)`; }
+  // quote / bubble cards
+  for (const [c, d] of QCS) { const k = inout(t, c.t0, c.t1, .4); d.style.opacity = clamp(k * 3); d.style.transform = `scale(${.75 + .25 * k}) rotate(${(1 - k) * -6}deg)`; }
+  // captions (karaoke): current phrase, spoken words full, active word with a gold marker
+  const ph = PH.find(p => t >= p.t0 && t < p.t1), cap = $('#cap');
+  if (ph) { if (cap._ph !== ph) { cap._ph = ph; cap.innerHTML = ph.map(w => `<b class="${w.k ? 'k' : ''}">${w.w}<i class="m"></i></b>`).join(''); }
+    [...cap.children].forEach((b, i) => { const w = ph[i], on = t >= w.s - .05, act = on && (t < w.e + .1 || i === ph.length - 1);
+      const p = back((t - w.s + .05) / .22); b.style.opacity = on ? 1 : .28; b.style.transform = `translateY(${on ? (1 - p) * 26 : 10}px) scale(${on ? .9 + .1 * p : .92})`;
+      b.style.color = so > .5 ? (w.k ? '#e0b765' : '#f3eee6') : ''; b.querySelector('.m').style.transform = `scaleX(${act ? sm((t - w.s) / .18) : (on ? 1 : 0)})`;
+      b.querySelector('.m').style.opacity = act ? 1 : .0; });
+    cap.style.top = so > .5 ? '1400px' : '1170px'; cap.style.opacity = 1 - endk; }
+  else cap.innerHTML = '';
+  // header
+  $('#prog i').style.width = (t / P.dur * 100) + '%';
+  let ch = P.chapters[0]; P.chapters.forEach(c => { if (t >= c[0]) ch = c; });
+  const cs = $('#chap span'); cs.textContent = ch[1]; const ck = back((t - ch[0]) / .4); cs.style.transform = `scale(${ck})`;
+  $('#chap').style.opacity = 1 - endk;
+  // end card
+  const E = $('#end'); E.style.opacity = endk; [...E.children].forEach((c, i) => { const p = back((t - P.end - .2 - i * .18) / .45); c.style.transform = `translateY(${(1 - p) * 60}px) scale(${.7 + .3 * p})`; c.style.opacity = clamp((t - P.end - .2 - i * .18) / .2); });
+};
+</script></body></html>

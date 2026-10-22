@@ -58,6 +58,16 @@ choosing. Never the same angle two days in a row, and no angle more than twice i
 6. **Case story**: one company / agent / person, step by step, then the lesson.
 7. **Two sides**: the claim, the push-back, what we actually know.
 8. **Timeline / prediction**: now → in 1 year → in 5 years (only sourced predictions).
+9. **Look-alikes, decoded** (reference: @buildwithomkar «They look the same. They're not.», 480k views):
+   3–5 AI products/models/agents that look the same but do different jobs. Hook «این N تا *شبیه هم‌اند.*»
+   over a `lineup` of tall cards → «ولی نیستن.» as the cards shrink (`compact_at`) → one chapter per item
+   (`tabs` + `tab`, its own `tint`, one product-specific visual: `prompt` / `tasks` / `roles` / `ui` /
+   a real screenshot) → «خلاصه‌ش» `stack` (last row = the surprise) → «جایی که مهمه» `table`
+   (price · privacy · strength · limit, rows lighting up as they are spoken) → «تو کدومو استفاده می‌کنی؟».
+   Look `soft-ui`, calm confident voice, 55–75 s. Every cell of the table is a verified fact from
+   `dossier.json` (pricing page, docs, launch post); unknown = «اعلام نشده», never a guess. Product
+   marks: the real logo only from the official press kit fetched through Drive, otherwise a coloured
+   letter mark (`mark` + `color`); never a generated fake logo.
 
 ## 3. Hooks and watch-time craft
 - **Second 0–1.5:** the strongest line + a visual pattern interrupt (huge word, unexpected object,
@@ -90,6 +100,12 @@ editorial), `Reem` (geometric kufi), `Messiri` (soft), `Changa` (tech), `Inter` 
 | `terminal` | data, money | Changa / Vaz | black, green #00E676 | mono / busy | finance, markets, numbers |
 | `warm-story` | human, soft | Messiri / Vaz | beige #F3E9DC, brown, terracotta #D2643C | color / minimal | women, family, education |
 | `royal-tech` | premium | Reem / Vaz | deep purple #140B2E, gold #F2C14E | color / normal | big companies, money |
+| `soft-ui` | premium product explainer | Markazi headline / Vaz caption | off-white + pastel blobs (`tint` per beat), ink, blue #3B6BFF | color / minimal | comparisons, product launches, "how X works" (shape 9) |
+
+`soft-ui` changes the layout: an optional serif headline on top (`head`, with `*word*` turning from
+grey to ink at `head_at`, `head_sub` under it), the narration as a one-line karaoke caption near the
+bottom (all words visible in grey, each turns ink/accent as it is spoken), soft white UI cards, focus-pull
+(blur) cuts, optional chapter tabs (`story.tabs` = labels, `beat.tab` = active index).
 
 Rules: match the preset to the story's mood; never the same preset two days in a row; one preset per
 reel. Minimal = few elements, lots of air, slower cuts; busy = ticker, corner labels, dot texture,
@@ -142,7 +158,13 @@ wireframe…
 ## 8. Visuals per beat
 Types: `object` (1–3 cut-outs; `anim` pop/slide, `float`, `stamp`, `marks`), `person` (real photo,
 b/w card, name + role), `quote` (card + source, optional round photo), `icon_grid`, `network`,
-`counter`, `timeline`, `ui` (app card), `chart`, `split` (A «یا» B), `none`; `huge: true` for one giant
+`counter`, `timeline`, `ui` (app card), `chart`, `split` (A «یا» B), `none`;
+soft-ui types (work in any look): `lineup` (`items[{name, el | mark+color, bg, fg, sub}]`, `compact_at`,
+`focus`), `prompt` (agent box that types `text`, `chips[{label, icon}]` pop with green dots, `status` pill
++ `count` counter), `tasks` (`cards[{title, sub, big | icon, progress}]` + `tags` lighting up in turn),
+`roles` (hub + `roles[{label, color, sub}]` orbs joined by lines), `stack` (summary rows, `highlight` the
+last), `table` (`cols` like lineup items, `rows[{label, cells}]`, `win` = column to colour, `row_at` = seconds
+when each row lights up — sync it to the narration); `huge: true` for one giant
 word; `iris: true` for a circle wipe. Every beat changes something on screen.
 
 **Elements: at most 3 generated collage sheets (≤ 9 items each), cut out automatically** —

@@ -541,6 +541,9 @@ two-news reel in REEL_SPEC.md is retired.)
 0. Two reels a day: the 15:00 reel must differ from the same day's 09:00 reel (read its slot file
    `creative` + topic) in story, angle, shape, look preset and voice (prefer the other gender), and the
    09:00 reel from the previous day's 15:00 reel. Never the same story twice in a day.
+   Shape 9 «Look-alikes, decoded» (STORY_SPEC §2, look `soft-ui`, user rule 2026-10-22): when 3–5
+   similar AI products / models / agents are in the news (launches in the same week, a viral "which one"
+   debate), make one of the week's reels in this format — about 1–2 a week, never two days running.
 1. History: `Reels` tab (last 14 rows: topic, and angle/shape/preset/voice in Notes), the last 7 days
    of posts, and the previous reel's slot file `creative`.
 2. Find 8–15 candidates trending in AI in the last 24–72 h (WebSearch across outlets, launches, viral

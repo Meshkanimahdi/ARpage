@@ -64,6 +64,26 @@
   .cap { font-weight: 700; font-size: 34px; color: var(--mute); text-align: center; }
   .ico { width: 170px; height: 170px; border-radius: 30px; display: grid; place-items: center; }
   .ico svg { width: 84px; height: 84px; }
+  /* soft-ui look (STORY_SPEC §4/§8): pastel blobs, serif headline on top, one-line karaoke caption at the bottom */
+  #blobs { position: absolute; inset: 0; display: none; }
+  #blobs i { position: absolute; border-radius: 50%; filter: blur(110px); opacity: .55; background: var(--tint, #C9D6FF); transition: none; }
+  .softui #blobs { display: block; } .softui #arc, .softui #floor, .softui #code { display: none; }
+  .softui .txt { top: auto; bottom: 330px; column-gap: 14px; }
+  .softui .w, .softui .w.k { font-family: var(--ft), Vaz; font-weight: 900; font-size: 54px; line-height: 1.4; }
+  .softui .paper .w.k, .softui .dark .w.k { color: var(--o); text-shadow: none; background: none; }
+  .softui .huge .w.k { font-size: 54px; }
+  .head { position: absolute; left: 60px; right: 60px; top: 190px; text-align: center; font-family: Markazi, Vaz; font-weight: 700; font-size: 98px; line-height: 1.12; direction: rtl; }
+  .head em { font-style: normal; font-weight: 400; transition: none; }
+  .head .sub { display: block; font-family: Vaz; font-weight: 500; font-size: 34px; color: var(--mute); margin-top: 10px; }
+  .paper .head { color: var(--ink); } .dark .head { color: #F3F1EE; } .dark .vis { color: #EEE; }
+  #tabs { position: absolute; left: 0; right: 0; top: 108px; display: none; justify-content: center; gap: 12px; direction: rtl; }
+  #tabs span { font-weight: 700; font-size: 24px; padding: 6px 18px 8px; border-radius: 20px; color: var(--mute); }
+  #tabs span.on { background: var(--ink); color: #fff; }
+  #tabs.dk span.on { background: #fff; color: #111; }
+  .soft { background: #fff; border-radius: 30px; box-shadow: 0 18px 50px rgba(20,20,30,.10), 0 0 0 2px rgba(20,20,30,.04); color: #141414; }
+  .dark .soft { background: #1B1B20; color: #EEE; box-shadow: 0 18px 50px rgba(0,0,0,.4), 0 0 0 2px rgba(255,255,255,.06); }
+  .chip { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 28px; padding: 12px 22px 14px; border-radius: 22px; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; background: #2BC56B; display: inline-block; }
   #end { position: absolute; inset: 0; display: none; background: var(--dark); }
 </style>
 </head>
@@ -77,7 +97,9 @@
   <div class="deco" id="dBL" style="left:70px; bottom:90px"></div><div class="deco" id="dBR" style="right:70px; bottom:90px"></div>
   <div id="ticker"><div id="tick"></div></div>
   <svg id="code" width="150" height="44"></svg>
+  <div id="blobs"><i id="b1" style="width:760px;height:760px;left:-220px;top:900px"></i><i id="b2" style="width:640px;height:640px;right:-200px;top:180px;opacity:.4"></i></div>
   <div id="beats"></div>
+  <div id="tabs"></div>
   <div id="end"></div>
 </div>
 <script>
@@ -203,6 +225,73 @@ V.split = s => {       // two cards side by side + "یا" badge
   return {el, anim(t, a) { [R, L].forEach((c, i) => { const k = P(t, a + i * .2, a + .5 + i * .2); c.style.opacity = k; tf(c, `translateY(${(1 - eo(k)) * 100}px)`); });
     const kb = P(t, a + (s.badge_at || 1.2), a + (s.badge_at || 1.2) + .3); badge.style.opacity = kb; tf(badge, `scale(${back(kb)})`); R.style.borderColor = kb > .5 ? 'var(--o)' : ''; }};
 };
+const mark = (ch, col) => `<div style="width:100%;height:100%;border-radius:50%;background:${col || 'var(--o)'};display:grid;place-items:center;color:#fff;font-family:Inter,Vaz;font-weight:800;font-size:60px">${esc(ch)}</div>`;
+const face = (o, size) => o.el ? `<img src="${url(o.el.includes('/') ? o.el : 'el/' + o.el + '.png')}" style="width:${size}px;height:${size}px;object-fit:contain">` : `<div style="width:${size}px;height:${size}px">${mark(o.mark || (o.name || '?')[0], o.color)}</div>`;
+V.lineup = s => {      // tall product cards side by side; at compact_at they shrink into a row of small cards
+  const el = h('div', 'vis'), it = s.items || [], n = it.length, gap = 18, W = (940 - gap * (n - 1)) / n;
+  const cs = it.map((o, i) => { const c = h('div', 'abs soft', `left:${70 + i * (W + gap)}px; top:60px; width:${W}px; height:600px; overflow:hidden; ${o.bg ? `background:${o.bg};` : ''}`);
+    c.innerHTML = `<div class="fc" style="position:absolute;left:0;right:0;top:70px;display:flex;justify-content:center">${face(o, Math.min(170, W - 30))}</div><div style="position:absolute;left:8px;right:8px;bottom:34px;text-align:center;font-family:Markazi,Vaz;font-weight:700;font-size:${W > 260 ? 54 : 42}px;color:${o.fg || 'inherit'}">${esc(o.name)}</div>` + (o.sub ? `<div style="position:absolute;left:8px;right:8px;bottom:12px;text-align:center;font-size:18px;color:var(--mute);font-family:Inter,Vaz;letter-spacing:2px">${esc(o.sub)}</div>` : '');
+    el.append(c); return c; });
+  return {el, anim(t, a, b) { const ck = s.compact_at != null ? eio(P(t, a + s.compact_at, a + s.compact_at + .6)) : 0;
+    cs.forEach((c, i) => { const k = P(t, a + i * .12, a + .5 + i * .12), f = s.focus === i && P(t, a + (s.focus_at || .8), a + (s.focus_at || .8) + .3);
+      c.style.opacity = clamp(k * 2); c.style.height = `${lerp(600, 300, ck)}px`; c.style.top = `${lerp(60, 260, ck)}px`;
+      tf(c, `translateY(${(1 - eo(k)) * 120 + Math.sin(t * 1.6 + i) * 4 * (1 - ck)}px) scale(${(1 + (f ? .06 * f : 0))})`);
+      c.querySelector('.fc').style.transform = `translateY(${-ck * 30}px) scale(${lerp(1, .62, ck)})`; c.style.outline = f ? `4px solid var(--o)` : ''; }); }};
+};
+V.prompt = s => {      // an agent prompt box that types itself, app chips popping in, then a "working in background" counter
+  const el = h('div', 'vis'), ltr = /^[A-Za-z]/.test(s.text || ''), box = h('div', 'abs soft', `left:90px; right:90px; top:80px; padding:34px 40px; font-weight:700; font-size:40px; direction:${ltr ? 'ltr' : 'rtl'}; ${ltr ? 'font-family:Inter' : ''}`);
+  box.innerHTML = `<span class="ty"></span><span class="ca" style="display:inline-block;width:4px;height:44px;background:var(--o);vertical-align:middle;margin:0 4px"></span>`; el.append(box);
+  const chips = (s.chips || []).map((c, i) => { const e = h('div', 'abs chip soft', `top:260px; left:${90 + i * 300}px; width:270px; justify-content:center`, `${c.icon ? svg(c.icon).replace('<svg', '<svg style="width:34px;height:34px"') : ''}${esc(c.label || c)}<span class="dot"></span>`); el.append(e); return e; });
+  const st = s.status ? h('div', 'abs chip soft', 'left:50%; top:420px; white-space:nowrap', `<span class="dot"></span><span>${esc(s.status)}</span><b class="cn" style="font-family:Inter;color:var(--o)"></b>`) : null; if (st) el.append(st);
+  return {el, anim(t, a, b) { const k = P(t, a, a + .4); box.style.opacity = k; tf(box, `translateY(${(1 - eo(k)) * 50}px)`);
+    const ty = s.text || '', n = Math.round(P(t, a + .3, a + .3 + (s.type_s || 1.6)) * ty.length); box.querySelector('.ty').textContent = ty.slice(0, n); box.querySelector('.ca').style.opacity = Math.floor(t * 2.4) % 2 ? 1 : .1;
+    chips.forEach((c, i) => { const at = a + (s.chips_at ?? 1.2) + i * .22, kc = P(t, at, at + .35); c.style.opacity = kc; tf(c, `scale(${lerp(.6, 1, back(kc))})`); });
+    if (st) { const at = a + (s.status_at ?? 2.2), ks = P(t, at, at + .4); st.style.opacity = ks; tf(st, `translateX(-50%) translateY(${(1 - eo(ks)) * 40}px)`);
+      st.querySelector('.cn').textContent = s.count ? fa(Math.round(P(t, at + .3, b - .2) * s.count)) : ''; } }};
+};
+V.tasks = s => {       // stacked soft task cards (title, sub, optional big number / progress) + a tag row that lights up in turn
+  const el = h('div', 'vis'), cards = (s.cards || []).map((c, i) => { const e = h('div', 'abs soft', `left:130px; right:130px; top:${40 + i * 190}px; height:160px; padding:0 40px; display:flex; align-items:center; gap:28px`);
+    e.innerHTML = (c.big ? `<div style="min-width:110px;height:110px;border-radius:24px;background:var(--o);color:#fff;display:grid;place-items:center;font-family:Inter,Vaz;font-weight:800;font-size:56px">${esc(c.big)}</div>` : c.icon ? `<div style="width:90px;height:90px;color:var(--o)">${svg(c.icon)}</div>` : '') +
+      `<div style="flex:1"><div style="font-weight:900;font-size:38px">${esc(c.title)}</div>${c.sub ? `<div style="font-weight:500;font-size:26px;color:var(--mute);margin-top:6px">${esc(c.sub)}</div>` : ''}${c.progress != null ? `<div style="height:12px;border-radius:6px;background:rgba(0,0,0,.08);margin-top:16px;overflow:hidden"><i class="pg" style="display:block;height:100%;width:0;background:var(--o);border-radius:6px"></i></div>` : ''}</div>` + (c.progress != null ? `<b class="pv" style="font-family:Inter;font-size:30px;color:var(--o)"></b>` : '');
+    el.append(e); return {e, c}; });
+  const tags = (s.tags || []).map((g, i) => { const e = h('div', 'abs chip soft', `top:${60 + cards.length * 190}px; left:${80 + i * 235}px; width:215px; justify-content:center; font-size:26px`, esc(g)); el.append(e); return e; });
+  return {el, anim(t, a, b) { cards.forEach(({e, c}, i) => { const at = a + i * (s.step ?? .6), k = P(t, at, at + .4); e.style.opacity = k; tf(e, `translateY(${(1 - eo(k)) * 60}px) scale(${lerp(.95, 1, eo(k))})`);
+      if (c.progress != null) { const pv = P(t, at + .3, at + 1.3) * c.progress; e.querySelector('.pg').style.width = pv + '%'; e.querySelector('.pv').textContent = fa(Math.round(pv)) + '٪'; } });
+    const act = Math.floor(P(t, a + .4, b) * tags.length * .999); tags.forEach((g, i) => { const k = P(t, a + .2 + i * .08, a + .5 + i * .08); g.style.opacity = k; const on = i === act;
+      g.style.background = on ? 'var(--o)' : ''; g.style.color = on ? '#fff' : ''; tf(g, `scale(${on ? 1.06 : 1})`); }); }};
+};
+V.roles = s => {       // one hub (a user / an agent) with role orbs appearing one by one, joined by thin lines
+  const el = h('div', 'vis'), r = s.roles || [], n = r.length, cx = 540, hy = 120, oy = 520, sp = Math.min(230, 940 / n);
+  const sv = h('div', 'abs', 'left:0; top:0; width:1080px; height:900px'); sv.innerHTML = `<svg width="1080" height="900">${r.map((_, i) => { const x = cx + (i - (n - 1) / 2) * sp; return `<path d="M${cx} ${hy + 90} C ${cx} ${oy - 120}, ${x} ${hy + 200}, ${x} ${oy - 70}" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="3" stroke-dasharray="8 10"/>`; }).join('')}</svg>`;
+  el.append(sv); const paths = [...sv.querySelectorAll('path')];
+  const hub = h('div', 'abs soft', `left:${cx - 90}px; top:${hy - 90}px; width:180px; height:180px; border-radius:50%; display:grid; place-items:center`, `<div style="width:90px;height:90px">${svg(s.hub || 'user')}</div>`); el.append(hub);
+  const orbs = r.map((o, i) => { const x = cx + (i - (n - 1) / 2) * sp, e = h('div', 'abs', `left:${x - 75}px; top:${oy - 75}px; width:150px; text-align:center`);
+    e.innerHTML = `<div style="width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 30%, #fff8, transparent 45%), ${o.color || 'var(--o)'};box-shadow:0 20px 40px ${o.color || '#0003'}55"></div><div style="font-weight:900;font-size:30px;margin-top:18px">${esc(o.label)}</div>${o.sub ? `<div style="font-size:22px;color:#2BC56B;font-weight:700">● ${esc(o.sub)}</div>` : ''}`;
+    el.append(e); return e; });
+  return {el, anim(t, a, b) { const k = P(t, a, a + .4); hub.style.opacity = k; tf(hub, `scale(${back(k)})`);
+    orbs.forEach((e, i) => { const at = a + .5 + i * (s.step ?? .5), ko = P(t, at, at + .4); e.style.opacity = ko; tf(e, `translateY(${(1 - eo(ko)) * 60 + Math.sin(t * 2 + i) * 6}px) scale(${lerp(.5, 1, back(ko))})`);
+      paths[i].style.opacity = ko; paths[i].style.strokeDashoffset = -t * 30; }); }};
+};
+V.stack = s => {       // "so basically": one row per item, appearing in turn; the last one is the punchline
+  const el = h('div', 'vis'), it = s.items || [];
+  const rows = it.map((o, i) => { const e = h('div', 'abs soft', `left:90px; right:90px; top:${20 + i * 165}px; height:140px; display:flex; align-items:center; gap:26px; padding:0 34px; ${o.bg ? `background:${o.bg};color:${o.fg || '#fff'};` : ''}`);
+    e.innerHTML = `<div style="width:90px;height:90px;flex:none">${face(o, 90)}</div><div><div style="font-family:Inter,Vaz;font-weight:800;font-size:22px;letter-spacing:3px;opacity:.6">${esc(o.name)}</div><div style="font-family:Markazi,Vaz;font-weight:700;font-size:52px;line-height:1.1">${esc(o.label)}</div></div>`;
+    el.append(e); return e; });
+  return {el, anim(t, a, b) { const last = rows.length - 1, dimAt = a + (s.dim_at ?? 99);
+    rows.forEach((e, i) => { const at = a + i * (s.step ?? .7), k = P(t, at, at + .4), dim = i < last ? P(t, dimAt, dimAt + .3) : 0;
+      e.style.opacity = k * (1 - dim * .55); tf(e, `translateY(${(1 - eo(k)) * 50}px) scale(${i === last && s.highlight ? 1 + .03 * P(t, at, at + .4) : 1})`);
+      if (i === last && s.highlight) e.style.outline = `4px solid ${k > .5 ? 'var(--o)' : 'transparent'}`; }); }};
+};
+V.table = s => {       // comparison table; rows light up one by one across the beat (or at row_at[i])
+  const el = h('div', 'vis'), cols = s.cols || [], rows = s.rows || [], cw = (940 - 190) / cols.length;
+  const c = h('div', 'abs soft', 'left:70px; right:70px; top:40px; padding:24px 0; overflow:hidden'); el.append(c);
+  c.innerHTML = `<div style="display:flex;padding:0 0 18px;direction:rtl"><div style="width:190px"></div>${cols.map(o => `<div style="width:${cw}px;text-align:center"><div style="width:64px;height:64px;margin:0 auto">${face(o, 64)}</div><div style="font-weight:900;font-size:24px;margin-top:8px">${esc(o.name)}</div></div>`).join('')}</div>` +
+    rows.map(r => `<div class="tr" style="display:flex;align-items:center;min-height:120px;direction:rtl;border-top:2px solid rgba(0,0,0,.05)"><div style="width:190px;padding-right:26px;font-weight:900;font-size:30px">${esc(r.label)}</div>${r.cells.map((x, i) => `<div style="width:${cw}px;text-align:center;font-weight:700;font-size:24px;line-height:1.3;padding:0 6px${s.win === i ? ';color:var(--o)' : ''}">${esc(x)}</div>`).join('')}</div>`).join('');
+  const trs = [...c.querySelectorAll('.tr')];
+  return {el, anim(t, a, b) { const k = P(t, a, a + .45); c.style.opacity = k; tf(c, `translateY(${(1 - eo(k)) * 80}px)`);
+    const act = s.row_at ? s.row_at.filter(x => t >= a + x).length - 1 : Math.floor(P(t, a + .6, b) * trs.length * .999);
+    trs.forEach((r, i) => { const on = i === act; r.style.background = on ? 'var(--ink)' : ''; r.style.color = on ? '#fff' : ''; r.style.opacity = i <= act || act < 0 ? 1 : .35; }); }};
+};
 V.none = () => ({el: h('div', 'vis'), anim() {}});
 
 // ---------------- beats ----------------
@@ -220,11 +309,13 @@ window.ready = (async () => {
     'clinic-calm': {font_display: 'Kufi', font_text: 'Vaz', accent: '#0FB5A6', paper: '#F7FAFA', ink: '#122', dark: '#0E1A1C', mode: 'color', density: 'minimal'},
     'terminal': {font_display: 'Changa', font_text: 'Vaz', accent: '#00E676', paper: '#EEF2EE', ink: '#0A0F0A', dark: '#050805', mode: 'mono', density: 'busy'},
     'warm-story': {font_display: 'Messiri', font_text: 'Vaz', accent: '#D2643C', paper: '#F3E9DC', ink: '#3A2418', dark: '#24150F', mode: 'color', density: 'minimal'},
+    'soft-ui': {font_display: 'Markazi', font_text: 'Vaz', accent: '#3B6BFF', paper: 'radial-gradient(1200px 1400px at 50% 45%, #F6F5F3, #ECEBE8 80%)', ink: '#141414', dark: 'radial-gradient(900px 1100px at 50% 40%, #1E1E24, #0B0B0E 75%)', mode: 'color', density: 'minimal', softui: true},
     'royal-tech': {font_display: 'Reem', font_text: 'Vaz', accent: '#F2C14E', paper: '#F1ECF7', ink: '#1A0F33', dark: 'radial-gradient(900px 1100px at 50% 52%, #2A1660, #140B2E 70%)', mode: 'color', density: 'normal'}};
   const th = Object.assign({}, PRESETS[(S.theme || {}).preset] || {}, S.theme || {}), rs = document.documentElement.style;
   for (const [k, v] of Object.entries({'--o': th.accent, '--paper': th.paper, '--ink': th.ink, '--dark': th.dark, '--fd': th.font_display, '--ft': th.font_text})) if (v) rs.setProperty(k, v);
   if (th.paper) $('paper').style.background = th.paper; if (th.dark) $('dark').style.background = th.dark;
-  document.body.classList.add(th.mode || 'color', th.density || 'normal');
+  document.body.classList.add(th.mode || 'color', th.density || 'normal'); if (th.softui) document.body.classList.add('softui');
+  if (S.tabs) { $('tabs').style.display = 'flex'; $('tabs').innerHTML = S.tabs.map(x => `<span>${esc(x)}</span>`).join(''); }
   { // a light accent (e.g. acid yellow) is unreadable on paper: keywords become ink with an accent marker band
     const c = (th.accent || '#FF6A13').replace('#', ''), [r, g, b] = [0, 2, 4].map(i => parseInt(c.slice(i, i + 2), 16)), lum = (.299 * r + .587 * g + .114 * b) / 255;
     if (lum > .62) { document.body.classList.add('lightaccent'); rs.setProperty('--kl', th.ink || '#111'); } }
@@ -252,8 +343,10 @@ window.ready = (async () => {
     }
     if (wi !== L.words.length) ISSUES.push(`beat ${i + 1}: ${wi} words on screen, ${L.words.length} spoken`);
     const v = (V[(bt.visual || {}).type || 'none'] || V.none)(bt.visual || {});
+    let hd = null;   // optional serif headline on top (soft-ui): *x* = the word that turns from grey to ink at head_at
+    if (bt.head) { hd = h('div', 'head', bt.head_top ? `top:${bt.head_top}px` : '', esc(bt.head).replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\|/g, '<br>') + (bt.head_sub ? `<span class="sub">${esc(bt.head_sub)}</span>` : '')); el.append(hd); }
     el.append(v.el, tx); root.append(el);
-    BEATS.push({el, tx, words, v, bt, a: L.start - .12});
+    BEATS.push({el, tx, words, v, bt, hd, a: L.start - .12});
     FITS.push(() => { let fs = 1; while (tx.scrollHeight > (bt.text_max || 470) && fs > .7) { fs -= .05; tx.querySelectorAll('.w').forEach(w => w.style.fontSize = ''); tx.style.zoom = fs; } });
   }
   BEATS.forEach((b, i) => { b.b = i + 1 < BEATS.length ? BEATS[i + 1].a : TL.end_start; });
@@ -262,7 +355,7 @@ window.ready = (async () => {
   end.innerHTML = `<img id="elogo" src="/news-reel/assets/m.png" style="position:absolute;left:390px;top:640px;width:300px;filter:drop-shadow(0 0 30px rgba(16,245,238,.4))"><div id="eh" style="position:absolute;left:0;right:0;top:1010px;text-align:center;font-family:Inter;font-weight:800;font-size:64px;letter-spacing:12px;color:#fff;direction:ltr">MESHKANI.PRO</div><div id="el" style="position:absolute;left:390px;width:300px;top:1100px;height:5px;background:var(--o)"></div><div id="eq" style="position:absolute;left:0;right:0;top:1140px;text-align:center;font-weight:700;font-size:44px;color:#bbb">${esc(S.end_text || '')}</div>`;
   // barcode decoration
   $('code').innerHTML = Array.from({length: 34}, (_, i) => `<rect x="${i * 4.3}" y="0" width="${[1, 2, 1, 3][i % 4]}" height="34" fill="#555"/>`).join('');
-  await document.fonts.ready; await Promise.all(['500', '700', '900'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش')));
+  await document.fonts.ready; await Promise.all(['500', '700', '900'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش'))); await Promise.all(['400', '700'].map(w => document.fonts.load(`${w} 40px Markazi`, 'آزمایش')));
   await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('image failed: ' + i.src))));
   for (const b of BEATS) { b.el.style.display = 'block'; } for (const f of FITS) f(); for (const b of BEATS) b.el.style.display = 'none';
   window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
@@ -278,6 +371,8 @@ function seek(t) {
   const lightBg = bgName !== 'dark'; for (const id of ['dTL', 'dTR', 'dBL', 'dBR', 'ticker', 'dots']) $(id).style.color = lightBg ? (bgName === 'accent' ? '#111' : 'var(--ink)') : '#eee';
   $('tick').style.transform = `translateX(${(t * 90) % 2400 - 1200}px)`; $('dBR').textContent = cur >= 0 ? `${fa(String(cur + 1).padStart(2, '0'))}/${fa(BEATS.length)}` : '';
   $('code').style.opacity = bgName === 'paper' && !inEnd ? .55 : 0;
+  $('blobs').style.opacity = bgName === 'paper' && !inEnd ? 1 : 0; $('b1').style.transform = `translate(${Math.sin(t * .4) * 80}px,${Math.cos(t * .3) * 60}px)`; $('b2').style.transform = `translate(${Math.cos(t * .35) * 70}px,${Math.sin(t * .5) * 50}px)`;
+  if (S.tabs) { const ti = BEATS[Math.max(0, cur)]?.bt.tab; [...$('tabs').children].forEach((x, i) => x.className = i === ti ? 'on' : ''); $('tabs').style.opacity = ti == null || inEnd ? 0 : 1; $('tabs').style.color = bgName === 'dark' ? '#eee' : ''; $('tabs').classList.toggle('dk', bgName === 'dark'); }
   $('arc').style.transform = `rotate(${t * 6}deg)`; $('floor').style.backgroundPosition = `0 ${t * 40}px`;
   BEATS.forEach((b, i) => {
     const on = i === cur && !inEnd, outK = P(t, b.b - .18, b.b);
@@ -285,7 +380,12 @@ function seek(t) {
     const inK = P(t, b.a, b.a + .22);
     b.el.style.opacity = Math.min(inK * 1.6, 1 - outK); b.el.style.filter = outK > 0 ? `blur(${outK * 18}px)` : (inK < 1 ? `blur(${(1 - inK) * 10}px)` : '');
     b.el.style.transform = `scale(${1 + .03 * P(t, b.a, b.b)})`;
-    for (const w of b.words) { const o = appear(w.e, t, w.t - .05, .3, 22); tf(w.e, `translateY(${o.y}px) scale(${o.s})`); }
+    const soft = document.body.classList.contains('softui');
+    for (const w of b.words) { if (soft) { const k = P(t, w.t - .05, w.t + .15); w.e.style.opacity = lerp(.22, 1, k); w.e.style.filter = ''; tf(w.e, ''); continue; }
+      const o = appear(w.e, t, w.t - .05, .3, 22); tf(w.e, `translateY(${o.y}px) scale(${o.s})`); }
+    if (b.hd) { const o = appear(b.hd, t, b.a, .45, 30); tf(b.hd, `translateY(${o.y}px)`); const ek = P(t, b.a + (b.bt.head_at ?? .7), b.a + (b.bt.head_at ?? .7) + .4);
+      b.hd.querySelectorAll('em').forEach(e => { e.style.color = `color-mix(in srgb, var(--mute) ${100 - ek * 100}%, currentColor)`; }); }
+    if (b.bt.tint) $('b1').style.background = $('b2').style.background = b.bt.tint;
     if (b.bt.iris) { const k = P(t, b.a, b.a + .45); b.el.style.clipPath = k < 1 ? `circle(${eio(k) * 1300}px at 540px 900px)` : ''; }
     b.v.anim(t, b.a, b.b);
   });
