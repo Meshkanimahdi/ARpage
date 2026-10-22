@@ -109,6 +109,16 @@
   .maxi .cap { color: #111; background: #fff; border: 4px solid #111; display: table; margin: 0 auto; padding: 6px 22px; }
   .maxi .card { border: 6px solid #111; box-shadow: 14px 16px 0 #111; }
   .maxi .deco { opacity: 1; color: #111 !important; background: #fff; padding: 4px 12px; border: 3px solid #111; }
+  /* maxi-photo look: full-bleed photoreal maximalist scenes, the headline typeset on a blank poster inside the
+     scene, the narration in a frosted-glass pill; the camera explores the set (STORY_SPEC §4, §8.0) */
+  .vis.full { top: 0; height: 1920px; overflow: hidden; }
+  .poster { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; direction: rtl; font-family: Lalezar, Vaz; color: #141414; line-height: 1.02; }
+  .poster .pl { display: block; } .poster .pk { color: #E8197D; }
+  .poster .ps { font-family: Vaz; font-weight: 700; color: #3a3a3a; margin-top: .45em; font-size: .3em; }
+  .mphoto .txt { top: auto; bottom: 250px; left: 70px; right: 70px; padding: 20px 34px 26px; border-radius: 62px; background: rgba(255,255,255,.2); backdrop-filter: blur(26px) saturate(1.35); -webkit-backdrop-filter: blur(26px) saturate(1.35); box-shadow: inset 0 0 0 2px rgba(255,255,255,.4), 0 24px 60px rgba(0,0,0,.28); column-gap: 14px; }
+  .mphoto .w, .mphoto .w.k { font-family: Vaz; font-weight: 900; font-size: 52px; line-height: 1.45; color: #fff !important; text-shadow: 0 2px 14px rgba(0,0,0,.45); background: none; }
+  .mphoto .w.k { color: #FFE14D !important; background: none !important; padding: 0; }
+  .mphoto #dots, .mphoto #ticker, .mphoto .deco, .mphoto #code { display: none !important; }
   #end { position: absolute; inset: 0; display: none; background: var(--dark); }
 </style>
 </head>
@@ -320,6 +330,18 @@ V.table = s => {       // comparison table; rows light up one by one across the 
     const act = s.row_at ? s.row_at.filter(x => t >= a + x).length - 1 : Math.floor(P(t, a + .6, b) * trs.length * .999);
     trs.forEach((r, i) => { const on = i === act; r.style.background = on ? 'var(--ink)' : ''; r.style.color = on ? '#fff' : ''; r.style.opacity = i <= act || act < 0 ? 1 : .35; }); }};
 };
+V.scene = s => {       // full-bleed scene photo; camera moves from `from` to `to` ([x, y, zoom] in frame px); optional poster headline
+  const el = h('div', 'vis full'), box = h('div', 'abs', 'left:0; top:0; width:1080px; height:1920px; transform-origin:0 0'), im = img(s.src, 1080, '', 'left:0; top:0; height:1920px; object-fit:cover');
+  box.append(im); el.append(box); let pt = null, lines = [];
+  if (s.poster && s.poster_text) { const [x, y, w, hh] = s.poster; pt = h('div', 'abs poster', `left:${x}px; top:${y}px; width:${w}px; height:${hh}px`);
+    lines = s.poster_text.split('|').map(l => { const e = h('span', 'pl', '', esc(l).replace(/\*([^*]+)\*/g, '<span class="pk">$1</span>')); pt.append(e); return e; });
+    if (s.poster_sub) { const e = h('span', 'pl ps', '', esc(s.poster_sub)); pt.append(e); lines.push(e); }
+    box.append(pt); FITS.push(() => { let fs = Math.min(w * .42, 260); pt.style.fontSize = fs + 'px'; while (([...pt.children].reduce((q, c) => q + c.offsetHeight, 0) > hh * .86 || [...pt.children].some(c => c.scrollWidth > w * .9)) && fs > 30) { fs -= 4; pt.style.fontSize = fs + 'px'; } }); }
+  const f0 = s.from || [540, 960, 1.0], f1 = s.to || [540, 900, 1.12];
+  return {el, anim(t, a, b) { const k = eio(P(t, a - .2, b + .2)), fx = lerp(f0[0], f1[0], k), fy = lerp(f0[1], f1[1], k), z = lerp(f0[2], f1[2], k);
+    const tx = clamp(540 - fx * z, 1080 - 1080 * z, 0), ty = clamp(960 - fy * z, 1920 - 1920 * z, 0); tf(box, `translate(${tx}px, ${ty}px) scale(${z})`);
+    lines.forEach((e, i) => { const at = a + (s.poster_at ?? .25) + i * .22, o = appear(e, t, at, .5, 30, .9); tf(e, `translateY(${o.y}px) scale(${o.s})`); }); }};
+};
 V.none = () => ({el: h('div', 'vis'), anim() {}});
 
 // ---------------- beats ----------------
@@ -339,11 +361,12 @@ window.ready = (async () => {
     'warm-story': {font_display: 'Messiri', font_text: 'Vaz', accent: '#D2643C', paper: '#F3E9DC', ink: '#3A2418', dark: '#24150F', mode: 'color', density: 'minimal'},
     'soft-ui': {font_display: 'Markazi', font_text: 'Vaz', accent: '#3B6BFF', paper: 'radial-gradient(1200px 1400px at 50% 45%, #F6F5F3, #ECEBE8 80%)', ink: '#141414', dark: 'radial-gradient(900px 1100px at 50% 40%, #1E1E24, #0B0B0E 75%)', mode: 'color', density: 'minimal', softui: true},
     'maxi-pop': {font_display: 'Lalezar', font_text: 'Lalezar', accent: '#FF2E93', paper: '#FFE14D', ink: '#111', dark: '#2B0A57', mode: 'color', density: 'busy', maxi: true},
+    'maxi-photo': {font_display: 'Vaz', font_text: 'Vaz', accent: '#FFE14D', mode: 'color', density: 'minimal', mphoto: true},
     'royal-tech': {font_display: 'Reem', font_text: 'Vaz', accent: '#F2C14E', paper: '#F1ECF7', ink: '#1A0F33', dark: 'radial-gradient(900px 1100px at 50% 52%, #2A1660, #140B2E 70%)', mode: 'color', density: 'normal'}};
   const th = Object.assign({}, PRESETS[(S.theme || {}).preset] || {}, S.theme || {}), rs = document.documentElement.style;
   for (const [k, v] of Object.entries({'--o': th.accent, '--paper': th.paper, '--ink': th.ink, '--dark': th.dark, '--fd': th.font_display, '--ft': th.font_text})) if (v) rs.setProperty(k, v);
   if (th.paper) $('paper').style.background = th.paper; if (th.dark) $('dark').style.background = th.dark;
-  document.body.classList.add(th.mode || 'color', th.density || 'normal'); if (th.softui) document.body.classList.add('softui');
+  document.body.classList.add(th.mode || 'color', th.density || 'normal'); if (th.softui) document.body.classList.add('softui'); if (th.mphoto) document.body.classList.add('mphoto');
   if (th.maxi) { document.body.classList.add('maxi'); const pts = Array.from({length: 24}, (_, i) => { const a = i * Math.PI / 12, r = i % 2 ? 36 : 49; return `${50 + r * Math.cos(a)},${50 + r * Math.sin(a)}`; }).join(' ');
     document.querySelector('#mxStar polygon').setAttribute('points', pts); $('mxSt').innerHTML = esc(S.badge || 'AI × ترند').replace(' ', '<br>'); }
   if (S.tabs) { $('tabs').style.display = 'flex'; $('tabs').innerHTML = S.tabs.map(x => `<span>${esc(x)}</span>`).join(''); }

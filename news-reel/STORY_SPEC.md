@@ -101,12 +101,27 @@ editorial), `Reem` (geometric kufi), `Messiri` (soft), `Changa` (tech), `Inter` 
 | `warm-story` | human, soft | Messiri / Vaz | beige #F3E9DC, brown, terracotta #D2643C | color / minimal | women, family, education |
 | `royal-tech` | premium | Reem / Vaz | deep purple #140B2E, gold #F2C14E | color / normal | big companies, money |
 | `maxi-pop` | maximalist, fashion-magazine collage | Lalezar / Lalezar | a new clashing field every beat (yellow, pink, blue, green, orange, ice) + pink/blue/yellow/green patterns | color / busy | fashion, design, art, pop culture, launches with hype |
+| `maxi-photo` | photoreal maximalist editorial sets (user reference 2026-10-22) | Lalezar poster headline / Vaz caption | whatever the scene photos carry: hot pink, sunflower yellow, cobalt, emerald, leopard / zebra / checker prints | color / minimal | fashion, design, lifestyle, beauty, culture |
 | `soft-ui` | premium product explainer | Markazi headline / Vaz caption | off-white + pastel blobs (`tint` per beat), ink, blue #3B6BFF | color / minimal | comparisons, product launches, "how X works" (shape 9) |
 
 `maxi-pop` adds: sunburst, polka dots, checkerboard and stripe bands, a spinning star badge (`story.badge`,
 2–3 words), two tickers in opposite directions, sticker cut-outs (white border + hard black shadow), black/pink
 boxed keywords tilted ±3°. Elements for it: `style` = «maximalist fashion-editorial collage cut-outs, glossy,
 saturated, bold patterns, sequins and texture, studio light», 1–3 objects per beat, overlapping.
+
+`maxi-photo` (engine story.html, visual `scene` on every beat): full-bleed photoreal maximalist sets — a
+designer's studio wall, a dressing room, a runway backstage, a boutique — densely layered with props,
+patterns, plants, neon shapes (no letters), real depth and warm light. Headlines are typeset by us on a
+**blank poster / frame the scene reserves** (`poster` box from `python3 news-reel/find_poster.py img`,
+`poster_text` with `*accent*` and `|`, `poster_sub`); the narration sits in a frosted-glass pill. The
+camera explores each set: `from`/`to` = [x, y, zoom] in frame pixels, so 2–3 beats can travel across the
+details of one image (poster → the sequinned dress → the tablet on the desk). Images: 4–7 scenes per reel
+with `gen_image.py --kind story` (≈ $0.044 each; cap $0.40 for this look), prompt pattern: «Photorealistic
+editorial photograph, vertical 9:16, of a maximalist … densely layered … [subject props tied to the beat] …
+In the exact centre: a large EMPTY cream poster in a thin black frame (≈60% width, 22–58% height),
+completely blank … 35mm, soft daylight + warm lamp glow … No text anywhere, no letters, no logos, no
+watermark, no people» (people only when the beat needs a real person, from a real photo). Read every scene
+before use; reject garbled letters, logos, warped objects. Never the flat `maxi-pop` stickers for this look.
 
 `soft-ui` changes the layout: an optional serif headline on top (`head`, with `*word*` turning from
 grey to ink at `head_at`, `head_sub` under it), the narration as a one-line karaoke caption near the
