@@ -538,6 +538,8 @@ two-news reel in REEL_SPEC.md is retired.)
 3. `bash news-reel/setup.sh`.
 
 ### 4.2 Story research (trending)
+00. Read `meshkani-pro/REQUESTS.md` first. A request for this slot overrides the rotation choices below
+    (topic area, angle, look, shape) but none of the safety / fact / budget rules.
 0. Two reels a day: the 15:00 reel must differ from the same day's 09:00 reel (read its slot file
    `creative` + topic) in story, angle, shape, look preset and voice (prefer the other gender), and the
    09:00 reel from the previous day's 15:00 reel. Never the same story twice in a day.

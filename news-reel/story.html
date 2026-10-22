@@ -84,6 +84,31 @@
   .dark .soft { background: #1B1B20; color: #EEE; box-shadow: 0 18px 50px rgba(0,0,0,.4), 0 0 0 2px rgba(255,255,255,.06); }
   .chip { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 28px; padding: 12px 22px 14px; border-radius: 22px; }
   .dot { width: 14px; height: 14px; border-radius: 50%; background: #2BC56B; display: inline-block; }
+  /* maximalist look (preset "maxi-pop"): clashing saturated fields that change every beat, patterns, double
+     tickers, sticker cut-outs with white borders, offset-shadow type, spinning badges */
+  #maxi { position: absolute; inset: 0; display: none; overflow: hidden; }
+  .maxi #maxi { display: block; } .maxi #arc, .maxi #floor, .maxi #code, .maxi #dots { display: none; }
+  #maxi .pat { position: absolute; }
+  #mxA { left: -120px; top: 1180px; width: 760px; height: 760px; border-radius: 50%; background: repeating-conic-gradient(var(--m2) 0 12deg, transparent 12deg 24deg); opacity: .9; }
+  #mxB { right: -90px; top: 60px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(var(--m3) 9px, transparent 10px) 0 0/44px 44px; }
+  #mxC { left: -100px; right: -100px; top: 1560px; height: 120px; transform: rotate(-6deg); background: repeating-linear-gradient(90deg, var(--m4) 0 60px, #111 60px 120px); }
+  #mxD { left: 40px; top: 470px; width: 200px; height: 200px; background: conic-gradient(#111 25%, #fff 0 50%, #111 0 75%, #fff 0) 0 0/50px 50px; transform: rotate(14deg); border: 8px solid #111; }
+  #mxStar { right: 50px; top: 1250px; width: 230px; height: 230px; }
+  #mxStar svg { width: 100%; height: 100%; }
+  #mxStar b { position: absolute; inset: 0; display: grid; place-items: center; font: 900 46px/1.05 Vaz; color: #111; text-align: center; }
+  #tick2 { position: absolute; left: -40px; right: -40px; top: 1660px; height: 70px; background: #111; color: var(--m3); transform: rotate(3deg); overflow: hidden; display: none; }
+  .maxi #tick2 { display: block; }
+  #tick2 div { position: absolute; white-space: nowrap; font: 900 40px/70px Lalezar; direction: rtl; }
+  .maxi #ticker { opacity: 1; background: var(--m4); color: #111 !important; border: 0; bottom: auto; top: 40px; height: 64px; transform: rotate(-2deg); }
+  .maxi #ticker div { font-family: Lalezar; font-weight: 400; font-size: 40px; line-height: 64px; }
+  .maxi .w { font-family: Lalezar, Vaz; font-weight: 400; color: #111 !important; text-shadow: 4px 4px 0 #fff, 8px 8px 0 var(--m2); }
+  .maxi .dark .w { color: #fff !important; text-shadow: 4px 4px 0 #111, 8px 8px 0 var(--m2); }
+  .maxi .w.k { display: inline-block; color: #fff !important; background: #111; padding: 0 18px; transform: rotate(-3deg); text-shadow: 6px 6px 0 var(--m2); border-radius: 10px; margin: 6px 0; }
+  .maxi .w.k:nth-of-type(even) { background: var(--m2); color: #111 !important; text-shadow: 5px 5px 0 #fff; transform: rotate(2.5deg); }
+  .maxi .obj { filter: drop-shadow(6px 0 0 #fff) drop-shadow(-6px 0 0 #fff) drop-shadow(0 6px 0 #fff) drop-shadow(0 -6px 0 #fff) drop-shadow(14px 16px 0 rgba(17,17,17,.9)) !important; }
+  .maxi .cap { color: #111; background: #fff; border: 4px solid #111; display: table; margin: 0 auto; padding: 6px 22px; }
+  .maxi .card { border: 6px solid #111; box-shadow: 14px 16px 0 #111; }
+  .maxi .deco { opacity: 1; color: #111 !important; background: #fff; padding: 4px 12px; border: 3px solid #111; }
   #end { position: absolute; inset: 0; display: none; background: var(--dark); }
 </style>
 </head>
@@ -95,7 +120,9 @@
   <div id="dots"></div>
   <div class="deco" id="dTL" style="left:70px; top:80px"></div><div class="deco" id="dTR" style="right:70px; top:80px"></div>
   <div class="deco" id="dBL" style="left:70px; bottom:90px"></div><div class="deco" id="dBR" style="right:70px; bottom:90px"></div>
-  <div id="ticker"><div id="tick"></div></div>
+  <div id="maxi"><div class="pat" id="mxA"></div><div class="pat" id="mxB"></div><div class="pat" id="mxC"></div><div class="pat" id="mxD"></div>
+    <div class="pat" id="mxStar"><svg viewBox="0 0 100 100"><polygon fill="var(--m3)" stroke="#111" stroke-width="2.5" points="${''}"/></svg><b id="mxSt"></b></div></div>
+  <div id="ticker"><div id="tick"></div></div><div id="tick2"><div id="tk2"></div></div>
   <svg id="code" width="150" height="44"></svg>
   <div id="blobs"><i id="b1" style="width:760px;height:760px;left:-220px;top:900px"></i><i id="b2" style="width:640px;height:640px;right:-200px;top:180px;opacity:.4"></i></div>
   <div id="beats"></div>
@@ -310,11 +337,14 @@ window.ready = (async () => {
     'terminal': {font_display: 'Changa', font_text: 'Vaz', accent: '#00E676', paper: '#EEF2EE', ink: '#0A0F0A', dark: '#050805', mode: 'mono', density: 'busy'},
     'warm-story': {font_display: 'Messiri', font_text: 'Vaz', accent: '#D2643C', paper: '#F3E9DC', ink: '#3A2418', dark: '#24150F', mode: 'color', density: 'minimal'},
     'soft-ui': {font_display: 'Markazi', font_text: 'Vaz', accent: '#3B6BFF', paper: 'radial-gradient(1200px 1400px at 50% 45%, #F6F5F3, #ECEBE8 80%)', ink: '#141414', dark: 'radial-gradient(900px 1100px at 50% 40%, #1E1E24, #0B0B0E 75%)', mode: 'color', density: 'minimal', softui: true},
+    'maxi-pop': {font_display: 'Lalezar', font_text: 'Lalezar', accent: '#FF2E93', paper: '#FFE14D', ink: '#111', dark: '#2B0A57', mode: 'color', density: 'busy', maxi: true},
     'royal-tech': {font_display: 'Reem', font_text: 'Vaz', accent: '#F2C14E', paper: '#F1ECF7', ink: '#1A0F33', dark: 'radial-gradient(900px 1100px at 50% 52%, #2A1660, #140B2E 70%)', mode: 'color', density: 'normal'}};
   const th = Object.assign({}, PRESETS[(S.theme || {}).preset] || {}, S.theme || {}), rs = document.documentElement.style;
   for (const [k, v] of Object.entries({'--o': th.accent, '--paper': th.paper, '--ink': th.ink, '--dark': th.dark, '--fd': th.font_display, '--ft': th.font_text})) if (v) rs.setProperty(k, v);
   if (th.paper) $('paper').style.background = th.paper; if (th.dark) $('dark').style.background = th.dark;
   document.body.classList.add(th.mode || 'color', th.density || 'normal'); if (th.softui) document.body.classList.add('softui');
+  if (th.maxi) { document.body.classList.add('maxi'); const pts = Array.from({length: 24}, (_, i) => { const a = i * Math.PI / 12, r = i % 2 ? 36 : 49; return `${50 + r * Math.cos(a)},${50 + r * Math.sin(a)}`; }).join(' ');
+    document.querySelector('#mxStar polygon').setAttribute('points', pts); $('mxSt').innerHTML = esc(S.badge || 'AI × ترند').replace(' ', '<br>'); }
   if (S.tabs) { $('tabs').style.display = 'flex'; $('tabs').innerHTML = S.tabs.map(x => `<span>${esc(x)}</span>`).join(''); }
   { // a light accent (e.g. acid yellow) is unreadable on paper: keywords become ink with an accent marker band
     const c = (th.accent || '#FF6A13').replace('#', ''), [r, g, b] = [0, 2, 4].map(i => parseInt(c.slice(i, i + 2), 16)), lum = (.299 * r + .587 * g + .114 * b) / 255;
@@ -373,6 +403,13 @@ function seek(t) {
   $('code').style.opacity = bgName === 'paper' && !inEnd ? .55 : 0;
   $('blobs').style.opacity = bgName === 'paper' && !inEnd ? 1 : 0; $('b1').style.transform = `translate(${Math.sin(t * .4) * 80}px,${Math.cos(t * .3) * 60}px)`; $('b2').style.transform = `translate(${Math.cos(t * .35) * 70}px,${Math.sin(t * .5) * 50}px)`;
   if (S.tabs) { const ti = BEATS[Math.max(0, cur)]?.bt.tab; [...$('tabs').children].forEach((x, i) => x.className = i === ti ? 'on' : ''); $('tabs').style.opacity = ti == null || inEnd ? 0 : 1; $('tabs').style.color = bgName === 'dark' ? '#eee' : ''; $('tabs').classList.toggle('dk', bgName === 'dark'); }
+  if (document.body.classList.contains('maxi')) {   // every beat gets a new clashing field + pattern colours
+    const MX = [['#FFE14D', '#FF2E93', '#2D5BFF', '#00D27A'], ['#FF2E93', '#FFE14D', '#00D27A', '#2D5BFF'], ['#2D5BFF', '#FF8A00', '#FFE14D', '#FF2E93'], ['#00D27A', '#2D5BFF', '#FF2E93', '#FFE14D'], ['#FF8A00', '#7B2DFF', '#FFE14D', '#00D27A'], ['#B8F2FF', '#FF2E93', '#FF8A00', '#2D5BFF']];
+    const m = MX[Math.max(0, cur) % MX.length], rs = document.documentElement.style; if (bgName === 'paper') $('paper').style.background = m[0];
+    rs.setProperty('--m2', m[1]); rs.setProperty('--m3', m[2]); rs.setProperty('--m4', m[3]);
+    $('maxi').style.opacity = inEnd ? 0 : 1; $('mxA').style.transform = `rotate(${t * 18}deg)`; $('mxB').style.transform = `rotate(${-t * 10}deg)`;
+    $('mxD').style.transform = `rotate(${14 + Math.sin(t * 2) * 8}deg)`; $('mxStar').style.transform = `rotate(${t * 40}deg) scale(${1 + .06 * Math.sin(t * 6)})`; $('mxSt').style.transform = `rotate(${-t * 40}deg)`;
+    $('mxC').style.backgroundPosition = `${t * 120}px 0`; $('tk2').textContent = $('tick').textContent; $('tk2').style.transform = `translateX(${-((t * 110) % 2400) + 1200}px)`; $('tick2').style.display = inEnd ? 'none' : ''; }
   $('arc').style.transform = `rotate(${t * 6}deg)`; $('floor').style.backgroundPosition = `0 ${t * 40}px`;
   BEATS.forEach((b, i) => {
     const on = i === cur && !inEnd, outK = P(t, b.b - .18, b.b);

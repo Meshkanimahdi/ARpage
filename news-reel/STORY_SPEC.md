@@ -100,7 +100,13 @@ editorial), `Reem` (geometric kufi), `Messiri` (soft), `Changa` (tech), `Inter` 
 | `terminal` | data, money | Changa / Vaz | black, green #00E676 | mono / busy | finance, markets, numbers |
 | `warm-story` | human, soft | Messiri / Vaz | beige #F3E9DC, brown, terracotta #D2643C | color / minimal | women, family, education |
 | `royal-tech` | premium | Reem / Vaz | deep purple #140B2E, gold #F2C14E | color / normal | big companies, money |
+| `maxi-pop` | maximalist, fashion-magazine collage | Lalezar / Lalezar | a new clashing field every beat (yellow, pink, blue, green, orange, ice) + pink/blue/yellow/green patterns | color / busy | fashion, design, art, pop culture, launches with hype |
 | `soft-ui` | premium product explainer | Markazi headline / Vaz caption | off-white + pastel blobs (`tint` per beat), ink, blue #3B6BFF | color / minimal | comparisons, product launches, "how X works" (shape 9) |
+
+`maxi-pop` adds: sunburst, polka dots, checkerboard and stripe bands, a spinning star badge (`story.badge`,
+2–3 words), two tickers in opposite directions, sticker cut-outs (white border + hard black shadow), black/pink
+boxed keywords tilted ±3°. Elements for it: `style` = «maximalist fashion-editorial collage cut-outs, glossy,
+saturated, bold patterns, sequins and texture, studio light», 1–3 objects per beat, overlapping.
 
 `soft-ui` changes the layout: an optional serif headline on top (`head`, with `*word*` turning from
 grey to ink at `head_at`, `head_sub` under it), the narration as a one-line karaoke caption near the
