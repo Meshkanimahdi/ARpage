@@ -1,0 +1,39 @@
+# SaaS product launch video
+
+- **id:** `180-saas-product-launch-video` · **category:** UI (Product / app motion with a rebuilt real UI)
+- **source:** https://prompt-motion.com/xelandre-363f00 · **creator:** @xelandre__
+- **use:** مناسب معرفی یا عرضه محصول دیجیتال؛ مزیت و تجربه استفاده را با رابط واقعی نشان دهد.
+- **visual style:** موشن محصول با نمایش رابط واقعی
+- **mood:** مدرن و هدف‌محور · **audience:** کاربران بالقوه و تصمیم‌گیرندگان مرتبط با محصول
+- **gender target:** جنسیت هدف در پرامپت مشخص نشده؛ قابل ارائه به همه جنسیت‌ها
+- **trend fit:** زیاد برای قالب‌های دیجیتال و اجتماعی؛ میزان بازدید واقعی سنجیده نشده
+- **has an `<inputs>` block (slots to personalise):** no
+
+## Prompt — verbatim. Do not change its structure (see SKILL.md → "What you may change").
+
+````text
+<direction>
+A 15-second motion design showreel that proves you are a world-class motion designer, built around your choice. Pick one visual concept from it and commit to it: name it in one line before you start. Every shot is made out of the previous one: shapes, type and color transform into the next scene instead of cutting or fading.
+One typeface, a palette of at most three colors plus black and white, one consistent camera language.
+It's code-driven: an HTML/JS page where every frame is computed from time, captured with headless Chrome, assembled with ffmpeg with motion blur, and sound generated in code.
+Show range: kinetic type, shape morphing, a 2D-to-3D moment, a data or UI moment, and an end title. Give each one an equal share of the time.
+Banned: particle bursts, glows, lens flares, camera shake, RGB split, crossfades, generic gradients, bouncy easing, holds longer than half a second, anything that looks like a template.
+</direction>
+
+<structure>
+120 BPM, something happens on every beat.
+First bar: hook. Then one technique per bar, each flowing out of the last. Last full bar: the strongest moment. Final half bar: end title, and the final frame matches the first so it loops.
+</structure>
+
+<build>
+1. One HTML file at 1920x1080. Every style is computed from time inside window.seek(t): no CSS animations, no timers, no state carried between frames.
+2. Use spring and exponential easing written as functions of time. Blur follows speed and direction on fast moves.
+3. Write a soundtrack in code with the Web Audio API (OfflineAudioContext): a kick on every beat, a riser into the last full bar, a hit on each scene change. Render it to WAV.
+4. Render with Playwright at 60fps, 3 subframes per frame blended with ffmpeg tmix for motion blur, then mux the audio.
+5. Before the full render, render one frame per beat and look at them. Fix anything cluttered, off the beat, overlapping or hard to read.
+</build>
+
+<start>
+Tell me the concept and show a beat-by-beat storyboard, then build it without asking me anything else. Give me the final MP4.
+</start>
+````

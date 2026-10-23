@@ -31,7 +31,9 @@
       "stories": "Stories",
       "control": "Automation Control",
       "log": "Automation Log",
-      "reels": "Reels"
+      "reels": "Reels",
+      "performance": "Performance",
+      "insights": "Insights"
     },
     "instagram_root_folder_id": "1QP2Qyzo_5j3dcLVxwq7hQXfR7Gozjulv",
     "post_images_folder_id": "10o8f4dqZ7cT4_MLZHrluER0eLUlkc7Tn",
@@ -148,5 +150,21 @@
       "reels_per_day": 2,
       "reel_stories_per_day": 2
     }
+  },
+  "analytics": {
+    "run_at": "09:40",
+    "insights_file": "insights.json (in _automation)",
+    "window_days": 30,
+    "measure_ages_h": [
+      24,
+      72,
+      168
+    ],
+    "min_samples": 3,
+    "explore_share": 0.25
+  },
+  "motion": {
+    "skill": ".claude/skills/mothion-graphy-2026/SKILL.md",
+    "built_pages": "news-reel/pm/README.md"
   }
 }

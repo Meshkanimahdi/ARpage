@@ -19,6 +19,16 @@ publish twice, never publish late, never publish unverified content.
 
 ## 0. Ground rules (both phases)
 
+- **Motion graphics (user rule 2026-10-23):** every reel's motion style comes from the skill
+  **mothion-graphy-2026** (`.claude/skills/mothion-graphy-2026/SKILL.md`, 230 tested prompts). Read
+  it by path at the start of every REEL_PREPARE (a session started before the skill existed does not
+  load it by itself). Pick the prompt that fits the news. Never change a prompt's structure; change only
+  timing, size/aspect ratio, duration and the topic slots (SKILL.md, "What you may change").
+- **Learn from the audience (user rule 2026-10-23):** a daily ANALYTICS phase (§6) measures every
+  post, story and reel and writes `_automation/insights.json`. Every PREPARE and REEL_PREPARE reads it
+  and lets it steer topic, angle, hook, format and motion style, inside the fixed rules (sector rotation,
+  facts, caps). The goal: more reach, watch time, saves, shares and follows, and the best social-media
+  content team there is.
 - **Model (user rule 2026-10-23): all content is produced with Claude Opus 5.5 (`claude-opus-5-5`).**
   This covers posts, carousel slides, stories and reels: research, writing, narration scripts, image
   prompts, motion design and QC. A publisher session or scheduled task must run on this model; Sonnet,
@@ -176,6 +186,10 @@ Drive and `Ready` rows in the sheet. Keep going only while
 5. Also read `_automation/history/publish-state.json` and `stories-state.json`
    (ids in config: the completed original batch). The never-republish list from the legacy state file (POST-001…POST-010,
    POST-011, the standalone test story) and everything in the sheet is history.
+6. **Audience insights:** read `_automation/insights.json` (§6), if present. Among the fields the
+   rule above still allows, prefer those with the best `leaders.field` ranking. Apply the `hooks`,
+   `caption` and `design` lessons to this bundle, and record which insight you used in the slot file
+   (`insight_used`). The sector rule and fact rules always win over insights.
 
 ### 1.3 Research (live)
 Use WebSearch/WebFetch, English first, local language if needed:
@@ -562,13 +576,28 @@ two-news reel in REEL_SPEC.md is retired.)
 2. Find 8–15 candidates trending in AI in the last 24–72 h (WebSearch across outlets, launches, viral
    demos, agent case studies, studies, statements; primary sources through Drive when WebFetch is
    blocked, §1.3). Drop rumours and anything you cannot attribute.
-3. Score each for hook strength, broad appeal for a Persian audience, a concrete everyday image, and
-   novelty vs. the last 14 reels. Pick one. Then choose today's **angle** (STORY_SPEC §1, 17 angles — search at least 5 of them), **shape**
+3. Read `_automation/insights.json` (§6). Score each candidate for hook strength, broad appeal for a
+   Persian audience, a concrete everyday image, novelty vs. the last 14 reels, and fit with what the
+   insights say this audience watches, saves and shares (`leaders.topic`, `leaders.angle`, `hooks`).
+   Keep 1 reel in 4 as an exploration pick (an untried angle, topic type or motion category). Pick one. Then choose today's **angle** (STORY_SPEC §1, 17 angles — search at least 5 of them), **shape**
    (§2), **look preset** (§4), **voice** (§5) and **tempo** (§6) — each different from yesterday's.
 4. Write `work/story/dossier.json`: idea, who/where/when, primary URL + confirming URLs, exact quote
    (only if confirmed) or paraphrase, allowed claims, field, selection reason.
 
 ### 4.3 Script, voice, elements
+0. **Motion style first (mandatory).** Follow the workflow in `.claude/skills/mothion-graphy-2026/SKILL.md`:
+   - read `references/index.md` and shortlist 3 prompts for this story;
+   - choose one, using the category table, `insights.json → leaders.motion_category` and the skill's
+     rotation rules;
+   - save the adapted prompt to `work/story/motion_prompt.md`, with only the allowed edits listed;
+   - build it as `news-reel/pm/<id>.html`, or reuse the file if it exists (`news-reel/pm/README.md` lists
+     the built prompts; prompt `089` is `news-reel/glass.html`).
+
+   Write the script so it fits the prompt's structure: one narration beat per section or shot, with
+   `beats[].shot` naming that section. A newly built engine file is committed and pushed to branch
+   `claude/ecstatic-davinci-1lqsug`, with a line added to `news-reel/pm/README.md`, so the next reel can
+   reuse it. If the push fails, log it. Fallback: if the built page still fails QC after 3 rounds and
+   the deadline is close, use one of our own engines (STORY_SPEC §8.0) and log `motion_fallback`.
 1. `work/story/story.json` per STORY_SPEC: `voice` + `voice_name` (fits the story; female for
    women-focused stories; not yesterday's), `theme` (preset + overrides), `tempo`, `stability`,
    `date`, `field`, `end_text`, `music_prompt`, `credits`, 18–34 `beats` (id, bg, text, visual).
@@ -588,8 +617,9 @@ two-news reel in REEL_SPEC.md is retired.)
    exit 4 → respell/rephrase the flagged beats). 60–90 s.
 
 ### 4.4 Render and QC
-1. `node news-reel/reel_render.mjs --dir=work/story --page=<glass.html|kinetic.html|flow.html|line.html|story.html> --mode=check` (the engine chosen for
-   this reel, STORY_SPEC §8.0 — vary it reel to reel); Read every
+1. `node news-reel/reel_render.mjs --dir=work/story --page=<pm/<id>.html | glass.html | fallback engine> --mode=check`
+   (the prompt chosen in §4.3 step 0). Also render the stills the prompt's own `<start>`/`<build>` asks for,
+   and review them yourself; Read every
    `out/sheet*.jpg`. Fix ISSUES (word mismatch), text overflow, wrong/ugly cut-outs, a visual that does
    not match its sentence, distorted people/products. Max 3 rounds.
 2. `--mode=video` in the background (run it with a timeout of at least 60 min), then `python3 news-reel/reel_assemble.py --dir work/story`:
@@ -614,8 +644,10 @@ two-news reel in REEL_SPEC.md is retired.)
    prompts `el/_sheet-*.txt`) · blank · Notes (credits). Read back.
 4. Reel slot file → `READY` (`kind`, `format: story`, `content_id`, `idea`, `sources`, `voices`, `video`,
    `cover`, `story` {drive_file_id, md5, duration, status PENDING, ids null}, `caption`, `script`,
-   `creative` {angle, shape, preset, voice, tempo}, `cost_usd`, `sheet.reel_row`, `reel` ids null).
-   Notes column: `angle=… shape=… preset=… voice=… tempo=…`. Log row (§3).
+   `creative` {angle, shape, preset, voice, tempo, motion_prompt {id, title, link}, motion_category,
+   insight_used}, `cost_usd`, `sheet.reel_row`, `reel` ids null). The **Motion Graphics Prompt** column
+   gets the adapted prompt from `motion_prompt.md`.
+   Notes column: `angle=… shape=… preset=… voice=… tempo=… motion=<id>`. Log row (§3).
 
 ## 5. REEL_PUBLISH phase (starts 08:57 → 09:00, and 14:57 → 15:00 Tehran)
 
@@ -652,9 +684,75 @@ two-news reel in REEL_SPEC.md is retired.)
 
 ---
 
+## 6. ANALYTICS phase — daily performance review (09:40 Tehran; Fridays also weekly)
+
+Goal: measure what the audience really does with every post, story and reel, then turn it into
+`_automation/insights.json`, which steers the next PREPARE and REEL_PREPARE runs. Read-only on Instagram.
+No publishing, no comments, no DMs, no account changes.
+
+1. Setup (§0.1) and control (§0.2). The Kill Switch stops this phase too. Lock `analytics_<date>__analytics`.
+2. **Inventory.**
+   - List the last 30 days of media with `INSTAGRAM_GET_IG_USER_MEDIA` (`ig_user_id: me`, account
+     `instagram_beath-billow`, fields `id,media_type,media_product_type,timestamp,permalink,caption,
+     like_count,comments_count`), paging by `paging.cursors.after`.
+   - Stories are not in that list: take their `media_id` from the slot files (posts' `stories[]`, reels'
+     `story`).
+   - Join every media id to its slot file to get content id, field, topic, slot time, format and `creative`
+     (angle, shape, look, voice, tempo, motion_prompt, motion_category), plus the caption's first line as
+     `hook`. Media that is not in any slot file (a manual repost) is tagged `manual`.
+3. **Metrics** (`INSTAGRAM_GET_IG_MEDIA_INSIGHTS`, metric list by type; on a 400, retry once with fewer
+   metrics, then mark the item unavailable):
+   - reels: `views, reach, likes, comments, shares, saved, total_interactions, ig_reels_avg_watch_time,
+     ig_reels_video_view_total_time`. Retention = avg watch time ÷ the reel's duration (from `reel.json`).
+   - carousels: `views, reach, likes, comments, shares, saved, total_interactions`.
+   - stories, while they are under 24 h old: `views, reach, replies, shares, navigation, follows,
+     profile_visits, total_interactions`. A 09:40 run catches every story posted since yesterday 09:40.
+
+   Measure each item at its 24 h mark, then again at 72 h and 7 days. Keep the latest value and the age it
+   was measured at.
+4. **Account.** `INSTAGRAM_GET_USER_INFO` (`followers_count`) and `INSTAGRAM_GET_USER_INSIGHTS` (`period:
+   day`, `metric_type: total_value`, yesterday 00:00–24:00 Tehran, as Unix times): `reach, views,
+   accounts_engaged, total_interactions, profile_views, follows_and_unfollows`. Empty metrics are valid.
+5. **Sheet.**
+   - Tab `Performance` (create it with this header if it is missing): one row per media id, updated in
+     place (find by Media ID). Columns A–Y: Media ID · Content ID · Type · Published (Tehran) · Permalink ·
+     Field · Topic · Format/Shape · Angle · Look · Motion Prompt · Voice · Hook · Age (h) · Views · Reach ·
+     Likes · Comments · Shares · Saves · Interactions · Avg Watch (s) · Retention % · Follows/Profile Visits ·
+     Score.
+   - Tab `Insights` (create it if missing): one row per day. Columns: Date · Followers · Δ Followers ·
+     Account Reach · Views · Accounts Engaged · Profile Views · Best item · Worst item · Top 3 lessons
+     (Persian) · Changes applied for the next days.
+6. **Score and learn.**
+   - Score each item against the median of its own type over the last 14 days. Weights:
+     - reels: 0.35 retention, 0.25 reach, 0.25 (shares + saves) ÷ reach, 0.15 follows/profile visits;
+     - carousels: 0.4 reach, 0.4 (saves + shares) ÷ reach, 0.2 likes/comments;
+     - stories: 0.5 reach ÷ followers, 0.3 navigation (forward taps or exits lower is better), 0.2 replies
+       and shares.
+   - Rank by field, topic type, format, angle, shape, look, motion prompt and category, voice gender, hook
+     type (question / number / shock / "how-to" / name-led), publish slot, and reel length. A dimension
+     value needs ≥ 3 items before it counts as a leader or a laggard. Until then it is `exploring`.
+   - Write `_automation/insights.json` (create it the first time, then update it in place):
+     `{updated, window_days, account{followers, delta_7d, reach_7d, engaged_7d}, leaders{field, topic,
+     format, angle, shape, look, motion_category, motion_prompt, voice, hook, slot, length} (each a ranked
+     list with median score and n), laggards{…}, hooks[lessons], caption[lessons], design[lessons],
+     explore[next untried options], recommendations[3–5 concrete instructions for the next 48 h]}`.
+   - Recommendations are concrete, for example «ریلزهای ۴۰–۵۵ ثانیه با قلاب سؤالی، retention بالاتری
+     داشتند → ریلز بعدی ≤ ۵۵ ثانیه و قلاب سؤالی» ("40–55 s reels with a question hook had higher retention
+     → next reel ≤ 55 s with a question hook"). Never write a recommendation that breaks the sector,
+     fact, cap or style-rotation rules.
+7. **Fridays: weekly review.**
+   - In the Insights row, compare the last 7 days with the 7 days before: followers, reach, average
+     retention, saves + shares per reach.
+   - Name the 3 strongest and 3 weakest patterns, and update `explore` with 3 new experiments for next
+     week (a new motion category, angle or posting-hook type).
+8. Log row (§3, Phase `ANALYTICS`): items measured, best item, the top recommendation.
+
+Every PREPARE (§1.2 step 6) and REEL_PREPARE (§4.2 step 3, §4.3 step 0) reads `insights.json`. The
+insights steer choices; they never override facts, rotation or the user's rules.
+
 ## 3. Reporting — sheet tab `Automation Log`
 
 Append one row per phase end and per error (reel phases: Slot `YYYY-MM-DD|09:00` or `|15:00`, Phase `REEL_PREPARE`/`REEL_PUBLISH`, cost column = clean-plate cost), columns A–H:
 `Logged At (Tehran) | Slot | Phase | Status | Content ID | Details | Image Cost (USD) | Run ID`.
 Details are short, plain Persian or English, no secrets or temporary links.
-No other notification channel is used.
+The `Performance` and `Insights` tabs (§6) are the analytics view. No other notification channel is used.
