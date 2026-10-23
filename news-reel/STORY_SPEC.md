@@ -190,9 +190,9 @@ photos, refined 3D renders with real materials, neon glass. Never flat clipart o
 ### 8.0 Engines, style rotation and motion craft (user rules 2026-10-22 — read before designing any reel)
 The user rejected the collage look ("cut-outs and icons that just slide around look childish"). Reference:
 the viral @ensan.besham reel (2.3M views) — glowing line-art explainers. **No fixed style (user rule 2026-10-22): every reel gets
-its own style.** Four engines: **`kinetic.html`** (agency kinetic type + UI, below), **`flow.html`** (one morphing actor of light, below) and **`line.html`** (glowing line-art explainer, below) and **`story.html`** (looks
+its own style.** Five engines: **`glass.html`** (Apple-keynote glass sting, below), **`kinetic.html`** (agency kinetic type + UI, below), **`flow.html`** (one morphing actor of light, below) and **`line.html`** (glowing line-art explainer, below) and **`story.html`** (looks
 in §4: paper-ember, mono-press, acid-pop, neon-night, maxi-pop, soft-ui …). Choose engine + look per story;
-never the same engine *and* look two reels in a row; across a week use at least three of the four engines and at least 4 looks.
+never the same engine *and* look two reels in a row; across a week use at least three of the five engines and at least 4 looks.
 The motion craft below (smooth expo easing, continuous movement, things that visibly happen, lead visual
 filling the frame, no empty or frozen frames, no toy-like bouncing) applies to **every** engine and look.
 - **One continuous canvas.** Each beat is a station on a big world; the camera travels to the next
@@ -210,6 +210,23 @@ filling the frame, no empty or frozen frames, no toy-like bouncing) applies to *
   or a palette (`accents: [...]`, one per station, with drifting colour glows) for a maximalist reel.
 - Real people / products as line art: a real photo → `python3 news-reel/lineart.py photo.jpg el/x.svg`
   (plain background works best; crop to the subject first) → `lineart` visual. Credit the photo.
+
+**glass.html — Apple-keynote glass sting** (user prompt reference 2026-10-23): soft white, bright blue
+(#2F6BFF / #3CC8F0 / mint #4ED6A0), navy, frosted glass; no purple, violet, magenta or orange. Eight shots
+driven by the narration: `header` (the news subject as a product lockup — disc + name + dark pill — rising out
+of a blue haze in a light app window; a cursor glides in, turns and clicks the disc) → `orbit` (hard cut on the
+music accent: navy app icon, four squares orbiting into a cross, collapsing into the menu bar) → `prompt`
+(menu bar over a blue sky wallpaper with line art; a frosted prompt box springs out and types what a user
+would ask) → `page` (whip-tilt into an answer page scrolling into place: title, 2–3 sentences with one
+`*key phrase*`, optional `controls` card) → `card` (a white card with a realistic image rises over it) → `duo`
+(two stacked cards with giant frosted-glass titles, e.g. a contrast: Open / Blocked) → `disc` (the lone mark,
+the only still hold) → black end card with the glowing wordmark. Beats carry `shot`; a beat with the same shot
+continues it, and `orbit` hands over to `prompt` by itself. Each shot has a nominal frame length and a stretch
+range that absorbs the narration time, so entries and exits keep their designed speed. Music at 124 BPM;
+`music_delay` lines a phrase accent up with the `orbit` cut. Data: `story.json → glass {product, pill, search,
+hero, card_title, card_sub, clock, prompt, crumb[], page_title, page_meta, page_body, controls[2], card_img,
+card_caption, card_caption_sub, duo[{img, pill, title}], wordmark}`. Use it for product, platform and
+launch news. Render with `--page=glass.html`.
 
 `story.json` for line.html: `{motion: {theme: {bg, line, acc, accents?}}, beats: [{id, text, head?, visual}], end_text}`.
 **kinetic.html — agency kinetic typography + UI** (user references 2026-10-22: @arpit_clipsyk Dbc1KrKh2wV,

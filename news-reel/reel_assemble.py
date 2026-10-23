@@ -73,13 +73,15 @@ def main():
     for k, v in tl['lines'].items():
         voice.append(add(d / 'voice/trim' / f'{k}.wav', v['start'] if isinstance(v, dict) else v[0], 1.0))
     m = music(d, spec, END)
-    mus = add(m, max(0, START - 0.3), 0.30 if START else 0.22, f"aloop=loop=-1:size=2147483647,atrim=0:{END - START + 0.6},afade=t=in:d=0.6,afade=t=out:st={END - START - 0.9}:d=1.2,")
+    mus = add(m, max(0, START - 0.3) + spec.get('music_delay', 0), 0.30 if START else 0.22, f"aloop=loop=-1:size=2147483647,atrim=0:{END - START + 0.6},afade=t=in:d=0.6,afade=t=out:st={END - START - 0.9}:d=1.2,")
     prev_bg = None
     for s in scenes:
         if START == 0:   # story reel: many quick cuts -> soft swish, stronger on a background change
             fx.append(add(SFX / 'whoosh.mp3', s['t0'] - 0.12, 0.4 if s.get('bg') != prev_bg else 0.14)); prev_bg = s.get('bg')
         else:
             fx.append(add(SFX / 'whoosh.mp3', s['t0'] - 0.15, 0.45))
+        for at, name, vol in s.get('sfx', []):   # engine cues (glass.html): clicks, key ticks, hits on hard cuts
+            fx.append(add(SFX / f'{name}.mp3', at, vol))
         if s['type'] in ('grid', 'steps', 'points', 'icon_grid', 'network', 'counter'):
             fx.append(add(SFX / 'tick.mp3', s['t0'] + 0.7, 0.35))
         if s['type'] == 'divider':
