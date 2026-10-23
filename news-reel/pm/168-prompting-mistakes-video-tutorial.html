@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — one-diagram explainer (prompt 168)</title>
+<!-- Skill motion-graphy-2026, prompt 168 "Prompting mistakes video tutorial": an explainer of one article as ONE
+     diagram in ONE continuous space. The camera zooms into a part, explains it with one concrete example, and pulls
+     back as the part locks into place. Every idea gets a picture before words; labels sit on the things they name;
+     one typeface, one accent; diagrams build themselves; one thing moves at a time; arrows flow in their real
+     direction; ≤ 7 words on screen (labels + subtitle chunk), ≥ 0.3 s a word; subtitles synced line by line.
+     Data: story.json {diagram{world, colours, items[]}, beats[{id, text, cams[[word,x,y,z]], draw[[word,item]],
+     labels[item|item.sub], takeaway?}]} + timeline.json. Pure seek(t). -->
+<style>
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-800-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-500-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-800-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --paper: #F4F1EA; --ink: #1E2226; --mid: #8C9096; --faint: #D8D2C4; --acc: #0E8A6A; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--paper); }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--paper); font-family: Vaz; }
+  #svg { position: absolute; inset: 0; }
+  text { font-family: Vaz; }
+  #sub { position: absolute; left: 70px; right: 70px; top: 1488px; height: 140px; display: flex; align-items: center; justify-content: center;
+         font: 800 58px Vaz; color: var(--ink); direction: rtl; text-align: center; }
+  #sub span { display: inline-block; background: rgba(244,241,234,.96); padding: 10px 36px 18px; border-radius: 28px; }
+  #take { position: absolute; left: 50%; top: 250px; translate: -50% 0; white-space: nowrap; text-align: center; font: 800 70px Vaz; line-height: 1.35; color: var(--ink); direction: rtl;
+          background: rgba(244,241,234,.95); padding: 10px 40px 20px; border-radius: 30px; box-shadow: 0 10px 40px rgba(30,34,38,.08); }
+  #take b { color: var(--acc); font-weight: 800; }
+  #handle { position: absolute; left: 0; right: 0; top: 1600px; text-align: center; font: 500 34px Vaz; color: var(--mid); letter-spacing: 1px; direction: ltr; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="svg" width="1080" height="1920" viewBox="0 0 1080 1920"><defs id="defs"></defs><g id="world"></g></svg>
+  <div id="take"></div>
+  <div id="sub"></div>
+  <div id="handle"></div>
+</div>
+<script src="/logo-motion/node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/r5/';
+const url = s => s.startsWith('/') ? s : DIR + s;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), lerp = (a, b, k) => a + (b - a) * k, P = (t, a, b) => clamp((t - a) / (b - a));
+const E = {o: gsap.parseEase('expo.out'), io: gsap.parseEase('expo.inOut'), p3: gsap.parseEase('power3.out'), s: gsap.parseEase('sine.inOut')};
+const NS = 'http://www.w3.org/2000/svg';
+function sv(tag, at = {}, parent) { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(at)) e.setAttribute(k, v); if (parent) parent.appendChild(e); return e; }
+const ISSUES = [], words = s => s.trim().split(/\s+/).filter(Boolean).length;
+let S, TL, D, IT = {}, BEATS = [], CAM = [], END = 60;
+
+// ---------- drawing helpers: every stroke draws itself (pathLength 1) ----------
+function stroke(parent, d, w = 5, col = 'var(--ink)', extra = {}) { return sv('path', Object.assign({d, fill: 'none', stroke: col, 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1}, extra), parent); }
+function label(parent, x, y, txt, size = 44, col = 'var(--ink)', weight = 800) { const t = sv('text', {x, y, 'text-anchor': 'middle', 'font-size': size, 'font-weight': weight, fill: col, direction: 'rtl', opacity: 0}, parent); t.textContent = txt; return t; }
+const rr = (x, y, w, h, r) => `M ${x + r} ${y} H ${x + w - r} Q ${x + w} ${y} ${x + w} ${y + r} V ${y + h - r} Q ${x + w} ${y + h} ${x + w - r} ${y + h} H ${x + r} Q ${x} ${y + h} ${x} ${y + h - r} V ${y + r} Q ${x} ${y} ${x + r} ${y} Z`;
+const circ = (cx, cy, r) => `M ${cx - r} ${cy} A ${r} ${r} 0 1 0 ${cx + r} ${cy} A ${r} ${r} 0 1 0 ${cx - r} ${cy}`;
+
+// every builder returns {strokes:[], fills:[], labels:{key: el}, update(k, t)} ; k = 0..1 draw progress
+const K = {};
+K.doc = (g, it) => { const o = {strokes: [], fills: [], labels: {}};
+  const bg = sv('path', {d: rr(it.x, it.y, it.w, it.h, 26), fill: '#FFFDF8', opacity: 0}, g); o.fills.push(bg);
+  o.strokes.push(stroke(g, rr(it.x, it.y, it.w, it.h, 26), 5));
+  o.strokes.push(stroke(g, `M ${it.x + 40} ${it.y + 110} H ${it.x + it.w - 40}`, 4, 'var(--faint)'));
+  const L = [0.82, 0.64, 0.9, 0.55, 0.78, 0.7, 0.46];
+  L.forEach((f, i) => o.strokes.push(stroke(g, `M ${it.x + it.w - 46} ${it.y + 170 + i * 50} H ${it.x + it.w - 46 - (it.w - 92) * f}`, 9, 'var(--faint)')));
+  o.labels[it.id] = label(g, it.x + it.w / 2, it.y + 78, it.label, 40, 'var(--ink)');
+  return o; };
+K.tag = (g, it) => { const o = {strokes: [], fills: [], labels: {}};
+  o.labels[it.id] = label(g, it.x, it.y, it.label, it.size || (it.big ? 64 : 40), it.accent ? 'var(--acc)' : 'var(--ink)'); o.tagOnly = true; return o; };
+K.arrow = (g, it) => { const o = {strokes: [], fills: [], labels: {}};
+  const p = stroke(g, it.d, 5, 'var(--ink)'); o.strokes.push(p);
+  const fl = sv('path', {d: it.d, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 7, 'stroke-linecap': 'round', 'stroke-dasharray': '2 34', opacity: 0}, g); o.flow = fl;
+  const L = p.getTotalLength ? 0 : 0; o.head = sv('path', {d: 'M -16 -12 L 0 0 L -16 12', fill: 'none', stroke: 'var(--ink)', 'stroke-width': 5, 'stroke-linecap': 'round', opacity: 0}, g); o.path = p;
+  return o; };
+K.ring = (g, it) => { const o = {strokes: [], fills: [], labels: {}};
+  o.strokes.push(stroke(g, circ(it.cx, it.cy, it.r), 5));
+  o.nodes = [];
+  for (let i = 0; i < it.n; i++) { const a = (-135 + i * 90) * Math.PI / 180, x = it.cx + Math.cos(a) * it.r, y = it.cy + Math.sin(a) * it.r;
+    const bg = sv('circle', {cx: x, cy: y, r: 72, fill: '#FFFDF8', opacity: 0}, g); o.fills.push(bg);
+    o.strokes.push(stroke(g, circ(x, y, 72), 5));
+    o.strokes.push(stroke(g, circ(x, y - 16, 18), 4.5)); o.strokes.push(stroke(g, `M ${x - 34} ${y + 36} Q ${x} ${y - 4} ${x + 34} ${y + 36}`, 4.5));
+    o.nodes.push([x, y]); }
+  o.labels[it.id] = label(g, it.cx, it.cy - it.r - 108, it.label, 52, 'var(--acc)');
+  o.labels[it.id + '.sub'] = label(g, it.cx, it.cy + 18, it.sub, 44, 'var(--ink)');
+  return o; };
+K.bubble = (g, it) => { const o = {strokes: [], fills: [], labels: {}}; const {x, y} = it;
+  o.strokes.push(stroke(g, `M ${x - 80} ${y - 60} H ${x + 80} Q ${x + 100} ${y - 60} ${x + 100} ${y - 40} V ${y + 30} Q ${x + 100} ${y + 50} ${x + 80} ${y + 50} H ${x + 10} L ${x - 30} ${y + 86} L ${x - 24} ${y + 50} H ${x - 80} Q ${x - 100} ${y + 50} ${x - 100} ${y + 30} V ${y - 40} Q ${x - 100} ${y - 60} ${x - 80} ${y - 60} Z`, 5, 'var(--acc)'));
+  const q = label(g, x, y + 22, '؟', 64, 'var(--acc)'); o.mark = q;
+  o.labels[it.id] = label(g, x, y + 150, it.label, 40); return o; };
+K.tube = (g, it) => { const o = {strokes: [], fills: [], labels: {}}; const {x, y} = it;
+  const liq = sv('path', {d: `M ${x - 26} ${y + 40} V ${y + 110} Q ${x - 26} ${y + 140} ${x} ${y + 140} Q ${x + 26} ${y + 140} ${x + 26} ${y + 110} V ${y + 40} Z`, fill: 'var(--acc)', opacity: 0}, g); o.fills.push(liq);
+  o.strokes.push(stroke(g, `M ${x - 30} ${y - 80} V ${y + 110} Q ${x - 30} ${y + 144} ${x} ${y + 144} Q ${x + 30} ${y + 144} ${x + 30} ${y + 110} V ${y - 80}`, 5));
+  o.strokes.push(stroke(g, `M ${x - 46} ${y - 80} H ${x + 46}`, 5));
+  o.labels[it.id] = label(g, x, y + 210, it.label, 40); return o; };
+K.debate = (g, it, all) => { const o = {strokes: [], fills: [], labels: {}}; const {cx, cy} = it;
+  o.strokes.push(stroke(g, `M ${cx - 150} ${cy - 40} Q ${cx} ${cy - 120} ${cx + 150} ${cy - 40}`, 5, 'var(--acc)'));
+  o.strokes.push(stroke(g, `M ${cx + 150} ${cy + 10} Q ${cx} ${cy + 90} ${cx - 150} ${cy + 10}`, 5, 'var(--acc)'));
+  o.strokes.push(stroke(g, `M ${cx + 128} ${cy - 62} L ${cx + 152} ${cy - 40} L ${cx + 122} ${cy - 30}`, 5, 'var(--acc)'));
+  o.strokes.push(stroke(g, `M ${cx - 128} ${cy + 32} L ${cx - 152} ${cy + 10} L ${cx - 122} ${cy}`, 5, 'var(--acc)'));
+  o.labels[it.id] = label(g, cx, cy - 130, it.label, 40); return o; };
+K.bars = (g, it) => { const o = {strokes: [], fills: [], labels: {}, bars: {}}; const H = 96, GAP = 96;
+  it.items.forEach((b, i) => { const y = it.y + i * (H + GAP);
+    const tr = sv('rect', {x: it.x, y, width: it.w, height: H, rx: 20, fill: 'none', stroke: 'var(--faint)', 'stroke-width': 4, opacity: 0}, g);
+    const bar = sv('rect', {x: it.x + it.w, y, width: 0, height: H, rx: 20, fill: b.accent ? 'var(--acc)' : 'var(--mid)'}, g);   // RTL: bars grow from the right
+    const nm = label(g, it.x + it.w - 30, y + H / 2 + 16, b.name, 42, '#fff'); nm.setAttribute('text-anchor', 'start');
+    const val = label(g, 0, y + H / 2 + 18, '', 48, 'var(--ink)');
+    o.bars[b.id] = {tr, bar, nm, val, y, v: b.value, k: 0}; o.labels[it.id + '.' + b.id] = nm; o.labels[it.id + '.' + b.id + '.val'] = val; });
+  o.labels[it.id + '.base'] = label(g, it.x + it.w / 2, it.y + it.items.length * (H + GAP) + 10, it.base, 40, 'var(--mid)');
+  o.geom = {x: it.x, w: it.w, H, GAP, y: it.y}; return o; };
+K.frame = (g, it) => { const o = {strokes: [], fills: [], labels: {}};
+  o.strokes.push(stroke(g, rr(it.x, it.y, it.w, it.h, 60), 4, 'var(--mid)', {'stroke-dasharray': '1'}));
+  o.dash = sv('path', {d: rr(it.x, it.y, it.w, it.h, 60), fill: 'none', stroke: 'var(--paper)', 'stroke-width': 6, 'stroke-dasharray': '18 22', opacity: 0}, g);
+  o.labels[it.id] = label(g, it.x + it.w / 2, it.y - 30, it.label, 62, 'var(--mid)'); return o; };
+K.stamp = (g, it) => { const o = {strokes: [], fills: [], labels: {}}; const gg = sv('g', {transform: `translate(${it.x} ${it.y}) rotate(-8)`}, g); o.sg = gg;
+  o.strokes.push(stroke(gg, rr(-170, -56, 340, 112, 14), 6, 'var(--acc)'));
+  o.labels[it.id] = label(gg, 0, 18, it.label, 56, 'var(--acc)'); o.labels[it.id].setAttribute('opacity', 0); return o; };
+K.gap = (g, it, all) => { const o = {strokes: [], fills: [], labels: {}}; const b = all[it.bars]; const G = b.geom;
+  const xs = G.x + G.w - G.w * 0.83, xg = G.x + G.w - G.w * 0.36, y = G.y + G.H * 2 + G.GAP + 56;
+  o.strokes.push(stroke(g, `M ${xs} ${y - 26} V ${y} H ${xg} V ${y - 26}`, 5, 'var(--acc)'));
+  o.strokes.push(stroke(g, `M ${(xs + xg) / 2 - 70} ${y + 40} L ${(xs + xg) / 2 - 20} ${y + 40} M ${(xs + xg) / 2 - 38} ${y + 26} L ${(xs + xg) / 2 - 20} ${y + 40} L ${(xs + xg) / 2 - 38} ${y + 54}`, 5, 'var(--acc)'));
+  o.strokes.push(stroke(g, `M ${(xs + xg) / 2 + 70} ${y + 40} L ${(xs + xg) / 2 + 20} ${y + 40} M ${(xs + xg) / 2 + 38} ${y + 26} L ${(xs + xg) / 2 + 20} ${y + 40} L ${(xs + xg) / 2 + 38} ${y + 54}`, 5, 'var(--acc)'));
+  o.labels[it.id] = label(g, (xs + xg) / 2, y + 120, it.label, 42, 'var(--acc)'); return o; };
+K.core = (g, it) => { const o = {strokes: [], fills: [], labels: {}}; const {cx, cy, r} = it;
+  const f = sv('circle', {cx, cy, r, fill: 'var(--acc)', opacity: 0}, g); o.fills.push(f);
+  o.strokes.push(stroke(g, circ(cx, cy, r), 5, 'var(--acc)'));
+  const pts = [[-58, -36], [0, -62], [58, -30], [-40, 42], [44, 46]];
+  [[0, 1], [1, 2], [0, 3], [2, 4], [3, 4], [1, 4]].forEach(([a, b]) => o.strokes.push(stroke(g, `M ${cx + pts[a][0]} ${cy + pts[a][1]} L ${cx + pts[b][0]} ${cy + pts[b][1]}`, 3.5, 'var(--acc)')));
+  o.dots = pts.map(([x, y]) => sv('circle', {cx: cx + x, cy: cy + y, r: 0, fill: 'var(--acc)'}, g));
+  o.labels[it.id] = label(g, cx, cy + r + 66, it.label, 44, 'var(--acc)'); return o; };
+K.check = (g, it) => { const o = {strokes: [], fills: [], labels: {}};
+  const f = sv('circle', {cx: it.x, cy: it.y, r: 46, fill: 'var(--acc)', opacity: 0}, g); o.fills.push(f);
+  o.strokes.push(stroke(g, circ(it.x, it.y, 46), 5, 'var(--acc)')); o.strokes.push(stroke(g, `M ${it.x - 20} ${it.y + 2} L ${it.x - 4} ${it.y + 18} L ${it.x + 22} ${it.y - 14}`, 7, '#fff')); return o; };
+K.hospital = (g, it) => { const o = {strokes: [], fills: [], labels: {}}; const {x, y, w, h} = it;
+  o.strokes.push(stroke(g, `M ${x} ${y + h} V ${y + 70} H ${x + w} V ${y + h} Z`, 5));
+  o.strokes.push(stroke(g, `M ${x + w / 2 - 70} ${y + 70} V ${y} H ${x + w / 2 + 70} V ${y + 70}`, 5));
+  o.strokes.push(stroke(g, `M ${x + w / 2} ${y + 18} V ${y + 56} M ${x + w / 2 - 19} ${y + 37} H ${x + w / 2 + 19}`, 6, 'var(--acc)'));
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) o.strokes.push(stroke(g, rr(x + 36 + i * ((w - 72) / 3) + 10, y + 100 + j * 80, (w - 72) / 3 - 20, 50, 8), 4, 'var(--faint)'));
+  o.strokes.push(stroke(g, rr(x + w / 2 - 36, y + h - 86, 72, 86, 8), 5));
+  o.labels[it.id] = label(g, x + w / 2, y + h + 70, it.label, 42); return o; };
+
+// ---------- build ----------
+window.ready = (async () => {
+  S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json(); D = S.diagram;
+  const rs = document.documentElement.style; for (const k of ['paper', 'ink', 'mid', 'faint']) if (D[k]) rs.setProperty('--' + k, D[k]); if (D.accent) rs.setProperty('--acc', D.accent);
+  const W = $('world');
+  for (const it of D.items) { const g = sv('g', {}, W); if (!K[it.kind]) { ISSUES.push('unknown kind ' + it.kind); continue; } IT[it.id] = Object.assign(K[it.kind](g, it, IT), {it, g, t0: Infinity}); }
+  // beats: words shown (subtitles), timings, draw times, camera keys
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) throw new Error('unknown line ' + bt.id);
+    const shown = bt.text.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/\*/g, '').replace(/\|/g, ' ').trim().split(/\s+/);
+    const wt = j => { const wi = Math.round(j * (L.words.length - 1) / Math.max(1, shown.length - 1)); return (L.words[wi] || [L.start])[0]; };
+    const b = {bt, L, shown, wt, labels: bt.labels || [], take: bt.takeaway || ''}; BEATS.push(b);
+  }
+  BEATS.forEach((b, i) => { b.a = b.L.start; b.b = i + 1 < BEATS.length ? BEATS[i + 1].L.start : TL.end_start; });
+  for (const b of BEATS) {
+    // camera: move starts 0.4 s before the line, lands 0.5 s into it; extra keys by word index
+    for (const [wi, x, y, z] of (b.bt.cams || [])) { const t = wi ? b.wt(wi) - .4 : b.a - .4; CAM.push({t, x, y, z}); }
+    const settle = (b.bt.cams || []).length ? b.a + .55 : b.a;
+    for (const [wi, id] of (b.bt.draw || [])) { const [base, part] = id.split('.'); const o = IT[base]; if (!o) { ISSUES.push('draw: unknown ' + id); continue; }
+      let t = Math.max(settle, b.wt(wi)); for (const [wj, x] of (b.bt.cams || [])) if (wj && wj <= wi) t = Math.max(t, b.wt(wj) + .55);
+      if (part) { o.bars[part].t0 = t; o.t0 = Math.min(o.t0, t); } else o.t0 = Math.min(o.t0, t); }
+    // label budget: ≤ 7 words with the subtitle chunk
+    b.lw = b.labels.reduce((n, id) => { const [base, part] = id.split('.'); const o = IT[base]; const el = o && o.labels[id]; if (!el) { ISSUES.push('label: unknown ' + id); return n; }
+      return n + words(el.textContent) + (o.bars && o.bars[part] ? 1 : 0); }, 0) + (b.take ? words(b.take) : 0);   // a bar's name also shows its value
+    b.chunk = clamp(7 - b.lw, 2, 4); if (b.lw + b.chunk > 7) ISSUES.push(`beat ${b.bt.id}: ${b.lw} label words + ${b.chunk} subtitle words > 7`);
+    b.chunks = []; for (let j = 0; j < b.shown.length; j += b.chunk) b.chunks.push({w: b.shown.slice(j, j + b.chunk).join(' '), t: b.wt(j)});
+  }
+  CAM.sort((p, q) => p.t - q.t);
+  // bars that are drawn part by part: the frame of the chart appears with its first bar
+  END = TL.total; $('handle').textContent = S.handle || '';
+  await document.fonts.ready; await Promise.all(['500', '800'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش AI')));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  window.SCENES = [{t0: 0, t1: END, type: 'diagram', bg: 'light', sfx: []}];
+  seek(0);
+})();
+
+// camera at time t: hold with a slow 3% push; between keys pull back, travel, push in (expo in-out)
+function camAt(t) {
+  let i = 0; for (let k = 0; k < CAM.length; k++) if (t >= CAM[k].t) i = k;
+  const c = CAM[i], n = CAM[i + 1], dur = .95;
+  if (t < CAM[0].t) return {x: CAM[0].x, y: CAM[0].y, z: CAM[0].z * .985, v: 0};
+  const k = P(t, c.t, c.t + dur), prev = CAM[i - 1] || c;
+  if (k < 1 && i > 0) { const e = E.io(k), dip = Math.sin(Math.PI * k) * .16; const z = lerp(prev.z, c.z, e) * (1 - dip);
+    return {x: lerp(prev.x, c.x, e), y: lerp(prev.y, c.y, e), z, v: Math.sin(Math.PI * k)}; }
+  const hold = Math.max(0, t - (c.t + dur)), span = n ? n.t - (c.t + dur) : 6;
+  return {x: c.x, y: c.y, z: c.z * (1 + .03 * E.s(clamp(hold / Math.max(.5, span)))), v: 0};
+}
+function seek(t) {
+  if (!BEATS.length) return;
+  const c = camAt(t), W = $('world');
+  W.setAttribute('transform', `translate(${540 - c.x * c.z} ${960 - c.y * c.z}) scale(${c.z})`);
+  $('svg').style.filter = c.v > .15 ? `blur(${(c.v * 2.2).toFixed(2)}px)` : '';   // stands in for the prompt's subframe motion blur on fast moves
+  let b = BEATS[0]; for (const x of BEATS) if (t >= x.a - .3) b = x;
+  const active = new Set(b.labels), nextA = BEATS[BEATS.indexOf(b) + 1];
+  // items draw themselves once, then stay: the diagram layout never reshuffles
+  for (const [id, o] of Object.entries(IT)) {
+    const k = E.p3(P(t, o.t0, o.t0 + (o.it.kind === 'hospital' || o.it.kind === 'ring' ? 1.3 : .8)));
+    o.g.style.display = t >= o.t0 ? 'block' : 'none';
+    o.strokes.forEach((s, i) => { const kk = clamp(k * (1 + o.strokes.length * .06) - i * .06); s.setAttribute('stroke-dashoffset', 1 - kk); });
+    o.fills.forEach(f => f.setAttribute('opacity', o.it.kind === 'core' ? (k * .14) : clamp(k * 1.4 - .4)));
+    if (o.flow) { const p = clamp((t - o.t0 - .8) / .3); o.flow.setAttribute('opacity', p * .85); o.flow.setAttribute('stroke-dashoffset', -(t - o.t0) * 60); }
+    if (o.it.kind === 'stamp') { const s = lerp(1.35, 1, E.o(P(t, o.t0, o.t0 + .35))); o.sg.setAttribute('transform', `translate(${o.it.x} ${o.it.y}) rotate(-8) scale(${s})`); }
+    if (o.dots) o.dots.forEach((d, i) => d.setAttribute('r', 11 * E.o(P(t, o.t0 + .3 + i * .08, o.t0 + .6 + i * .08))));
+    if (o.mark) o.mark.setAttribute('opacity', clamp((t - o.t0 - .4) / .3));
+    if (o.bars) for (const [bid, br] of Object.entries(o.bars)) { const G = o.geom; const kb = E.p3(P(t, br.t0 ?? Infinity, (br.t0 ?? Infinity) + 1.4));
+      br.tr.setAttribute('opacity', t >= o.t0 ? clamp((t - o.t0) / .3) : 0);
+      const w = G.w * br.v / 100 * kb; br.bar.setAttribute('x', G.x + G.w - w); br.bar.setAttribute('width', Math.max(0, w));
+      br.val.textContent = (br.t0 !== undefined && t >= br.t0) ? (Math.round(br.v * kb) + '').replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]) + '٪' : '';
+      br.val.setAttribute('x', G.x + G.w - w - 70); br.val.setAttribute('opacity', br.nm.getAttribute('opacity')); }
+    for (const [key, el] of Object.entries(o.labels)) { if (key.endsWith('.val')) continue;   // a label shows only in beats that name it, after its thing is drawn
+      const on = active.has(key) && t >= o.t0 + .35 && (!key.includes('.') || !o.bars || (o.bars[key.split('.')[1]] && t >= (o.bars[key.split('.')[1]].t0 ?? Infinity)) || key.endsWith('.base'));
+      const fin = on ? clamp((t - Math.max(b.a, o.t0 + .35)) / .3) : 0, fout = nextA && active.has(key) ? 1 - clamp((t - (nextA.a - .35)) / .25) : 1;
+      el.setAttribute('opacity', (fin * fout).toFixed(3)); }
+    if (o.bars) for (const br of Object.values(o.bars)) br.val.setAttribute('opacity', br.nm.getAttribute('opacity'));
+  }
+  // subtitles: line by line, in chunks that keep the screen at ≤ 7 words
+  const sub = $('sub'); let ch = null; for (const x of b.chunks) if (t >= x.t - .05) ch = x;
+  const lineOn = t <= b.L.end + .35 && t >= b.a - .05;
+  if (ch && lineOn && !b.take) { if (sub._c !== ch) { sub._c = ch; sub.innerHTML = `<span>${ch.w}</span>`; } const k = E.o(P(t, ch.t - .05, ch.t + .2)); sub.firstChild.style.opacity = k; sub.firstChild.style.transform = `translateY(${(1 - k) * 14}px)`; }
+  else if (b.take && ch && lineOn) { if (sub._c !== ch) { sub._c = ch; sub.innerHTML = `<span style="font-size:46px;color:var(--mid)">${ch.w}</span>`; } }
+  else { sub.innerHTML = ''; sub._c = null; }
+  // payoff: the one-line takeaway over the complete diagram
+  const tk = $('take'), tb = BEATS.find(x => x.take); if (tb && t >= tb.a + .5) { if (!tk._s) { tk._s = 1; tk.innerHTML = tb.take.replace(/^(\S+\s\S+)/, '<b>$1</b>'); } const k = E.o(P(t, tb.a + .5, tb.a + 1.1)); tk.style.opacity = k; tk.style.transform = `translateY(${(1 - k) * 24}px)`; } else { tk.style.opacity = 0; tk._s = 0; tk.innerHTML = ''; }
+  $('handle').style.opacity = E.o(P(t, TL.end_start, TL.end_start + .6));
+}
+window.seek = seek;
+</script>
+</body>
+</html>
