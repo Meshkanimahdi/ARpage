@@ -34,7 +34,8 @@ samples were made with them. **Never change the core structure of a prompt.**
    - Implement it as an engine page `news-reel/pm/<id>.html` that follows the page contract (`window.ready`,
      `window.seek(t)` as a pure function of time, `START = 0`, `DURATION`, `SCENES`, `ISSUES`; data from
      `story.json` + `timeline.json`). See `news-reel/glass.html`.
-   - If `news-reel/pm/<id>.html` already exists, reuse it with new data.
+   - If `news-reel/pm/<id>.html` already exists (list: `news-reel/pm/README.md`; `089` is `news-reel/glass.html`),
+     reuse it with new data. After building a new page, add it to that list.
    - Follow the prompt's own `<build>`, `<gotchas>` and `<start>` steps. Where `<start>` says "show me stills
      first", render those stills and review them yourself (Read them). The publisher never waits for
      approval. Fix what is cluttered, off-beat, overlapping or hard to read, then render the film.
