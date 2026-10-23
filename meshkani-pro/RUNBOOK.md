@@ -442,12 +442,29 @@ JSON.
    JPEG, each < 8 MB, Drive `md5Checksum` == local md5, correct order and names.
 6. Write `qa` results into the slot JSON. Never pass QA just because files exist.
 
+### 1.7b Music under the carousel (user rule 2026-10-23)
+Every carousel post carries music. The Instagram API cannot attach library music to a carousel, so after
+QA each approved slide becomes a short video item, and one continuous track plays across them: slide k
+plays the track from k × 8 s. The image stays exactly the approved slide, with only a slow 3% push.
+1. Write `music_prompt` for this post: instrumental, matched to the news mood and sector, different from
+   the last 3 posts (tempo, instruments, energy). Examples: "calm hopeful felt piano and warm pads,
+   92 bpm"; "confident modern electronic pulse, light percussion, 110 bpm". No vocals and no famous
+   melodies. Record it in the slot file as `music {prompt, cost}`.
+2. `python3 meshkani-pro/scripts/slides_music.py --slides work/final/slide1.jpg work/final/slide2.jpg work/final/slide3.jpg --out work/final/music --prompt "<music_prompt>"`
+   This uses ElevenLabs `/v1/music`, audio only, with the key from env. It writes `slide1.mp4 … slide3.mp4`
+   (1080x1350, 8 s each, −16 LUFS) and `music.mp3`.
+3. Check one clip: extract its first and last frame and Read them; they match the approved slide. Listen
+   through the numbers in `slides_music.json`.
+4. Store `POST-NNN-slide-1.mp4 … -3.mp4` next to the JPEGs (§1.8). Record the Drive ids and md5 in the
+   slot file under `slides[].video`. The JPEGs stay the source of truth for QA and the sheet.
+
 ### 1.8 Storage (Drive + sheet)
 - Folder names: `YYYY-MM-DD_POST-NNN_<short-english-slug>` under
   `Images` (`post_images_folder_id`) for slides and under `استوری`
   (`story_images_folder_id`) for stories (`ensure_folder`). Raw model images and
   the dossier go to `_automation/packages/...`.
-- Files: `POST-NNN-slide-1.jpg … -3.jpg`, `POST-NNN-STORY-1.jpg … -3.jpg`.
+- Files: `POST-NNN-slide-1.jpg … -3.jpg`, `POST-NNN-slide-1.mp4 … -3.mp4` (music versions, §1.7b),
+  `POST-NNN-STORY-1.jpg … -3.jpg`.
 - Sheet (`LIVE` only), value input `USER_ENTERED`, times `YYYY-MM-DD HH:MM:SS`:
   - `Carousel Posts`: find the row whose column A equals the Content ID, else
     the first row after the last non-empty column A. Write A–S (Content ID,
@@ -500,9 +517,13 @@ links are never written to the sheet or logs. Remove sharing in §2.6.
 ### 2.3 Carousel
 Re-check Kill Switch first. Then, using `account: instagram_beath-billow`,
 `ig_user_id: 17841471767180096`:
-1. For slides 1→3 in order: `INSTAGRAM_POST_IG_USER_MEDIA` with `image_url`,
-   `is_carousel_item: true`. Save each id to `post.child_container_ids`
-   immediately (write the state file).
+1. For slides 1→3 in order: `INSTAGRAM_POST_IG_USER_MEDIA` with `video_url: public_image_url(<slide-k.mp4>)`
+   and `is_carousel_item: true` (the music versions, §1.7b; `share_public` them in §2.2). Save each id to
+   `post.child_container_ids` immediately (write the state file). Poll `INSTAGRAM_GET_POST_STATUS` for each
+   child until `FINISHED` (about 20 s apart, at most about 6 min in total, inside the window) before step 2.
+   If a child ends in `ERROR`, recreate that one child once. If it fails again, fall back to the image
+   children (`image_url` of the JPEGs) for the whole carousel, publish without music, and log
+   `music_fallback`. A post is never skipped because of music.
 2. `INSTAGRAM_POST_IG_USER_MEDIA` with `media_type: CAROUSEL`, `children` = the
    three ids in order, `caption` = the exact caption (raw `#`, not `%23`). Save
    `post.carousel_container_id`, set status `PUBLISHING`, set
@@ -514,7 +535,7 @@ Re-check Kill Switch first. Then, using `account: instagram_beath-billow`,
 5. Verify with `INSTAGRAM_GET_IG_MEDIA` (fields
    `id,caption,permalink,timestamp,username,media_type,children{media_url,media_type}`):
    username, `CAROUSEL_ALBUM`, caption equals the approved caption, three children
-   in order. Save permalink and `published_at`; status `PUBLISHED`.
+   in order (`VIDEO` children when the music versions were used). Save permalink and `published_at`; status `PUBLISHED`.
 6. Update the `Carousel Posts` row: Status `Published`, Actual Publish time,
    Published Post URL. Read back to confirm. If the sheet
    write fails, keep the state file as truth and retry only the sheet write.
