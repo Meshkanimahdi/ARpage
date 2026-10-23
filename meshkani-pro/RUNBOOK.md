@@ -271,6 +271,22 @@ slot file. Stories are `POST-NNN-STORY-1..3`.
 - Every number, name and claim must be in `allowed_claims`.
 
 ### 1.5 Design brief
+**Grid variety (user rule 2026-10-23).** Reel covers and post slide 1 are what the profile grid shows,
+so the page must never look uniform. Before designing a cover or slide 1:
+1. Look at the grid. Take the last 9 grid items (`INSTAGRAM_GET_IG_USER_MEDIA` with fields
+   `id,media_product_type,thumbnail_url,media_url,timestamp`; covers via `thumbnail_url`, carousels via
+   their first child, or the Drive files named in the slot files). Download them to `work/grid/`, then
+   Read them as one contact sheet.
+2. Pick a clearly different look from the last 3 grid items, and different from all of the last 9 in its
+   combination of palette and layout type. The look covers palette (dominant hues), light key
+   (dark ↔ light), layout type (big photo with a bottom headline, split screen, centred object on flat
+   colour, typographic poster, collage, close-up face…), headline position and type style. Alternate the
+   light key so the grid has rhythm. Record the choice in the slot file as
+   `design_fingerprint {palette[hex], key, layout, headline_pos}`.
+3. Check it: `python3 meshkani-pro/scripts/grid_check.py --new <cover.jpg or slide1.jpg> --prev work/grid/*.jpg --crop45`.
+   Exit 3 means it is too similar: change the palette, key or layout, then regenerate or re-render (at
+   most twice). Read the `_vs_grid.jpg` sheet before READY.
+
 Before any image, write `work/brief.json`: sector, mood/tone, palette (hex),
 image type (licensed real photo vs labelled concept image), Persian type style
 and weights, title/body hierarchy, where image vs text sits, a distinct
@@ -659,6 +675,8 @@ two-news reel in REEL_SPEC.md is retired.)
      for example «هوش مصنوعی *۲ برابر* پزشک‌ها؟» ("AI *twice* as good as doctors?") or
      «Walmart درش رو باز کرد، *Amazon* بست» ("Walmart opened its door, *Amazon* closed it"). Every word
      must be true to `allowed_claims`: a question for anything uncertain, never a false promise.
+   - **Grid variety:** apply the rule in §1.5 (last 9 grid items, `grid_check.py`, `design_fingerprint`).
+     The cover must differ clearly in colour and design type from the previous covers and slides.
    - Read both `cover.jpg` and `cover_grid.jpg`:
      - the headline is readable at phone-thumbnail size and the logo is crisp;
      - nothing important falls outside the 4:5 grid crop;
