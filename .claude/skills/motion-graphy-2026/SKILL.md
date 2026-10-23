@@ -1,9 +1,9 @@
 ---
-name: mothion-graphy-2026
+name: motion-graphy-2026
 description: "Catalog of 230 tested, approved motion-graphics prompts from Prompt Motion: product/UI films, explainers, kinetic type, 3D, showreels, editorial, music-driven, hand-drawn, story, pixel and stop-motion. Each has a title, use, mood, audience, trend fit and the full verbatim prompt. Use it BEFORE designing any reel, story animation, promo or motion graphic, especially for meshkani.pro. Pick the style that fits the news, keep the prompt's structure exactly, and change only timing, size/aspect ratio, duration and the topic-specific slots. Triggers: reel, Reels, motion graphics, موشن گرافیک, ریلز, animation, promo video, explainer video, product sting, showreel, kinetic typography."
 ---
 
-# mothion-graphy-2026: tested motion-graphics prompts
+# motion-graphy-2026: tested motion-graphics prompts
 
 Mahdi's rule (2026-10-23): before producing **any** reel, first consult this skill and choose, for the news and
 its content, the best motion-graphics style from this catalog. The prompts were tested and approved; professional

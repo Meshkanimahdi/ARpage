@@ -20,7 +20,7 @@ publish twice, never publish late, never publish unverified content.
 ## 0. Ground rules (both phases)
 
 - **Motion graphics (user rule 2026-10-23):** every reel's motion style comes from the skill
-  **mothion-graphy-2026** (`.claude/skills/mothion-graphy-2026/SKILL.md`, 230 tested prompts). Read
+  **motion-graphy-2026** (`.claude/skills/motion-graphy-2026/SKILL.md`, 230 tested prompts). Read
   it by path at the start of every REEL_PREPARE (a session started before the skill existed does not
   load it by itself). Pick the prompt that fits the news. Never change a prompt's structure; change only
   timing, size/aspect ratio, duration and the topic slots (SKILL.md, "What you may change").
@@ -585,7 +585,7 @@ two-news reel in REEL_SPEC.md is retired.)
    (only if confirmed) or paraphrase, allowed claims, field, selection reason.
 
 ### 4.3 Script, voice, elements
-0. **Motion style first (mandatory).** Follow the workflow in `.claude/skills/mothion-graphy-2026/SKILL.md`:
+0. **Motion style first (mandatory).** Follow the workflow in `.claude/skills/motion-graphy-2026/SKILL.md`:
    - read `references/index.md` and shortlist 3 prompts for this story;
    - choose one, using the category table, `insights.json → leaders.motion_category` and the skill's
      rotation rules;

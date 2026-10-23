@@ -188,8 +188,8 @@ photos, refined 3D renders with real materials, neon glass. Never flat clipart o
 ## 8. Visuals per beat
 
 ### 8.0 Engines, style rotation and motion craft (user rules 2026-10-22 — read before designing any reel)
-**Since 2026-10-23 the motion style of every reel comes from the skill `mothion-graphy-2026`**
-(`.claude/skills/mothion-graphy-2026/SKILL.md`, 230 tested prompts; RUNBOOK §4.3 step 0). Never change a
+**Since 2026-10-23 the motion style of every reel comes from the skill `motion-graphy-2026`**
+(`.claude/skills/motion-graphy-2026/SKILL.md`, 230 tested prompts; RUNBOOK §4.3 step 0). Never change a
 prompt's structure; change only timing, size/aspect ratio, duration and the topic slots. The engines
 below are our own and serve only as fallbacks (`glass.html` is prompt 089 of the catalog). Their motion
 craft rules still apply to every page built from a catalog prompt, unless the prompt says otherwise.

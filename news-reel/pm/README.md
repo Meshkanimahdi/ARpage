@@ -1,4 +1,4 @@
-# Built motion-graphics prompts (skill mothion-graphy-2026)
+# Built motion-graphics prompts (skill motion-graphy-2026)
 
 One engine page per catalog prompt, so later reels can reuse it with new data (`story.json` + `timeline.json`).
 Page contract: see `news-reel/glass.html` (`window.ready`, pure `window.seek(t)`, `START = 0`, `DURATION`, `SCENES`

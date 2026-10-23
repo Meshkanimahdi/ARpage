@@ -164,7 +164,7 @@
     "explore_share": 0.25
   },
   "motion": {
-    "skill": ".claude/skills/mothion-graphy-2026/SKILL.md",
+    "skill": ".claude/skills/motion-graphy-2026/SKILL.md",
     "built_pages": "news-reel/pm/README.md"
   }
 }
