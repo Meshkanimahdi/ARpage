@@ -75,6 +75,19 @@ samples were made with them. **Never change the core structure of a prompt.**
    - The render runs through `news-reel/reel_render.mjs` at 30 fps.
    - The `<start>` questions are answered from the dossier; nobody is asked.
 
+## Priority rule: realistic elements and real logos (user rule 2026-10-23)
+This rule overrides a prompt's style lines. Every prompt's structure, shots, timing logic and motion rules
+stay as they are, but its *visual vocabulary* yields to realism:
+- Objects in a scene are realistic, stylish, premium elements: real photos, or prompt-engineered
+  photoreal cut-outs (STORY_SPEC §8.2). This applies even when the prompt says "flat", "line icons",
+  "no stock icons" or "clean diagrams". A diagram can still be a diagram, but its nodes, products and
+  places are realistic cut-outs, not drawn pictograms.
+- Real icons and **the real logo** of every company, startup, product, app or lab the story names are
+  mandatory, both in the reel and on the cover. Sources and handling: RUNBOOK §4.3 step 2. Never generate
+  or redraw a logo.
+- If a prompt bans something this rule requires (for example "no logos" or "no photos"), this rule wins.
+  Note it in `motion_prompt.md` as `- overridden by user rule (realism/logo): …`.
+
 ## What you must never change
 The order and role of the sections and shots, the story beats, the through-line or continuity idea, the
 transition grammar (match cuts, morphs, whips, blur dissolves), the camera language, the easing and motion

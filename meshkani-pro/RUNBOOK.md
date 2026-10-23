@@ -608,7 +608,21 @@ two-news reel in REEL_SPEC.md is retired.)
    Every element and scene image is realistic and premium, never a simple icon as the lead visual.
    Each prompt follows the 12-point prompt-engineering checklist in STORY_SPEC §8.2.
 2. Line engine: real photos of people/products → `python3 news-reel/lineart.py` into `work/story/el/*.svg`;
-   no image generation is needed. For story.html looks:
+   no image generation is needed. Realistic elements and real logos (user rule 2026-10-23,
+   skill "Priority rule"):
+   - **The real logo of the news subject is mandatory** (user rule 2026-10-23). A startup, company,
+     product, app or lab in the news appears with its own official logo or app icon: on the cover, and
+     wherever the story names it in the reel.
+     - Sources, in this order: the official brand or press-kit page; the logo file (SVG/PNG) or
+       `apple-touch-icon` on the company's own site; the company's official social avatar; Google's
+       favicon service `https://www.google.com/s2/favicons?domain=<domain>&sz=256` (app icons only).
+       Fetch them through Drive (`GOOGLEDRIVE_UPLOAD_FROM_URL`) when WebFetch is blocked. Wikimedia
+       blocks the Drive fetcher.
+     - Never generate, redraw, recolour, crop into or distort a logo, and never ask an image model to draw
+       one. Place the real file as it is, on a clean white or brand-colour chip.
+     - Save the source URL in `elements.json → logos[]` and in the slot file. If no official file can be
+       found, use the company name in Latin type instead, never a fake mark.
+   For story.html looks:
    `work/story/elements.json`: every object the beats need, in **≤ 3 sheets of ≤ 9 items** (user rule —
    no per-element image calls). `python3 news-reel/sprite_sheet.py --dir work/story`; Read the sheet
    previews; regenerate a sheet at most twice. Real products: refs per §1.5.1. Real people: real photos
@@ -624,8 +638,35 @@ two-news reel in REEL_SPEC.md is retired.)
    not match its sentence, distorted people/products. Max 3 rounds.
 2. `--mode=video` in the background (run it with a timeout of at least 60 min), then `python3 news-reel/reel_assemble.py --dir work/story`:
    `reel.json` must show 55–92 s, −15.5…−12 LUFS, true peak ≤ −1 dBFS; H.264 1080×1920 30 fps + AAC.
-3. Extract frames at 1 s, the middle and the end card and Read them; Read `cover.jpg` (it should
-   show the hook text; set `cover_t` in story.json if not).
+3. Extract frames at 1 s, the middle and the end card and Read them.
+3b. **Designed cover (user rule 2026-10-23).** Every reel gets its own cover, not a video frame. It works
+   like a YouTube thumbnail: very eye-catching and on trend, with a headline that makes the viewer stop.
+   - Background: one `python3 meshkani-pro/scripts/gen_image.py --kind story` image (≈ $0.05), written
+     with the §8.2 prompt-engineering checklist. It shows one strong focal subject in the upper 60% with
+     dramatic light and a clear emotion; the lower 40% stays dark or calm for the headline. No text,
+     letters, numbers or logos in the image. Pass the real product photo as `--ref` when there is one.
+   - `work/story/cover.json`:
+     - `bg`
+     - `logo`: the real logo, §4.3 step 2
+     - `logo_label`: the brand name, if the logo is an icon only
+     - `kicker`: 1–3 words, such as «فوری», «مطالعه‌ی Science», «بی‌سابقه»
+     - `title`: 3–7 words in Persian; one or two `*accent*` words; at most one `|` line break
+     - `sub`: optional, ≤ 6 words
+     - `accent` / `ink`: colours
+   - Render with `node news-reel/cover_render.mjs --dir=work/story`, which writes `cover.jpg` and the 4:5
+     preview `cover_grid.jpg`. Exit 5 means a missing image or a headline that is too long; shorten it.
+   - Headline formula: curiosity gap + concrete stakes. Use a number, a contrast, a "you" or a question,
+     for example «هوش مصنوعی *۲ برابر* پزشک‌ها؟» ("AI *twice* as good as doctors?") or
+     «Walmart درش رو باز کرد، *Amazon* بست» ("Walmart opened its door, *Amazon* closed it"). Every word
+     must be true to `allowed_claims`: a question for anything uncertain, never a false promise.
+   - Read both `cover.jpg` and `cover_grid.jpg`:
+     - the headline is readable at phone-thumbnail size and the logo is crisp;
+     - nothing important falls outside the 4:5 grid crop;
+     - the cover differs from the last 3 covers (layout, colour, kicker).
+
+     Regenerate the background at most twice. Record `cover` {prompt, title, kicker, logo source} in
+     the slot file and the Reels Notes column. Insights (§6) track whether a cover's headline type wins
+     reach.
 4. `python3 news-reel/story_cut.py --dir work/story` → `story.mp4` (≤ 60 s) for the Story share.
 
 ### 4.5 Storage, caption, sheet

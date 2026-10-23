@@ -286,6 +286,11 @@ when each row lights up — sync it to the narration); `huge: true` for one gian
 word; `iris: true` for a circle wipe. Every beat changes something on screen.
 
 ### 8.2 Elements and image prompts (user rule 2026-10-23)
+**Real logos are mandatory.** Every company, startup, product, app or lab the story names appears with its
+own official logo or app icon (sources and handling: RUNBOOK §4.3 step 2). Never generate or redraw a logo.
+Realistic elements and logos win over any prompt's "flat / icon / no-logo" style line (skill
+motion-graphy-2026, "Priority rule"). Every reel also gets a designed thumbnail-style cover (RUNBOOK §4.4
+step 3b).
 **Realistic elements, not simple icons.** We generate with the best image models, so every object in a
 motion graphic is a realistic, stylish, professional element: a real-looking phone with a glowing UI,
 a brushed-metal server, a frosted-glass chat bubble, a silk dress on a mannequin, a gold coin stack. Plain
