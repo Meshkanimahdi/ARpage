@@ -104,6 +104,18 @@
   .endbg { position: absolute; inset: 0; background: radial-gradient(700px 520px at 50% 50%, #272729, #0b0b0d 70%, #020204); }
   .wm { position: absolute; left: 540px; top: 960px; font: 600 120px Inter; color: #F3F3F5; letter-spacing: -2px; white-space: nowrap; direction: ltr;
         text-shadow: 0 0 8px rgba(255,255,255,.55), 0 0 60px rgba(160,200,255,.35), 0 0 140px rgba(120,170,255,.25); }
+  /* real logos */
+  img.logo { width: 62%; height: 62%; border-radius: 24%; object-fit: cover; display: block; }
+  .appic img.logo { width: 100%; height: 100%; border-radius: 28%; }
+  .mbar .mk img.logo { width: 52px; height: 52px; border-radius: 12px; }
+  .chips { display: flex; gap: 18px; direction: rtl; }
+  .chip { display: inline-flex; align-items: center; gap: 14px; background: #fff; border-radius: 40px; padding: 10px 26px 10px 12px; box-shadow: 0 6px 20px rgba(30,47,82,.12); direction: ltr; }
+  .chip img { width: 56px; height: 56px; border-radius: 14px; object-fit: cover; }
+  .chip b { font: 600 32px Inter; color: #111; }
+  .pg .chips { position: absolute; right: 110px; top: 1080px; }
+  .card .chips { position: absolute; left: 50px; top: 56px; }
+  .card .chip img { position: static; width: 56px; height: 56px; border-radius: 14px; }
+  .card .chip b { display: inline; font: 600 32px Inter; line-height: 1; color: #111; }
   /* caption */
   #cap { position: absolute; left: 60px; right: 60px; bottom: 150px; display: flex; justify-content: center; z-index: 40; pointer-events: none; }
   #cap > div { max-width: 920px; padding: 22px 38px; border-radius: 44px; background: rgba(255,255,255,.66); backdrop-filter: blur(26px) saturate(1.4); -webkit-backdrop-filter: blur(26px) saturate(1.4);
@@ -143,7 +155,10 @@ function blur(el, x, y = x, round = false) {
   if (round || Math.abs(x - y) < .01) { el.style.filter = `blur(${x}px)`; return; }
   if (!el._g) dfilter(el); el._g.setAttribute('stdDeviation', `${x.toFixed(2)} ${y.toFixed(2)}`); el.style.filter = `url(#${el._fid})`;
 }
-const MARK = c => `<svg viewBox="0 0 64 64" fill="none" stroke="${c}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M14 22h36l-3 30H17z"/><path d="M24 22v-4a8 8 0 0 1 16 0v4"/><path d="M38 33l2.2 4.8 4.8 2.2-4.8 2.2L38 47l-2.2-4.8L31 40l4.8-2.2z" fill="${c}" stroke-width="2"/></svg>`;
+const DRAWN = c => `<svg viewBox="0 0 64 64" fill="none" stroke="${c}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M14 22h36l-3 30H17z"/><path d="M24 22v-4a8 8 0 0 1 16 0v4"/><path d="M38 33l2.2 4.8 4.8 2.2-4.8 2.2L38 47l-2.2-4.8L31 40l4.8-2.2z" fill="${c}" stroke-width="2"/></svg>`;
+// the mark is a topic slot: the real logo file (glass.logo) when the story names a brand, never redrawn (user rule 2026-10-23)
+const MARK = c => S && S.glass && S.glass.logo ? `<img class="logo" src="${url(S.glass.logo)}">` : DRAWN(c);
+const CHIPS = a => (a || []).length ? `<div class="chips">${a.map(x => `<span class="chip"><img src="${url(x.src)}"><b>${esc(x.label || '')}</b></span>`).join('')}</div>` : '';
 
 // ---------- cursor (shared by S1, S3, S4) ----------
 const CUR = $('cursor');
@@ -158,7 +173,7 @@ SH.header = {N: 72, stretch: [24, 46], async build(sc, S) {
   const bg = h('div', '', 'position:absolute;inset:0'); sc.append(bg);
   const cam = h('div', 'cam'); sc.append(cam);
   const win = h('div', 'win', '', `<div class="band"></div><div class="search">${await icon('search')}<span>${esc(G.search || 'جست‌وجو')}</span></div>
-    <div class="col"><div>${await icon('shopping-bag')}</div><div style="opacity:.45">${await icon('message-circle')}</div></div>
+    <div class="col"><div>${await icon((G.col_icons || [])[0] || 'shopping-bag')}</div><div style="opacity:.45">${await icon((G.col_icons || [])[1] || 'message-circle')}</div></div>
     <div class="pcard"><img src="${url(G.hero)}"><b>${esc(G.card_title || '')}</b><i>${esc(G.card_sub || '')}</i></div>`);
   cam.append(win);
   const ring = h('div', 'ring'); cam.append(ring);
@@ -232,7 +247,7 @@ SH.prompt = {N: 58, stretch: [20, 49], async build(sc, S) {
       <div class="dot" style="left:594px;background:#2F6BFF"></div><div class="dot" style="left:643px;background:#3CC8F0"></div><div class="dot" style="left:691px;background:#4ED6A0"></div>
       <div class="clock">${esc(G.clock || 'Fri Oct 23  9:41 AM')}</div>`);
   mb.querySelectorAll('span > svg').forEach(s => { s.style.position = 'static'; s.style.width = '34px'; s.style.height = '34px'; s.parentElement.style.top = '14px'; });
-  mb.querySelector('.mk svg').style.cssText = 'position:static;width:52px;height:52px';
+  const mk = mb.querySelector('.mk svg'); if (mk) mk.style.cssText = 'position:static;width:52px;height:52px';
   cam.append(mb);
   const box = h('div', 'gbox', '', `<div class="tx"><span class="t"></span><span class="caret"></span></div><div class="ics">${await icon('plus', 2)}${await icon('mic', 2)}${await icon('image', 2)}</div><div class="send">${await icon('arrow-up', 2.6)}</div>`);
   cam.append(box);
@@ -261,7 +276,7 @@ SH.page = {N: 28, stretch: [21, 27], async build(sc, S) {
   const G = S.glass || {};
   const pg = h('div', 'pg', '', `<div class="crumb">${(G.crumb || []).map((c, i, a) => i === a.length - 1 ? `<b>${esc(c)}</b>` : esc(c)).join('  ›  ')}</div><h1>${esc(G.page_title || '')}</h1>
     <div class="meta">${esc(G.page_meta || '')}</div><div class="body">${esc(G.page_body || '').replace(/\*([^*]+)\*/g, '<span class="k">$1</span>')}</div>
-    ${G.controls ? `<div class="ctl"><div class="row"><span>${esc(G.controls[0])}</span><span class="tg"></span></div><div class="row"><span>${esc(G.controls[1])}</span><span class="sl"><b></b><i></i></span></div></div>` : ''}`);
+    ${CHIPS(G.page_logos)}${G.controls ? `<div class="ctl"><div class="row"><span>${esc(G.controls[0])}</span><span class="tg"></span></div><div class="row"><span>${esc(G.controls[1])}</span><span class="sl"><b></b><i></i></span></div></div>` : ''}`);
   sc.append(pg); const fl = h('div', 'flash'); sc.append(fl);
   return {pg, fl, k: pg.querySelector('.k'), sl: pg.querySelector('.sl')};
 }, layout(o) { const r = o.k ? o.k.getBoundingClientRect() : null; o.kx = r ? r.left + r.width * .45 : 500; o.ky = r ? r.bottom + 18 : 1100; },
@@ -279,7 +294,7 @@ SH.card = {N: 28, stretch: [18, 20], async build(sc, S, shots) {
   const G = S.glass || {};
   const under = shots.find(x => x.name === 'page');   // the page stays behind the card, blurred
   const back = under ? under.sc.querySelector('.pg').cloneNode(true) : h('div'); back.style.transform = ''; sc.append(back);
-  const card = h('div', 'card', '', `<div class="grab"></div><img src="${url(G.card_img || G.hero)}"><div class="cp"><b>${esc(G.card_caption || '')}</b><i>${esc(G.card_caption_sub || '')}</i></div>`); sc.append(card);
+  const card = h('div', 'card', '', `<div class="grab"></div><img src="${url(G.card_img || G.hero)}">${CHIPS(G.card_logos)}<div class="cp"><b>${esc(G.card_caption || '')}</b><i>${esc(G.card_caption_sub || '')}</i></div>`); sc.append(card);
   return {back, card};
 }, render(n, o, r) {
   const top = (n <= 18 ? kf(n, [[0, 642], [4, 456], [9, 395], [13, 369], [18, 348]]) : 348 - (n - 18) * 4) + OY - 560 - r * 22;
@@ -374,7 +389,7 @@ window.ready = (async () => {
   for (const sh of SHOTS) sh.o = await sh.def.build(sh.sc, S, SHOTS);
   // captions: the narration, word by word
   for (const b of BEATS) { const raw = b.bt.text.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/\|/g, ' ').trim().split(/\s+/); let open = false;
-    b.words = raw.map((w, j) => { const st = w.startsWith('*'), en = /\*[،.,!؟?:…»"]*$/.test(w) && w.length > 1, k = open || st; open = en ? false : (st ? true : open);
+    b.words = raw.map((w, j) => { const st = w.startsWith('*'), en = /\*[،؛.,!؟?:…»"]*$/.test(w) && w.length > 1, k = open || st; open = en ? false : (st ? true : open);
       const wi = Math.round(j * (b.L.words.length - 1) / Math.max(1, raw.length - 1)); return {w: w.replace(/\*/g, ''), k, t: (b.L.words[wi] || [b.L.start])[0]}; }); }
   await document.fonts.ready; await Promise.all(['500', '800'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش AI'))); await Promise.all(['400', '500', '600', '700'].map(w => document.fonts.load(`${w} 40px Inter`, 'AI')));
   await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('image failed: ' + i.src))));

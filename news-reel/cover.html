@@ -27,6 +27,12 @@
   #title b { color: var(--ink); background: var(--acc); padding: 0 .16em .08em; border-radius: .14em; text-shadow: none; display: inline-block; transform: rotate(-1.5deg); }
   #sub { position: absolute; left: 80px; right: 80px; bottom: 360px; text-align: center; font: 600 44px Vaz; color: rgba(255,255,255,.92); direction: rtl; }
   #brand { position: absolute; left: 0; right: 0; bottom: 305px; text-align: center; font: 600 30px Vaz; color: rgba(255,255,255,.7); letter-spacing: 2px; direction: ltr; }
+  /* light key (cover.json "light": true): white shade, dark headline — lets covers alternate key on the grid */
+  #c.light #shade { background: linear-gradient(180deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.55) 54%, rgba(255,255,255,.94) 72%, #fff 100%); }
+  #c.light #title { color: #111; text-shadow: 0 2px 0 rgba(255,255,255,.6); }
+  #c.light #title b { color: #fff; }
+  #c.light #sub { color: rgba(17,17,17,.85); }
+  #c.light #brand { color: rgba(17,17,17,.55); }
 </style>
 </head>
 <body>
@@ -39,7 +45,7 @@ window.ISSUES = [];
 window.ready = (async () => {
   const C = await (await fetch(url('cover.json'))).json();
   if (C.accent) document.documentElement.style.setProperty('--acc', C.accent); if (C.ink) document.documentElement.style.setProperty('--ink', C.ink);
-  $('bg').src = url(C.bg);
+  $('bg').src = url(C.bg); if (C.light) $('c').classList.add('light');
   if (C.kicker) $('kicker').textContent = C.kicker; else $('kicker').remove();
   if (C.logo) $('logo').innerHTML = `<img src="${url(C.logo)}">${C.logo_label ? `<span>${esc(C.logo_label)}</span>` : ''}`; else $('logo').remove();
   $('title').innerHTML = esc(C.title).replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>');
