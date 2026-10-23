@@ -1,41 +1,30 @@
-# راه‌اندازی یک‌باره (برای مهدی) — حدود ۳۰ تا ۴۵ دقیقه
+# راه‌اندازی یک‌باره (مسیر Composio، بدون اپ Meta) — حدود ۲۰ دقیقه
 
-هیچ کلیدی را در چت ننویس. همه‌چیز فقط در داشبورد هاست (Cloudflare) و Meta وارد می‌شود.
+هیچ کلیدی را در چت ننویس. کلیدها فقط در داشبورد Cloudflare (بخش Secret) وارد می‌شوند.
 
-## الف) اپ Meta
-1. به developers.facebook.com برو → My Apps → Create App → نوع **Business**.
-2. محصول **Instagram** را اضافه کن، گزینه **API setup with Instagram login**.
-3. حساب `meshkani.pro` را (باید Professional باشد) اضافه کن و **Generate token** بزن. توکن را فقط در مرحله «ج» استفاده کن.
-4. در **App settings → Basic** مقدار **App Secret** را ببین (فقط برای مرحله «ج»).
-5. مجوزها: `instagram_business_basic`، `instagram_business_manage_comments`، `instagram_business_manage_messages`.
-6. تا وقتی اپ در حالت Development است فقط حساب‌های Tester (خودت و تیمت) کار می‌کنند. برای کاربران واقعی باید **App Review** و **Live mode** بگیری (مجوزهای بالا را درخواست کن؛ ویدیوی کوتاه از کارکرد لازم است). تست‌های من با حساب خودت انجام می‌شود.
+## واقعیت درباره سرعت
+Composio برای کامنت و دایرکت اینستاگرام **تریگر push** ندارد (پیدا نکردم؛ اکشن وبهوک آن هم یک اپ Live در Meta می‌خواهد). پس سرویس هر ~۱۰ ثانیه صندوق را چک می‌کند (poll). نتیجه:
+- تأخیر واقعی از لحظه نوشتن کامنت تا انتشار پاسخ: میانگین حدود ۷–۸ ثانیه، p95 حدود ۱۲–۱۴ ثانیه (نصف فاصله poll + ۲ تا ۳ ثانیه پردازش).
+- **زیر ۵ ثانیه روی این مسیر تضمین نمی‌شود.** poll هر ۲ ثانیه ممکن است ولی سهمیه Composio و محدودیت اینستاگرام را می‌سوزاند و پیشنهادش نمی‌کنم.
+- اگر روزی اپ Meta گرفتی، همین کد با `TRANSPORT="meta"` وبهوک واقعی دارد و به ~۳ ثانیه می‌رسد.
+- هر دور poll روی حساب بی‌صدا فقط ۲ تماس Composio است (کامنت فقط وقتی تعداد کامنت پست عوض شود خوانده می‌شود).
 
-## ب) Cloudflare
-1. در dash.cloudflare.com اکانت (رایگان کافی است) بساز.
-2. KV: Storage → KV → Create namespace با نام `RESPONDER_KV`؛ شناسه‌اش را به من بگو (شناسه مخفی نیست).
-3. Workers → Create → Worker با نام `meshkani-responder`؛ کد را من از ریپو دیپلوی می‌کنم (مرحله بعد از اتمام کارهای شما).
+## ۱) کلیدها
+1. **COMPOSIO_API_KEY**: وارد dashboard.composio.dev شو ← Settings ← API Keys ← یک کلید جدید برای همین سرویس بساز و کپی کن.
+2. **ANTHROPIC_API_KEY**: console.anthropic.com ← API Keys ← Create Key (نام: meshkani-responder).
+3. **ADMIN_TOKEN**: یک رشته تصادفی بلند (۳۲+ حرف) که خودت می‌سازی؛ برای گزارش‌گیری و روشن/خاموش کردن poller.
+4. **شناسه اکانت Composio برای meshkani.pro**: در Composio ← Connected accounts ← اکانت اینستاگرام `meshkani.pro` ← شناسه‌اش (شبیه `ca_...`). توجه: اکانت‌های `mirror.dev` و `mahdi.meshkani` هم وصل‌اند؛ سرویس فقط با شناسه صریح کار می‌کند و اگر اکانت اشتباه باشد خودش متوقف می‌شود. این شناسه محرمانه نیست؛ همین‌جا به من بگو.
 
-## ج) متغیرهای محرمانه (Settings → Variables and Secrets → Secret)
-| نام | مقدار |
-|---|---|
-| `ANTHROPIC_API_KEY` | کلید API آنتروپیک (یک کلید مخصوص همین سرویس بساز) |
-| `IG_ACCESS_TOKEN` | توکن مرحله الف-۳ (long-lived؛ هر ~۶۰ روز تمدید) |
-| `IG_APP_SECRET` | App Secret مرحله الف-۴ |
-| `WEBHOOK_VERIFY_TOKEN` | یک رشته تصادفی بلند که خودت می‌سازی |
-| `ADMIN_TOKEN` | یک رشته تصادفی بلند دیگر (برای گزارش‌گیری من) |
+## ۲) Cloudflare
+1. در dash.cloudflare.com اکانت رایگان بساز (Durable Objects روی پلن رایگان با SQLite کار می‌کند؛ اگر خطای پلن داد، پلن Workers Paid حدود ۵ دلار در ماه).
+2. Storage & Databases ← KV ← Create namespace با نام `RESPONDER_KV` ← شناسه را به من بگو.
+3. Workers & Pages ← Create ← **Import a repository** ← ریپوی `ARpage`، شاخه `claude/ecstatic-davinci-1lqsug`، **Root directory = `responder`**، Build command خالی، Deploy command `npx wrangler deploy`.
+4. بعد از اولین دیپلوی: Worker ← Settings ← Variables and Secrets ← سه Secret بالا را به‌صورت **Secret** وارد کن: `COMPOSIO_API_KEY`، `ANTHROPIC_API_KEY`، `ADMIN_TOKEN`.
 
-## د) وبهوک
-Meta → Instagram → API setup → Webhooks:
-- Callback URL: `https://<آدرس-worker>/webhook` (بعد از دیپلوی به تو می‌دهم)
-- Verify token: همان `WEBHOOK_VERIFY_TOKEN`
-- Subscribe به فیلدهای **comments** و **messages** برای `meshkani.pro`.
+## ۳) بعد از شما
+من شناسه KV و شناسه اکانت را در `wrangler.toml` می‌گذارم، با `DRY_RUN=1` (فقط تصمیم و لاگ) poller را روشن می‌کنم، با یک کامنت تست از حساب شخصی‌ات زمان واقعی را اندازه می‌گیرم و عدد واقعی را به تو می‌گویم. فقط بعد از تأیید تو `DRY_RUN=0` می‌شود.
 
-## بعد از شما
-من دیپلوی می‌کنم (حالت `DRY_RUN=1`: فقط تصمیم و لاگ، بدون پاسخ واقعی)، با کامنت تست از حساب Tester تأخیر را اندازه می‌گیرم، و فقط بعد از تأیید زیر ۵ ثانیه `DRY_RUN=0` را روشن می‌کنم.
-
-## هزینه و تأخیر (تخمین، بعد از تست واقعی دقیق می‌شود)
-- تأخیر: وبهوک تا پاسخ منتشرشده معمولاً ۲ تا ۳٫۵ ثانیه (مدل با تلاش کم و بدون thinking ≈ ۱–۲ ثانیه + ارسال اینستاگرام). هدف p95 ≤ ۵ ثانیه؛ هر رویداد زمانش لاگ می‌شود.
-- هزینه به ازای ۱۰۰۰ پاسخ: حدود **۳ تا ۸ دلار** (Sonnet 5.5: ورودی ۲$ و خروجی ۱۰$ به ازای هر میلیون توکن؛ پرامپت سیستم کش می‌شود، اما در ترافیک کم کش گاهی منقضی می‌شود و سمت بالای بازه را می‌دهد). مورد نادیده‌گرفته‌شده فقط هزینه ورودی دارد و موارد پیش‌فیلتر شده رایگان‌اند. Cloudflare Workers و KV در حجم این پیج رایگان است.
-
-## مسیر جایگزین (فقط اگر خودت بگویی «بله»)
-Composio triggers به‌جای اپ Meta؛ نیاز به کلید API Composio روی سرور دارد. بدون تأیید صریح تو استفاده نمی‌شود.
+## هزینه
+- مدل (Sonnet 5.5، ورودی ۲$ و خروجی ۱۰$ به ازای میلیون توکن): حدود **۳ تا ۸ دلار به ازای ۱۰۰۰ پاسخ**. مورد نادیده‌گرفته‌شده فقط هزینه ورودی دارد؛ پیش‌فیلترها رایگان‌اند.
+- Composio: ~۱۷٬۰۰۰ تماس در روز در حالت poll هر ۱۰ ثانیه؛ باید با سهمیه پلن Composio چک شود (نمی‌دانم پلنت چقدر اجازه می‌دهد). می‌شود شب‌ها poll را کندتر کرد.
+- Cloudflare: Worker و KV در این حجم تقریباً رایگان.

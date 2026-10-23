@@ -9,7 +9,7 @@ class FakeKV {
   async put(k: string, v: string) { this.m.set(k, v); }
   async list({ prefix }: { prefix: string }) { return { keys: [...this.m.keys()].filter((k) => k.startsWith(prefix)).map((name) => ({ name })), list_complete: true }; }
 }
-const mkEnv = (over: Partial<Env> = {}): Env => ({ KV: new FakeKV() as any, ANTHROPIC_API_KEY: "k", IG_ACCESS_TOKEN: "t", IG_APP_SECRET: "secret", WEBHOOK_VERIFY_TOKEN: "vt", ADMIN_TOKEN: "adm", DRY_RUN: "1", IG_USER_ID: "own", IG_USERNAME: "meshkani.pro", MODEL: "m", GRAPH_VERSION: "v23.0", LLM_TIMEOUT_MS: "3500", ...over });
+const mkEnv = (over: Partial<Env> = {}): Env => ({ KV: new FakeKV() as any, ANTHROPIC_API_KEY: "k", IG_ACCESS_TOKEN: "t", IG_APP_SECRET: "secret", WEBHOOK_VERIFY_TOKEN: "vt", ADMIN_TOKEN: "adm", DRY_RUN: "1", IG_USER_ID: "own", IG_USERNAME: "meshkani.pro", MODEL: "m", GRAPH_VERSION: "v23.0", LLM_TIMEOUT_MS: "3500", COMPOSIO_API_KEY: "ck", COMPOSIO_ACCOUNT_ID: "ca_1", COMPOSIO_BASE: "https://c", POLLER: {} as any, POLL_MS: "10000", MEDIA_WINDOW: "5", IG_ALT_IDS: "alt", TRANSPORT: "meta", ...over });
 
 const commentPayload = { object: "instagram", entry: [{ id: "own", changes: [{ field: "comments", value: { id: "c9", text: "سؤال؟", from: { id: "u9", username: "ali" }, media: { id: "m1" } } }] }] };
 const dmPayload = { object: "instagram", entry: [{ id: "own", messaging: [{ sender: { id: "u8" }, recipient: { id: "own" }, timestamp: Date.now(), message: { mid: "mid1", text: "سلام" } }, { sender: { id: "own" }, message: { mid: "e", text: "echo", is_echo: true } }] }] };

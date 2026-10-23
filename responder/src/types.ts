@@ -5,6 +5,14 @@ export interface Env {
   IG_APP_SECRET: string;
   WEBHOOK_VERIFY_TOKEN: string;
   ADMIN_TOKEN: string;
+  COMPOSIO_API_KEY: string;
+  COMPOSIO_ACCOUNT_ID: string; // connected account of @meshkani.pro (never the default)
+  COMPOSIO_BASE: string;
+  POLLER: DurableObjectNamespace;
+  POLL_MS: string;
+  MEDIA_WINDOW: string;
+  IG_ALT_IDS: string; // comma-separated other ids our account shows up as
+  TRANSPORT: string; // "composio" | "meta"
   DRY_RUN: string;
   IG_USER_ID: string;
   IG_USERNAME: string;
@@ -30,7 +38,7 @@ export interface Incoming {
   text: string;
   mediaId?: string; // comments only
   parentId?: string; // comment is a reply inside a thread
-  timestampMs?: number; // DMs: when the user wrote it
+  timestampMs?: number; // when the user wrote it (DMs and polled comments)
 }
 
 export interface Decision {

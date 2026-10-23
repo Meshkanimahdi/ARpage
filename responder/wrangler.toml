@@ -10,6 +10,13 @@ IG_USERNAME = "meshkani.pro"
 MODEL = "claude-sonnet-5-5"
 GRAPH_VERSION = "v23.0"
 LLM_TIMEOUT_MS = "3500"
+TRANSPORT = "composio"
+COMPOSIO_BASE = "https://backend.composio.dev"
+# Connected account of @meshkani.pro in Composio (NOT the default: mirror.dev / mahdi.meshkani are also connected).
+COMPOSIO_ACCOUNT_ID = "REPLACE_WITH_CONNECTED_ACCOUNT_ID"
+POLL_MS = "10000"
+MEDIA_WINDOW = "5"
+IG_ALT_IDS = "28326185053748542"
 
 # Create with: npx wrangler kv namespace create RESPONDER_KV   then paste the id here.
 [[kv_namespaces]]
@@ -17,4 +24,15 @@ binding = "KV"
 id = "REPLACE_WITH_KV_NAMESPACE_ID"
 
 # Secrets (set in the Cloudflare dashboard or `wrangler secret put`, never in chat or git):
-#   ANTHROPIC_API_KEY, IG_ACCESS_TOKEN, IG_APP_SECRET, WEBHOOK_VERIFY_TOKEN, ADMIN_TOKEN
+#   ANTHROPIC_API_KEY, COMPOSIO_API_KEY, ADMIN_TOKEN   (Meta-only route: IG_ACCESS_TOKEN, IG_APP_SECRET, WEBHOOK_VERIFY_TOKEN)
+
+[[durable_objects.bindings]]
+name = "POLLER"
+class_name = "Poller"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["Poller"]
+
+[triggers]
+crons = ["* * * * *"]

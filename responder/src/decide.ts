@@ -8,6 +8,7 @@ const MAX_TURNS_PER_USER = 2;
 
 export interface PrefilterCtx {
   ownUserId: string;
+  ownUsername?: string;
   /** replies already sent to this user on this media/thread (including this one if applicable) */
   priorReplies: number;
   now: number;
@@ -15,7 +16,7 @@ export interface PrefilterCtx {
 
 /** Cheap deterministic gate: runs before the LLM so obvious noise costs nothing and adds no latency. */
 export function prefilter(msg: Incoming, ctx: PrefilterCtx): Decision | null {
-  if (msg.userId === ctx.ownUserId) return { action: "ignore", reason: "own comment" };
+  if (msg.userId === ctx.ownUserId || (ctx.ownUsername && msg.username === ctx.ownUsername)) return { action: "ignore", reason: "own comment" };
   const t = msg.text.trim();
   if (!t) return { action: "ignore", reason: "empty" };
   if (EMOJI_ONLY.test(t)) return { action: "ignore", reason: "emoji only" };

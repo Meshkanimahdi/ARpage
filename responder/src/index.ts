@@ -1,6 +1,8 @@
 import { decide } from "./decide";
-import { fetchCaption, parseWebhook, replyToComment, sendDm, verifySignature } from "./instagram";
+import { parseWebhook, verifySignature } from "./instagram";
+import { fetchCaption, replyToComment, sendDm } from "./transport";
 import { anthropicLlm } from "./llm";
+export { Poller } from "./poller";
 import type { Decision, Env, Incoming, Llm, PostContext } from "./types";
 
 const DAY = 86400;
@@ -30,7 +32,7 @@ export async function handleOne(env: Env, msg: Incoming, t0: number, deps: Deps)
   const post = msg.kind === "comment" ? await loadPost(env, msg.mediaId) : null;
 
   const tLlm = Date.now();
-  const d: Decision = await decide(msg, post, deps.llm, { ownUserId: env.IG_USER_ID, priorReplies, now: Date.now() }, Number(env.LLM_TIMEOUT_MS) || 3500);
+  const d: Decision = await decide(msg, post, deps.llm, { ownUserId: env.IG_USER_ID, ownUsername: env.IG_USERNAME, priorReplies, now: Date.now() }, Number(env.LLM_TIMEOUT_MS) || 3500);
   const llmMs = Date.now() - tLlm;
 
   let sent = false;
@@ -45,11 +47,11 @@ export async function handleOne(env: Env, msg: Incoming, t0: number, deps: Deps)
       error = (e as Error).message;
     }
   }
-  const latencyMs = Date.now() - t0;
+  const latencyMs = Date.now() - (msg.timestampMs ? Math.min(t0, msg.timestampMs) : t0);
   const day = new Date().toISOString().slice(0, 10);
   await env.KV.put(
     `log:${day}:${String(t0).padStart(13, "0")}:${msg.id}`,
-    JSON.stringify({ at: new Date(t0).toISOString(), kind: msg.kind, user: msg.username ?? msg.userId, media: msg.mediaId, text: msg.text.slice(0, 300), action: d.action, reason: d.reason, reply: d.text, flag: d.flag === true, sent, dry, error, latency_ms: latencyMs, llm_ms: llmMs, over_budget: latencyMs > 5000 }),
+    JSON.stringify({ at: new Date(t0).toISOString(), kind: msg.kind, user: msg.username ?? msg.userId, media: msg.mediaId, text: msg.text.slice(0, 300), action: d.action, reason: d.reason, reply: d.text, flag: d.flag === true, sent, dry, error, latency_ms: latencyMs, llm_ms: llmMs, detect_ms: t0 - (msg.timestampMs ?? t0), over_budget: latencyMs > 5000 }),
     { expirationTtl: 45 * DAY },
   );
 }
@@ -79,10 +81,18 @@ async function admin(req: Request, env: Env, url: URL): Promise<Response> {
 }
 
 export default {
+  /** Cron safety net: make sure the poller loop is alive (idempotent). */
+  async scheduled(_e: ScheduledEvent, env: Env, ctx: ExecutionContext) {
+    if (env.TRANSPORT === "composio") ctx.waitUntil(env.POLLER.get(env.POLLER.idFromName("main")).fetch("https://poller/admin/poller/start", { method: "POST" }));
+  },
   async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const t0 = Date.now();
     const url = new URL(req.url);
     if (url.pathname === "/health") return new Response("ok");
+    if (url.pathname.startsWith("/admin/poller/")) {
+      if (!env.ADMIN_TOKEN || req.headers.get("Authorization") !== `Bearer ${env.ADMIN_TOKEN}`) return new Response("forbidden", { status: 403 });
+      return env.POLLER.get(env.POLLER.idFromName("main")).fetch(req);
+    }
     if (url.pathname.startsWith("/admin/")) return admin(req, env, url);
     if (url.pathname !== "/webhook") return new Response("not found", { status: 404 });
 
