@@ -2,6 +2,7 @@
 
 Verbatim task definition handed over from the previous (Mac/Codex) publisher.
 Cloud overrides agreed with the user are listed at the end; everything else applies as written.
+**Model (user rule 2026-10-23): every post, story and reel is made with Claude Opus 5.5 (`claude-opus-5-5`) — RUNBOOK §0.**
 
 ---
 

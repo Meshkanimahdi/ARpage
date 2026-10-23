@@ -19,6 +19,12 @@ publish twice, never publish late, never publish unverified content.
 
 ## 0. Ground rules (both phases)
 
+- **Model (user rule 2026-10-23): all content is produced with Claude Opus 5.5 (`claude-opus-5-5`).**
+  This covers posts, carousel slides, stories and reels: research, writing, narration scripts, image
+  prompts, motion design and QC. A publisher session or scheduled task must run on this model; Sonnet,
+  Haiku or older models are not allowed for content. If a run finds it is not on Opus 5.5 (it
+  knows its model from its own system prompt), it still runs the phase, so no slot is missed, and
+  writes a `MODEL_MISMATCH` row (`model=<actual>`) in the Automation Log so the session gets moved.
 - Time zone is `Asia/Tehran` everywhere. Get times only from
   `python3 meshkani-pro/scripts/tehran.py`.
 - Slots: `12:00` and `21:00` (posts), `09:00` and `15:00` (reels). Slot key format `YYYY-MM-DD|HH:MM`.
