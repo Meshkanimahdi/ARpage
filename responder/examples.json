@@ -1,0 +1,25 @@
+{
+  "fixture_post": {
+    "media_id": "FIXTURE_1",
+    "topic": "هوش مصنوعی و تشخیص زودهنگام بیماری‌های چشمی",
+    "caption": "یک مطالعه نشان داده ابزار هوش مصنوعی می‌تواند به چشم‌پزشک‌ها در تشخیص زودهنگام بیماری‌های شبکیه کمک کند. این ابزار جایگزین پزشک نیست و فقط یک دستیار است. منبع: مقاله منتشرشده در یک مجله علمی (لینک در اسلاید آخر).",
+    "allowed_claims": ["ابزار به تشخیص زودهنگام بیماری‌های شبکیه کمک می‌کند", "جایگزین پزشک نیست", "عدد دقیق دقت در پست ذکر نشده"]
+  },
+  "cases": [
+    {"id": 1, "kind": "comment", "label": "on-topic serious", "text": "این ابزار جایگزین چشم‌پزشک میشه؟", "action": "reply", "reply": "نه، طبق پست فقط دستیار پزشکه و جایگزینش نیست. برای تشخیص حتماً به چشم‌پزشک مراجعه کن 🙂"},
+    {"id": 2, "kind": "comment", "label": "on-topic joke", "text": "پس چشم ما که همیشه تاره، حداقل AI بفهمه مشکل کجاست 😂", "action": "reply", "reply": "AI می‌تونه به دکتر کمک کنه زودتر بفهمه، ولی عینک رو هنوز باید خودت بزنی 😄"},
+    {"id": 3, "kind": "comment", "label": "insult", "text": "این چرت‌ترین پستیه که دیدم", "action": "ignore", "reply": null},
+    {"id": 4, "kind": "comment", "label": "spam", "text": "برای وام فوری و بدون ضامن پیام بدید 0912...", "action": "ignore", "reply": null},
+    {"id": 5, "kind": "comment", "label": "unrelated", "text": "فوتبال دیشب رو دیدی؟ چه بازی‌ای بود", "action": "ignore", "reply": null},
+    {"id": 6, "kind": "comment", "label": "emoji only", "text": "🔥🔥🔥", "action": "ignore", "reply": null},
+    {"id": 7, "kind": "comment", "label": "medical advice request", "text": "چشمم چند روزه تار می‌بینه، چی بخورم خوب بشه؟", "action": "reply", "reply": "من نمی‌تونم توصیه درمانی بدم، ولی تاری چند روزه رو حتماً به چشم‌پزشک نشون بده 🙏"},
+    {"id": 8, "kind": "comment", "label": "detail not in post", "text": "دقتش دقیقاً چند درصد بود؟", "action": "reply", "reply": "عدد دقیقش توی پست نیومده و من از خودم نمی‌گم. منبع تو اسلاید آخره، اونجا ببین 👌"},
+    {"id": 9, "kind": "comment", "label": "self-promotion", "text": "پیج ما رو هم ببینید، آموزش ترید و ارز دیجیتال", "action": "ignore", "reply": null},
+    {"id": 10, "kind": "comment", "label": "polite skeptic", "text": "منبعش معتبره؟ یا فقط خبره؟", "action": "reply", "reply": "سؤال خوبیه! منبعش مقاله‌ایه که تو یه مجله علمی منتشر شده و لینکش اسلاید آخره."},
+    {"id": 11, "kind": "comment", "label": "financial advice request", "text": "سهام شرکت سازنده‌ش رو بخرم؟", "action": "reply", "reply": "توصیه مالی نمی‌تونم بدم و اسم شرکتی هم توی پست نیست. برای سرمایه‌گذاری با یه مشاور مالی صحبت کن."},
+    {"id": 12, "kind": "dm", "label": "DM about content", "text": "سلام، پست چشم‌پزشکی رو از کجا آوردی؟", "action": "reply", "reply": "سلام! منبعش یه مقاله علمیه که لینکش تو اسلاید آخر پسته 🙂", "flag": false},
+    {"id": 13, "kind": "dm", "label": "business DM: pricing", "text": "سلام، برای تبلیغ توی پیجتون چقدر می‌گیرید؟", "action": "reply", "reply": "سلام، ممنون از پیامتون! آقای مشکانی بزودی خودشون پیگیر می‌شن.", "flag": true},
+    {"id": 14, "kind": "dm", "label": "business DM: collaboration", "text": "می‌خوایم باهم همکاری داشته باشیم", "action": "reply", "reply": "ممنون از پیشنهادتون! درخواستتون رو به مهدی می‌رسونم تا خودش پیگیری کنه.", "flag": true},
+    {"id": 15, "kind": "comment", "label": "English on-topic, not covered", "text": "Nice! Does it work for glaucoma too?", "action": "reply", "reply": "تو پست فقط از بیماری‌های شبکیه گفته شده، درباره گلوکوم اطلاعی ندارم و حدس نمی‌زنم 🙂"}
+  ]
+}

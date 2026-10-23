@@ -1,0 +1,20 @@
+name = "meshkani-responder"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# Safety: stays "1" (decide + log, never call Instagram) until the end-to-end test passes.
+[vars]
+DRY_RUN = "1"
+IG_USER_ID = "17841471767180096"
+IG_USERNAME = "meshkani.pro"
+MODEL = "claude-sonnet-5-5"
+GRAPH_VERSION = "v23.0"
+LLM_TIMEOUT_MS = "3500"
+
+# Create with: npx wrangler kv namespace create RESPONDER_KV   then paste the id here.
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# Secrets (set in the Cloudflare dashboard or `wrangler secret put`, never in chat or git):
+#   ANTHROPIC_API_KEY, IG_ACCESS_TOKEN, IG_APP_SECRET, WEBHOOK_VERIFY_TOKEN, ADMIN_TOKEN
