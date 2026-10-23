@@ -10,6 +10,7 @@
 // alignment of the plain text → trim → fixed brisk tempo. Writes <dir>/timeline.json and voice/trim/<id>.wav.
 // Key: env Elevenlabs_API_KEY (audio only, never printed). Model: eleven_v4 (user rule).
 import fs from 'node:fs'; import path from 'node:path'; import crypto from 'node:crypto'; import {execFileSync} from 'node:child_process';
+import {latinize} from './fa_lexicon.mjs';
 const args = Object.fromEntries(process.argv.slice(2).map(a => a.replace(/^--/, '').split('=')));
 const dir = path.resolve(args.dir), TEMPO = +(args.tempo || 1.2);   // the brisk pace the user approved (2026-10-21)
 const key = process.env.Elevenlabs_API_KEY || process.env.ELEVENLABS_API_KEY;
@@ -19,10 +20,10 @@ const MODEL = 'eleven_v4';
 const vdir = path.join(dir, 'voice'); fs.mkdirSync(path.join(vdir, 'trim'), {recursive: true});
 const sh = (c, a) => execFileSync(c, a, {encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe']});
 const sq = t => t.replace(/\s+/g, ' ').trim();
-const withTags = t => sq(t.replace(/\[icon:[^\]]*\]/g, '').replace(/\{([^|}]*)\|([^}]*)\}/g, '$2').replace(/\*/g, '').replace(/\s*\|\s*/g, ' '));
+const withTags = t => sq(latinize(t.replace(/\[icon:[^\]]*\]/g, '').replace(/\{([^|}]*)\|([^}]*)\}/g, '$2').replace(/\*/g, '').replace(/\s*\|\s*/g, ' '), S.lexicon));
 const plain = t => sq(withTags(t).replace(/\[[^\]]*\]/g, ''));
 const shownText = t => sq(t.replace(/\[icon:[^\]]*\]/g, '').replace(/\{([^|}]*)\|([^}]*)\}/g, '$1').replace(/\[[^\]]*\]/g, '').replace(/\*/g, '').replace(/\s*\|\s*/g, ' '));   // STT often writes numbers as digits
-const norm = s => s.replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]).replace(/[ً-ٰٟ‌\s.,،؛:!?؟«»"'()\-–—…]/g, '').replace(/ي/g, 'ی').replace(/ك/g, 'ک');
+const norm = s => s.toLowerCase().replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]).replace(/[ً-ٰٟ‌\s.,،؛:!?؟«»"'()\-–—…]/g, '').replace(/ي/g, 'ی').replace(/ك/g, 'ک');
 function sim(a, b) { a = norm(a); b = norm(b); const m = a.length, n = b.length; if (!m || !n) return 0;
   let p = Array.from({length: n + 1}, (_, j) => j);
   for (let i = 1; i <= m; i++) { const c = [i]; for (let j = 1; j <= n; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; }
@@ -61,7 +62,7 @@ for (const b of S.beats) {
   let best = null;
   for (let take = 0; take < 3; take++) {        // up to 3 takes, keep the clearest
     const f = path.join(vdir, `${b.id}-${hsh}-${take}.mp3`); await tts(spoken, 7 + take * 101, f);
-    const heard = await stt(f), score = Math.max(sim(ptxt, heard), sim(shownText(b.text), heard));
+    const heard = await stt(f), score = Math.max(sim(ptxt, heard), sim(ptxt, latinize(heard, S.lexicon)), sim(shownText(b.text), heard));   // STT may write Latin names in Persian
     if (!best || score > best.score) best = {f, heard, score};
     if (score >= 0.9) break;
   }

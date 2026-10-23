@@ -305,6 +305,11 @@ repeat. Abstract topics (a study, a policy, a model release) skip this step.
    as a generation reference it is fine.
 
 ### 1.6 Prompts and generation
+Prompt engineering (user rule 2026-10-23). Every object and scene in an image is realistic, stylish and
+professional, never flat clipart or simple icons. Each visual bracket below is written with the
+checklist in STORY_SPEC §8.2 (subject, camera, lens and f-stop, angle, key + fill + rim light, 2–4
+materials, background, composition, colour mood, exclusions), in concrete words, not adjectives.
+
 Mother prompt (fill every bracket from the dossier and brief; record each final
 prompt in the slot JSON and the sheet):
 
@@ -562,8 +567,11 @@ two-news reel in REEL_SPEC.md is retired.)
    women-focused stories; not yesterday's), `theme` (preset + overrides), `tempo`, `stability`,
    `date`, `field`, `end_text`, `music_prompt`, `credits`, 18–34 `beats` (id, bg, text, visual).
    Hook in beat 1, open loop, re-hooks, payoff, closing question (STORY_SPEC §3). Every script carries
-   English v4 audio tags where the tone turns, numbers/dates/Latin names via `{shown|spoken}`
-   (STORY_SPEC §5). Only allowed claims.
+   English v4 audio tags where the tone turns, numbers/dates via `{shown|spoken}`; brand,
+   startup, product and people names, and misread loanwords (`code`, `prompt`, `AI`), written in
+   English in the spoken text (STORY_SPEC §5). Only allowed claims.
+   Every element and scene image is realistic and premium, never a simple icon as the lead visual.
+   Each prompt follows the 12-point prompt-engineering checklist in STORY_SPEC §8.2.
 2. Line engine: real photos of people/products → `python3 news-reel/lineart.py` into `work/story/el/*.svg`;
    no image generation is needed. For story.html looks:
    `work/story/elements.json`: every object the beats need, in **≤ 3 sheets of ≤ 9 items** (user rule —

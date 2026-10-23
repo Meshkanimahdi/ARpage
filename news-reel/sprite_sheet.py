@@ -26,11 +26,19 @@ MAX_SHEETS, MAX_ITEMS = 3, 9
 
 
 def prompt_for(sheet, style, cols, rows):
-    lines = [f"A clean sprite sheet: a {cols}x{rows} grid of {len(sheet['items'])} separate, isolated objects for a motion-graphics "
-             f"video. Style for every object: {style}. Each object is complete (nothing cut off), centred in its own "
-             "equal grid cell with wide empty margins, objects never touch or overlap, no grid lines, no frames, no labels, "
-             "no text, no watermark, no logos except where the description asks for a real product's own design. Fully "
-             "transparent background, no floor, no cast shadow outside the object. Cells, left to right, top to bottom:"]
+    # premium, realistic product-photography language (user rule 2026-10-23: realistic, stylish, professional
+    # elements, never flat or simple icons) — STORY_SPEC §8.2
+    lines = [f"High-end commercial product photography sprite sheet for a premium motion-graphics video: a {cols}x{rows} grid "
+             f"of {len(sheet['items'])} separate, isolated hero objects. Look for every object: {style}. Shot like a luxury "
+             "advertising campaign: medium-format camera, 100mm macro lens, f/8 so every object is tack sharp, eye-level "
+             "three-quarter view, large softbox key light from upper left, soft fill, crisp rim light tracing the edges, "
+             "accurate physically based materials (brushed metal, frosted glass, glossy ceramic, fine fabric weave, soft "
+             "leather, micro-scratches), true-to-life proportions, clean high-dynamic-range colour, no film grain. Each object "
+             "is complete (nothing cut off), centred in its own equal grid cell and fills about 70% of it, with wide empty "
+             "margins; objects never touch or overlap; no grid lines, frames, labels, text, numbers, watermarks, or logos "
+             "except where the description asks for a real product's own design. Not cartoon, not clipart, not flat icon, "
+             "not low-poly, not plastic toy-like. Fully transparent background, no floor, no cast shadow outside the object. "
+             "Cells, left to right, top to bottom:"]
     for i, it in enumerate(sheet["items"], 1):
         lines.append(f"{i}. {it['desc']}")
     return "\n".join(lines)
@@ -145,7 +153,7 @@ def main():
         png = el / f"_sheet-{s['name']}.png"
         if not a.only_split:
             pf = el / f"_sheet-{s['name']}.txt"
-            pf.write_text(prompt_for(s, spec.get("style", "photorealistic studio photo, soft light"), cols, rows))
+            pf.write_text(prompt_for(s, spec.get("style", "photorealistic premium studio product photo, refined materials, soft key light with crisp rim light"), cols, rows))
             cmd = [sys.executable, str(GEN), "--kind", "sheet", "--prompt-file", str(pf), "--out", str(png)]
             for ref in s.get("refs", []):
                 cmd += ["--ref", str(d / ref)]

@@ -130,9 +130,9 @@ bottom (all words visible in grey, each turns ink/accent as it is spoken), soft 
 
 Rules: match the preset to the story's mood; never the same preset two days in a row; one preset per
 reel. Minimal = few elements, lots of air, slower cuts; busy = ticker, corner labels, dot texture,
-more objects per beat. The element sheets follow the look (`style` in elements.json): photoreal studio
-cut-outs, black-and-white press photos, glossy 3D clay, paper-craft collage, isometric icons, neon
-wireframe…
+more objects per beat. The element sheets follow the look (`style` in elements.json) but are always
+**realistic, stylish and professional** (§8.2): photoreal premium product cut-outs, black-and-white press
+photos, refined 3D renders with real materials, neon glass. Never flat clipart or toy-like clay.
 
 ## 5. Voice — chosen per story (ElevenLabs **eleven_v4** only)
 | voice | id | gender | best for |
@@ -155,8 +155,17 @@ wireframe…
   `[sarcastic]` `[dramatic]` `[thoughtful]` `[surprised]` `[firm]` `[laughs]` `[sighs]` `[playful]`.
 - Pauses: punctuation (، . …) or `[short pause]` after a full stop — never an ellipsis plus a pause
   tag in the same spot.
-- Numbers, dates, percentages, prices, Latin names: say them as Persian words and show the short form
-  with `{shown|spoken}` → `{۲۰۲۵|دو هزار و بیست و پنج}`, `{OpenAI|اوپن‌ای‌آی}`, `{۴۰٪|چهل درصد}`.
+- Numbers, dates, percentages, prices: say them as Persian words and show the short form
+  with `{shown|spoken}` → `{۲۰۲۵|دو هزار و بیست و پنج}`, `{۴۰٪|چهل درصد}`.
+- **Names and loanwords go to the voice in Latin (user rule 2026-10-23).** Brands, startups, products,
+  models and people are written in English exactly as the company or person spells them: `OpenAI`,
+  `ChatGPT`, `Anthropic`, `Nvidia`, `Sam Altman`, never «اوپن ای آی». Persian-script words that
+  ElevenLabs misreads are also written in English: `code` (never «کد»), `prompt`, `agent`, `AI`, `app`;
+  Persian suffixes stay Persian after a space (`code ها`, `prompt ها`). The caption may still show
+  Persian when that reads better: `{کدنویسی|code نویسی}`. `news-reel/fa_lexicon.mjs` converts the common
+  Persian spellings on the spoken side automatically (story_voice and reel_voice); add story-specific
+  names in `story.json → lexicon: {"اسنپ فود": "Snappfood"}`. After the voice run, read `voice/qc.json`
+  and fix any name that still sounds wrong by respelling it in Latin.
 - A mispronounced word: add diacritics on the wrong syllable only, or respell; then regenerate.
 - `stability` 0.5 default; 0.35 for very expressive storytelling (set in story.json). No `style` /
   `speed` on v4 — pace comes from the writing and the reel's `tempo`.
@@ -253,6 +262,37 @@ soft-ui types (work in any look): `lineup` (`items[{name, el | mark+color, bg, f
 last), `table` (`cols` like lineup items, `rows[{label, cells}]`, `win` = column to colour, `row_at` = seconds
 when each row lights up — sync it to the narration); `huge: true` for one giant
 word; `iris: true` for a circle wipe. Every beat changes something on screen.
+
+### 8.2 Elements and image prompts (user rule 2026-10-23)
+**Realistic elements, not simple icons.** We generate with the best image models, so every object in a
+motion graphic is a realistic, stylish, professional element: a real-looking phone with a glowing UI,
+a brushed-metal server, a frosted-glass chat bubble, a silk dress on a mannequin, a gold coin stack. Plain
+Lucide icons are only for small helpers (bullets, a tile inside a typed line next to text, UI chrome), never
+the lead visual of a beat. In kinetic.html and atelier.html, `[icon:el.<id>]` puts the realistic cut-out
+`el/<id>.png` inside the typed line instead of an icon; `zoom`, `route`, `stack` and `scene` take real
+images. In line.html the lead visual is `lineart` traced from a real or generated photo, not an icon.
+
+**Write every image prompt with prompt engineering** (skill `ai-photo-prompt-guide`). The formula is
+subject + camera look + environment + light + materials + emotion + composition. Each prompt sets:
+1. **Subject:** the exact object or scene, and the one detail that ties it to the beat.
+2. **Aspect ratio:** 9:16 for scenes; the cell for sheets.
+3. **Camera:** medium format or full-frame. **Lens:** 100mm macro for objects, 35mm for sets, 85mm for people.
+4. **F-stop:** f/8 for objects (everything sharp), f/2.8 for sets (depth).
+5. **Angle:** three-quarter or eye level; low angle for power.
+6. **Lighting:** the most important choice, set as key + fill + rim: direction, quality and colour.
+7. **Textures:** 2–4 concrete materials (brushed aluminium, frosted glass, satin, leather, ceramic).
+8. **Background:** transparent for sheets; for sets, the place, the time of day and the clutter level.
+9. **Composition:** where the eye goes; negative space for our type.
+10. **Colour mood:** the reel's palette.
+11. **Realism notes:** "premium advertising quality" and "physically accurate materials".
+12. **Exclusions:** "no text, no letters, no logos, no watermark, not cartoon, not clipart, not flat icon".
+
+Concrete words beat adjectives: write "soft 45° softbox key from the left, cyan rim light", not
+"beautiful lighting". `elements.json → style` carries the shared camera, light, material and colour
+language for the whole sheet. Each item's `desc` names its own object, material and angle, e.g. «matte
+black smartphone, three-quarter view, screen glowing with a soft blue chat interface without readable
+text, brushed aluminium edge catching a cyan rim light». Read every sheet. Reject and regenerate any that
+looks like clipart or plastic toys, or has warped shapes or fake letters.
 
 **Elements: at most 3 generated collage sheets (≤ 9 items each), cut out automatically** —
 `python3 news-reel/sprite_sheet.py --dir work/story` with `elements.json`

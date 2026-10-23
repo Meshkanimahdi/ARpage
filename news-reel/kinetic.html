@@ -29,6 +29,8 @@
   .dk .type .k { color: var(--acc); background: none; }
   .ic { display: inline-flex; align-items: center; justify-content: center; width: 1.05em; height: 1.05em; border-radius: .26em; background: #111; vertical-align: -.2em; margin: 0 .12em; box-shadow: 0 10px 24px rgba(0,0,0,.25); }
   .dk .ic { background: var(--acc); }
+  .ic:has(img) { width: 1.5em; height: 1.5em; background: none; box-shadow: none; vertical-align: -.45em; }
+  .ic img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 12px 22px rgba(0,0,0,.35)); }
   .ic svg { width: 62%; height: 62%; stroke: var(--acc); }
   .dk .ic svg { stroke: #111; }
   .cur { display: inline-block; width: .07em; height: .9em; background: currentColor; vertical-align: -.1em; margin: 0 .05em; }
@@ -82,7 +84,8 @@ const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&l
 const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
 function h(tag, cls, style, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (style) e.style.cssText = style; if (html !== undefined) e.innerHTML = html; return e; }
 const ISSUES = [], ICON = {};
-async function icon(n) { if (!ICON[n]) { const r = await fetch(`/logo-motion/node_modules/lucide-static/icons/${n}.svg`); ICON[n] = r.ok ? (await r.text()).replace(/stroke-width="2"/, 'stroke-width="2.4"') : (ISSUES.push('icon missing: ' + n), '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor"/></svg>'); } return ICON[n]; }
+async function icon(n) { if (n.startsWith('el.')) return `<img src="${url('el/' + n.slice(3) + '.png')}">`;   // [icon:el.<id>] = a realistic cut-out from the element sheets
+  if (!ICON[n]) { const r = await fetch(`/logo-motion/node_modules/lucide-static/icons/${n}.svg`); ICON[n] = r.ok ? (await r.text()).replace(/stroke-width="2"/, 'stroke-width="2.4"') : (ISSUES.push('icon missing: ' + n), '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor"/></svg>'); } return ICON[n]; }
 // blur-in for any element; returns progress
 function inn(e, t, a, d = .45, dx = 0, dy = 40) { const k = E.o(P(t, a, a + d)); e.style.opacity = k; e.style.filter = k < 1 ? `blur(${(1 - k) * 18}px)` : ''; e.style.transform = `translate(${(1 - k) * dx}px, ${(1 - k) * dy}px)`; return k; }
 
@@ -155,7 +158,7 @@ window.ready = (async () => {
     const L = TL.lines[bt.line || bt.id]; if (!L) throw new Error('unknown line ' + bt.id); const v = bt.visual || {type: 'type'};
     // words as spoken; [icon:name] inside the text is shown as an icon tile and is not spoken
     const raw = bt.text.replace(/\[(?!icon:)[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/\|/g, ' ').trim().split(/\s+/); let open = false, wi = 0; const shown = [];
-    for (const w of raw) { const ic = w.match(/^\[icon:([\w-]+)\]$/); if (ic) { shown.push({icon: ic[1], t: (L.words[wi] || [L.start + wi * .3])[0] - .05}); continue; }
+    for (const w of raw) { const ic = w.match(/^\[icon:([\w.-]+)\]$/); if (ic) { shown.push({icon: ic[1], t: (L.words[wi] || [L.start + wi * .3])[0] - .05}); continue; }
       const st = w.startsWith('*'), en = /\*[،.,!؟?:…»"]*$/.test(w) && w.length > 1, k = open || st; open = en ? false : (st ? true : open);
       shown.push({w: w.replace(/\*/g, ''), k, t: (L.words[wi] || [L.start + wi * .3])[0]}); wi++; }
     if (wi !== L.words.length) ISSUES.push(`beat ${bt.id}: ${wi} words shown, ${L.words.length} spoken`);

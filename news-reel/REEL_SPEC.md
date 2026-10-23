@@ -81,8 +81,9 @@ spoken sentence (the subtitles carry the sentence).
   limit or what it means. 4–6 lines, ≤ ~25 s of speech per news (the tool fails above tempo 1.25).
 - Only facts from the post's dossier `allowed_claims` / caption. Keep company claims attributed.
 - Emotion tags at the start of a line are allowed: `[excited]`, `[curious]`, `[thoughtful]`, `[warm]`.
-- Latin names: write them the way they are said in Persian (اسپیس‌ایکس, انویدیا), so the voice and the
-  speech-to-text check agree.
+- Latin names (user rule 2026-10-23): brands, startups, products and people are written in English
+  exactly (SpaceX, Nvidia, OpenAI, Sam Altman), and so are words ElevenLabs misreads (`code`, not «کد»).
+  `fa_lexicon.mjs` latinizes common Persian spellings on the spoken side; `spec.json → lexicon` adds more.
 
 ## Voices
 

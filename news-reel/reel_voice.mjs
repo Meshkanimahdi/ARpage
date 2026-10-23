@@ -3,6 +3,7 @@
 //   node news-reel/reel_voice.mjs --dir=work/reel-2026-10-20 [--budget=26]
 // Key: env Elevenlabs_API_KEY / ELEVENLABS_API_KEY (audio only; never used for images, never printed).
 import fs from 'node:fs'; import path from 'node:path'; import crypto from 'node:crypto'; import {execFileSync} from 'node:child_process';
+import {latinize} from './fa_lexicon.mjs';
 const args = Object.fromEntries(process.argv.slice(2).map(a => a.replace(/^--/, '').split('=')));
 const dir = path.resolve(args.dir); const BUDGET = +(args.budget || 26), MAXLEN = 60.5, MAXTEMPO = 1.25;
 const key = process.env.Elevenlabs_API_KEY || process.env.ELEVENLABS_API_KEY
@@ -13,7 +14,7 @@ const vdir = path.join(dir, 'voice'); fs.mkdirSync(path.join(vdir, 'trim'), {rec
 const sh = (cmd, a) => execFileSync(cmd, a, {encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe']});
 const dur = f => +sh('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).trim();
 const clean = s => s.replace(/\[[^\]]*\]\s*/g, '');
-const norm = s => clean(s).replace(/[ً-ٰٟ‌\s.,،؛:!?؟«»"'()\-–—]/g, '').replace(/ي/g, 'ی').replace(/ك/g, 'ک');
+const norm = s => clean(s).toLowerCase().replace(/[ً-ٰٟ‌\s.,،؛:!?؟«»"'()\-–—]/g, '').replace(/ي/g, 'ی').replace(/ك/g, 'ک');
 function sim(a, b) { a = norm(a); b = norm(b); const m = a.length, n = b.length; if (!m || !n) return 0;
   let prev = Array.from({length: n + 1}, (_, j) => j);
   for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; }
@@ -43,9 +44,10 @@ const groups = spec.news.map(n => ({voice: n.voice, lines: n.lines.map(l => ({..
 if (spec.end_line) groups[groups.length - 1].lines.push({id: 'END', text: spec.end_line, endcard: true});
 const qc = [];
 for (const g of groups) for (const l of g.lines) {
-  const hsh = crypto.createHash('sha256').update(g.voice + '|' + l.text).digest('hex').slice(0, 10);
-  l.raw = path.join(vdir, `${l.id}-${hsh}.mp3`); await tts(l.text, g.voice, l.raw);
-  const heard = await stt(l.raw), score = sim(l.text, heard);
+  const spoken = latinize(l.text, spec.lexicon);   // brand/people names and misread loanwords go to the voice in Latin
+  const hsh = crypto.createHash('sha256').update(g.voice + '|' + spoken).digest('hex').slice(0, 10);
+  l.raw = path.join(vdir, `${l.id}-${hsh}.mp3`); await tts(spoken, g.voice, l.raw);
+  const heard = await stt(l.raw), score = Math.max(sim(l.text, heard), sim(spoken, latinize(heard, spec.lexicon)));
   qc.push({id: l.id, want: clean(l.text), heard, score: +score.toFixed(3)});
   // 2) trim leading/trailing silence
   l.trim = path.join(vdir, `${l.id}-trim.wav`);
