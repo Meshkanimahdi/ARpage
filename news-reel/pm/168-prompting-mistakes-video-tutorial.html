@@ -75,9 +75,10 @@ K.ring = (g, it) => { const o = {strokes: [], fills: [], labels: {}};
   o.strokes.push(stroke(g, circ(it.cx, it.cy, it.r), 5));
   o.nodes = [];
   for (let i = 0; i < it.n; i++) { const a = (-135 + i * 90) * Math.PI / 180, x = it.cx + Math.cos(a) * it.r, y = it.cy + Math.sin(a) * it.r;
-    const bg = sv('circle', {cx: x, cy: y, r: 72, fill: '#FFFDF8', opacity: 0}, g); o.fills.push(bg);
-    o.strokes.push(stroke(g, circ(x, y, 72), 5));
-    o.strokes.push(stroke(g, circ(x, y - 16, 18), 4.5)); o.strokes.push(stroke(g, `M ${x - 34} ${y + 36} Q ${x} ${y - 4} ${x + 34} ${y + 36}`, 4.5));
+    if (!it.node_img) { const bg = sv('circle', {cx: x, cy: y, r: 72, fill: '#FFFDF8', opacity: 0}, g); o.fills.push(bg); }
+    if (it.node_img) { o.pics = o.pics || []; o.pics.push(picture(g, it.node_img, x - 92, y - 92, 184, 184)); }
+    else { o.strokes.push(stroke(g, circ(x, y, 72), 5));
+      o.strokes.push(stroke(g, circ(x, y - 16, 18), 4.5)); o.strokes.push(stroke(g, `M ${x - 34} ${y + 36} Q ${x} ${y - 4} ${x + 34} ${y + 36}`, 4.5)); }
     o.nodes.push([x, y]); }
   o.labels[it.id] = label(g, it.cx, it.cy - it.r - 108, it.label, 52, 'var(--acc)');
   o.labels[it.id + '.sub'] = label(g, it.cx, it.cy + 18, it.sub, 44, 'var(--ink)');
@@ -136,6 +137,26 @@ K.hospital = (g, it) => { const o = {strokes: [], fills: [], labels: {}}; const 
   for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) o.strokes.push(stroke(g, rr(x + 36 + i * ((w - 72) / 3) + 10, y + 100 + j * 80, (w - 72) / 3 - 20, 50, 8), 4, 'var(--faint)'));
   o.strokes.push(stroke(g, rr(x + w / 2 - 36, y + h - 86, 72, 86, 8), 5));
   o.labels[it.id] = label(g, x + w / 2, y + h + 70, it.label, 42); return o; };
+
+// realistic elements and real logos (user rule 2026-10-23: they win over the prompt's flat style)
+let CID = 0;
+function picture(g, src, x, y, w, h, shadow = true) {
+  const id = 'pc' + (CID++), d = $('defs');
+  const cp = sv('clipPath', {id}, d); const r = sv('rect', {x, y: y + h, width: w, height: 0}, cp);
+  if (!$('psh')) d.insertAdjacentHTML('beforeend', '<filter id="psh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#1E2226" flood-opacity=".22"/></filter>');
+  const gg = sv('g', {'clip-path': `url(#${id})`}, g); const im = sv('image', {href: url(src), x, y, width: w, height: h, preserveAspectRatio: 'xMidYMid meet'}, gg);
+  if (shadow) im.setAttribute('filter', 'url(#psh)');
+  return {clip: r, x, y, w, h, im};
+}
+K.pic = (g, it) => { const o = {strokes: [], fills: [], labels: {}, pics: []};
+  if (it.glow) { const f = sv('circle', {cx: it.x + it.w / 2, cy: it.y + it.h / 2, r: Math.max(it.w, it.h) * .55, fill: 'var(--acc)', opacity: 0}, g); o.fills.push(f); o.glow = true; }
+  o.pics.push(picture(g, it.img, it.x, it.y, it.w, it.h));
+  if (it.label) o.labels[it.id] = label(g, it.label_x ?? it.x + it.w / 2, it.label_y ?? it.y + it.h + 56, it.label, it.size || 42, it.accent ? 'var(--acc)' : 'var(--ink)');
+  return o; };
+K.logo = (g, it) => { const o = {strokes: [], fills: [], labels: {}, pics: []}; const pad = it.pad ?? 26, w = it.w, h = it.h;
+  const chip = sv('rect', {x: it.x - w / 2 - pad, y: it.y - h / 2 - pad * .7, width: w + pad * 2, height: h + pad * 1.4, rx: (h + pad * 1.4) / 2, fill: '#fff', opacity: 0}, g);
+  chip.setAttribute('filter', 'url(#psh)'); o.fills.push(chip);
+  o.pics.push(picture(g, it.img, it.x - w / 2, it.y - h / 2, w, h, false)); return o; };
 
 // ---------- build ----------
 window.ready = (async () => {
@@ -196,7 +217,9 @@ function seek(t) {
     const k = E.p3(P(t, o.t0, o.t0 + (o.it.kind === 'hospital' || o.it.kind === 'ring' ? 1.3 : .8)));
     o.g.style.display = t >= o.t0 ? 'block' : 'none';
     o.strokes.forEach((s, i) => { const kk = clamp(k * (1 + o.strokes.length * .06) - i * .06); s.setAttribute('stroke-dashoffset', 1 - kk); });
-    o.fills.forEach(f => f.setAttribute('opacity', o.it.kind === 'core' ? (k * .14) : clamp(k * 1.4 - .4)));
+    if (!o.glow) o.fills.forEach(f => f.setAttribute('opacity', o.it.kind === 'core' ? (k * .14) : clamp(k * 1.4 - .4)));
+    if (o.pics) o.pics.forEach((pc, i) => { const kp = E.p3(P(t, o.t0 + i * .12, o.t0 + .7 + i * .12)); pc.clip.setAttribute('y', pc.y + pc.h * (1 - kp) - 30); pc.clip.setAttribute('height', pc.h * kp + 60); pc.im.setAttribute('opacity', clamp(kp * 1.6)); });
+    if (o.glow) o.fills.forEach(f => f.setAttribute('opacity', k * .16));
     if (o.flow) { const p = clamp((t - o.t0 - .8) / .3); o.flow.setAttribute('opacity', p * .85); o.flow.setAttribute('stroke-dashoffset', -(t - o.t0) * 60); }
     if (o.it.kind === 'stamp') { const s = lerp(1.35, 1, E.o(P(t, o.t0, o.t0 + .35))); o.sg.setAttribute('transform', `translate(${o.it.x} ${o.it.y}) rotate(-8) scale(${s})`); }
     if (o.dots) o.dots.forEach((d, i) => d.setAttribute('r', 11 * E.o(P(t, o.t0 + .3 + i * .08, o.t0 + .6 + i * .08))));
