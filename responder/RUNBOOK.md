@@ -31,6 +31,7 @@ Write the state after every 10 sends, and always before exiting, including on er
 
 ## 2. Comments
 1. `INSTAGRAM_GET_IG_USER_MEDIA` `ig_user_id: "me"`, `limit: 10`, fields `id,caption,username,timestamp,media_product_type,permalink,comments_count`.
+1b. Also check by id any older media that still gets comments (keep a short list in `responder_state.json` → `watch_media`; e.g. a reel that fell out of the newest 10 but whose `comments_count` still grows). Remove it after ~3 days with no new comments.
 2. For each media (skip if `comments_count` is 0): `INSTAGRAM_GET_IG_MEDIA_COMMENTS` `limit: 50`, fields `id,text,username,timestamp,from,parent_id,replies{id,username}`.
 3. Candidate = `timestamp > checkpoint` and age ≤ 6 h, not in `replied_comments`/`ignored_seen`, `username != meshkani.pro`, and no existing reply by
    `meshkani.pro` in its `replies` (platform-side idempotency: if one exists, add to `replied_comments` and skip).
