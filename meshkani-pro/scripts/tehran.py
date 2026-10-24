@@ -5,7 +5,7 @@
   tehran.py slot prepare|publish     which slot this run serves, with deadlines (JSON)
   tehran.py wait-until HH:MM         block until that Tehran time today (max 9 minutes)
   tehran.py check-deadline SLOTKEY   exit 0 if still inside the publish window, 3 if late
-  tehran.py reel prepare|publish     which daily story reel (09:00 or 15:00) this run serves (JSON)
+  tehran.py reel prepare|publish     which daily story reel (09:00, 15:00 or 21:00) this run serves (JSON)
 """
 import json
 import sys
@@ -53,8 +53,8 @@ def slot_info(phase):
 
 
 def reel_info(phase):
-    """Daily story reels at 09:00 and 15:00 (config reel.slots).
-    prepare: 21:30-23:59 -> tomorrow 09:00; 00:00-08:30 -> today 09:00; 12:30-14:30 -> today 15:00.
+    """Daily story reels at 09:00, 15:00 and 21:00 (config reel.slots), all prepared the same day.
+    prepare: 06:15-08:30 -> 09:00; 12:30-14:30 -> 15:00; 18:30-20:30 -> 21:00.
     publish: the reel whose time is within 120 min before .. grace after now."""
     r, t = CONFIG["reel"], now()
     publish = None

@@ -6,10 +6,19 @@ Instagram account `meshkani.pro`. Each scheduled run starts a fresh Claude
 session and is told which phase to run: **PREPARE** or **PUBLISH** (posts, §1–§2) or
 **REEL_PREPARE** / **REEL_PUBLISH** (the daily reel, §4–§5).
 
-Daily schedule (Tehran, user 2026-10-21): **09:00** story reel · **12:00** post + 3 stories ·
-**15:00** story reel · **21:00** post + 3 stories. Each reel (one trending AI story — news-reel/STORY_SPEC.md)
-is also shared to the Story. The 09:00 reel is prepared the evening before (21:45, retry 23:15); the
-15:00 reel the same day (12:45, retry 13:45).
+Daily schedule (Tehran, user rule 2026-10-24):
+
+| time | what is published | prepared at (main, retry) |
+|---|---|---|
+| **06:00** | ANALYTICS: the daily review that starts the day (§6) | — |
+| **09:00** | reel + its story | 06:30, 07:30 (the same morning, after ANALYTICS; never the night before) |
+| **12:00** | post + 3 stories | 10:30, 11:05 |
+| **15:00** | reel + its story | 12:45, 13:45 |
+| **18:00** | post + 3 stories | 16:30, 17:05 |
+| **21:00** | reel + its story | 18:45, 19:45 |
+
+Publish runs start at :57 the hour before. Each reel (one trending AI story, news-reel/STORY_SPEC.md) is
+also shared to the Story. The comment and DM responder runs separately (responder/).
 
 Source of the rules: `TASK_SPEC.md` (standing task + cloud overrides) and «دستور کار انتقال انتشار محتوای meshkani.pro» (20 Oct 2026).
 Where this file and that brief disagree, the brief's safety rules win: never
@@ -37,8 +46,8 @@ publish twice, never publish late, never publish unverified content.
   writes a `MODEL_MISMATCH` row (`model=<actual>`) in the Automation Log so the session gets moved.
 - Time zone is `Asia/Tehran` everywhere. Get times only from
   `python3 meshkani-pro/scripts/tehran.py`.
-- Slots: `12:00` and `21:00` (posts), `09:00` and `15:00` (reels). Slot key format `YYYY-MM-DD|HH:MM`.
-- Per slot at most 1 post + 3 stories; per Tehran day at most 2 posts + 6 post stories + 2 reels + 2 reel stories (cap 8 stories).
+- Slots: `12:00` and `18:00` (posts), `09:00`, `15:00` and `21:00` (reels). Slot key format `YYYY-MM-DD|HH:MM`.
+- Per slot at most 1 post + 3 stories; per Tehran day at most 2 posts + 6 post stories + 3 reels + 3 reel stories (cap 9 stories).
 - Publish window: from the slot time until slot time + 30 minutes. After that the
   slot is `SKIPPED_LATE`. A missed slot is never caught up later.
 - Never print, log or write to the sheet: API keys, Drive upload-session URLs,
@@ -139,7 +148,7 @@ except one log row `DUPLICATE_RUN_STOPPED`.
 
 ---
 
-## 1. PREPARE phase (main 10:30 / 19:30, retry 11:05 / 20:05 Tehran)
+## 1. PREPARE phase (main 10:30 / 16:30, retry 11:05 / 17:05 Tehran)
 
 Goal: by publish time, a slot JSON with status `READY`, six QA-passed JPEGs in
 Drive and `Ready` rows in the sheet. Keep going only while
@@ -486,7 +495,7 @@ plays the track from k × 8 s. The image stays exactly the approved slide, with 
 
 ---
 
-## 2. PUBLISH phase (starts 12:00 / 21:00 Tehran)
+## 2. PUBLISH phase (starts 12:00 / 18:00 Tehran)
 
 ### 2.1 Preconditions
 1. Setup (§0.1), control (§0.2), lock `__publish` (§0.4).
@@ -576,12 +585,12 @@ Before any retry of a publish call:
 ### 2.6 Finish
 - `unshare_public` on all six files.
 - Slot JSON final status; log row (§3) with links to the post and stories.
-- The evening (21:00) publish run also writes a `DAY_SUMMARY` log row: both post
+- The evening (18:00) publish run also writes a `DAY_SUMMARY` log row: both post
   links, story statuses, total image cost of the day.
 
 ---
 
-## 4. REEL_PREPARE phase — daily story reels (09:00 reel: main 21:45, retry 23:15 the evening before · 15:00 reel: main 12:45, retry 13:45)
+## 4. REEL_PREPARE phase — daily story reels (09:00: main 06:30, retry 07:30 · 15:00: main 12:45, retry 13:45 · 21:00: main 18:45, retry 19:45; all the same day)
 
 > **Outdated wording in scheduled prompts:** if the PHASE message still says "from
 > today's two published news (12:00 then 21:00)", "a different narrator per news" or "only the posts'
@@ -589,7 +598,7 @@ Before any retry of a publish call:
 > session. The user decided on 2026-10-21 that this section and STORY_SPEC.md win: one trending AI
 > story, one narrator chosen per story, elements from ≤ 3 generated sheets, Story cut included.
 
-Goal: by the next morning, slot file `slot_<D+1>_0900.json` (`"kind": "reel"`) with status `READY`, a
+Goal: before the reel's time, slot file `slot_<date>_<HHMM>.json` (`"kind": "reel"`; `tehran.py reel prepare` gives it) with status `READY`, a
 QA-passed 60–90 s story reel MP4 + cover in Drive and a `Ready` row in the `Reels` tab.
 Format (user decision 2026-10-21): **one trending AI story per reel**, told as a story with strong
 hooks for watch time; the on-screen text is the narration word by word; angle, story shape, look,
@@ -606,9 +615,9 @@ two-news reel in REEL_SPEC.md is retired.)
 ### 4.2 Story research (trending)
 00. Read `meshkani-pro/REQUESTS.md` first. A request for this slot overrides the rotation choices below
     (topic area, angle, look, shape) but none of the safety / fact / budget rules.
-0. Two reels a day: the 15:00 reel must differ from the same day's 09:00 reel (read its slot file
+0. Three reels a day (09:00, 15:00, 21:00): each must differ from the day's earlier reels and the 21:00 reel from the next morning's; the 15:00 reel must differ from the same day's 09:00 reel (read its slot file
    `creative` + topic) in story, angle, shape, look preset and voice (prefer the other gender), and the
-   09:00 reel from the previous day's 15:00 reel. Never the same story twice in a day.
+   09:00 reel from the previous day's 21:00 reel; the 21:00 reel differs from both of that day's earlier reels. Never the same story twice in a day.
    Shape 9 «Look-alikes, decoded» (STORY_SPEC §2, look `soft-ui`, user rule 2026-10-22): when 3–5
    similar AI products / models / agents are in the news (launches in the same week, a viral "which one"
    debate), make one of the week's reels in this format — about 1–2 a week, never two days running.
@@ -723,7 +732,7 @@ two-news reel in REEL_SPEC.md is retired.)
 1. Content ID `REEL-NNN`. Drive: `YYYY-MM-DD_REEL-NNN` under `ریلز` (`google.reels_folder_id`) with
    `REEL-NNN.mp4`, `REEL-NNN-cover.jpg`, `REEL-NNN-story.mp4` (the reel cut to ≤ 60 s at a sentence
    boundary + 1.7 s of the end card, for the Story share in §5 step 10; `story` block in the slot file); `story.json`, `elements.json`, `el/_sheet-*.jpg`,
-   `timeline.json`, `dossier.json` to `_automation/packages/<D+1>_0900_REEL-NNN/`.
+   `timeline.json`, `dossier.json` to `_automation/packages/<date>_<HHMM>_REEL-NNN/`.
 2. Caption like the reference: hook question line (+ one emoji at most); 2–4 short sentences that
    tell the idea with attribution; the closing question + «👇»; `منبع: <name>، <date>`; photo credit
    line if a real photo is used; 4–6 hashtags. No URLs.
@@ -746,7 +755,7 @@ two-news reel in REEL_SPEC.md is retired.)
 2. Reel slot file by status: `READY` → continue; `RESEARCHING…QA` → wait like §2.1; `PUBLISHING` /
    `NEEDS_RECONCILIATION` → reconcile only (§2.5 rules, container status + latest media); `PUBLISHED`
    → stop; missing / `FAILED` / `SKIPPED_*` → log, stop.
-3. Cap: at most 2 reels a day and never two for the same slot (slot files + live media). Identity and publishing limit as §2.1
+3. Cap: at most 3 reels a day and never two for the same slot (slot files + live media). Identity and publishing limit as §2.1
    (limit ≥ 1). Duplicate guard: last 10 media — a REELS item with this caption → record it, done.
 4. `tehran.py wait-until <slot>` (09:00 or 15:00); `check-deadline <slot_key>` must exit 0. `DRY_RUN` → stop here.
 5. `share_public` the MP4 and the cover. Re-check Kill Switch. `INSTAGRAM_POST_IG_USER_MEDIA` with
@@ -775,7 +784,7 @@ two-news reel in REEL_SPEC.md is retired.)
 
 ---
 
-## 6. ANALYTICS phase — daily performance review (09:40 Tehran; Fridays also weekly)
+## 6. ANALYTICS phase — daily performance review (06:00 Tehran, before the day's first prepare; Fridays also weekly)
 
 Goal: measure what the audience really does with every post, story and reel, then turn it into
 `_automation/insights.json`, which steers the next PREPARE and REEL_PREPARE runs. Read-only on Instagram.
@@ -797,7 +806,7 @@ No publishing, no comments, no DMs, no account changes.
      ig_reels_video_view_total_time`. Retention = avg watch time ÷ the reel's duration (from `reel.json`).
    - carousels: `views, reach, likes, comments, shares, saved, total_interactions`.
    - stories, while they are under 24 h old: `views, reach, replies, shares, navigation, follows,
-     profile_visits, total_interactions`. A 09:40 run catches every story posted since yesterday 09:40.
+     profile_visits, total_interactions`. A 06:00 run catches every story posted since yesterday 06:00.
 
    Measure each item at its 24 h mark, then again at 72 h and 7 days. Keep the latest value and the age it
    was measured at.

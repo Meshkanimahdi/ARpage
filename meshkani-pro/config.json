@@ -8,12 +8,12 @@
   "timezone": "Asia/Tehran",
   "slots": {
     "12:00": {
-      "prepare_start": "11:00",
+      "prepare_start": "10:30",
       "publish_at": "12:00"
     },
-    "21:00": {
-      "prepare_start": "20:00",
-      "publish_at": "21:00"
+    "18:00": {
+      "prepare_start": "16:30",
+      "publish_at": "18:00"
     }
   },
   "grace_minutes": 30,
@@ -21,8 +21,8 @@
     "posts_per_slot": 1,
     "stories_per_slot": 3,
     "posts_per_day": 2,
-    "stories_per_day": 8,
-    "note": "6 post stories + 2 reel stories (2026-10-21)"
+    "stories_per_day": 9,
+    "note": "6 post stories + 3 reel stories (2026-10-24)"
   },
   "google": {
     "spreadsheet_id": "1V6PkoiYAprKCEvsfT1ThGkKTouldAVWG7SoM1Ejrfyo",
@@ -127,11 +127,11 @@
     "slots": {
       "09:00": {
         "prepare_window": [
-          "21:30",
+          "06:15",
           "08:30"
         ],
-        "prepare_main": "21:45 (previous day)",
-        "prepare_retry": "23:15 (previous day)"
+        "prepare_main": "06:30",
+        "prepare_retry": "07:30"
       },
       "15:00": {
         "prepare_window": [
@@ -140,6 +140,14 @@
         ],
         "prepare_main": "12:45",
         "prepare_retry": "13:45"
+      },
+      "21:00": {
+        "prepare_window": [
+          "18:30",
+          "20:30"
+        ],
+        "prepare_main": "18:45",
+        "prepare_retry": "19:45"
       }
     },
     "publish_at": "09:00",
@@ -147,12 +155,12 @@
     "format": "story reel (news-reel/STORY_SPEC.md)",
     "max_seconds": 92,
     "caps": {
-      "reels_per_day": 2,
-      "reel_stories_per_day": 2
+      "reels_per_day": 3,
+      "reel_stories_per_day": 3
     }
   },
   "analytics": {
-    "run_at": "09:40",
+    "run_at": "06:00",
     "insights_file": "insights.json (in _automation)",
     "window_days": 30,
     "measure_ages_h": [
