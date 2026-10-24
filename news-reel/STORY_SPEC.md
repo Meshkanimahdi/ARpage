@@ -14,7 +14,7 @@ previous reel's `story.json`; record today's choices in the slot file → `creat
 ---
 
 ## 1. Angle (what the story is about) — rotate
-Pick today's story from what is trending in AI in the last 24–72 h (several independent outlets,
+Pick today's story from what is trending in AI in the last 7 days (user rule 2026-10-24) (several independent outlets,
 platform buzz, big launches, viral demos, notable statements, new studies). Verify it like news
 (RUNBOOK §1.3). Search the angles below widely — run a few searches in at least 5 different angles
 every day (e.g. "AI <angle keyword> this week", "AI startup shut down", "AI game viral") before

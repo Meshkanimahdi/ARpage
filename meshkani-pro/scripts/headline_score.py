@@ -38,7 +38,7 @@ def main():
     for line in Path(a.cands).read_text().splitlines():
         line = line.strip()
         if not line: continue
-        m = re.match(r'^([A-F])\s*[:|]\s*(.+)$', line); angle, text = (m.group(1), m.group(2)) if m else ('?', line)
+        m = re.match(r'^([A-G])\s*[:|]\s*(.+)$', line); angle, text = (m.group(1), m.group(2)) if m else ('?', line)
         words = [w for w in re.split(r'\s+', text.replace('|', ' ')) if w]
         n, s, why, fail = len(words), 0.0, [], []
         s += 2 if 2 <= n <= 6 else (0 if n <= 8 else -3); why.append(f'{n} words')
@@ -46,7 +46,7 @@ def main():
         if ai:
             s -= 8 if norm(words[0]) in [norm(x) for x in L['ai_fatigue']] or norm(' '.join(words[:2])) in [norm(x) for x in L['ai_fatigue']] else 6
             why.append('AI-fatigue: ' + ','.join(ai))
-        for key, pts in (('stake', 3), ('tension', 3), ('command', 2), ('you', 2)):
+        for key, pts in (('stake', 3), ('tension', 3), ('command', 2), ('you', 2), ('groups', 3)):   # groups: job/life-group call-out (angle G)
             hit = has(text, L[key])
             if hit: s += pts; why.append(f'{key}: ' + ','.join(hit[:3]))
         if not has(text, L['you']) and re.search(r'(^|\s)(ن?می[\u200c ]?\S+ی|\S+ت)(؟|\s|$)', text):   # 2nd-person verb or "your …" suffix

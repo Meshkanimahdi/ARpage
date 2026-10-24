@@ -41,14 +41,17 @@ tension. They never lead with "هوش مصنوعی" (AI). The AI angle belongs i
    never as an insult.
 
 ## Process (each reel cover, each post slide 1)
-1. **Write 12 candidates** across these angles, 2 each:
+1. **Write 14 candidates** across these angles, 2 each (A–G):
    - **A. personal stake:** your job, money or family;
    - **B. power name:** a famous person or brand in the story;
    - **C. conflict:** a ban, a fight, a firing, a secret;
    - **D. contrarian or command:** «… شو» ("become …"), «… نکن» ("don't …"), "everyone is wrong
      about …";
    - **E. question to the viewer:** "would you …?";
-   - **F. shock number:** a number from the claims, framed for a person.
+   - **F. shock number:** a number from the claims, framed for a person;
+   - **G. job / life-group call-out (user rule 2026-10-24):** name the group the story touches and promise or
+     warn it: «اگه آشپزی، این به دردت می‌خوره», «آرایشگرها منتظر باشن», «اونایی که می‌خوان لاغر شن خوشحال
+     باشن». True to the story, respectful (speak to the goal, never shame a body or a class).
 2. **Score them:**
    `python3 meshkani-pro/scripts/headline_score.py --facts work/story/dossier.json --cands work/story/headlines.txt`
    This checks the length, the AI-fatigue words, the stake, name, tension, question and number signals,

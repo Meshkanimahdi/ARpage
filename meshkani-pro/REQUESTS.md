@@ -7,7 +7,7 @@ file `creative.request` which request you followed. Requests for past slots are 
 ## Reel 2026-10-23 09:00 (prepared 2026-10-22 21:45, user request 2026-10-22)
 - **Topic area:** the role of AI in fashion and style, told so it appeals to women — design and
   collections, virtual try-on and AI stylists, AI models in campaigns / on the runway, trend forecasting,
-  fashion brands' AI moves. Pick the strongest *verified* story trending in the last 72 h; if nothing big,
+  fashion brands' AI moves. Pick the strongest *verified* story trending in the last 7 days; if nothing big,
   widen to the last 14 days (still verified, dated in the caption). Angle: creative work (STORY_SPEC §1).
 - **Look: `maxi-photo`, mandatory** (from the user's reference 2026-10-22: a photoreal maximalist creative
   studio — posters, disco ball, pink balloon dog, plants, leopard / checker prints, neon heart — with the

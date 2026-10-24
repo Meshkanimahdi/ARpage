@@ -203,13 +203,16 @@ Drive and `Ready` rows in the sheet. Keep going only while
 ### 1.3 Research (live)
 Use WebSearch/WebFetch, English first, local language if needed:
 
-> با ساعت فعلی تهران و جست‌وجوی زنده، خبرهای معتبر ۲۴ تا ۴۸ ساعت اخیر را دربارهٔ اثر واقعی
+> با ساعت فعلی تهران و جست‌وجوی زنده، خبرهای معتبر **هفت روز اخیر** را دربارهٔ اثر واقعی
 > هوش مصنوعی در چند صنعت پیدا کن. قبل از انتخاب، ۱۴ پست اخیر و سابقهٔ هفت روز گذشته را بررسی
 > کن. برای هر نامزد، منبع اصلی، تاریخ انتشار، تاریخ رخداد، ادعای دقیق و محدودیت آن را
 > استخراج کن. موضوع‌های تکراری و شایعات را حذف کن. حوزهٔ کمتر پوشش‌داده‌شده را در صورت وجود
 > خبر هم‌سطح ترجیح بده. اگر خبر مناسب نیست، خروجی را «خبر مناسب پیدا نشد» قرار بده؛ خبر یا
 > آمار نساز.
 
+- **Search window: the last 7 days** (user rule 2026-10-24; it was 24–48 h). The event or announcement must
+  be inside the last 7 Tehran days; prefer the freshest of two equal stories, and never repeat a story
+  already covered (check 14 posts and 14 reels).
 - Aim for 15–30 candidates across many fields from `config.json → sectors`
   (search each fresh field explicitly, e.g. "AI in football", "AI film
   production", "AI restaurant"). Do not pad the list.
@@ -670,7 +673,7 @@ narrator talks, nothing attractive in the picture").
    debate), make one of the week's reels in this format — about 1–2 a week, never two days running.
 1. History: `Reels` tab (last 14 rows: topic, and angle/shape/preset/voice in Notes), the last 7 days
    of posts, and the previous reel's slot file `creative`.
-2. Find 8–15 candidates trending in AI in the last 24–72 h (WebSearch across outlets, launches, viral
+2. Find 8–15 candidates trending in AI in the **last 7 days** (user rule 2026-10-24) (WebSearch across outlets, launches, viral
    demos, agent case studies, studies, statements; primary sources through Drive when WebFetch is
    blocked, §1.3). Drop rumours and anything you cannot attribute.
 3. Read `_automation/insights.json` (§6). Score each candidate for hook strength, broad appeal for a
@@ -678,6 +681,15 @@ narrator talks, nothing attractive in the picture").
    insights say this audience watches, saves and shares (`leaders.topic`, `leaders.angle`, `hooks`).
    Keep 1 reel in 4 as an exploration pick (an untried angle, topic type or motion category). Pick one. Then choose today's **angle** (STORY_SPEC §1, 17 angles — search at least 5 of them), **shape**
    (§2), **look preset** (§4), **voice** (§5) and **tempo** (§6) — each different from yesterday's.
+3b. **Profession and life-group reels (user rule 2026-10-24).** At least 1 reel a day (and up to 2) is
+   an AI story tied to a specific job or everyday group, framed as a call-out to that group: chefs and home
+   cooks, hairdressers and beauticians, taxi and delivery drivers, teachers, students, doctors and nurses,
+   shopkeepers, farmers, tailors, real-estate agents, parents, people trying to lose weight, gamers…
+   Search for it explicitly: "AI cooking/recipe", "AI salon/hair", "AI weight loss", "AI taxi"… within
+   the 7-day window. The cover and first line name the group with a provocative but true promise or
+   warning: «اگه آشپزی، این به دردت می‌خوره», «آرایشگرها منتظر باشن», «اونایی که می‌خوان لاغر شن خوشحال
+   باشن» (HEADLINES.md angle G). Rotate groups; never the same group twice in 7 days. Never insult or
+   shame a group (weight, looks, class, ethnicity): speak to its goal or stake, not its body.
 4. Write `work/story/dossier.json`: idea, who/where/when, primary URL + confirming URLs, exact quote
    (only if confirmed) or paraphrase, allowed claims, field, selection reason.
 
