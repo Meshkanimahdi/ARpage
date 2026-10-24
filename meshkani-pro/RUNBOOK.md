@@ -613,19 +613,41 @@ narrator talks, nothing attractive in the picture").
    (beat) has its own `shot` saying exactly what the viewer sees while that sentence is spoken. The picture
    shows the real thing being said: the person, product, place, logo, or the event itself. Never a pun on a
    Persian word (REEL-007 showed a gold wedding ring for «حلقه» meaning "loop"), never a decorative object.
-2. **Full frame, always.** Every shot fills the 1080x1920 frame: a cinematic photo, a realistic generated
-   scene in the cover's visual language, real footage, or a real UI. No empty or beige canvas with small
-   cut-outs; the main subject is at least 40% of the frame width. Nothing is cut by the frame edge unless it
-   is a full-bleed background, and no text is truncated.
+2. **A designed, filled frame, always — not always a full-screen photo** (user rule 2026-10-24, second
+   review). Never an empty or beige canvas with small cut-outs while the narrator talks; the main subject is
+   at least 40% of the frame width. The look follows the chosen motion prompt: full-bleed photos, kinetic
+   typography, real UI, framed photos on a designed ground, split screens, editorial layouts, 3D. Do not make
+   every reel a full-screen photo slideshow. Nothing is cut by the frame edge unless it is a full-bleed
+   background, and no text is truncated.
 3. **Rhythm.** A new shot or a clear camera change every 1.5–3 s; no still picture longer than 1.5 s,
    except a final CTA of at most 2 s. Cut on action. Length 40–55 s (the 60–92 s ranges below are replaced).
 4. **Hook in 2 seconds.** The first frame is the strongest picture of the reel, already moving, and the first
    spoken line is the cover headline's angle (HEADLINES.md), never a slow lead-in like «یه آزمایش واقعی از…»
    ("a real experiment from…").
-5. **Motion prompt fit.** One-diagram/zoom-map prompts (for example pm/168, 194) are only for list or
-   how-to topics, never for a news story. A story reel uses a shot-based prompt (for example 211, 144, 086, or
-   205-style cuts) with full-bleed images replacing any plain canvas the prompt describes.
-6. **Gate (blocking).** After `reel_assemble.py`, run `python3 news-reel/reel_qa.py work/story/reel.mp4`.
+5. **Motion prompt fit and variety.** One-diagram/zoom-map prompts (for example pm/168, 194) are only for list
+   or how-to topics, never for a news story. **Every reel uses a different motion prompt** (user rule
+   2026-10-24): never one used in the last 10 reels (check `news-reel/pm/README.md` "used in" and the Reels
+   sheet), and rotate the category (UI, kinetic type, editorial, 3D, story, explainer…) so consecutive reels
+   look clearly different. Reusing a built engine is fine only after 10 other reels.
+7. **Pre-production plan before building (user rule 2026-10-24).** Write `work/story/production_plan.md`
+   before any image or render:
+   - the chosen prompt and why it fits; the shot list with times;
+   - for each shot, how it is made, cheapest first: code/typography/UI (free) → real photos and logos (free)
+     → a frame of a storyboard sheet → a single generated image (only when a sheet cannot work);
+   - the number of storyboard sheets, the image budget (target ≤ $0.25 per reel, never more than $0.50
+     without a logged reason) and the main quality risks.
+8. **Storyboard sheets, never one image per shot (user rule 2026-10-24).** When the prompt needs generated
+   pictures, generate them as storyboard sheets: up to 12 vertical 9:16 panels in one wide image
+   (`gen_image.py --kind board`, 3840x2160, 6 columns x 2 rows, thin black gutters, one prompt listing the
+   panels in reading order, same world/light/character, `--ref` for a recurring character). Cut them with
+   `python3 news-reel/storyboard_cut.py board.png --out work/story/raw --names s01,…,s12` (finds the gutters,
+   upscales each panel to 1080x1920). Use each panel as a shot, and reuse a panel with a different camera
+   move or crop where it fits. One sheet ≈ $0.11 for 12 shots instead of ≈ $0.60. Regenerate a whole sheet
+   at most once; a single bad panel is replaced by reusing another panel, not by a new call. Read the sheet
+   before cutting.
+6. **Gate (blocking).** After `reel_assemble.py`, run `python3 news-reel/reel_qa.py work/story/reel.mp4`
+   (add `--layout designed` for typography/UI/editorial looks on plain grounds: it relaxes only the flat-area
+   limits; holds, rhythm, hook and length stay strict).
    Exit 3 is a FAIL: fix and re-render, never publish. Then Read `qa/contact.jpg` (1 frame per second) and
    check each second against the narration for cropped elements, cut-off text, and a picture that does not
    match its sentence. Record `qa.attention` (the qa.json numbers) in the slot file.
@@ -724,7 +746,9 @@ narrator talks, nothing attractive in the picture").
      letters, numbers or logos in the image. Pass the real product photo as `--ref` when there is one.
    - `work/story/cover.json`:
      - `bg`
-     - `logo`: the real logo, §4.3 step 2
+     - `logo`: the real logo, §4.3 step 2 — only of the story's main subject (the company, lab or product the
+       news is about). A technology merely used inside the story (e.g. the model an experiment ran on) is
+       named in the reel, not put on the cover (user question 2026-10-24 on REEL-007's Claude chip).
      - `logo_label`: the brand name, if the logo is an icon only
      - `kicker`: 1–3 words, such as «فوری», «مطالعه‌ی Science», «بی‌سابقه»
      - `title`: 3–7 words in Persian; one or two `*accent*` words; at most one `|` line break

@@ -98,6 +98,14 @@
         1536
       ],
       "background": "transparent"
+    },
+    "board": {
+      "request_size": "3840x2160",
+      "fallback_aspect_ratio": "16:9",
+      "final": [
+        3840,
+        2160
+      ]
     }
   },
   "sectors": [

@@ -78,9 +78,13 @@ samples were made with them. **Never change the core structure of a prompt.**
 ## Priority rule: full-frame shots for news reels (user rule 2026-10-24, after REEL-007)
 - A news story never uses a one-diagram/zoom-map prompt (e.g. 168, 194): they left the frame mostly empty
   with tiny cut-outs. Those prompts are only for list or how-to topics.
-- Pick a shot-based prompt and keep its structure, but every shot fills the 1080x1920 frame with a real or
-  realistic picture of exactly what the narration says; replace any plain canvas the prompt describes with
-  full-bleed images (an allowed "topic slot" edit). No word-pun objects.
+- Pick a shot-based prompt and keep its structure. Every frame is designed and filled with exactly what the
+  narration says (no word-pun objects), but not every reel is a full-screen photo slideshow: follow the
+  prompt's own look (typography, UI, editorial, 3D, framed photos…).
+- A different prompt for every reel: never one used in the last 10 reels; rotate categories.
+- Plan first (`production_plan.md`: shots, how each is made cheapest-first, budget ≤ $0.25), and make
+  generated pictures as storyboard sheets of 12 panels (`gen_image.py --kind board` + `news-reel/storyboard_cut.py`),
+  never one image call per shot (RUNBOOK §4.0 rules 7–8).
 - New picture or camera change every 1.5–3 s, no still over 1.5 s, hook in the first 2 s, 40–55 s.
 - Gate: `python3 news-reel/reel_qa.py <reel.mp4>` must pass, then read its contact sheet (RUNBOOK §4.0).
 

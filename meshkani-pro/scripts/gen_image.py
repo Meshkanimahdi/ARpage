@@ -45,7 +45,7 @@ def data_url(path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--kind", choices=["post", "story", "object", "sheet"], required=True)
+    ap.add_argument("--kind", choices=["post", "story", "object", "sheet", "board"], required=True)
     ap.add_argument("--prompt-file", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--ref", action="append", default=[], help="reference/edit-source image")

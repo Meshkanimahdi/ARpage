@@ -54,7 +54,11 @@ def main():
     ap.add_argument('--max-flat-frames', type=float, default=0.15, help='max share of seconds that are >60%% flat')
     ap.add_argument('--max-hold', type=float, default=1.5, help='longest allowed still stretch, seconds')
     ap.add_argument('--max-shot', type=float, default=3.5, help='max mean shot length, seconds')
+    ap.add_argument('--layout', choices=['photo', 'designed'], default='photo',
+                    help='designed = typography/UI/editorial on plain grounds: relaxes only the flat-area limits')
     a = ap.parse_args()
+    if a.layout == 'designed':
+        a.max_flat, a.max_flat_frames = max(a.max_flat, .72), max(a.max_flat_frames, .45)
 
     video = Path(a.video)
     out = Path(a.out) if a.out else video.parent / 'qa'
@@ -109,7 +113,7 @@ def main():
     hook_flat = max(flats[:4]) if flats else 1
     hook_motion = sum(d[:20]) / max(1, len(d[:20]))
     report.update(hook_flat=round(hook_flat, 2), hook_motion=round(hook_motion, 2))
-    if hook_flat > 0.45:
+    if hook_flat > (0.72 if a.layout == 'designed' else 0.45):
         fails.append(f'weak hook: first 2 s are {hook_flat:.0%} empty')
     if hook_motion < 0.8:
         fails.append(f'weak hook: almost no motion in the first 2 s ({hook_motion:.2f})')
