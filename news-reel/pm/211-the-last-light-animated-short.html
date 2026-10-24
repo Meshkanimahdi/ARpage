@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — shot-list short film (prompt 211)</title>
+<!-- Skill motion-graphy-2026, prompt 211 "The Last Light animated short", adapted under RUNBOOK §4.0:
+     a story told as a shot list, one action per shot, every shot a full-bleed picture (1080x1920), shots joined
+     through motion and sound (cut on action: the outgoing move carries into the incoming shot with blur that
+     follows speed and direction), never crossfades. Anticipation before a move and follow-through after it
+     (spring settle on every cut), colour shifts with the mood, a beat of stillness before the last line lands.
+     Data: story.json {beats[{id, text, shots[[word, shot, variant?]], counter?[word, n], void?word, chips?[[word, img, label]],
+     bubble?[word, text]}], moves{shot: in|out|left|right|up|down|hook}, grade{beat: css filter}, end_text}
+     + timeline.json; plates in raw/<shot>.png (9:16). Pure seek(t): no timers, no state between frames. -->
+<style>
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-800-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-500-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-800-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --acc: #FF6A2A; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+  #stage { position: absolute; inset: 0; overflow: hidden; font-family: Vaz; }
+  #plate { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 960px; will-change: transform, filter; }
+  #sub { position: absolute; left: 60px; right: 140px; top: 1170px; height: 150px; display: flex; align-items: center; justify-content: center; direction: rtl; }
+  #sub .pill { display: inline-block; padding: 14px 38px 22px; border-radius: 34px; background: rgba(8, 10, 14, .58);
+               font: 800 62px/1.3 Vaz; color: #fff; white-space: nowrap; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+  #sub .w { display: inline-block; margin: 0 .14em; }
+  #sub .k { color: var(--acc); }
+  .chip { position: absolute; display: flex; align-items: center; gap: 18px; padding: 16px 30px 16px 18px; border-radius: 60px; background: #fff;
+          font: 800 46px Vaz; color: #111; direction: ltr; box-shadow: 0 14px 40px rgba(0,0,0,.28); opacity: 0; }
+  .chip img { width: 84px; height: 84px; border-radius: 18px; }
+  #bubble { position: absolute; left: 120px; top: 330px; padding: 26px 40px; border-radius: 40px 40px 40px 10px; background: #fff; color: #111;
+            font: 800 64px Vaz; direction: ltr; letter-spacing: 1px; opacity: 0; box-shadow: 0 16px 50px rgba(0,0,0,.3); white-space: nowrap; }
+  #count { position: absolute; left: 0; right: 80px; top: 1345px; text-align: center; font: 800 170px/1 Vaz; color: #fff; opacity: 0;
+           text-shadow: 0 10px 50px rgba(0,0,0,.45); }
+  #count small { display: inline-block; font: 800 56px Vaz; color: #fff; margin-right: 22px; vertical-align: middle; }
+  #strike { position: absolute; left: 420px; width: 330px; top: 1420px; height: 22px; background: var(--acc); border-radius: 11px; transform-origin: 0 50%; transform: rotate(-8deg) scaleX(0); }
+  #end { position: absolute; left: 0; right: 0; top: 250px; text-align: center; opacity: 0; color: #fff; }
+  #end h1 { margin: 0; font: 800 120px/1.25 Vaz; text-shadow: 0 10px 50px rgba(0,0,0,.4); }
+  #end h1 b { color: var(--acc); }
+  #end p { margin: 30px 0 0; font: 800 50px Vaz; opacity: .92; }
+  #handle { position: absolute; left: 0; right: 0; top: 1360px; text-align: center; font: 800 40px Vaz; color: #fff; letter-spacing: 2px; direction: ltr; opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg width="0" height="0" style="position:absolute"><filter id="dblur" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur id="dbg" stdDeviation="0 0"/></filter></svg>
+  <img id="plate">
+  <div id="count"></div><div id="strike"></div>
+  <div id="bubble"></div>
+  <div id="chips"></div>
+  <div id="sub"></div>
+  <div id="end"></div>
+  <div id="handle"></div>
+</div>
+<script src="/logo-motion/node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/r7b/';
+const url = s => s.startsWith('/') ? s : DIR + s;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), lerp = (a, b, k) => a + (b - a) * k, P = (t, a, b) => clamp((t - a) / (b - a));
+const E = {o: gsap.parseEase('expo.out'), io: gsap.parseEase('sine.inOut'), p3: gsap.parseEase('power3.out'), b: gsap.parseEase('back.out(2.2)')};
+const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const ISSUES = [];
+let S, TL, SHOTS = [], BEATS = [], END = 60, IMG = {};
+
+// camera move for one shot: k = 0..1 over the shot. Returns zoom z and offsets x,y (px) and the move direction
+// (unit vector of on-screen motion, used for the cut whip). Pans never reveal an edge: |x| <= (z-1)*540.
+function move(m, k) {
+  const e = E.io(k);
+  switch (m) {
+    case 'hook': { const a = E.o(clamp(k * 3.2)); return {z: lerp(1.42, 1.1, a) - .03 * k, x: 0, y: lerp(-60, 0, a), dir: [0, 0]}; }
+    case 'in': return {z: lerp(1.07, 1.24, e), x: 0, y: 0, dir: [0, 0]};
+    case 'out': return {z: lerp(1.26, 1.07, e), x: 0, y: 0, dir: [0, 0]};
+    case 'left': return {z: 1.17, x: lerp(70, -70, e), y: 0, dir: [-1, 0]};
+    case 'right': return {z: 1.17, x: lerp(-70, 70, e), y: 0, dir: [1, 0]};
+    case 'up': return {z: 1.17, x: 0, y: lerp(-130, 130, e), dir: [0, 1]};      // the picture moves down = the camera tilts up
+    case 'down': return {z: 1.17, x: 0, y: lerp(130, -130, e), dir: [0, -1]};
+  }
+  ISSUES.push('unknown move ' + m); return {z: 1.1, x: 0, y: 0, dir: [0, 0]};
+}
+const spring = u => u < 0 ? 0 : Math.exp(-7 * u) * Math.cos(13 * u);   // anticipation/follow-through settle after a cut
+
+window.ready = (async () => {
+  S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json();
+  END = TL.total;
+  const shown = t => t.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/\|/g, ' ').trim().split(/\s+/);
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) throw new Error('unknown line ' + bt.id);
+    const raw = shown(bt.text), words = raw.map(w => ({w: w.replace(/\*/g, ''), k: /\*/.test(w)}));
+    // keyword spans *a b*: mark the words inside
+    let on = false; raw.forEach((w, i) => { const st = w.startsWith('*'), en = w.endsWith('*') || /\*[.…!؟?،]*$/.test(w); if (st) on = true; words[i].k = on || words[i].k; if (en) on = false; });
+    const wt = j => { const wi = Math.round(j * (L.words.length - 1) / Math.max(1, words.length - 1)); return (L.words[wi] || [L.start])[0]; };
+    BEATS.push({bt, L, words, wt});
+  }
+  BEATS.forEach((b, i) => { b.a = b.L.start; b.b = i + 1 < BEATS.length ? BEATS[i + 1].L.start : TL.end_start; });
+  // shots: cut a hair before the word that starts them
+  for (const b of BEATS) for (const [wi, id, v] of b.bt.shots) SHOTS.push({id, v: v || 0, beat: b, t0: wi ? b.wt(wi) - .06 : (b === BEATS[0] ? 0 : b.a - .12)});
+  if (S.end_shot) SHOTS.push({id: S.end_shot[0], v: S.end_shot[1] || 0, beat: BEATS[BEATS.length - 1], t0: TL.end_start - .05});
+  SHOTS.sort((p, q) => p.t0 - q.t0); SHOTS[0].t0 = 0;
+  SHOTS.forEach((s, i) => { s.t1 = i + 1 < SHOTS.length ? SHOTS[i + 1].t0 : END; s.m = (S.moves[s.id + (s.v ? '.' + s.v : '')] || S.moves[s.id] || 'in');
+    if (s.t1 - s.t0 > 3.2 && i < SHOTS.length - 1) ISSUES.push(`shot ${s.id} lasts ${(s.t1 - s.t0).toFixed(1)}s (> 3 s): split it`); if (s.t1 - s.t0 < .7) ISSUES.push(`shot ${s.id} lasts ${(s.t1 - s.t0).toFixed(2)}s (< 0.7 s)`); });
+  // preload plates
+  await Promise.all([...new Set(SHOTS.map(s => s.id))].map(id => new Promise((res) => { const im = new Image(); im.onload = res; im.onerror = () => { ISSUES.push('missing plate ' + id); res(); }; im.src = url('raw/' + id + '.png'); IMG[id] = im.src; })));
+  // overlays
+  const ch = $('chips');
+  for (const b of BEATS) for (const [wi, img, lab, x, y] of (b.bt.chips || [])) { const d = document.createElement('div'); d.className = 'chip'; d.innerHTML = `<img src="${url(img)}"><span>${lab}</span>`;
+    d.style.left = x + 'px'; d.style.top = y + 'px'; ch.appendChild(d); (b.chipEls = b.chipEls || []).push({el: d, t: b.wt(wi)}); }
+  $('end').innerHTML = `<h1>${(S.end_text || '').replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>')}</h1><p>${S.end_sub || ''}</p>`;
+  $('handle').textContent = (S.handle || '').toUpperCase().replace('@', '');
+  await document.fonts.ready; await Promise.all(['500', '800'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش MIT')));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  window.SCENES = SHOTS.map(s => ({t0: s.t0, t1: s.t1, type: 'shot', bg: s.beat.bt.id, sfx: []}));
+  for (const b of BEATS) { if (b.bt.counter) { const t = b.wt(b.bt.counter[0]); for (let i = 0; i < 6; i++) window.SCENES[0].sfx.push([t + i * .42, 'tick', .25]); }
+    if (b.bt.void !== undefined) window.SCENES[0].sfx.push([b.wt(b.bt.void), 'hit', .45]); }
+  window.SCENES[0].sfx.push([TL.end_start, 'hit', .4]);
+  seek(0);
+})();
+
+function seek(t) {
+  if (!SHOTS.length) return;
+  let i = 0; for (let k = 0; k < SHOTS.length; k++) if (t >= SHOTS[k].t0) i = k;
+  const s = SHOTS[i], k = P(t, s.t0, s.t1), c = move(s.m, k);
+  // cut on action: the last 0.1 s of a shot and the first 0.12 s of the next whip along the incoming move
+  const nx = SHOTS[i + 1], pv = SHOTS[i - 1];
+  let whip = 0, wdir = c.dir;
+  if (nx && t > nx.t0 - .1) { whip = P(t, nx.t0 - .1, nx.t0); wdir = move(nx.m, 0).dir; }
+  else if (pv && t < s.t0 + .12) { whip = -(1 - P(t, s.t0, s.t0 + .12)); }
+  const wd = (wdir[0] || wdir[1]) ? wdir : [0, 1];
+  const amp = 90 * Math.sign(whip) * whip * whip;
+  const set = 1 + .045 * spring(t - s.t0) * (i ? 1 : 0);
+  const pl = $('plate');
+  if (pl._id !== s.id) { pl._id = s.id; pl.src = IMG[s.id]; }
+  pl.style.transform = `translate(${c.x + wd[0] * amp}px, ${c.y + wd[1] * amp}px) scale(${c.z * set})`;
+  const bl = Math.abs(whip) * 26; $('dbg').setAttribute('stdDeviation', `${(wd[0] ? bl : bl * .2).toFixed(1)} ${(wd[1] ? bl : bl * .2).toFixed(1)}`);
+  const grade = (S.grade || {})[s.beat.bt.id] || '';
+  pl.style.filter = (bl > .3 ? 'url(#dblur) ' : '') + grade;
+
+  // beat at t
+  let b = BEATS[0]; for (const x of BEATS) if (t >= x.a - .1) b = x;
+  // subtitles: up to 4 words of the current line, revealed word by word as they are spoken
+  const sub = $('sub'); const lineOn = t >= b.a - .05 && t <= b.L.end + .3 && t < TL.end_start;
+  if (lineOn) {
+    let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
+    const c0 = Math.floor(j / 4) * 4, chunk = b.words.slice(c0, c0 + 4);
+    const key = b.bt.id + ':' + c0;
+    if (sub._k !== key) { sub._k = key; sub.innerHTML = `<span class="pill">${chunk.map(w => `<span class="w${w.k ? ' k' : ''}">${w.w}</span>`).join(' ')}</span>`; }
+    [...sub.querySelectorAll('.w')].forEach((el, q) => { const tw = b.wt(c0 + q), kk = E.o(P(t, tw - .04, tw + .16)); el.style.opacity = kk; el.style.transform = `translateY(${(1 - kk) * 16}px)`; });
+    const pk = E.o(P(t, b.wt(c0) - .06, b.wt(c0) + .14)); sub.firstChild.style.transform = `scale(${.94 + .06 * pk})`;
+  } else { sub.innerHTML = ''; sub._k = null; }
+
+  // chips (real logos), bubble, counter, void
+  for (const x of BEATS) for (const cp of (x.chipEls || [])) { const kin = E.b(P(t, cp.t, cp.t + .35)), kout = P(t, x.b - .25, x.b);
+    cp.el.style.opacity = clamp(kin * 1.4) * (1 - kout); cp.el.style.transform = `scale(${.6 + .4 * kin}) translateY(${kout * -20}px)`; }
+  const bub = $('bubble'), bb = BEATS.find(x => x.bt.bubble);
+  if (bb && t >= bb.wt(bb.bt.bubble[0]) - .1 && t < bb.b) { const t0 = bb.wt(bb.bt.bubble[0]) - .1, txt = bb.bt.bubble[1], n = Math.floor(clamp((t - t0) / .9) * txt.length);
+    bub.textContent = txt.slice(0, Math.max(1, n)); const kk = E.b(P(t, t0, t0 + .3)); bub.style.opacity = clamp(kk * 1.5) * (1 - P(t, bb.b - .2, bb.b)); bub.style.transform = `scale(${.7 + .3 * kk})`; }
+  else bub.style.opacity = 0;
+  const cnt = $('count'), cb = BEATS.find(x => x.bt.counter), vb = BEATS.find(x => x.bt.void !== undefined), stk = $('strike');
+  if (cb && t >= cb.wt(cb.bt.counter[0]) - .05 && t < (vb ? vb.b : cb.b)) {
+    const t0 = cb.wt(cb.bt.counter[0]), n = Math.max(1, Math.round(cb.bt.counter[1] * E.o(P(t, t0, cb.L.end - .2))));
+    const voided = vb && t >= vb.wt(vb.bt.void);
+    const html = `<span id="num">${fa(n)}</span><small>${voided ? 'باطل شد' : 'بار پشت هم'}</small>`; if (cnt._h !== html) { cnt._h = html; cnt.innerHTML = html; }
+    const r = $('num').getBoundingClientRect(); stk.style.left = (r.left - 20) + 'px'; stk.style.width = (r.width + 40) + 'px'; stk.style.top = (r.top + r.height * .5 - 11) + 'px'; cnt.style.opacity = clamp((t - t0) / .15) * (1 - P(t, (vb ? vb.b : cb.b) - .2, vb ? vb.b : cb.b));
+    cnt.style.transform = `scale(${1 + .08 * spring(t - t0)})`;
+    const ks = voided ? E.o(P(t, vb.wt(vb.bt.void), vb.wt(vb.bt.void) + .25)) : 0; stk.style.transform = `rotate(-8deg) scaleX(${ks})`; stk.style.opacity = cnt.style.opacity;
+  } else { cnt.style.opacity = 0; stk.style.transform = 'rotate(-8deg) scaleX(0)'; }
+
+  // end card over the last shot: a beat of stillness, then the question lands
+  const te = TL.end_start, ke = E.b(P(t, te + .15, te + .6)), kh = E.o(P(t, te + .5, te + 1));
+  $('end').style.opacity = clamp(ke * 1.4); $('end').style.transform = `scale(${.85 + .15 * ke})`;
+  $('handle').style.opacity = kh;
+}
+window.seek = seek;
+</script>
+</body>
+</html>
