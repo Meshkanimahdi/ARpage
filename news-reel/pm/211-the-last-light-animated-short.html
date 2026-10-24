@@ -143,8 +143,10 @@ function seek(t) {
     let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
     const c0 = Math.floor(j / 4) * 4, chunk = b.words.slice(c0, c0 + 4);
     const key = b.bt.id + ':' + c0;
-    if (sub._k !== key) { sub._k = key; sub.innerHTML = `<span class="pill">${chunk.map(w => `<span class="w${w.k ? ' k' : ''}">${w.w}</span>`).join(' ')}</span>`; }
-    [...sub.querySelectorAll('.w')].forEach((el, q) => { const tw = b.wt(c0 + q), kk = E.o(P(t, tw - .04, tw + .16)); el.style.opacity = kk; el.style.transform = `translateY(${(1 - kk) * 16}px)`; });
+    if (sub._k !== key) { sub._k = key; const lat = w => /^[A-Za-z0-9.\-]+[،,.!?؟…]*$/.test(w.w), grp = [];   // runs of Latin words stay one LTR span (else «Pollen Robotics» shows reversed)
+      chunk.forEach((w, q) => { const g = grp[grp.length - 1]; if (g && lat(w) && lat(chunk[q - 1])) { g.w += ' ' + w.w; g.k = g.k || w.k; } else grp.push({w: w.w, k: w.k, i: q, l: lat(w)}); });
+      sub.innerHTML = `<span class="pill">${grp.map(g => `<span class="w${g.k ? ' k' : ''}" data-i="${g.i}"${g.l ? ' dir="ltr"' : ''}>${g.w}</span>`).join(' ')}</span>`; }
+    [...sub.querySelectorAll('.w')].forEach((el, q) => { const tw = b.wt(c0 + +el.dataset.i), kk = E.o(P(t, tw - .04, tw + .16)); el.style.opacity = kk; el.style.transform = `translateY(${(1 - kk) * 16}px)`; });
     const pk = E.o(P(t, b.wt(c0) - .06, b.wt(c0) + .14)); sub.firstChild.style.transform = `scale(${.94 + .06 * pk})`;
   } else { sub.innerHTML = ''; sub._k = null; }
 
