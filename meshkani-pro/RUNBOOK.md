@@ -287,6 +287,10 @@ so the page must never look uniform. Before designing a cover or slide 1:
    Exit 3 means it is too similar: change the palette, key or layout, then regenerate or re-render (at
    most twice). Read the `_vs_grid.jpg` sheet before READY.
 
+**Slide-1 headline:** use the headline system in `meshkani-pro/HEADLINES.md` (12 candidates,
+`headline_score.py`, no «هوش مصنوعی» (AI) as the hook, stakes or names or tension, truth gate). Record
+`slides[0].headline {text, angle, score}`. The caption's first line uses the same angle.
+
 Before any image, write `work/brief.json`: sector, mood/tone, palette (hex),
 image type (licensed real photo vs labelled concept image), Persian type style
 and weights, title/body hierarchy, where image vs text sits, a distinct
@@ -692,6 +696,13 @@ two-news reel in REEL_SPEC.md is retired.)
      - `accent` / `ink`: colours
    - Render with `node news-reel/cover_render.mjs --dir=work/story`, which writes `cover.jpg` and the 4:5
      preview `cover_grid.jpg`. Exit 5 means a missing image or a headline that is too long; shorten it.
+   - **Headline system (user rule 2026-10-24, mandatory):** follow `meshkani-pro/HEADLINES.md`.
+     - Write 12 candidates across 6 angles and score them with `scripts/headline_score.py`.
+     - No «هوش مصنوعی» (AI) or similar AI words on the cover. Use personal stakes, power names,
+       conflict, commands and questions, always true to `allowed_claims`.
+     - Record `cover.headline {text, angle, score, runner_up}`. The caption's first line and the reel's
+       first spoken line use the same angle.
+     - The same system applies to post slide 1 (§1.5).
    - Headline formula: curiosity gap + concrete stakes. Use a number, a contrast, a "you" or a question,
      for example «هوش مصنوعی *۲ برابر* پزشک‌ها؟» ("AI *twice* as good as doctors?") or
      «Walmart درش رو باز کرد، *Amazon* بست» ("Walmart opened its door, *Amazon* closed it"). Every word
@@ -820,6 +831,11 @@ No publishing, no comments, no DMs, no account changes.
      داشتند → ریلز بعدی ≤ ۵۵ ثانیه و قلاب سؤالی» ("40–55 s reels with a question hook had higher retention
      → next reel ≤ 55 s with a question hook"). Never write a recommendation that breaks the sector,
      fact, cap or style-rotation rules.
+6b. **Headline learning** (HEADLINES.md step 4): join reach and the 3 s hold with
+    `cover.headline.angle` / `slides[0].headline.angle` and its features (AI word, stake, name, tension,
+    command, question, number, length). Keep `leaders.headline_angle` and `headline_lessons` in
+    insights.json. When a word or pattern wins clearly (≥ 3 items, ≥ 2× the median reach), add it to
+    `meshkani-pro/headline_lexicon.json → learned` with a bonus (commit and push).
 7. **Fridays: weekly review.**
    - In the Insights row, compare the last 7 days with the 7 days before: followers, reach, average
      retention, saves + shares per reach.
