@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="fa">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important} body{margin:0} img{max-width:100%} :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>از عکس تا خانه</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="مطالعه‌ی موردی: بازسازی پلان و تور سه‌بعدی اسکچی یک آپارتمان از روی ۱۲ عکس آگهی Airbnb.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;800&family=Vazirmatn:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an architect's presentation board. Wide white sheets, ink rules, dimension-line section marks, a drawing title block; one blue reserved for photo stations and links. */
+:root {
+  --paper: #ffffff;
+  --ink: #141414;
+  --ink-2: #4b4d50;
+  --ink-3: #8a8d91;
+  --rule: #e4e5e7;
+  --grid: #f1f2f4;
+  --blue: #2e58c4;
+  --blue-wash: #eef2fb;
+  --display: "Noto Kufi Arabic", "Vazirmatn", Tahoma, sans-serif;
+  --body: "Vazirmatn", Tahoma, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; animation: none !important; } }
+body {
+  margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.85;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+img { display: block; max-width: 100%; height: auto; }
+a { color: var(--blue); }
+a:focus-visible, button:focus-visible, input:focus-visible + .handle { outline: 2px solid var(--blue); outline-offset: 3px; }
+.board { max-width: 1240px; margin: 0 auto; }
+.fa-num { font-feature-settings: "tnum"; }
+
+/* top bar */
+.topbar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; padding-block: 18px 14px; border-bottom: 1px solid var(--ink); font-size: 13px; }
+.topbar .who { font-weight: 700; }
+.topbar .meta { font-family: var(--mono); font-size: 12px; color: var(--ink-2); letter-spacing: .02em; direction: ltr; }
+
+/* dimension-line eyebrow */
+.dim { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; color: var(--ink-2); }
+.dim::before, .dim::after { content: ""; height: 9px; flex: 0 0 auto; border-left: 1px solid var(--ink-3); width: 0; }
+.dim span { white-space: nowrap; }
+.dim i { flex: 1; height: 1px; background: var(--ink-3); min-width: 24px; }
+
+/* hero */
+.hero { display: grid; gap: 28px; padding-block: 56px 24px; }
+.hero h1 { font-family: var(--display); font-weight: 800; font-size: clamp(36px, 6.4vw, 84px); line-height: 1.12; letter-spacing: -.01em; margin: 0; max-width: 15ch; text-wrap: balance; }
+.hero h1 em { font-style: normal; color: var(--blue); }
+.hero-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 40px; align-items: end; }
+.lede { margin: 0; font-size: clamp(16px, 1.6vw, 19px); color: var(--ink-2); max-width: 58ch; }
+.ctas { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 10px; font: 500 15px var(--body); text-decoration: none; padding: 11px 20px; border: 1px solid var(--ink); color: var(--ink); background: var(--paper); border-radius: 2px; cursor: pointer; transition: background .15s, color .15s; }
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn:hover { background: var(--blue); border-color: var(--blue); color: #fff; }
+@media (max-width: 760px) { .hero-row { grid-template-columns: minmax(0, 1fr); } }
+
+.drawing { position: relative; border: 1px solid var(--ink); background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 28px 28px; background-position: -1px -1px; }
+.drawing img { width: 100%; }
+.crop::before, .crop::after { content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--ink); border-style: solid; pointer-events: none; }
+.crop::before { top: -8px; right: -8px; border-width: 1px 1px 0 0; }
+.crop::after { bottom: -8px; left: -8px; border-width: 0 0 1px 1px; }
+.titleblock { position: absolute; left: 14px; bottom: 14px; display: grid; grid-template-columns: auto auto; border: 1px solid var(--ink); background: var(--paper); font-size: 11.5px; line-height: 1.5; }
+.titleblock > * { padding: 5px 10px; border-bottom: 1px solid var(--ink); }
+.titleblock > :nth-child(odd) { border-left: 1px solid var(--ink); font-family: var(--mono); color: var(--ink-2); font-size: 10.5px; letter-spacing: .04em; }
+.titleblock > :nth-last-child(-n+2) { border-bottom: 0; }
+@media (max-width: 640px) { .titleblock { position: static; border-width: 1px 0 0 0; grid-template-columns: auto 1fr; } }
+
+/* facts */
+.facts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-block: 1px solid var(--ink); margin-block: 8px 0; }
+.fact { padding: 18px 16px 16px; display: grid; gap: 2px; align-content: start; }
+.fact + .fact { border-right: 1px solid var(--rule); }
+.fact b { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 3.2vw, 40px); line-height: 1.2; }
+.fact small { font-size: 13px; color: var(--ink-2); line-height: 1.6; }
+.fact .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; color: var(--ink-3); direction: ltr; text-align: right; }
+@media (max-width: 860px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fact + .fact { border-right: 0; } .fact { border-bottom: 1px solid var(--rule); } .fact:nth-child(even) { border-right: 1px solid var(--rule); } .fact:last-child { grid-column: 1 / -1; border-bottom: 0; } }
+
+/* sections */
+section { padding-block: 88px 0; display: grid; gap: 32px; }
+h2 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 4vw, 48px); line-height: 1.2; margin: 0; max-width: 20ch; text-wrap: balance; }
+h3 { font-family: var(--display); font-weight: 600; font-size: 19px; line-height: 1.5; margin: 0; }
+p { margin: 0; }
+.cols { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px 56px; align-items: start; }
+.cols > * { min-width: 0; }
+.prose { display: grid; gap: 16px; max-width: 60ch; color: var(--ink-2); }
+.prose strong { color: var(--ink); }
+@media (max-width: 900px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+
+/* contact sheet */
+.sheet { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 10px; border: 1px solid var(--ink); }
+.sheet figure { margin: 0; position: relative; }
+.sheet img { aspect-ratio: 4 / 3; object-fit: cover; width: 100%; filter: grayscale(.15); }
+.sheet figcaption { position: absolute; top: 5px; right: 5px; width: 22px; height: 22px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+.sheet-cap { display: flex; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-top: 8px; letter-spacing: .04em; }
+
+/* process */
+.steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--ink); }
+.step { padding: 22px 18px 8px 18px; display: grid; gap: 10px; align-content: start; }
+.step + .step { border-right: 1px solid var(--rule); }
+.step .n { font-family: var(--display); font-weight: 800; font-size: 34px; line-height: 1; color: var(--blue); }
+.step p { font-size: 14.5px; color: var(--ink-2); line-height: 1.8; }
+@media (max-width: 980px) { .steps { grid-template-columns: minmax(0, 1fr); } .step + .step { border-right: 0; border-top: 1px solid var(--rule); } .step { grid-template-columns: 56px 1fr; } .step .n { grid-row: span 2; } }
+
+/* plan */
+.plan-fig { margin: 0; }
+.deduce { list-style: none; margin: 0; padding: 0; display: grid; }
+.deduce li { display: grid; grid-template-columns: auto 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--rule); font-size: 15px; color: var(--ink-2); }
+.deduce li b { color: var(--ink); font-weight: 700; }
+.pill { font: 500 10.5px var(--mono); letter-spacing: .06em; padding: 2px 8px; border: 1px solid currentColor; border-radius: 99px; height: fit-content; margin-top: 4px; white-space: nowrap; direction: ltr; }
+.pill.hi { color: var(--ink); } .pill.mid { color: var(--ink-2); } .pill.lo { color: var(--ink-3); }
+
+/* compare */
+.compare-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+@media (max-width: 860px) { .compare-grid { grid-template-columns: minmax(0, 1fr); } }
+.compare { --pos: 50%; position: relative; margin: 0; border: 1px solid var(--ink); aspect-ratio: 4 / 3; max-width: 100%; overflow: hidden; user-select: none; touch-action: pan-y; background: var(--grid); }
+.compare img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.compare .b { clip-path: inset(0 0 0 var(--pos)); background: #fff; }
+.compare input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; z-index: 3; }
+.compare .handle { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 0; border-left: 1.5px solid var(--ink); z-index: 2; pointer-events: none; }
+.compare .handle::after { content: "⟷"; position: absolute; top: 50%; left: 0; transform: translate(-50%, -50%); width: 42px; height: 42px; border-radius: 50%; background: var(--paper); border: 1.5px solid var(--ink); display: grid; place-items: center; font-size: 18px; line-height: 1; color: var(--ink); }
+.compare .tag { position: absolute; top: 12px; z-index: 2; font: 500 11px var(--mono); letter-spacing: .08em; padding: 3px 9px; background: var(--paper); border: 1px solid var(--ink); pointer-events: none; }
+.compare .tag.l { left: 12px; } .compare .tag.r { right: 12px; }
+.compare-cap { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; color: var(--ink-2); margin-top: 10px; }
+.compare-cap b { color: var(--blue); font-family: var(--display); }
+
+/* two languages */
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.duo figure { margin: 0; display: grid; gap: 10px; }
+.duo .drawing.real { background: #e3e3e0; background-image: none; }
+.duo figcaption { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--ink-2); }
+.duo figcaption span:first-child { color: var(--ink); font-weight: 700; }
+@media (max-width: 760px) { .duo { grid-template-columns: minmax(0, 1fr); } }
+
+/* live demo */
+.demo { position: relative; border: 1px solid var(--ink); aspect-ratio: 16 / 10; max-width: 100%; overflow: hidden; background: #fff; }
+.demo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 4%; }
+.demo iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.demo .launch { position: absolute; inset: 0; display: grid; place-content: center; gap: 12px; justify-items: center; background: rgba(255, 255, 255, .55); border: 0; cursor: pointer; font: inherit; color: var(--ink); }
+.demo .launch .btn { pointer-events: none; font-size: 17px; padding: 14px 26px; }
+.demo .launch:hover .btn { background: var(--blue); border-color: var(--blue); color: #fff; }
+.demo .launch small { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2); letter-spacing: .04em; }
+@media (max-width: 640px) { .demo { aspect-ratio: 3 / 4; } }
+.howto { display: flex; flex-wrap: wrap; gap: 6px 26px; font-size: 13.5px; color: var(--ink-2); }
+.howto b { font-family: var(--mono); font-weight: 500; color: var(--ink); font-size: 12px; letter-spacing: .04em; margin-left: 6px; }
+.demo-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+
+/* tech + limits */
+.ledger { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--ink); }
+.ledger > div { padding: 22px 0 0; display: grid; gap: 14px; align-content: start; }
+.ledger > div + div { border-right: 1px solid var(--rule); padding-right: 32px; }
+.ledger > div:first-child { padding-left: 32px; }
+.ledger ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.ledger li { padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 15px; color: var(--ink-2); display: grid; grid-template-columns: 9.5em 1fr; gap: 12px; }
+.ledger li b { color: var(--ink); font-weight: 600; }
+@media (max-width: 820px) { .ledger { grid-template-columns: minmax(0, 1fr); } .ledger > div + div { border-right: 0; padding-right: 0; padding-top: 36px; } .ledger > div:first-child { padding-left: 0; } .ledger li { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+
+/* uses */
+.uses { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--ink); }
+.use { padding: 22px 18px; display: grid; gap: 8px; align-content: start; }
+.use + .use { border-right: 1px solid var(--rule); }
+.use p { font-size: 14.5px; color: var(--ink-2); }
+@media (max-width: 900px) { .uses { grid-template-columns: repeat(2, minmax(0, 1fr)); } .use:nth-child(3) { border-right: 0; } .use:nth-child(n+3) { border-top: 1px solid var(--rule); } }
+@media (max-width: 520px) { .uses { grid-template-columns: minmax(0, 1fr); } .use + .use { border-right: 0; border-top: 1px solid var(--rule); } }
+
+/* closing */
+.closing { padding-block: 110px 40px; display: grid; gap: 28px; }
+.closing blockquote { margin: 0; font-family: var(--display); font-weight: 800; font-size: clamp(26px, 4.2vw, 52px); line-height: 1.35; max-width: 22ch; text-wrap: balance; }
+.closing blockquote em { font-style: normal; color: var(--blue); }
+.sign { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 16px; border-top: 1px solid var(--ink); padding-top: 18px; }
+.sign .name { font-family: var(--display); font-weight: 800; font-size: 22px; line-height: 1.4; }
+.sign .role { color: var(--ink-2); font-size: 14px; }
+.sign .date { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: .04em; }
+</style>
+</head>
+<body>
+<div class="board" dir="rtl">
+  <div class="topbar">
+    <span class="who">مهدی مشکانی · نمونه‌کار</span>
+    <span class="meta">CASE STUDY 01 — SPATIAL RECONSTRUCTION</span>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="dim"><i></i><span>مطالعه‌ی موردی · بازسازی فضایی با هوش مصنوعی</span><i></i></div>
+    <h1>دوازده عکس، یک خانه که <em>می‌شود در آن قدم زد</em></h1>
+    <div class="hero-row">
+      <p class="lede">یک آگهی Airbnb فقط عکس داشت. بدون بازدید، بدون نقشه و بدون متر، از همان عکس‌ها پلان آپارتمان را بازسازی کردیم و یک تور سه‌بعدی اسکچی ساختیم که در هر مرورگری باز می‌شود و در هر ایستگاه، عکس واقعی را روی مدل نشان می‌دهد.</p>
+      <div class="ctas">
+        <a class="btn primary" href="#demo">دیدن تور زنده</a>
+        <a class="btn" href="tour.html">صفحه‌ی کامل تور</a>
+      </div>
+    </div>
+    <figure class="drawing crop" style="margin:0">
+      <img src="assets/axo-sketch.webp" width="1882" height="1298" alt="نمای آکسونومتریک اسکچی آپارتمان با دیوارهای برش‌خورده، مبلمان و شماره‌ی ایستگاه‌های عکس">
+      <div class="titleblock" aria-label="مشخصات ترسیم">
+        <span>PROJECT</span><span>آپارتمان آگهی ۴۰۳۲۷۵۴۷</span>
+        <span>VIEW</span><span>آکسونومتریک، برش در ارتفاع ۱٫۳۵ متر</span>
+        <span>SOURCE</span><span>۱۲ عکس آگهی</span>
+        <span>SCALE</span><span>تخمینی، ±۱۵٪</span>
+      </div>
+    </figure>
+    <div class="facts">
+      <div class="fact"><span class="k">INPUT</span><b class="fa-num">۱۲</b><small>عکس آگهی، تنها ورودی</small></div>
+      <div class="fact"><span class="k">AREA</span><b class="fa-num">≈۵۰</b><small>متر مربع فضای بازسازی‌شده</small></div>
+      <div class="fact"><span class="k">VIEWS</span><b class="fa-num">۳</b><small>پلان، سه‌بعدی، قدم زدن</small></div>
+      <div class="fact"><span class="k">STATIONS</span><b class="fa-num">۱۲</b><small>ایستگاه با عکس واقعی روی مدل</small></div>
+      <div class="fact"><span class="k">RUNTIME</span><b>مرورگر</b><small>بدون نصب، روی موبایل و دسکتاپ</small></div>
+    </div>
+  </header>
+
+  <!-- BRIEF -->
+  <section aria-labelledby="h-brief">
+    <div class="dim"><i></i><span>مسئله</span><i></i></div>
+    <div class="cols">
+      <div class="prose">
+        <h2 id="h-brief">عکس‌ها زیبا بودند، ولی نمی‌گفتند خانه چه شکلی است</h2>
+        <p>مهمانی که آگهی را ورق می‌زند، تخت و کاناپه و آشپزخانه را می‌بیند، اما نمی‌فهمد این‌ها کنار هم چطور چیده شده‌اند. حمام کجاست؟ از در که وارد می‌شوی چه می‌بینی؟ آشپزخانه جداست یا در همان اتاق؟</p>
+        <p><strong>هدف:</strong> بدون هیچ داده‌ای جز همین دوازده عکس، فضای خانه را آن‌قدر دقیق بازسازی کنیم که بشود در آن قدم زد، و هر جا حدس زده‌ایم، صادقانه بگوییم.</p>
+      </div>
+      <div>
+        <div class="sheet" id="sheet"></div>
+        <div class="sheet-cap"><span>CONTACT SHEET · 12 FRAMES</span><span>منبع: عکس‌های آگهی</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section aria-labelledby="h-process">
+    <div class="dim"><i></i><span>فرایند</span><i></i></div>
+    <h2 id="h-process">از عکس به فضا، در پنج قدم</h2>
+    <div class="steps">
+      <div class="step"><span class="n">۱</span><h3>خواندن عکس‌ها</h3><p>هر عکس یک نقطه‌ی دید است. پنجره، قوس‌ها و یخچال در چند عکس تکرار می‌شوند و از روی همین تکرارها، جای هر دیوار معلوم شد.</p></div>
+      <div class="step"><span class="n">۲</span><h3>پیدا کردن مقیاس</h3><p>تخت ۱۶۰×۲۰۰، اجاق ۶۰ سانتی و ارتفاع یخچال، خط‌کش‌های پنهان عکس‌ها بودند. همه‌ی اندازه‌ها از این‌ها درآمد.</p></div>
+      <div class="step"><span class="n">۳</span><h3>ترسیم پلان</h3><p>پلان با محل و جهت دوربین هر عکس کشیده شد. کنار هر بخش نوشتیم چقدر به آن مطمئنیم.</p></div>
+      <div class="step"><span class="n">۴</span><h3>ساخت مدل</h3><p>دیوار، قوس، پنجره و مبلمان مستقیم از داده‌ی پلان ساخته می‌شوند. پلان و مدل یک منبع دارند و همیشه با هم می‌خوانند.</p></div>
+      <div class="step"><span class="n">۵</span><h3>اسکچ و ایستگاه‌ها</h3><p>لبه‌های هندسه به خط تبدیل شد. در هر ایستگاه، دوربین به جای عکاس می‌رود و عکس واقعی روی مدل ظاهر می‌شود.</p></div>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section aria-labelledby="h-plan">
+    <div class="dim"><i></i><span>پلان</span><i></i></div>
+    <div class="cols">
+      <div class="prose">
+        <h2 id="h-plan">پلانی که از دل عکس‌ها بیرون آمد</h2>
+        <p>یک اتاق اصلی بزرگ با خواب، نشیمن و کابینت‌های آشپزخانه؛ دو درگاه قوسی به ناهارخوری و آشپزخانه‌ی جدا؛ و در ضلع دیگر، راهروی ورودی و حمام.</p>
+        <ul class="deduce">
+          <li><span class="pill hi">HIGH</span><span><b>چیدمان اتاق اصلی</b> و ترتیب قوس‌ها، تلویزیون و یخچال. در هشت عکس دیده می‌شود.</span></li>
+          <li><span class="pill mid">MEDIUM</span><span><b>ورودی و حمام</b> پشت قفسه‌ی کنار تخت. سه عکس آن را نشان می‌دهند.</span></li>
+          <li><span class="pill mid">MEDIUM</span><span><b>دیوار بین آشپزخانه و ناهارخوری.</b> احتمالاً بالکنی که بسته و به خانه اضافه شده.</span></li>
+          <li><span class="pill lo">LOW</span><span><b>داخل حمام.</b> فقط کابین دوش دیده شده؛ روشویی و توالت حدسی‌اند.</span></li>
+        </ul>
+      </div>
+      <figure class="drawing crop plan-fig">
+        <img src="assets/plan-sketch.webp" width="1682" height="1772" loading="lazy" alt="پلان دوبعدی اسکچی آپارتمان از بالا با مبلمان و شماره‌ی ایستگاه‌ها">
+      </figure>
+    </div>
+  </section>
+
+  <!-- COMPARE -->
+  <section aria-labelledby="h-compare">
+    <div class="dim"><i></i><span>عکس در برابر مدل</span><i></i></div>
+    <div class="cols" style="align-items:end">
+      <h2 id="h-compare">همان نقطه، همان زاویه؛ یک بار عکس، یک بار طرح</h2>
+      <p class="prose">خط وسط را بکشید. دوربین مدل دقیقاً همان‌جایی ایستاده که عکاس ایستاده بود. جاهایی که کمی جابه‌جاست، همان جاهایی است که اندازه را تخمین زده‌ایم.</p>
+    </div>
+    <div class="compare-grid">
+      <div>
+        <figure class="compare" data-compare>
+          <img class="a" src="photos/p04.jpg" width="1200" height="900" loading="lazy" alt="عکس واقعی: قوس ناهارخوری، تلویزیون، قوس آشپزخانه و کابینت‌ها">
+          <img class="b" src="assets/walk-4-sketch.webp" width="1200" height="900" loading="lazy" alt="مدل اسکچی از همان نقطه">
+          <span class="tag l">PHOTO</span><span class="tag r">MODEL</span>
+          <input type="range" min="0" max="100" value="50" dir="ltr" aria-label="مقایسه‌ی عکس و مدل در ایستگاه ۴">
+          <span class="handle"></span>
+        </figure>
+        <div class="compare-cap"><span><b>۴</b> · از روی تخت، رو به قوس‌ها</span><span>اتاق اصلی</span></div>
+      </div>
+      <div>
+        <figure class="compare" data-compare>
+          <img class="a" src="photos/p01.jpg" width="1200" height="900" loading="lazy" alt="عکس واقعی: تخت، قفسه‌ی جداکننده و کاناپه‌ی L">
+          <img class="b" src="assets/walk-1-sketch.webp" width="1200" height="900" loading="lazy" alt="مدل اسکچی از همان نقطه">
+          <span class="tag l">PHOTO</span><span class="tag r">MODEL</span>
+          <input type="range" min="0" max="100" value="50" dir="ltr" aria-label="مقایسه‌ی عکس و مدل در ایستگاه ۱">
+          <span class="handle"></span>
+        </figure>
+        <div class="compare-cap"><span><b>۱</b> · از سمت آشپزخانه، رو به تخت</span><span>اتاق اصلی</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TWO LANGUAGES -->
+  <section aria-labelledby="h-duo">
+    <div class="dim"><i></i><span>یک مدل، دو زبان</span><i></i></div>
+    <h2 id="h-duo">اسکچ برای فهمیدن فضا، واقعی برای حس کردنش</h2>
+    <div class="duo">
+      <figure>
+        <div class="drawing crop"><img src="assets/axo-sketch.webp" width="1882" height="1298" loading="lazy" alt="مدل در سبک اسکچ"></div>
+        <figcaption><span>اسکچ</span><span>سطوح سفید، فقط لبه‌ها با خط</span></figcaption>
+      </figure>
+      <figure>
+        <div class="drawing real crop"><img src="assets/axo-real.webp" width="1871" height="1291" loading="lazy" alt="مدل در سبک واقعی با رنگ و جنس برداشته از عکس‌ها"></div>
+        <figcaption><span>واقعی</span><span>رنگ و جنس برداشته از خود عکس‌ها</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- LIVE DEMO -->
+  <section id="demo" aria-labelledby="h-demo">
+    <div class="dim"><i></i><span>تور زنده</span><i></i></div>
+    <h2 id="h-demo">خودتان در خانه قدم بزنید</h2>
+    <div class="demo" id="demoBox">
+      <img src="assets/axo-sketch.webp" width="1882" height="1298" loading="lazy" alt="">
+      <button type="button" class="launch" id="launch">
+        <span class="btn primary">▶ شروع تور زنده</span>
+        <small>WEBGL · THREE.JS · روی همین صفحه بارگذاری می‌شود</small>
+      </button>
+    </div>
+    <div class="demo-foot">
+      <div class="howto">
+        <span><b>DRAG</b>چرخاندن یا نگاه کردن</span>
+        <span><b>SCROLL</b>زوم</span>
+        <span><b>CLICK</b>روی شماره، رفتن به ایستگاه</span>
+        <span><b>W A S D</b>قدم زدن</span>
+      </div>
+      <a href="tour.html" class="btn">باز کردن در صفحه‌ی کامل</a>
+    </div>
+  </section>
+
+  <!-- TECH + LIMITS -->
+  <section aria-labelledby="h-tech">
+    <div class="dim"><i></i><span>زیر کاپوت</span><i></i></div>
+    <h2 id="h-tech">ساده برای بیننده، دقیق زیر سطح</h2>
+    <div class="ledger">
+      <div>
+        <h3>چطور ساخته شد</h3>
+        <ul>
+          <li><b>یک منبع داده</b><span>پلان دوبعدی، مدل سه‌بعدی و نقشه‌ی کوچک همه از یک فهرست دیوار و درگاه ساخته می‌شوند.</span></li>
+          <li><b>طراحی خطی</b><span>لبه‌های هر جسم از هندسه‌اش استخراج می‌شود، خطوط پنهان حذف می‌شوند و یک لایه‌ی دوم با کمی بیرون‌زدگی حس دست‌کشیده می‌دهد.</span></li>
+          <li><b>جنس‌ها</b><span>چوب کف، کاشی‌ها و پرده‌ها در لحظه با کد کشیده می‌شوند؛ تابلوها و تلویزیون از خود عکس‌ها بریده شده‌اند.</span></li>
+          <li><b>اجرا</b><span>Three.js در مرورگر؛ بدون سرور، بدون نصب، روی موبایل.</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3>حدود دقت</h3>
+        <ul>
+          <li><b>ابعاد</b><span>تخمینی، حدود ±۱۵٪. برای عدد قطعی باید متراژ را از میزبان پرسید.</span></li>
+          <li><b>جای دوربین‌ها</b><span>از روی عکس تخمین زده شده؛ برای همین عکس کاملاً روی مدل نمی‌نشیند.</span></li>
+          <li><b>داخل حمام</b><span>فقط دوش در عکس‌ها پیداست؛ بقیه حدس است و در پلان با خط‌چین آمده.</span></li>
+          <li><b>جهت شمال</b><span>در عکس‌ها معلوم نیست؛ پلان قطب‌نما ندارد.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- USES -->
+  <section aria-labelledby="h-uses">
+    <div class="dim"><i></i><span>کاربرد</span><i></i></div>
+    <h2 id="h-uses">همین روش، برای هر فضایی که فقط عکس دارد</h2>
+    <div class="uses">
+      <div class="use"><h3>اجاره و Airbnb</h3><p>مهمان قبل از رزرو، چیدمان خانه را می‌فهمد و سؤال‌های تکراری کمتر می‌شود.</p></div>
+      <div class="use"><h3>پیش‌فروش ساختمان</h3><p>وقتی هنوز عکسی نیست، از روی نقشه یک تور اسکچی ساخته می‌شود.</p></div>
+      <div class="use"><h3>بازسازی و دکوراسیون</h3><p>وضع موجود از عکس‌ها مدل می‌شود و طرح جدید روی همان مدل امتحان می‌شود.</p></div>
+      <div class="use"><h3>هتل و اقامتگاه</h3><p>هر اتاق یک تور سبک دارد که داخل سایت رزرو جا می‌شود.</p></div>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <footer class="closing">
+    <blockquote>کیمیاگری یعنی از چیزی که همین حالا دارید، <em>چند عکس معمولی</em>، تجربه‌ای بسازید که رقیب ندارد.</blockquote>
+    <div class="sign">
+      <div>
+        <div class="name">مهدی مشکانی</div>
+        <div class="role">مشاور توسعه‌ی کسب‌وکار با هوش مصنوعی</div>
+      </div>
+      <div class="date">آبان ۱۴۰۵ · CASE STUDY 01</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function () {
+  const fa = (v) => String(v).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]);
+  // contact sheet
+  const sheet = document.getElementById("sheet");
+  for (let n = 1; n <= 12; n++) {
+    const f = document.createElement("figure");
+    f.innerHTML = `<img src="photos/p${String(n).padStart(2, "0")}.jpg" width="320" height="240" loading="lazy" alt="عکس ${fa(n)} آگهی"><figcaption>${fa(n)}</figcaption>`;
+    sheet.appendChild(f);
+  }
+  // before/after sliders
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll("[data-compare]").forEach((fig) => {
+    const input = fig.querySelector("input");
+    const set = (v) => fig.style.setProperty("--pos", v + "%");
+    input.addEventListener("input", () => set(input.value));
+    if (reduced || !("IntersectionObserver" in window)) return;
+    // one gentle nudge the first time it scrolls into view, so it reads as draggable
+    const io = new IntersectionObserver((es) => {
+      if (!es[0].isIntersecting) return;
+      io.disconnect();
+      const t0 = performance.now();
+      const tick = (t) => {
+        const k = Math.min(1, (t - t0) / 1400);
+        if (+input.value !== 50 && k < 1 && fig.dataset.touched) return;
+        set(50 + Math.sin(k * Math.PI * 2) * 14 * (1 - k));
+        if (k < 1) requestAnimationFrame(tick); else set(input.value);
+      };
+      requestAnimationFrame(tick);
+    }, { threshold: 0.6 });
+    io.observe(fig);
+    input.addEventListener("pointerdown", () => (fig.dataset.touched = 1));
+  });
+  // live demo loads only on request
+  const launch = document.getElementById("launch");
+  launch.addEventListener("click", () => {
+    const box = document.getElementById("demoBox");
+    const f = document.createElement("iframe");
+    f.src = "tour.html#embed";
+    f.title = "تور سه‌بعدی آپارتمان";
+    f.allow = "fullscreen";
+    f.setAttribute("allowfullscreen", "");
+    box.innerHTML = "";
+    box.appendChild(f);
+    f.focus();
+  });
+})();
+</script>
+</body>
+</html>
