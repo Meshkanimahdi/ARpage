@@ -93,7 +93,7 @@ def main():
     f.append(f"[voice][duck]{''.join(fx)}amix=inputs={2 + len(fx)}:normalize=0,atrim=0:{END},loudnorm=I=-12:TP=-1.5:LRA=8[out]")
     run('ffmpeg', '-y', '-loglevel', 'error', *ins, '-filter_complex', ';'.join(f), '-map', '[out]', '-ar', '48000', str(out / 'mix.wav'))
     run('ffmpeg', '-y', '-loglevel', 'error', '-i', str(out / 'video.mp4'), '-i', str(out / 'mix.wav'), '-c:v', 'copy',
-        '-af', 'alimiter=limit=0.85:level=false', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-shortest', '-movflags', '+faststart', str(d / 'reel.mp4'))
+        '-af', 'alimiter=limit=0.8:level=false', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-shortest', '-movflags', '+faststart', str(d / 'reel.mp4'))
     # cover: a frame from the first news hook (after the logo)
     ct = spec.get('cover_t', START + 1.6)
     run('ffmpeg', '-y', '-loglevel', 'error', '-ss', str(ct), '-i', str(d / 'reel.mp4'), '-frames:v', '1', '-q:v', '2', str(d / 'cover.jpg'))
