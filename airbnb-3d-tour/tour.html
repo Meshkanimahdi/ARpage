@@ -241,7 +241,7 @@ aside { display: grid; gap: 18px; min-width: 0; }
       </div>
       <div class="hud caption" id="caption" hidden dir="rtl">
         <div class="t" id="capText"></div>
-        <label class="blend"><span>مدل</span><input type="range" id="blend" min="0" max="100" value="100" aria-label="ترکیب مدل سه‌بعدی و عکس واقعی"><span>عکس واقعی</span></label>
+        <label class="blend"><span>مدل</span><input type="range" id="blend" min="0" max="100" value="100" aria-label="ترکیب مدل سه‌بعدی و رندر هم‌زاویه"><span>رندر</span></label>
       </div>
       <canvas class="minimap" id="minimap" aria-label="نقشه‌ی کوچک؛ برای رفتن به هر نقطه کلیک کنید"></canvas>
       <div class="hud hint" id="hint"></div>
@@ -250,7 +250,7 @@ aside { display: grid; gap: 18px; min-width: 0; }
     <div class="tour-notes">
       <span>سبک اسکچ: همه‌ی سطوح سفیدند و فقط لبه‌ها با خط کشیده می‌شوند؛ خط‌های دوم کمی بیرون‌زده‌اند تا حس طراحی دستی بدهند.</span>
       <span>پلان دوبعدی و نمای سه‌بعدی همان مدل‌اند، فقط زاویه‌ی دوربین فرق می‌کند. سبک «واقعی» رنگ و جنس عکس‌ها را برمی‌گرداند.</span>
-      <span>در هر ایستگاه، عکس واقعی روی مدل ظاهر می‌شود و با اسلایدر می‌توانید بین این دو جابه‌جا شوید.</span>
+      <span>در هر ایستگاه یک رندر دقیقاً از زاویه‌ی همان دوربین روی مدل ظاهر می‌شود؛ رندر با Nano Banana و با دو مرجع ساخته شده: طرح خطی برای هندسه و عکس واقعی برای جنس و نور.</span>
     </div>
   </section>
 
@@ -307,7 +307,7 @@ aside { display: grid; gap: 18px; min-width: 0; }
       <p><b>اتاق اصلی.</b> عکس‌های ۱ و ۴ از دو سر مخالف اتاق گرفته شده‌اند. در یکی تخت و پنجره پیداست و در دیگری قوس‌ها و آشپزخانه. با کنار هم گذاشتن این دو، چهار دیوار اتاق معلوم می‌شود: سر تخت روی یک دیوار، کاناپه و پنجره روی دیوار بیرونی، کابینت‌ها روبه‌روی آن، و دو قوس روی دیوار انتهایی.</p>
       <p><b>ناهارخوری و آشپزخانه.</b> در عکس ۸ از داخل ناهارخوری، از میان قوس همان دیوار با چراغ دیواری و کاناپه دیده می‌شود، پس این قوس نزدیک گوشه‌ی دیوار کاناپه است. در عکس ۴ آشپزخانه پشت قوس دوم است و یخچال درست کنار آن در اتاق اصلی ایستاده. هر دو فضا پنجره‌ی بیرونی دارند و دیوار تلویزیون بینشان است. احتمالاً این نوار در اصل بالکن بوده که بسته و به خانه اضافه شده؛ در آپارتمان‌های این سبک رایج است.</p>
       <p><b>ورودی و حمام.</b> در عکس ۲ در ورودی از پشت قفسه‌ی کنار تخت پیداست. عکس ۱۲ دو درگاه کنار هم را نشان می‌دهد: سمت چپ راهروی ورودی با جاکفشی، سمت راست در حمام با کابین دوش. عکس ۱۱ داخل همان راهروست، با آینه‌ی قدی و قفسه‌ی مودم.</p>
-      <p><b>مدل سه‌بعدی.</b> دیوارها، درگاه‌ها و پنجره‌ها مستقیم از همین پلان بالا آمده‌اند. در سبک اسکچ، لبه‌ی هر جسم از هندسه‌ی خودش استخراج و به‌صورت خط کشیده می‌شود. ارتفاع سقف ۲٫۷ متر فرض شده. محل و جهت دوربین هر ایستگاه از روی عکس تخمین زده شده، برای همین عکس واقعی کاملاً روی مدل نمی‌نشیند.</p>
+      <p><b>مدل سه‌بعدی.</b> دیوارها، درگاه‌ها و پنجره‌ها مستقیم از همین پلان بالا آمده‌اند. در سبک اسکچ، لبه‌ی هر جسم از هندسه‌ی خودش استخراج و به‌صورت خط کشیده می‌شود. ارتفاع سقف ۲٫۷ متر فرض شده. محل و جهت دوربین هر ایستگاه از روی عکس تخمین زده شده. برای اینکه تصویر هر ایستگاه دقیقاً روی مدل بنشیند، از همان زاویه‌ی مدل یک رندر با هوش مصنوعی ساخته شد؛ این رندرها عکس واقعی نیستند و جزئیاتی مثل داخل حمام در آن‌ها ساخته‌ی مدل است.</p>
     </section>
   </section>
 </div>
@@ -396,8 +396,9 @@ window.HOME = (function () {
   const TOUR_ORDER = [11, 12, 2, 4, 6, 5, 1, 9, 3, 10, 8, 7];
   const fa = (v) => String(v).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]).replace(".", "٫");
   const photoSrc = (n) => `photos/p${String(n).padStart(2, "0")}.jpg`;
+  const renderSrc = (n) => `renders/r${String(n).padStart(2, "0")}.jpg`;
   const roomName = Object.fromEntries(ROOMS.map((r) => [r.id, r.name]));
-  return { ROOMS, WALLS, WALL_RECTS, WINDOWS, OPENINGS, PHOTOS, TOUR_ORDER, fa, photoSrc, roomName };
+  return { ROOMS, WALLS, WALL_RECTS, WINDOWS, OPENINGS, PHOTOS, TOUR_ORDER, fa, photoSrc, renderSrc, roomName };
 })();
 </script>
 
@@ -1268,14 +1269,14 @@ window.HOME = (function () {
     Object.entries(stopBtns).forEach(([k, b]) => b.setAttribute("aria-current", String(+k === n)));
     if (n) {
       const p = H.PHOTOS.find((q) => q.n === n);
-      capText.innerHTML = `<b>${fa(n)}</b>${roomName[p.room]} · ${p.cap}`;
+      capText.innerHTML = `<b>${fa(n)}</b>${roomName[p.room]} · ${p.cap}<br><small style="opacity:.75">رندر هوش مصنوعی از زاویه‌ی همین دوربین، بر پایه‌ی عکس ${fa(n)} آگهی</small>`;
       caption.hidden = false; hint.style.opacity = 0;
       stopBtns[n].scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduced ? "auto" : "smooth" });
     } else { caption.hidden = true; hint.style.opacity = 1; }
   }
   function showPhoto(n) {
     photoEl.classList.remove("instant");
-    photoEl.src = photoSrc(n);
+    photoEl.src = H.renderSrc(n);
     photoEl.alt = H.PHOTOS.find((q) => q.n === n).cap;
     blend.value = 100;
     requestAnimationFrame(() => (photoEl.style.opacity = 1));

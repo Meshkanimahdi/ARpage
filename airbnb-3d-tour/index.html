@@ -133,6 +133,13 @@ p { margin: 0; }
 .compare-cap { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; color: var(--ink-2); margin-top: 10px; }
 .compare-cap b { color: var(--blue); font-family: var(--display); }
 
+/* render gallery */
+.renders { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 10px; border: 1px solid var(--ink); }
+.renders figure { margin: 0; position: relative; }
+.renders img { aspect-ratio: 4 / 3; object-fit: cover; width: 100%; }
+.renders figcaption { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+@media (max-width: 700px) { .renders { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
 /* two languages */
 .duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 .duo figure { margin: 0; display: grid; gap: 10px; }
@@ -243,7 +250,7 @@ p { margin: 0; }
       <div class="step"><span class="n">۲</span><h3>پیدا کردن مقیاس</h3><p>تخت ۱۶۰×۲۰۰، اجاق ۶۰ سانتی و ارتفاع یخچال، خط‌کش‌های پنهان عکس‌ها بودند. همه‌ی اندازه‌ها از این‌ها درآمد.</p></div>
       <div class="step"><span class="n">۳</span><h3>ترسیم پلان</h3><p>پلان با محل و جهت دوربین هر عکس کشیده شد. کنار هر بخش نوشتیم چقدر به آن مطمئنیم.</p></div>
       <div class="step"><span class="n">۴</span><h3>ساخت مدل</h3><p>دیوار، قوس، پنجره و مبلمان مستقیم از داده‌ی پلان ساخته می‌شوند. پلان و مدل یک منبع دارند و همیشه با هم می‌خوانند.</p></div>
-      <div class="step"><span class="n">۵</span><h3>اسکچ و ایستگاه‌ها</h3><p>لبه‌های هندسه به خط تبدیل شد. در هر ایستگاه، دوربین به جای عکاس می‌رود و عکس واقعی روی مدل ظاهر می‌شود.</p></div>
+      <div class="step"><span class="n">۵</span><h3>اسکچ و ایستگاه‌ها</h3><p>لبه‌های هندسه به خط تبدیل شد. از زاویه‌ی هر ایستگاه، Nano Banana رندری ساخت که هندسه‌اش را از طرح و جنسش را از عکس واقعی می‌گیرد.</p></div>
     </div>
   </section>
 
@@ -298,6 +305,39 @@ p { margin: 0; }
     </div>
   </section>
 
+  <!-- SKETCH TO RENDER -->
+  <section aria-labelledby="h-render">
+    <div class="dim"><i></i><span>طرح خطی به رندر</span><i></i></div>
+    <div class="cols" style="align-items:end">
+      <h2 id="h-render">طرح خطی رندر شد، بی‌آنکه زاویه ذره‌ای جابه‌جا شود</h2>
+      <p class="prose">برای هر ایستگاه، نمای اسکچی مدل و عکس واقعی همان نقطه را به Nano Banana دادیم: طرح برای هندسه و زاویه، عکس برای جنس، رنگ و نور. نتیجه دقیقاً روی مدل می‌نشیند. این تصاویر رندرند، نه عکس؛ جزئیاتی که در عکس‌ها دیده نمی‌شد را مدل ساخته است.</p>
+    </div>
+    <div class="compare-grid">
+      <div>
+        <figure class="compare" data-compare>
+          <img class="a" src="renders/r05.jpg" width="1200" height="900" loading="lazy" alt="رندر هوش مصنوعی ایستگاه ۵: کاناپه‌ی L و میز جلومبلی">
+          <img class="b" src="assets/sketch-05.webp" width="1200" height="900" loading="lazy" alt="طرح خطی مدل از همان زاویه">
+          <span class="tag l">RENDER</span><span class="tag r">SKETCH</span>
+          <input type="range" min="0" max="100" value="50" dir="ltr" aria-label="مقایسه‌ی طرح خطی و رندر در ایستگاه ۵">
+          <span class="handle"></span>
+        </figure>
+        <div class="compare-cap"><span><b>۵</b> · کاناپه و میز، رو به دیوار پنجره</span><span>اتاق اصلی</span></div>
+      </div>
+      <div>
+        <figure class="compare" data-compare>
+          <img class="a" src="renders/r12.jpg" width="1200" height="900" loading="lazy" alt="رندر هوش مصنوعی ایستگاه ۱۲: درگاه ورودی و حمام">
+          <img class="b" src="assets/sketch-12.webp" width="1200" height="900" loading="lazy" alt="طرح خطی مدل از همان زاویه">
+          <span class="tag l">RENDER</span><span class="tag r">SKETCH</span>
+          <input type="range" min="0" max="100" value="50" dir="ltr" aria-label="مقایسه‌ی طرح خطی و رندر در ایستگاه ۱۲">
+          <span class="handle"></span>
+        </figure>
+        <div class="compare-cap"><span><b>۱۲</b> · درگاه ورودی و حمام</span><span>ورودی</span></div>
+      </div>
+    </div>
+    <div class="renders" id="renders" aria-label="۱۲ رندر هم‌زاویه با مدل"></div>
+    <div class="sheet-cap"><span>12 RENDERS · NANO BANANA · SKETCH + PHOTO REFERENCES</span><span>هر رندر از زاویه‌ی همان ایستگاه در مدل</span></div>
+  </section>
+
   <!-- TWO LANGUAGES -->
   <section aria-labelledby="h-duo">
     <div class="dim"><i></i><span>یک مدل، دو زبان</span><i></i></div>
@@ -347,6 +387,7 @@ p { margin: 0; }
           <li><b>یک منبع داده</b><span>پلان دوبعدی، مدل سه‌بعدی و نقشه‌ی کوچک همه از یک فهرست دیوار و درگاه ساخته می‌شوند.</span></li>
           <li><b>طراحی خطی</b><span>لبه‌های هر جسم از هندسه‌اش استخراج می‌شود، خطوط پنهان حذف می‌شوند و یک لایه‌ی دوم با کمی بیرون‌زدگی حس دست‌کشیده می‌دهد.</span></li>
           <li><b>جنس‌ها</b><span>چوب کف، کاشی‌ها و پرده‌ها در لحظه با کد کشیده می‌شوند؛ تابلوها و تلویزیون از خود عکس‌ها بریده شده‌اند.</span></li>
+          <li><b>رندرها</b><span>Nano Banana با دو مرجع: طرح خطی همان زاویه برای هندسه، عکس واقعی برای جنس و نور.</span></li>
           <li><b>اجرا</b><span>Three.js در مرورگر؛ بدون سرور، بدون نصب، روی موبایل.</span></li>
         </ul>
       </div>
@@ -354,7 +395,7 @@ p { margin: 0; }
         <h3>حدود دقت</h3>
         <ul>
           <li><b>ابعاد</b><span>تخمینی، حدود ±۱۵٪. برای عدد قطعی باید متراژ را از میزبان پرسید.</span></li>
-          <li><b>جای دوربین‌ها</b><span>از روی عکس تخمین زده شده؛ برای همین عکس کاملاً روی مدل نمی‌نشیند.</span></li>
+          <li><b>جای دوربین‌ها</b><span>از روی عکس تخمین زده شده. رندرها از زاویه‌ی خود مدل ساخته شده‌اند و دقیق روی آن می‌نشینند، ولی عکس واقعی نیستند.</span></li>
           <li><b>داخل حمام</b><span>فقط دوش در عکس‌ها پیداست؛ بقیه حدس است و در پلان با خط‌چین آمده.</span></li>
           <li><b>جهت شمال</b><span>در عکس‌ها معلوم نیست؛ پلان قطب‌نما ندارد.</span></li>
         </ul>
@@ -397,6 +438,12 @@ p { margin: 0; }
     f.innerHTML = `<img src="photos/p${String(n).padStart(2, "0")}.jpg" width="320" height="240" loading="lazy" alt="عکس ${fa(n)} آگهی"><figcaption>${fa(n)}</figcaption>`;
     sheet.appendChild(f);
   }
+  const rg = document.getElementById("renders");
+  [11, 12, 2, 4, 6, 5, 1, 9, 3, 10, 8, 7].forEach((n) => {
+    const f = document.createElement("figure");
+    f.innerHTML = `<img src="renders/r${String(n).padStart(2, "0")}.jpg" width="400" height="300" loading="lazy" alt="رندر ایستگاه ${fa(n)}"><figcaption>${fa(n)}</figcaption>`;
+    rg.appendChild(f);
+  });
   // before/after sliders
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.querySelectorAll("[data-compare]").forEach((fig) => {
