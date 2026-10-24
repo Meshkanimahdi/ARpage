@@ -6,7 +6,8 @@
 <!-- Reel cover, YouTube-thumbnail style (user rule 2026-10-23). A scroll-stopping photoreal background made with our
      image model (no text in it), the news subject's REAL logo, and a huge typeset Persian headline (exact spelling,
      never model-drawn). Everything important sits inside the 4:5 grid crop (y 285–1635) and avoids the reel UI.
-     Data: <dir>/cover.json {bg, logo?, logo_label?, kicker?, title ("*word*" = accent box), sub?, accent?, ink?, dark?} -->
+     Data: <dir>/cover.json {bg, logo?, logo_label?, kicker?, title ("*word*" = accent box), sub?, accent?, ink?, dark?,
+     pos?: bottom|top|middle (headline position; vary it cover to cover, user rule 2026-10-24), align?: center|right} -->
 <style>
   @font-face { font-family: Vaz; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
   @font-face { font-family: Vaz; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
@@ -33,6 +34,16 @@
   #c.light #title b { color: #fff; }
   #c.light #sub { color: rgba(17,17,17,.85); }
   #c.light #brand { color: rgba(17,17,17,.55); }
+  /* headline position (cover.json "pos"): the shade follows the headline */
+  #c.top #shade { background: linear-gradient(0deg, rgba(0,0,0,0) 38%, rgba(0,0,0,.3) 56%, rgba(0,0,0,.8) 76%, rgba(0,0,0,.88) 100%); }
+  #c.top #top { top: auto; bottom: 330px; }
+  #c.top #title { bottom: auto; top: 330px; }
+  #c.top #sub, #c.middle #sub { bottom: auto; }
+  #c.middle #shade { background: linear-gradient(180deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,.62) 40%, rgba(0,0,0,.62) 62%, rgba(0,0,0,.1) 100%); }
+  #c.middle #title { bottom: auto; top: 50%; transform: translateY(-50%); }
+  #c.right #title, #c.right #sub { text-align: right; left: 70px; right: 70px; }
+  #c.light.top #shade { background: linear-gradient(0deg, rgba(255,255,255,0) 40%, rgba(255,255,255,.6) 58%, rgba(255,255,255,.95) 78%, #fff 100%); }
+  #c.light.middle #shade { background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.8) 40%, rgba(255,255,255,.8) 62%, rgba(255,255,255,0) 100%); }
 </style>
 </head>
 <body>
@@ -46,6 +57,7 @@ window.ready = (async () => {
   const C = await (await fetch(url('cover.json'))).json();
   if (C.accent) document.documentElement.style.setProperty('--acc', C.accent); if (C.ink) document.documentElement.style.setProperty('--ink', C.ink);
   $('bg').src = url(C.bg); if (C.light) $('c').classList.add('light');
+  const POS = C.pos || 'bottom'; if (POS !== 'bottom') $('c').classList.add(POS); if (C.align === 'right') $('c').classList.add('right');
   if (C.kicker) $('kicker').textContent = C.kicker; else $('kicker').remove();
   if (C.logo) $('logo').innerHTML = `<img src="${url(C.logo)}">${C.logo_label ? `<span>${esc(C.logo_label)}</span>` : ''}`; else $('logo').remove();
   $('title').innerHTML = esc(C.title).replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>');
@@ -53,8 +65,11 @@ window.ready = (async () => {
   await document.fonts.ready; await Promise.all(['600', '900'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش AI')));
   await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('image failed: ' + i.src))));
   // fit: shrink the headline until it is at most 3 lines and stays inside the 4:5 grid crop
-  const T = $('title'); let fs = 132; while (fs > 72 && (T.offsetHeight > 132 * 1.12 * 3 * fs / 132 + 4 || T.getBoundingClientRect().top < 560)) { fs -= 4; T.style.fontSize = fs + 'px'; }
-  if (T.getBoundingClientRect().top < 520) ISSUES.push('headline too long for the cover');
+  // fit: shrink the headline until it is at most 3 lines and stays inside the 4:5 grid crop (y 285–1635)
+  const T = $('title'), out = () => { const r = T.getBoundingClientRect(); return POS === 'bottom' ? r.top < 560 : (r.top < 320 || r.bottom > 1600); };
+  let fs = 132; while (fs > 72 && (T.offsetHeight > 132 * 1.12 * 3 * fs / 132 + 4 || out())) { fs -= 4; T.style.fontSize = fs + 'px'; }
+  if (POS === 'bottom' ? T.getBoundingClientRect().top < 520 : out()) ISSUES.push('headline too long for the cover');
+  if (POS !== 'bottom' && $('sub')) { const r = T.getBoundingClientRect(); $('sub').style.top = (r.bottom + 24) + 'px'; }
 })();
 </script>
 </body>

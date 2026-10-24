@@ -754,6 +754,13 @@ narrator talks, nothing attractive in the picture").
      - `title`: 3–7 words in Persian; one or two `*accent*` words; at most one `|` line break
      - `sub`: optional, ≤ 6 words
      - `accent` / `ink`: colours
+   - **Headline position varies (user rule 2026-10-24):** `cover.json → pos` is `top`, `middle` or `bottom`
+     (optionally `align: right`). Never the same position as the previous reel cover; plan it before the
+     background, and write the background prompt so the calm area sits where the headline goes. Record `pos`
+     in the slot file.
+   - **Clear before clever (user rule 2026-10-24):** a viewer who has not seen the news must understand the
+     headline at once. No unexplained nicknames or riddles («اردک‌ها» for robots, «۳۰ ساعت تنها چی‌کار
+     می‌کنه؟» without a subject); speak to the viewer («اگه تو… چی‌کار می‌کنی؟») or name the real thing.
    - Render with `node news-reel/cover_render.mjs --dir=work/story`, which writes `cover.jpg` and the 4:5
      preview `cover_grid.jpg`. Exit 5 means a missing image or a headline that is too long; shorten it.
    - **Headline system (user rule 2026-10-24, mandatory):** follow `meshkani-pro/HEADLINES.md`.
