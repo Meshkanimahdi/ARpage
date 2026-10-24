@@ -75,6 +75,15 @@ samples were made with them. **Never change the core structure of a prompt.**
    - The render runs through `news-reel/reel_render.mjs` at 30 fps.
    - The `<start>` questions are answered from the dossier; nobody is asked.
 
+## Priority rule: full-frame shots for news reels (user rule 2026-10-24, after REEL-007)
+- A news story never uses a one-diagram/zoom-map prompt (e.g. 168, 194): they left the frame mostly empty
+  with tiny cut-outs. Those prompts are only for list or how-to topics.
+- Pick a shot-based prompt and keep its structure, but every shot fills the 1080x1920 frame with a real or
+  realistic picture of exactly what the narration says; replace any plain canvas the prompt describes with
+  full-bleed images (an allowed "topic slot" edit). No word-pun objects.
+- New picture or camera change every 1.5–3 s, no still over 1.5 s, hook in the first 2 s, 40–55 s.
+- Gate: `python3 news-reel/reel_qa.py <reel.mp4>` must pass, then read its contact sheet (RUNBOOK §4.0).
+
 ## Priority rule: realistic elements and real logos (user rule 2026-10-23)
 This rule overrides a prompt's style lines. Every prompt's structure, shots, timing logic and motion rules
 stay as they are, but its *visual vocabulary* yields to realism:

@@ -605,6 +605,31 @@ hooks for watch time; the on-screen text is the narration word by word; angle, s
 voice and rhythm change every day — read `news-reel/STORY_SPEC.md` fully before starting. (The
 two-news reel in REEL_SPEC.md is retired.)
 
+### 4.0 Reel visual rules (user rule 2026-10-24, after REEL-007; these override any older rule below)
+Mahdi on REEL-007: «سبک بد، قلاب افتضاح، صدا با تصاویر همخوانی نداره، همش صفحه خالیه و راوی حرف می‌زنه، بدون هیچ
+جذابیتی در تصویر» ("bad style, terrible hook, the audio doesn't match the pictures, the screen is always empty while the
+narrator talks, nothing attractive in the picture").
+1. **Shot list with the script.** Write narration and pictures together in `story.json`: every sentence
+   (beat) has its own `shot` saying exactly what the viewer sees while that sentence is spoken. The picture
+   shows the real thing being said: the person, product, place, logo, or the event itself. Never a pun on a
+   Persian word (REEL-007 showed a gold wedding ring for «حلقه» meaning "loop"), never a decorative object.
+2. **Full frame, always.** Every shot fills the 1080x1920 frame: a cinematic photo, a realistic generated
+   scene in the cover's visual language, real footage, or a real UI. No empty or beige canvas with small
+   cut-outs; the main subject is at least 40% of the frame width. Nothing is cut by the frame edge unless it
+   is a full-bleed background, and no text is truncated.
+3. **Rhythm.** A new shot or a clear camera change every 1.5–3 s; no still picture longer than 1.5 s,
+   except a final CTA of at most 2 s. Cut on action. Length 40–55 s (the 60–92 s ranges below are replaced).
+4. **Hook in 2 seconds.** The first frame is the strongest picture of the reel, already moving, and the first
+   spoken line is the cover headline's angle (HEADLINES.md), never a slow lead-in like «یه آزمایش واقعی از…»
+   ("a real experiment from…").
+5. **Motion prompt fit.** One-diagram/zoom-map prompts (for example pm/168, 194) are only for list or
+   how-to topics, never for a news story. A story reel uses a shot-based prompt (for example 211, 144, 086, or
+   205-style cuts) with full-bleed images replacing any plain canvas the prompt describes.
+6. **Gate (blocking).** After `reel_assemble.py`, run `python3 news-reel/reel_qa.py work/story/reel.mp4`.
+   Exit 3 is a FAIL: fix and re-render, never publish. Then Read `qa/contact.jpg` (1 frame per second) and
+   check each second against the narration for cropped elements, cut-off text, and a picture that does not
+   match its sentence. Record `qa.attention` (the qa.json numbers) in the slot file.
+
 ### 4.1 Preconditions
 1. Setup (§0.1), control (§0.2). Slot: `python3 meshkani-pro/scripts/tehran.py reel prepare`; none →
    log, stop. Lock `<slot_file without .json>__reel_prepare` (retry: `__reel_prepare_retry`).
@@ -643,6 +668,7 @@ two-news reel in REEL_SPEC.md is retired.)
    - build it as `news-reel/pm/<id>.html`, or reuse the file if it exists (`news-reel/pm/README.md` lists
      the built prompts; prompt `089` is `news-reel/glass.html`).
 
+   §4.0 applies: never a one-diagram/zoom-map prompt for a news story.
    Write the script so it fits the prompt's structure: one narration beat per section or shot, with
    `beats[].shot` naming that section. A newly built engine file is committed and pushed to branch
    `claude/ecstatic-davinci-1lqsug`, with a line added to `news-reel/pm/README.md`, so the next reel can
@@ -678,17 +704,18 @@ two-news reel in REEL_SPEC.md is retired.)
    previews; regenerate a sheet at most twice. Real products: refs per §1.5.1. Real people: real photos
    (Wikimedia Commons first, `fetch_to_drive` + download), credited.
 3. `node news-reel/story_voice.mjs --dir=work/story --tempo=<tempo>` (eleven_v4; exit 3 → shorten,
-   exit 4 → respell/rephrase the flagged beats). 60–90 s.
+   exit 4 → respell/rephrase the flagged beats). 40–55 s (§4.0).
 
 ### 4.4 Render and QC
 1. `node news-reel/reel_render.mjs --dir=work/story --page=<pm/<id>.html | glass.html | fallback engine> --mode=check`
-   (the prompt chosen in §4.3 step 0). Also render the stills the prompt's own `<start>`/`<build>` asks for,
+   (the prompt chosen in §4.3 step 0; §4.0 rules apply). Also render the stills the prompt's own `<start>`/`<build>` asks for,
    and review them yourself; Read every
    `out/sheet*.jpg`. Fix ISSUES (word mismatch), text overflow, wrong/ugly cut-outs, a visual that does
    not match its sentence, distorted people/products. Max 3 rounds.
 2. `--mode=video` in the background (run it with a timeout of at least 60 min), then `python3 news-reel/reel_assemble.py --dir work/story`:
-   `reel.json` must show 55–92 s, −15.5…−12 LUFS, true peak ≤ −1 dBFS; H.264 1080×1920 30 fps + AAC.
-3. Extract frames at 1 s, the middle and the end card and Read them.
+   `reel.json` must show 40–55 s (§4.0), −15.5…−12 LUFS, true peak ≤ −1 dBFS; H.264 1080×1920 30 fps + AAC.
+3. **Attention gate (§4.0 rule 6, blocking):** `python3 news-reel/reel_qa.py work/story/reel.mp4`; exit 3 → fix
+   and re-render. Read `work/story/qa/contact.jpg` second by second against the narration.
 3b. **Designed cover (user rule 2026-10-23).** Every reel gets its own cover, not a video frame. It works
    like a YouTube thumbnail: very eye-catching and on trend, with a headline that makes the viewer stop.
    - Background: one `python3 meshkani-pro/scripts/gen_image.py --kind story` image (≈ $0.05), written
