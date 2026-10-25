@@ -183,14 +183,15 @@ function scene(b, t, u, ink, dark) {
   switch (s.type) {
     case 'hook': {
       const tt = b.wt(s.dark_at), pre = t < tt - .02;
-      if (pre) return wave(540, 1050, 760, 330, t, '#1B1A18', 30).replace(/^/, '<svg width="1080" height="1920" style="position:absolute">') + '</svg>' + bigWord(s.big, 430, 300, 'var(--a1)', pr(t, b.wt(1) - .1, b.wt(1) + .5)) + handNote('یه صدا…', 640, 250, pr(t, 0, .9), ink, -5);
+      if (pre) { const pulse = 1 + .06 * Math.abs(Math.sin(t * 7)); return `<svg width="1080" height="1920" style="position:absolute">${wave(540, 1000, 960, 560 * pulse, t, '#1B1A18', 34)}</svg>` + bigWord(s.big, 380, 320, 'var(--a1)', 1) + handNote('یه صدا…', 600, 230, cl(.5 + t), ink, -5) + `<div style="position:absolute;left:470px;top:${fall(t + .35, 1180, 1290, .6, 6000).y.toFixed(1)}px;width:120px;height:120px;border-radius:50%;background:var(--a1)"></div>`; }
       const k = pr(t, tt, tt + .45);
       return bigWord(s.then[1], 560, 230, '#F3EEE4', k) + svg(markerPath('M 180 900 C 360 860, 700 950, 900 880', pr(t, tt + .25, tt + .8), 'var(--a1)', 16));
     }
     case 'logo': {
       const tn = b.wt(s.note[0]);
       let r = bigWord('Dessa', 300, 250, 'var(--a2)', pr(t, b.a, b.a + .5)) + (t < b.wt(4) + .2 ? `<svg width="1080" height="1920" style="position:absolute;opacity:${(1 - pr(t, b.wt(4) - .2, b.wt(4) + .2)).toFixed(2)}">${wave(540, 860, 760, 300, t, '#2F6BFF', 30)}</svg>` : '');
-      r += `<div style="color:${ink}">${blockMark(410, 720, 260, b.wt(4) - .2, t)}</div>`;
+      r += `<svg width="1080" height="1920" style="position:absolute;opacity:.35">${wave(540, 1270, 900, 200, t, "#2F6BFF", 32)}</svg>`;
+      r += `<div style="color:${ink};transform:rotate(${(Math.sin(t * 2.2) * 4).toFixed(2)}deg) scale(${(1 + .04 * Math.sin(t * 5)).toFixed(3)});transform-origin:540px 850px;position:absolute;inset:0">${blockMark(410, 720, 260, b.wt(4) - .2, t)}</div>`;
       r += wordmark(370, 1030, 340, ink, pr(t, b.wt(5) - .3, b.wt(5) + .2));
       if (t >= tn - .05) r += handNote(s.note[1], 120, 1210, pr(t, tn - .05, tn + .9), 'var(--a1)', -3, 78) + svg(markerPath('M 360 1200 C 420 1150, 480 1130, 520 1110', pr(t, tn + .2, tn + .7), 'var(--a1)', 10));
       return r;
@@ -210,7 +211,11 @@ function scene(b, t, u, ink, dark) {
     case 'type': {
       const ik = b.words.findIndex(w => w.k), tk = b.wt(ik);
       const lead = b.words.slice(0, ik).map(w => w.w).join(' ');
-      return `<div class="big" style="top:420px;font-size:84px;font-weight:500;color:${ink};opacity:${cl(u * 3)};transform:translateY(${((1 - ez.out(cl(u * 2))) * 30).toFixed(1)}px)">${lead.length > 26 ? lead.split(' ').slice(-4).join(' ') : lead}</div>` +
+      let prop = `<svg width="1080" height="1920" style="position:absolute;opacity:.5">${wave(540, 1240, 900, 300, t, '#F3EEE4', 32)}</svg>`;
+      if (s.prop === 'mute') prop += svg(markerPath('M 150 1420 L 930 1060', pr(t, b.a + .4, b.a + 1), 'var(--a1)', 22));
+      if (s.prop === 'lock') { const k = ez.back(pr(t, b.a + .2, b.a + .7)); prop += svg(`<g transform="translate(540 1250) scale(${k.toFixed(3)})"><path d="M -90 -40 V -110 A 90 90 0 0 1 90 -110 V -40" fill="none" stroke="#F3EEE4" stroke-width="34"/><rect x="-150" y="-40" width="300" height="230" rx="30" fill="var(--a1)"/><circle cx="0" cy="60" r="26" fill="#1F1D1B"/></g>`); }
+      if (s.prop === 'twin') prop = `<svg width="1080" height="1920" style="position:absolute">${wave(540, 1180, 900, 260, t, '#F3EEE4', 32)}${wave(540, 1300, 900, 260, t + .05, 'var(--a1)', 32, .1)}</svg>`;
+      return prop + `<div class="big" style="top:420px;font-size:84px;font-weight:500;color:${ink};opacity:${cl(u * 3)};transform:translateY(${((1 - ez.out(cl(u * 2))) * 30).toFixed(1)}px)">${lead.length > 26 ? lead.split(' ').slice(-4).join(' ') : lead}</div>` +
         bigWord(s.big, 640, Math.min(300, Math.floor(1400 / s.big.length)), 'var(--a1)', pr(t, tk - .08, tk + .45)) + svg(markerPath('M 170 1010 C 400 1060, 690 960, 920 1020', pr(t, tk + .3, tk + .9), '#F3EEE4', 14));
     }
     case 'wave': {
