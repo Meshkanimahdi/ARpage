@@ -117,7 +117,7 @@ function seek(t) {
   const dark = !endOn && isDark(b, t);
   // hard paper switches: every new idea lands on the next sheet (cream → kraft → blue paper)
   let idx = 0; for (const sc of (window.SCENES || [])) if (t >= sc.t0) idx++;
-  $('root').style.background = dark ? 'var(--char)' : ['#F3EEE4', '#D9C39C', '#C4D5EE'][idx % 3];
+  $('root').style.background = dark ? 'var(--char)' : (bi === 0 ? '#F3EEE4' : ['#F3EEE4', '#D9C39C', '#C4D5EE'][idx % 3]);
   $('grain').style.mixBlendMode = dark ? 'screen' : 'multiply'; $("grain").style.opacity = dark ? .3 : .55;
   const ink = dark ? '#F3EEE4' : '#1B1A18';
   // camera: never still — push 1.0 → 1.04 across a beat, a snap-zoom kick on every hit
@@ -183,7 +183,16 @@ function scene(b, t, u, ink, dark) {
   switch (s.type) {
     case 'hook': {
       const tt = b.wt(s.dark_at), pre = t < tt - .02;
-      if (pre) { const pulse = 1 + .06 * Math.abs(Math.sin(t * 7)); return `<svg width="1080" height="1920" style="position:absolute">${wave(540, 1000, 960, 560 * pulse, t, '#1B1A18', 34)}</svg>` + bigWord(s.big, 380, 320, 'var(--a1)', 1) + handNote('یه صدا…', 600, 230, cl(.5 + t), ink, -5) + `<div style="position:absolute;left:470px;top:${fall(t + .35, 1180, 1290, .6, 6000).y.toFixed(1)}px;width:120px;height:120px;border-radius:50%;background:var(--a1)"></div>`; }
+      if (pre) {
+        // the laugh, shown: the waveform bursts in laughter rhythm, «ها» notes pop in one by one, a ball bounces
+        const burst = .55 + .45 * Math.abs(Math.sin(t * 9)) * (0.6 + .4 * Math.abs(Math.sin(t * 2.3)));
+        let r = `<svg width="1080" height="1920" style="position:absolute">${wave(540, 1000, 960, 620 * burst, t * 1.6, '#1B1A18', 34)}</svg>` + bigWord(s.big, 360, 320, 'var(--a1)', 1);
+        const has = [[.15, 150, 640, -12], [.55, 760, 600, 9], [.95, 420, 1260, -6], [1.35, 820, 1220, 7], [1.75, 120, 1180, 10]];
+        has.forEach(([t0, x, y, rot]) => { if (t < t0) return; const k = pr(t, t0, t0 + .25), e = ez.back(k), [sx, sy] = squash(k - .2);
+          r += `<div class="hand" style="left:${x}px;top:${y}px;font-size:180px;color:var(--a1);transform:rotate(${rot}deg) scale(${(sx * e).toFixed(3)},${(sy * e).toFixed(3)})">ها</div>`; });
+        const f = fall(t + .3, 1100, 1330, .7, 7000), [bx, by] = squash(f.hit >= 0 ? t + .3 - f.hit : -1);
+        return r + `<div style="position:absolute;left:480px;top:${f.y.toFixed(1)}px;width:120px;height:120px;border-radius:50%;background:var(--a1);transform:scale(${bx},${by})"></div>` + handNote('یه صدا…', 600, 230, 1, ink, -5);
+      }
       const k = pr(t, tt, tt + .45);
       return bigWord(s.then[1], 560, 230, '#F3EEE4', k) + svg(markerPath('M 180 900 C 360 860, 700 950, 900 880', pr(t, tt + .25, tt + .8), 'var(--a1)', 16));
     }
