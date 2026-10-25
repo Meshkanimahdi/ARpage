@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — kinetic type showreel (prompt 105)</title>
+<!-- Skill motion-graphy-2026, prompt 105 "Kinetic type showreel": hook bar, then one technique per bar flowing out of
+     the last (kinetic type, shape morph via whips/zooms, a 2D-to-3D moment = photos as tilted 3D layers, a data/UI
+     moment = KPI card), strongest moment last, end title; ONE typeface (Vazirmatn), at most three colours plus black and
+     white (theme light/dark/ink/acc), spring/expo easing, blur follows speed, nothing holds; built on our kinetic engine.
+     Kinetic engine (STORY_SPEC §8.0): agency-style kinetic typography and UI.
+     Typewriter sentences with icons inside the words, giant words whipping past with motion blur, glass pill
+     chains with a travelling search lens, a dark KPI card whose number climbs while its chart draws, real photos
+     stacked as tilted 3D layers, photo cards joined by a route line that draws itself, an icon that zooms through
+     the camera into the next beat. References: @olafmotion (DbSpdwSsdnF), @arpit_clipsyk (Dbc1KrKh2wV),
+     @mgulifes (DM-pomvI6AM). Data: story.json {kinetic:{theme}, beats[{id,text,bg?,visual}]} + timeline.json. -->
+<style>
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-800-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-800-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: Markazi; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/markazi-text/files/markazi-text-arabic-700-normal.woff2); }
+  @font-face { font-family: Inter; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-800-normal.woff2); }
+  :root { --light: linear-gradient(165deg, #FFFFFF 25%, #FFF3B0 55%, #FFD400 100%); --dark: radial-gradient(900px 700px at 50% 100%, #3A2E00, #070707 70%); --ink: #111; --acc: #FFD400; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Vaz; }
+  .bg { position: absolute; inset: 0; }
+  #bgL { background: var(--light); } #bgD { background: var(--dark); opacity: 0; }
+  #glowl { position: absolute; width: 1400px; height: 600px; left: -160px; top: 1500px; border-radius: 50%; background: var(--acc); filter: blur(160px); opacity: .5; }
+  .scn { position: absolute; inset: 0; display: none; }
+  .type { position: absolute; left: 70px; right: 70px; top: 760px; text-align: center; font-weight: 800; font-size: 92px; line-height: 1.3; color: var(--ink); direction: rtl; }
+  .dk .type { color: #fff; }
+  .type .k { font-family: Vaz; font-weight: 900; font-size: 1.08em; color: var(--ink); background: linear-gradient(transparent 62%, var(--acc) 62%); }
+  .dk .type .k { color: var(--acc); background: none; }
+  .ic { display: inline-flex; align-items: center; justify-content: center; width: 1.05em; height: 1.05em; border-radius: .26em; background: #111; vertical-align: -.2em; margin: 0 .12em; box-shadow: 0 10px 24px rgba(0,0,0,.25); }
+  .dk .ic { background: var(--acc); }
+  .ic:has(img) { width: 1.5em; height: 1.5em; background: none; box-shadow: none; vertical-align: -.45em; }
+  .ic img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 12px 22px rgba(0,0,0,.35)); }
+  .ic svg { width: 62%; height: 62%; stroke: var(--acc); }
+  .dk .ic svg { stroke: #111; }
+  .cur { display: inline-block; width: .07em; height: .9em; background: currentColor; vertical-align: -.1em; margin: 0 .05em; }
+  .whip { position: absolute; left: -200px; right: -200px; top: 760px; text-align: center; font-family: Vaz; font-weight: 900; font-size: 230px; line-height: 1; color: var(--ink); white-space: nowrap; }
+  .dk .whip { color: #fff; }
+  .pill { position: absolute; top: 880px; height: 150px; padding: 0 56px; border-radius: 80px; display: flex; align-items: center; gap: 20px; font-weight: 800; font-size: 64px; white-space: nowrap; color: #fff; background: rgba(30,30,30,.55); backdrop-filter: blur(14px); box-shadow: inset 0 2px 0 rgba(255,255,255,.35), inset 0 -2px 0 rgba(0,0,0,.4), 0 20px 50px rgba(0,0,0,.35); border: 2px solid rgba(255,255,255,.25); }
+  .pill.on { background: #fff; color: #111; }
+  .lens { position: absolute; top: 895px; width: 120px; height: 120px; border-radius: 50%; background: #111; display: grid; place-items: center; box-shadow: 0 0 0 4px #fff; }
+  .lens svg { width: 56px; height: 56px; stroke: #fff; }
+  .kpi { position: absolute; left: 140px; right: 140px; top: 620px; height: 640px; border-radius: 54px; background: linear-gradient(160deg, #1E1E1E, #0B0B0B); box-shadow: 0 50px 120px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12); color: #fff; padding: 56px 60px; box-sizing: border-box; }
+  .kpi .lb { font-weight: 500; font-size: 36px; color: #9A9A9A; }
+  .kpi .v { font-family: Vaz; font-weight: 900; font-size: 170px; line-height: 1.1; direction: ltr; text-align: right; }
+  .kpi .d { position: absolute; left: 60px; top: 150px; font: 800 38px Vaz; color: var(--acc); direction: ltr; }
+  .kpi svg { position: absolute; left: 40px; right: 40px; bottom: 50px; }
+  .st { position: absolute; left: 50%; top: 520px; width: 640px; transform-style: preserve-3d; }
+  .st img { position: absolute; left: -320px; width: 640px; border-radius: 30px; box-shadow: 0 40px 80px rgba(0,0,0,.45); border: 3px solid rgba(255,255,255,.7); }
+  .card { position: absolute; width: 390px; border-radius: 40px; background: #fff; box-shadow: 0 30px 70px rgba(0,0,0,.25); overflow: hidden; }
+  .card img { width: 100%; height: 250px; object-fit: cover; display: block; }
+  .card .ft { display: flex; justify-content: space-between; align-items: center; padding: 22px 26px 26px; }
+  .card b { font-weight: 800; font-size: 38px; color: #111; } .card i { font-style: normal; font-size: 24px; color: #777; display: block; }
+  .card u { text-decoration: none; background: #1E7BFF; color: #fff; font: 800 24px Vaz; border-radius: 30px; padding: 8px 20px 10px; }
+  .zoomic { position: absolute; left: 340px; top: 660px; width: 400px; height: 400px; border-radius: 96px; background: #111; display: grid; place-items: center; box-shadow: 0 40px 90px rgba(0,0,0,.35); }
+  .zoomic svg { width: 58%; height: 58%; stroke: var(--acc); }
+  .head { position: absolute; left: 70px; right: 70px; top: 330px; text-align: center; font-weight: 800; font-size: 64px; color: var(--ink); }
+  .head .k { font-family: Vaz; color: var(--ink); background: linear-gradient(transparent 60%, var(--acc) 60%); }
+  .dk .head { color: #fff; } .dk .head .k { color: var(--acc); background: none; }
+  #cap { position: absolute; left: 80px; right: 80px; top: 1440px; text-align: center; font-weight: 800; font-size: 46px; line-height: 1.45; direction: rtl; color: var(--ink); }
+  #cap span { opacity: .25; } #cap span.on { opacity: 1; }
+  #cap { background: rgba(255,255,255,.88); border-radius: 34px; padding: 18px 28px 22px; box-shadow: 0 16px 40px rgba(0,0,0,.18); } .dkp #cap { background: rgba(10,10,10,.72); } #cap:empty { display: none; }
+  .dkp #cap { color: #fff; }
+  #end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; opacity: 0; background: #070707; }
+  #end img { width: 230px; filter: drop-shadow(0 0 30px rgba(16,245,238,.55)); }
+  #end .h { font: 800 54px Vaz; letter-spacing: 10px; color: #fff; direction: ltr; }
+  #end .q { font-weight: 800; font-size: 46px; color: #ddd; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="bg" id="bgL"></div><div class="bg" id="bgD"></div><div id="glowl"></div><div id="bgi" style="position:absolute;inset:0;overflow:hidden"><img id="bgimg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:50% 50%"><div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,7,7,.55),rgba(7,7,7,.25) 40%,rgba(7,7,7,.7))"></div></div>
+  <div id="scenes"></div>
+  <div id="cap"></div>
+  <div id="end"><img src="/news-reel/assets/m.png"><div class="h">MESHKANI.PRO</div><div class="q"></div></div>
+</div>
+<script src="/logo-motion/node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const url = s => s.startsWith('/') ? s : DIR + s;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), P = (t, a, b) => clamp((t - a) / (b - a)), lerp = (a, b, k) => a + (b - a) * k;
+const E = {o: gsap.parseEase('expo.out'), io: gsap.parseEase('expo.inOut'), p3: gsap.parseEase('power3.out'), p4i: gsap.parseEase('power4.in')};
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
+const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+function h(tag, cls, style, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (style) e.style.cssText = style; if (html !== undefined) e.innerHTML = html; return e; }
+const ISSUES = [], ICON = {};
+async function icon(n) { if (n.startsWith('el.')) return `<img src="${url('el/' + n.slice(3) + '.png')}">`;   // [icon:el.<id>] = a realistic cut-out from the element sheets
+  if (!ICON[n]) { const r = await fetch(`/logo-motion/node_modules/lucide-static/icons/${n}.svg`); ICON[n] = r.ok ? (await r.text()).replace(/stroke-width="2"/, 'stroke-width="2.4"') : (ISSUES.push('icon missing: ' + n), '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor"/></svg>'); } return ICON[n]; }
+// blur-in for any element; returns progress
+function inn(e, t, a, d = .45, dx = 0, dy = 40) { const k = E.o(P(t, a, a + d)); e.style.opacity = k; e.style.filter = k < 1 ? `blur(${(1 - k) * 18}px)` : ''; e.style.transform = `translate(${(1 - k) * dx}px, ${(1 - k) * dy}px)`; return k; }
+
+const V = {};
+V.type = async (sc, v, b) => {   // the narration typed with a cursor; [icon:name] tokens become icon tiles inside the line
+  const box = h('div', 'type'); sc.append(box); const toks = [];
+  for (const w of b.shown) { if (w.icon) { const s = h('span', 'ic', '', await icon(w.icon)); box.append(s, ' '); toks.push({e: s, t: w.t, icon: 1}); }
+    else { const s = h('span', w.k ? 'k' : '', '', ''); box.append(s, ' '); toks.push({e: s, t: w.t, w: w.w}); } }
+  const cur = h('span', 'cur'); box.append(cur);
+  return t => { let last = null; toks.forEach(o => { const k = P(t, o.t - .05, o.t + .25);
+      if (o.icon) { o.e.style.transform = `scale(${E.o(k)}) rotate(${(1 - E.o(k)) * -20}deg)`; o.e.style.opacity = k > 0 ? 1 : 0; }
+      else { o.e.textContent = o.w.slice(0, Math.round(k * o.w.length)); } if (k > 0) last = o; });
+    cur.style.opacity = Math.floor(t * 2.6) % 2 ? 1 : 0; if (last) last.e.after(cur); };
+};
+V.whip = async (sc, v, b) => {   // a giant word arrives with a horizontal motion blur, holds, leaves the other way
+  const w = h('div', 'whip', '', esc(v.word)); sc.append(w);
+  return t => { const k = E.o(P(t, b.a - .05, b.a + .5)), o = E.p4i(P(t, b.b - .35, b.b)); const x = (1 - k) * 900 - o * 900;
+    w.style.transform = `translateX(${x}px) scale(${1 + .04 * P(t, b.a, b.b)})`; w.style.filter = `blur(${Math.abs(x) / 40}px)`; w.style.opacity = Math.min(k * 2, 1); };
+};
+V.pills = async (sc, v, b) => {  // a row of glass pills sliding; a search lens travels and turns each one on as it is named
+  const items = v.items || [], row = h('div', '', 'position:absolute; left:0; top:0'); sc.append(row); const ps = [];
+  let x = 540; for (const it of items) { const p = h('div', 'pill', '', esc(it)); row.append(p); ps.push(p); }
+  const lens = h('div', 'lens', '', await icon('search')); sc.append(lens);
+  const lg = b.shown.find(w => w.icon && w.icon.startsWith('el.')); let lgE = null; if (lg) { lgE = h('div', '', 'position:absolute; left:390px; top:500px; width:300px; height:300px; border-radius:70px; background:#fff; display:grid; place-items:center; box-shadow:0 30px 70px rgba(0,0,0,.2)', `<img src="${url('el/' + lg.icon.slice(3) + '.png')}" style="width:220px;height:220px;object-fit:contain">`); sc.append(lgE); }
+  return t => { let xx = 0; const W = ps.map(p => p.offsetWidth + 30); const act = Math.min(items.length - 1, Math.floor(P(t, b.a + .2, b.b - .2) * items.length));
+    const center = W.slice(0, act).reduce((s, w) => s + w, 0) + W[act] / 2;
+    const tot = W.reduce((s, w) => s + w, 0), fits = tot < 1000; const off = lerp(540 + 600, fits ? 540 - tot / 2 : 540 - center, E.o(P(t, b.a - .1, b.a + .6))) + Math.sin(t) * 6;
+    ps.forEach((p, i) => { p.style.left = (off + xx) + 'px'; xx += W[i]; p.classList.toggle('on', i === act); p.style.transform = `scale(${i === act ? 1.08 : .92})`; p.style.opacity = i === act ? 1 : .6; });
+    const lx = fits ? off + W.slice(0, act).reduce((s, w) => s + w, 0) + W[act] - 50 : 540 + W[act] / 2 - 10; lens.style.left = lx + 'px'; lens.style.top = '1050px'; lens.style.opacity = P(t, b.a + .3, b.a + .6); if (lgE) { const k = inn(lgE, t, lg.t - .1, .45, 0, 50); lgE.style.transform += ` scale(${.8 + .2 * k})`; } };
+};
+V.kpi = async (sc, v, b) => {    // dark KPI card: label, a number that climbs, a delta badge, a chart that draws
+  const c = h('div', 'kpi', '', `<div class="lb">${esc(v.label || '')}</div><div class="v"></div><div class="d">${esc(v.delta || '')}</div><svg width="720" height="260" viewBox="0 0 720 260"><path class="ar" fill="url(#g${b.i})" opacity="0"/><path class="ln" fill="none" stroke="var(--acc)" stroke-width="7" stroke-linecap="round"/><defs><linearGradient id="g${b.i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--acc)" stop-opacity=".45"/><stop offset="1" stop-color="var(--acc)" stop-opacity="0"/></linearGradient></defs></svg>`);
+  sc.append(c); const pts = v.points || [8, 10, 9, 14, 13, 20, 24, 23, 30, 40], mx = Math.max(...pts), xy = pts.map((p, i) => [i * 720 / (pts.length - 1), 240 - p / mx * 220]);
+  const d = xy.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' '); const ln = c.querySelector('.ln'), ar = c.querySelector('.ar'); ln.setAttribute('d', d); ar.setAttribute('d', d + ' L720 260 L0 260 Z');
+  const L = ln.getTotalLength ? 2000 : 0;
+  return t => { inn(c, t, b.a - .05, .5, 0, 80); c.style.transform += ` perspective(1600px) rotateX(${(1 - E.o(P(t, b.a, b.a + .7))) * 18}deg)`;
+    const k = E.p3(P(t, b.a + .3, b.a + 1.6)), val = lerp(v.from || 0, v.to, k); c.querySelector('.v').textContent = (v.prefix || '') + fa(v.decimals ? val.toFixed(v.decimals) : Math.round(val)) + (v.suffix || '');
+    const len = ln.getTotalLength(); ln.style.strokeDasharray = len; ln.style.strokeDashoffset = len * (1 - k); ar.setAttribute('opacity', k); };
+};
+V.stack = async (sc, v, b) => {  // real photos / screenshots stacked as tilted 3D layers, rising with parallax
+  const st = h('div', 'st'); sc.append(st); const ims = (v.images || []).map((s, i) => { const im = h('img'); im.src = url(s); st.append(im); return im; });
+  if (v.head) sc.append(h('div', 'head', '', esc(v.head).replace(/\*([^*]+)\*/g, '<span class="k">$1</span>')));
+  return t => { const hd = sc.querySelector('.head'); if (hd) inn(hd, t, b.a, .5);
+    ims.forEach((im, i) => { const k = E.o(P(t, b.a + i * .15, b.a + .8 + i * .15)), dr = P(t, b.a, b.b);
+      im.style.opacity = k; im.style.transform = `perspective(2000px) rotateX(48deg) rotateZ(-12deg) translateY(${(i - (ims.length - 1) / 2) * 150 - dr * 40}px) translateZ(${i * 70 + (1 - k) * -500}px)`; }); };
+};
+V.route = async (sc, v, b) => {  // photo cards joined by a route line that draws from one to the next
+  const cs = v.cards || [], pos = [[590, 210], [100, 620], [590, 1030]].slice(0, cs.length), cards = [];
+  const sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.setAttribute('width', 1080); sv.setAttribute('height', 1920); sv.style.cssText = 'position:absolute; inset:0'; sc.append(sv);
+  const paths = [];
+  for (let i = 0; i + 1 < pos.length; i++) { const [x1, y1] = pos[i], [x2, y2] = pos[i + 1], p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', `M${x1 + 195} ${y1 + 360} C ${x1 + 195} ${y1 + 480}, ${x2 + 195} ${y2 - 120}, ${x2 + 195} ${y2 - 10}`); p.setAttribute('fill', 'none'); p.setAttribute('stroke', '#1E7BFF'); p.setAttribute('stroke-width', 10); p.setAttribute('stroke-linecap', 'round'); sv.append(p); paths.push(p); }
+  cs.forEach((c, i) => { const e = h('div', 'card', `left:${pos[i][0]}px; top:${pos[i][1]}px`, `<img src="${url(c.img)}"><div class="ft"><div><b>${esc(c.title)}</b><i>${esc(c.sub || '')}</i></div><u>${esc(c.tag || 'جزئیات')}</u></div>`); sc.append(e); cards.push(e); });
+  return t => { const seg = (b.b - b.a - .4) / Math.max(1, cs.length);
+    cards.forEach((c, i) => { const k = inn(c, t, b.a + i * seg, .5, 0, 60); c.style.transform += ` rotate(${(i % 2 ? 1 : -1) * 2 * k}deg)`; });
+    paths.forEach((p, i) => { const L = p.getTotalLength(), k = E.p3(P(t, b.a + i * seg + .35, b.a + (i + 1) * seg)); p.style.strokeDasharray = L; p.style.strokeDashoffset = L * (1 - k); }); };
+};
+V.zoom = async (sc, v, b) => {   // an icon tile that lands, then zooms through the camera into the next beat
+  const z = h('div', 'zoomic', '', await icon(v.icon || 'sparkles')); sc.append(z);
+  if (v.head) sc.append(h('div', 'head', 'top:1180px', esc(v.head).replace(/\*([^*]+)\*/g, '<span class="k">$1</span>')));
+  return t => { const k = E.o(P(t, b.a - .05, b.a + .55)), o = E.p4i(P(t, b.b - .55, b.b)); z.style.transform = `scale(${lerp(.3, 1, k) * (1 + o * 9)}) rotate(${(1 - k) * -14}deg)`; z.style.opacity = k * (1 - P(t, b.b - .15, b.b));
+    const hd = sc.querySelector('.head'); if (hd) { inn(hd, t, b.a + .25, .45); hd.style.opacity *= 1 - o; } };
+};
+
+let S, TL, B = [], END = 60;
+window.ready = (async () => {
+  S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json();
+  const th = Object.assign({}, (S.kinetic || {}).theme || {}), rs = document.documentElement.style;
+  for (const [k, c] of [['light', '--light'], ['dark', '--dark'], ['ink', '--ink'], ['acc', '--acc']]) if (th[k]) rs.setProperty(c, th[k]);
+  for (const [i, bt] of S.beats.entries()) {
+    const L = TL.lines[bt.line || bt.id]; if (!L) throw new Error('unknown line ' + bt.id); const v = bt.visual || {type: 'type'};
+    // words as spoken; [icon:name] inside the text is shown as an icon tile and is not spoken
+    const raw = bt.text.replace(/\[(?!icon:)[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/\|/g, ' ').trim().split(/\s+/); let open = false, wi = 0; const shown = [];
+    for (const w of raw) { const ic = w.match(/^\[icon:([\w.-]+)\]$/); if (ic) { shown.push({icon: ic[1], t: (L.words[wi] || [L.start + wi * .3])[0] - .05}); continue; }
+      const st = w.startsWith('*'), en = /\*[،.,!؟?:…»"]*$/.test(w) && w.length > 1, k = open || st; open = en ? false : (st ? true : open);
+      shown.push({w: w.replace(/\*/g, ''), k, t: (L.words[wi] || [L.start + wi * .3])[0]}); wi++; }
+    if (wi !== L.words.length) ISSUES.push(`beat ${bt.id}: ${wi} words shown, ${L.words.length} spoken`);
+    const sc = h('div', 'scn' + (bt.bg === 'dark' ? ' dk' : '')); $('scenes').append(sc);
+    const b = {bt, v, sc, i, a: L.start, shown, dark: bt.bg === 'dark'}; B.push(b);
+  }
+  B.forEach((b, i) => b.b = i + 1 < B.length ? B[i + 1].a : TL.end_start);
+  for (const b of B) { if (!V[b.v.type]) ISSUES.push(`beat ${b.bt.id}: unknown type ${b.v.type}`); b.upd = await (V[b.v.type] || V.type)(b.sc, b.v, b); }
+  END = TL.total; $('end').querySelector('.q').textContent = S.end_text || '';
+  await document.fonts.ready; await Promise.all(['500', '800', '900'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش'))); await document.fonts.load('700 40px Markazi', 'آزمایش'); await document.fonts.load('800 40px Inter', 'AI');
+  await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('image failed: ' + i.src))));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  window.SCENES = B.map(b => ({t0: b.a - .2, t1: b.b - .2, type: b.v.type, bg: b.dark ? 'dark' : 'light'})).concat([{t0: TL.end_start, t1: END, type: 'end'}]);
+  seek(0);
+})();
+
+function seek(t) {
+  if (!B.length) return;
+  let i = 0; B.forEach((b, k) => { if (t >= b.a - .2) i = k; }); const b = B[i], inEnd = t >= TL.end_start;
+  B.forEach(x => x.sc.style.display = x === b && !inEnd ? 'block' : 'none');
+  // light ↔ dark with a soft wipe; the scene enters out of a blur and leaves into one
+  const dk = b.dark ? E.io(P(t, b.a - .25, b.a + .15)) : 1 - E.io(P(t, b.a - .25, b.a + .15)) * (B[i - 1] && B[i - 1].dark ? 1 : 0) - (B[i - 1] && B[i - 1].dark ? 0 : 1);
+  $('bgD').style.opacity = clamp(b.dark ? dk : (B[i - 1] && B[i - 1].dark ? 1 - E.io(P(t, b.a - .25, b.a + .15)) : 0)); $('glowl').style.opacity = .35 + .2 * Math.sin(t);
+  $('glowl').style.transform = `translateX(${Math.sin(t * .4) * 120}px)`; document.body.classList.toggle('dkp', b.dark);
+  const outK = P(t, b.b - .22, b.b); b.sc.style.filter = outK > 0 && b.v.type !== 'zoom' && b.v.type !== 'whip' ? `blur(${outK * 16}px)` : ''; b.sc.style.opacity = b.v.type === 'zoom' || b.v.type === 'whip' ? 1 : 1 - outK * .7;
+  { const bgs = (b.bt.bgs || []).map(([wi, im]) => [wi ? ((b.shown.filter(w => !w.icon)[wi] || {}).t ?? b.a) - .06 : b.a - .2, im]); let cur = null, t0 = b.a;
+    for (const [tt, im] of bgs) if (t >= tt) { cur = im; t0 = tt; }
+    const bi = $('bgimg'), box = $('bgi'); if (cur && !inEnd) { if (bi._s !== cur) { bi._s = cur; bi.src = url(cur); } box.style.display = 'block';
+      const k = P(t, t0, t0 + 3), sp = Math.exp(-7 * Math.max(0, t - t0)) * Math.cos(13 * Math.max(0, t - t0));
+      bi.style.transform = `scale(${(1.06 + .07 * k) * (1 + .03 * sp)})`; bi.style.filter = b.v.type === 'stack' || b.v.type === 'kpi' || b.v.type === 'pills' ? 'blur(14px) brightness(.8)' : 'brightness(.85)'; }
+    else box.style.display = 'none'; }
+  if (b.upd) b.upd(t);
+  // caption (the narration) for scenes whose main visual is not the typed sentence
+  const cap = $('cap');
+  if (!inEnd && b.v.type !== 'type') { if (cap._b !== b) { cap._b = b; cap.innerHTML = b.shown.filter(w => !w.icon).map(w => `<span>${esc(w.w)}</span>`).join(' '); }
+    const ws = b.shown.filter(w => !w.icon); [...cap.children].forEach((s, j) => s.classList.toggle('on', t >= ws[j].t - .05)); cap.style.opacity = 1 - outK; }
+  else { cap.innerHTML = ''; cap._b = null; }
+  const e = $('end'), ek = P(t, TL.end_start, TL.end_start + .6); e.style.opacity = ek;
+}
+window.seek = seek;
+</script>
+</body>
+</html>
