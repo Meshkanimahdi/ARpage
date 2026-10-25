@@ -22,7 +22,8 @@
     "stories_per_slot": 3,
     "posts_per_day": 2,
     "stories_per_day": 9,
-    "note": "6 post stories + 3 reel stories (2026-10-24)"
+    "note": "6 post stories + 3 reel stories (2026-10-24)",
+    "slides_per_post": 9
   },
   "google": {
     "spreadsheet_id": "1V6PkoiYAprKCEvsfT1ThGkKTouldAVWG7SoM1Ejrfyo",
@@ -107,6 +108,24 @@
         3840,
         2160
       ]
+    },
+    "postboard": {
+      "request_size": "2560x3200",
+      "fallback_aspect_ratio": "4:5",
+      "final": [
+        2560,
+        3200
+      ],
+      "note": "9 slides: 3x3 grid of 4:5 panels"
+    },
+    "storyboard3": {
+      "request_size": "3456x2048",
+      "fallback_aspect_ratio": "16:9",
+      "final": [
+        3456,
+        2048
+      ],
+      "note": "3 stories: 3x1 grid of 9:16 panels"
     }
   },
   "sectors": [

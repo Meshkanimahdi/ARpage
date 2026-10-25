@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro carousel slide / story</title>
+<!-- Carousel slides and post stories with the Persian text typeset in code (user rule 2026-10-25: 9 slides from
+     one storyboard image; the image model draws pictures only, never text). One page renders one item:
+     ?dir=<work dir>&i=<index into slides.json items>.
+     Data: <dir>/slides.json {format: post|story, accent, ink, total, items[{bg, kind: hook|point|stat|quote|cta,
+       kicker?, title, body?, big?, label?, pos?: top|bottom, logo?, concept?: true}]}
+     Post 1080x1350: text inside 8% side margins, between 7% and 84% height; footer @meshkani.pro + «n از N».
+     Story 1080x1920: no text in the top 230 px or the bottom 280 px; footer @meshkani.pro only. -->
+<style>
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-800-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-500-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-800-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: Vaz; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --acc: #FF6A2A; --ink: #fff; }
+  html, body { margin: 0; background: #000; overflow: hidden; }
+  #c { position: relative; overflow: hidden; font-family: Vaz; color: #fff; }
+  #bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #shade { position: absolute; inset: 0; }
+  #box { position: absolute; left: 8%; right: 8%; direction: rtl; text-align: right; }
+  .kicker { display: inline-block; font: 800 38px Vaz; color: var(--ink); background: var(--acc); padding: 6px 22px 12px; border-radius: 14px; margin-bottom: 22px; }
+  .title { font: 900 86px/1.22 Vaz; letter-spacing: -0.5px; text-shadow: 0 4px 0 rgba(0,0,0,.25), 0 14px 40px rgba(0,0,0,.5); }
+  .title b { color: var(--ink); background: var(--acc); padding: 0 .14em .06em; border-radius: .12em; text-shadow: none; }
+  .body { margin-top: 22px; font: 500 44px/1.6 Vaz; color: rgba(255,255,255,.95); text-shadow: 0 2px 18px rgba(0,0,0,.6); }
+  .body b { font-weight: 800; color: #fff; }
+  .big { font: 900 220px/1 Vaz; color: var(--acc); text-shadow: 0 10px 40px rgba(0,0,0,.45); }
+  .label { font: 800 54px/1.4 Vaz; margin-top: 8px; }
+  .quote { font: 800 64px/1.45 Vaz; }
+  .quote::before { content: '«'; color: var(--acc); } .quote::after { content: '»'; color: var(--acc); }
+  .who { margin-top: 18px; font: 500 38px Vaz; opacity: .9; }
+  .cta { margin-top: 30px; display: inline-flex; gap: 14px; font: 800 40px Vaz; }
+  .cta span { background: rgba(255,255,255,.14); border: 2px solid rgba(255,255,255,.5); border-radius: 999px; padding: 8px 26px 14px; }
+  .logo { display: inline-flex; align-items: center; gap: 14px; background: #fff; color: #111; border-radius: 26px; padding: 12px 22px; font: 800 34px Vaz; direction: ltr; margin-bottom: 22px; }
+  .logo img { height: 58px; max-width: 220px; object-fit: contain; }
+  #foot { position: absolute; left: 8%; right: 8%; display: flex; justify-content: space-between; align-items: center; font: 800 30px Vaz; color: rgba(255,255,255,.88); direction: ltr; }
+  #foot .n { direction: rtl; background: rgba(0,0,0,.35); border-radius: 999px; padding: 4px 18px 8px; }
+  #concept { font: 500 24px Vaz; color: rgba(255,255,255,.75); }
+</style>
+</head>
+<body>
+<div id="c"><img id="bg"><div id="shade"></div><div id="box"></div><div id="foot"></div></div>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/', I = +(Q.get('i') || 0);
+const url = s => s.startsWith('/') ? s : DIR + s, $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
+const rich = s => esc(s).replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>');
+const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+window.ISSUES = [];
+window.ready = (async () => {
+  const S = await (await fetch(url('slides.json'))).json(), it = S.items[I], story = S.format === 'story';
+  const W = 1080, H = story ? 1920 : 1350;
+  document.body.style.width = W + 'px'; document.body.style.height = H + 'px';
+  const c = $('c'); c.style.width = W + 'px'; c.style.height = H + 'px';
+  if (S.accent) document.documentElement.style.setProperty('--acc', S.accent);
+  if (S.ink) document.documentElement.style.setProperty('--ink', S.ink);
+  $('bg').src = url(it.bg);
+  const pos = it.pos || (it.kind === 'hook' ? 'bottom' : 'bottom');
+  const top = story ? 300 : Math.round(H * 0.07), bottom = story ? H - 300 : Math.round(H * 0.84);
+  $('shade').style.background = pos === 'top'
+    ? 'linear-gradient(0deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 62%, rgba(0,0,0,.85) 100%)'
+    : 'linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.55) 58%, rgba(0,0,0,.88) 100%)';
+  let h = '';
+  if (it.logo) h += `<div class="logo"><img src="${url(it.logo)}">${it.logo_label ? esc(it.logo_label) : ''}</div><br>`;
+  if (it.kicker) h += `<div class="kicker">${esc(it.kicker)}</div>`;
+  if (it.kind === 'stat') h += `<div class="big">${esc(fa(it.big))}</div><div class="label">${rich(it.label || it.title)}</div>`;
+  else if (it.kind === 'quote') h += `<div class="quote"><bdi>${rich(it.title)}</bdi></div>${it.body ? `<div class="who">${rich(it.body)}</div>` : ''}`;
+  else {
+    h += `<div class="title">${rich(it.title)}</div>`;
+    if (it.body) h += `<div class="body">${rich(it.body)}</div>`;
+    if (it.kind === 'cta') h += `<div class="cta">${(it.cta || ['ذخیره کن', 'برای یه نفر بفرست']).map(x => `<span>${esc(x)}</span>`).join('')}</div>`;
+  }
+  const box = $('box'); box.innerHTML = h;
+  // footer
+  const foot = $('foot'); foot.style.top = (story ? H - 280 - 52 : H - 70) + 'px';
+  foot.innerHTML = story ? `<span style="flex:1;text-align:center">@meshkani.pro</span>`
+    : `<span>@meshkani.pro</span>${it.concept ? '<span id="concept">تصویر مفهومی</span>' : ''}<span class="n">${fa(I + 1)} از ${fa(S.total || S.items.length)}</span>`;
+  await document.fonts.ready; await Promise.all(['500', '800', '900'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش AI')));
+  await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('image failed: ' + i.src))));
+  // fit: hook titles start large; shrink until the box fits between top and bottom
+  const T = box.querySelector('.title, .quote, .label');
+  let fs = it.kind === 'hook' ? 132 : (it.kind === 'quote' ? 64 : 86), min = it.kind === 'hook' ? 104 : 60;
+  if (T) T.style.fontSize = fs + 'px';
+  const place = () => { if (pos === 'top') { box.style.top = top + 'px'; box.style.bottom = ''; } else { box.style.top = ''; box.style.bottom = (H - bottom) + 'px'; } };
+  place();
+  const fits = () => { const r = box.getBoundingClientRect(); return r.top >= top - 1 && r.bottom <= bottom + 1; };
+  while (T && !fits() && fs > min) { fs -= 4; T.style.fontSize = fs + 'px'; }
+  const B = box.querySelector('.body'); let bs = 44;
+  while (B && !fits() && bs > 34) { bs -= 2; B.style.fontSize = bs + 'px'; }
+  if (!fits()) ISSUES.push(`item ${I + 1}: text does not fit (title ${fs}px, body ${bs}px): shorten it`);
+  const words = (it.title + ' ' + (it.body || '')).replace(/[*|]/g, ' ').trim().split(/\s+/).length;
+  if (words > (story ? 30 : 45)) ISSUES.push(`item ${I + 1}: ${words} words (max ${story ? 30 : 45})`);
+  window.REPORT = {i: I + 1, kind: it.kind, title_px: fs, body_px: B ? bs : null, words};
+})();
+</script>
+</body>
+</html>

@@ -247,6 +247,38 @@ limits[], why_it_matters_fa, image_rights, dedupe_key, selection_reason,
 candidates_considered` (short list with drop reasons). Upload it to the package
 folder (`ensure_folder` under `packages`).
 
+### 1.3b Nine-slide carousels from one storyboard image (user rule 2026-10-25; from the 2026-10-26 prepares)
+Mahdi: one storyboard image, cut into slides, gives better quality, lower cost and more information per post.
+- **A post has 9 slides** (was 3) **+ 3 stories**. The rest of §1 still applies; where it says 3 slides or
+  six images, read 9 slides + 3 stories.
+- **Pictures:** the 9 slide pictures come from ONE image: `gen_image.py --kind postboard` (2560x3200, a 3x3
+  grid of 4:5 panels, thin black gutters, one prompt listing the 9 panels in reading order, one world, light
+  and palette, real-product `--ref` photos per §1.5.1). Cut it with
+  `python3 news-reel/storyboard_cut.py board.png --out work/final/slides --names p1,…,p9 --cols 3 --rows 3 --size 1080x1350`.
+  The 3 story pictures come from ONE image: `gen_image.py --kind storyboard3` (3456x2048, 3 panels of 9:16),
+  cut with `--cols 3 --rows 1 --size 1080x1920`. Two image calls per post (≈ $0.20) instead of six.
+- **No text in the generated pictures.** The board prompt asks for pictures only (no letters, numbers,
+  logos or UI text). All Persian text is typeset in code with `news-reel/slide.html`:
+  `work/final/slides/slides.json` → `node news-reel/slide_render.mjs --dir=work/final/slides` (and the same for
+  stories with `"format": "story"` and `--prefix=story`). This gives exact spelling, so the OCR/fix loop of
+  §1.7 is replaced by reading `slide_sheet.jpg` / `story_sheet.jpg`; exit 5 = text does not fit → shorten.
+  Footers (`@meshkani.pro`, «n از ۹», «تصویر مفهومی» when `concept: true`) are part of the render, so
+  `footer_overlay.mjs` is not used for these posts.
+- **Slide plan (kinds: hook, point, stat, quote, cta):** 1 hook (headline system, ≥ 104 px, a clear different
+  look per §1.5), 2 what happened, 3 who and the evidence, 4–7 the detail: one idea per slide (a number as a
+  `stat`, a real quote as `quote`, a step, a comparison, the limit), 8 what it means for the audience's work or
+  business, 9 `cta`: one question + «ذخیره کن / برای یه نفر بفرست». Each slide ≤ 45 words; vary `pos` and kind
+  so swiping feels designed. Every number, name and quote from `allowed_claims`.
+- **Board QA:** Read the board before cutting (the 9 panels must be distinct compositions of one story, the
+  real product must match its refs), then Read `slide_sheet.jpg`. At most one board regeneration; a single weak
+  panel is replaced by reusing/cropping another panel, not by a new call.
+- **Music (§1.7b):** `slides_music.py --slides` with the 9 slides → nine 8 s clips on one 72 s track.
+- **Storage and sheet:** `POST-NNN-slide-1.jpg … -9.jpg` (+ `.mp4`), stories as before. The sheet keeps its
+  columns: `Slide 1 Text` = slide 1, `Slide 2 Text` = slides 2–8 numbered one per line, `Slide 3 Text` = slide 9;
+  `Image 1 Prompt` = slide board prompt, `Image 2 Prompt` = story board prompt, `Image 3 Prompt` =
+  `slides.json` layout summary; `Image 1/2/3 Drive URL` = slide 1, the post folder, slide 9.
+- **Publish (§2.3):** one carousel with 9 children (video children with music, image children as fallback).
+
 ### 1.4 Content (Persian)
 Content ID: the next `POST-NNN` after the highest id in the sheet **and** in any
 slot file. Stories are `POST-NNN-STORY-1..3`.
