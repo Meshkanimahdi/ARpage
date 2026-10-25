@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — paper-style product film (prompt 149)</title>
+<!-- Skill motion-graphy-2026, prompt 149 "Paper-style product launch film" (HAND), built as its own engine.
+     Look from the prompt: a paper-light canvas, marker notes that draw on (stroke-dashoffset), real physics (a ball
+     and falling paper tags with gravity and bounces), huge kinetic type, hard light/dark switches, a new idea every
+     1.5–2 s, a sound on every hit, the real logo mark + wordmark on the end card (never boxed).
+     Page standards: vertical 1080x1920, Persian narration (eleven_v4) with a word-by-word caption, music bed
+     from ElevenLabs; the prompt's SFX (pops, pen scribbles, whooshes, logo sub-hit) go to SCENES[].sfx.
+     Data: story.json beats[{id, text, scene{type, big?, then?[word, text], dark?, dark_at?, note?[word, text],
+     notes?[[word, text]…], drop?[…], strike?, el?}}], end_text, end_sub; elements el/*.svg|png.
+     Pure seek(t): every style is computed from t, no CSS animations, timers or Math.random. -->
+<style>
+  @font-face { font-family: V; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-500-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: H; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/aref-ruqaa/files/aref-ruqaa-arabic-700-normal.woff2); }
+  @font-face { font-family: H; font-weight: 700; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --paper: #F3EEE4; --ink: #1B1A18; --a1: #FF5A36; --a2: #2F6BFF; --char: #1F1D1B; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
+  #root { position: absolute; inset: 0; overflow: hidden; background: var(--paper); font-family: V; }
+  #grain { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: .9; }
+  #cam { position: absolute; inset: 0; transform-origin: 540px 820px; }
+  .ly { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  .big { position: absolute; left: 0; right: 0; text-align: center; font-weight: 900; line-height: 1.05; white-space: nowrap; }
+  .hand { font-family: H; font-weight: 700; position: absolute; white-space: nowrap; }
+  .tag { position: absolute; padding: 18px 34px 24px; border-radius: 14px; background: #fff; font: 900 64px V; color: var(--ink);
+         box-shadow: 0 10px 0 rgba(0,0,0,.08), 0 18px 34px rgba(0,0,0,.16); }
+  .sticky { position: absolute; width: 330px; height: 300px; display: flex; align-items: center; justify-content: center;
+            font: 700 76px H; color: var(--ink); box-shadow: 0 16px 30px rgba(0,0,0,.18); }
+  #sub { position: absolute; left: 70px; right: 70px; top: 1440px; height: 150px; display: flex; align-items: center; justify-content: center; }
+  #sub .pill { padding: 12px 36px 20px; border-radius: 26px; font: 900 60px/1.3 V; white-space: nowrap; }
+  #sub .w { display: inline-block; margin: 0 .13em; }
+  #mark { position: absolute; }
+  #mark i { position: absolute; width: 0; height: 0; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div id="root">
+  <svg id="grain" width="1080" height="1920"><filter id="pn"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="3" seed="7"/><feColorMatrix values="0 0 0 0 .45  0 0 0 0 .4  0 0 0 0 .34  1.1 0 0 0 -.45"/></filter><rect width="1080" height="1920" filter="url(#pn)"/></svg>
+  <div id="cam"><div id="stage" class="ly"></div></div>
+  <div id="sub"></div>
+</div>
+<script src="/logo-motion/node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const U = s => s.startsWith('/') ? s : DIR + s, $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), mix = (a, b, k) => a + (b - a) * k, pr = (t, a, b) => cl((t - a) / (b - a));
+const ez = {out: gsap.parseEase('expo.out'), back: gsap.parseEase('back.out(1.6)'), io: gsap.parseEase('power2.inOut'), el: gsap.parseEase('elastic.out(1,0.45)')};
+const ISSUES = [];
+let S, TL, B = [], END = 50, ST;
+
+// squash/stretch landing: k 0..1 since impact, returns [sx, sy]
+const squash = k => { if (k < 0) return [1, 1]; const s = Math.exp(-6 * k) * Math.cos(16 * k) * .22; return [1 + s, 1 - s]; };
+// a ball under gravity that bounces on y = floor with restitution r; dt seconds since release from y0
+function fall(dt, y0, floor, r = .55, g = 5200) {
+  if (dt <= 0) return {y: y0, hit: -1};
+  let h = floor - y0, v = 0, t = dt, hit = -1, n = 0, tAcc = 0;
+  let tf = Math.sqrt(2 * h / g);                       // first fall
+  if (t < tf) return {y: y0 + .5 * g * t * t, hit};
+  t -= tf; tAcc = tf; v = g * tf * r; hit = tAcc;
+  while (n < 6) { const tb = 2 * v / g; if (t < tb) return {y: floor - (v * t - .5 * g * t * t), hit, n}; t -= tb; tAcc += tb; hit = tAcc; v *= r; n++; }
+  return {y: floor, hit};
+}
+// marker path that draws on: returns svg string with dashoffset at k
+const markerPath = (d, k, col, w = 12) => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - cl(k)).toFixed(3)}"/>`;
+const svg = (inner, x = 0, y = 0, w = 1080, h = 1920) => `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="position:absolute;left:${x}px;top:${y}px;overflow:visible">${inner}</svg>`;
+
+window.ready = (async () => {
+  S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json();
+  END = TL.total;
+  const shown = t => t.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/);
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) { ISSUES.push('no timing for ' + bt.id); continue; }
+    const raw = shown(bt.text); let on = false;
+    const words = raw.map(w => { const st = w.startsWith('*'); if (st) on = true; const k = on || /\*/.test(w); if (/\*[.…،؛!؟?]*$/.test(w)) on = false; return {w: w.replace(/\*/g, ''), k}; });
+    const wt = j => { const i = Math.round(cl(j / Math.max(1, words.length - 1)) * (L.words.length - 1)); return (L.words[i] || [L.start])[0]; };
+    B.push({bt, sc: bt.scene || {}, L, words, wt});
+  }
+  B.forEach((b, i) => { b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
+  // preload images and svgs used by the scenes
+  ST = {mark: await (await fetch(U('el/block_mark.svg'))).text(), word: await (await fetch(U('el/block_wordmark.svg'))).text()};
+  await document.fonts.ready; await Promise.all(['500 40px V', '900 40px V', '700 40px H'].map(f => document.fonts.load(f, 'صدای Dessa')));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  // one scene per idea: the beat start and each keyword hit inside it (a new idea every 1.5–2 s)
+  const SC = [];
+  for (const b of B) {
+    const hits = hitTimes(b); const pts = [b.a, ...hits.filter(h => h > b.a + .9 && h < b.b - .9)];
+    pts.forEach((p, i) => SC.push({t0: p, t1: i + 1 < pts.length ? pts[i + 1] : b.b, type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: i ? [[p, 'hit', .35]] : [[p, 'whoosh', .3]]}));
+  }
+  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .2, 'hit', .5]]});
+  window.SCENES = SC;
+  for (const s of SC) if (s.t1 - s.t0 > 3.2) ISSUES.push(`idea ${s.bg} holds ${(s.t1 - s.t0).toFixed(1)} s (> 3): add a hit`);
+  seek(0);
+})();
+
+function hitTimes(b) {
+  const s = b.sc, t = [];
+  if (s.then) t.push(b.wt(s.then[0]));
+  if (s.note) t.push(b.wt(s.note[0]));
+  if (s.extra) t.push(b.wt(s.extra[0]));
+  if (s.notes) (Array.isArray(s.notes[0]) ? s.notes : [s.notes]).forEach(n => t.push(b.wt(n[0])));
+  b.words.forEach((w, i) => { if (w.k && (i === 0 || !b.words[i - 1].k)) t.push(b.wt(i)); });
+  if (s.drop) s.drop.forEach((_, i) => t.push(b.L.start + .5 + i * .38));
+  return [...new Set(t.map(x => +x.toFixed(2)))].sort((p, q) => p - q);
+}
+
+function isDark(b, t) { const s = b.sc; if (s.dark) return true; if (s.dark_at !== undefined && t >= b.wt(s.dark_at) - .02) return true; return false; }
+
+function seek(t) {
+  if (!B.length) return;
+  let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
+  const endOn = t >= TL.end_start, b = B[bi], u = t - b.a;
+  const dark = !endOn && isDark(b, t);
+  // hard paper switches: every new idea lands on the next sheet (cream → kraft → blue paper)
+  let idx = 0; for (const sc of (window.SCENES || [])) if (t >= sc.t0) idx++;
+  $('root').style.background = dark ? 'var(--char)' : ['#F3EEE4', '#D9C39C', '#C4D5EE'][idx % 3];
+  $('grain').style.mixBlendMode = dark ? 'screen' : 'multiply'; $("grain").style.opacity = dark ? .3 : .55;
+  const ink = dark ? '#F3EEE4' : '#1B1A18';
+  // camera: never still — push 1.0 → 1.04 across a beat, a snap-zoom kick on every hit
+  const hits = hitTimes(b); let kick = 0; for (const h of hits) if (t >= h) kick = Math.exp(-7 * (t - h)) * .05;
+  const push = mix(1, 1.04, ez.io(pr(t, b.a, b.b)));
+  $('cam').style.transform = `scale(${(push + kick).toFixed(4)}) rotate(${(Math.sin(t * .7) * .4).toFixed(3)}deg)`;
+  let h = '';
+  if (endOn) h = endCard(t - TL.end_start, ink);
+  else h = render(b, t, u, ink, dark);
+  const st = $('stage'); if (st._h !== h) { st._h = h; st.innerHTML = h; }
+  caption(b, t, dark, endOn);
+}
+
+function bigWord(txt, y, size, col, k, from = 'down') {
+  // kinetic type: grows from a squashed slab, overshoots a little, settles; never appears from nothing
+  const e = ez.back(cl(k)), [sx, sy] = squash(k - .35);
+  const dy = from === 'down' ? (1 - e) * 160 : -(1 - e) * 160;
+  return `<div class="big" style="top:${y}px;font-size:${size}px;color:${col};opacity:${cl(k * 3)};transform:translateY(${dy.toFixed(1)}px) scale(${(sx * (.6 + .4 * e)).toFixed(3)},${(sy * (.6 + .4 * e)).toFixed(3)})">${txt}</div>`;
+}
+function handNote(txt, x, y, k, col, rot = -4, size = 74) {
+  // handwriting revealed left-to-right in reading order (RTL: from the right) with a marker underline that draws on
+  const w = Math.max(200, txt.length * size * .42);
+  return `<div class="hand" style="left:${x}px;top:${y}px;font-size:${size}px;color:${col};transform:rotate(${rot}deg);clip-path:inset(0 0 0 ${(100 - cl(k * 1.6) * 100).toFixed(1)}%)">${txt}</div>` +
+    svg(markerPath(`M ${x + w} ${y + size * 1.7} C ${x + w * .66} ${y + size * 1.85}, ${x + w * .33} ${y + size * 1.55}, ${x} ${y + size * 1.75}`, k * 1.4 - .3, col, 9));
+}
+function wave(cx, cy, w, hgt, t, col, n = 28, phase = 0) {
+  let r = ''; const bw = w / n;
+  for (let i = 0; i < n; i++) { const a = Math.abs(Math.sin(t * 6.3 + i * .55 + phase) * Math.sin(t * 2.1 + i * .23)) * .85 + .15;
+    const hh = hgt * a; r += `<rect x="${(cx - w / 2 + i * bw + bw * .2).toFixed(1)}" y="${(cy - hh / 2).toFixed(1)}" width="${(bw * .6).toFixed(1)}" height="${hh.toFixed(1)}" rx="${(bw * .3).toFixed(1)}" fill="${col}"/>`; }
+  return r;
+}
+// paper-craft props drawn in code (no footage, no generated pictures): layered card shapes with folds and drop shadows
+const shadow = `<defs><filter id="ds" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="14" stdDeviation="14" flood-opacity=".22"/></filter></defs>`;
+function mic(x, y, s, k) { const e = ez.back(cl(k)); return svg(`${shadow}<g filter="url(#ds)" transform="translate(${x} ${y}) scale(${(s * e).toFixed(3)}) rotate(${(-8 + 8 * e).toFixed(2)})">
+  <rect x="-70" y="-190" width="140" height="230" rx="70" fill="#2a2a2e"/><rect x="-58" y="-178" width="116" height="200" rx="58" fill="#3a3a40"/>
+  ${Array.from({length: 7}, (_, i) => `<line x1="-50" x2="50" y1="${-150 + i * 24}" y2="${-150 + i * 24}" stroke="#55555c" stroke-width="5"/>`).join('')}
+  <path d="M -100 -10 C -100 90, 100 90, 100 -10" fill="none" stroke="#C9C2B6" stroke-width="16" stroke-linecap="round"/><rect x="-10" y="70" width="20" height="90" fill="#C9C2B6"/><rect x="-90" y="150" width="180" height="26" rx="13" fill="#B9B1A3"/></g>`); }
+function bin(x, y, s) { return svg(`${shadow}<g filter="url(#ds)" transform="translate(${x} ${y}) scale(${s})"><path d="M -150 -170 L 150 -170 L 120 170 L -120 170 Z" fill="#D8D2C6"/>
+  ${Array.from({length: 9}, (_, i) => `<line x1="${-140 + i * 35}" y1="-165" x2="${-112 + i * 28}" y2="165" stroke="#B8B0A2" stroke-width="5"/>`).join('')}<ellipse cx="0" cy="-170" rx="150" ry="34" fill="#C4BCAE"/><ellipse cx="0" cy="-170" rx="132" ry="24" fill="#8E877B"/></g>`); }
+function laptop(x, y, s, t, k) { const e = ez.back(cl(k)); return svg(`${shadow}<g filter="url(#ds)" transform="translate(${x} ${y}) scale(${(s * e).toFixed(3)})">
+  <rect x="-330" y="-420" width="660" height="430" rx="26" fill="#cfd2d6"/><rect x="-306" y="-396" width="612" height="382" rx="12" fill="#14161a"/>
+  ${wave(0, -205, 470, 200, t, '#2F6BFF', 26)}<path d="M -400 10 L 400 10 L 360 60 L -360 60 Z" fill="#b9bdc2"/><rect x="-70" y="10" width="140" height="14" rx="7" fill="#9fa4aa"/></g>`); }
+function lens(x, y, s, k, rot) { const e = ez.back(cl(k)); return svg(`${shadow}<g filter="url(#ds)" transform="translate(${x} ${y}) rotate(${rot}) scale(${(s * e).toFixed(3)})">
+  <rect x="-22" y="120" width="44" height="230" rx="20" fill="#1d1d1f"/><circle r="150" fill="rgba(200,225,255,.25)" stroke="#B08A3E" stroke-width="26"/><path d="M -80 -70 A 110 110 0 0 1 40 -110" stroke="#fff" stroke-width="14" fill="none" stroke-linecap="round" opacity=".7"/></g>`); }
+function bubble(x, y, w, hgt, k, inner) { const e = ez.back(cl(k)); return svg(`${shadow}<g filter="url(#ds)" transform="translate(${x} ${y}) scale(${e.toFixed(3)})">
+  <path d="M ${-w / 2} ${-hgt / 2} h ${w} a 30 30 0 0 1 30 30 v ${hgt - 60} a 30 30 0 0 1 -30 30 h ${-w * .62} l -70 70 l 10 -70 h ${-w * .38 + 60} a 30 30 0 0 1 -30 -30 v ${-(hgt - 60)} a 30 30 0 0 1 30 -30 z" fill="#fff"/>${inner}</g>`); }
+function blockMark(x, y, size, t0, t) {
+  // the real Block mark (3x3 rounded squares from block.xyz), each cell pops in with a stagger
+  let r = ''; const c = size / 44;
+  for (let i = 0; i < 9; i++) { const k = ez.back(pr(t, t0 + i * .05, t0 + i * .05 + .35)), cx = (i % 3) * 16 + 6, cy = Math.floor(i / 3) * 16 + 6;
+    r += `<rect x="${(cx - 6 * k)}" y="${(cy - 6 * k)}" width="${12 * k}" height="${12 * k}" rx="2" fill="currentColor"/>`; }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 44 44" style="position:absolute;left:${x}px;top:${y}px;overflow:visible">${r}</svg>`;
+}
+function wordmark(x, y, w, col, k) { return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;color:${col};opacity:${cl(k * 2)};transform:translateY(${((1 - ez.out(cl(k))) * 40).toFixed(1)}px)">${ST.word.replace(/fill="black"/g, `fill="${col}"`).replace('width="116" height="35"', `width="${w}" height="${(w * 35 / 116).toFixed(0)}"`)}</div>`; }
+
+function render(b, t, u, ink, dark) {
+  const s = b.sc; let ex = '';
+  if (s.extra) { const te = b.wt(s.extra[0]) - .05; if (t >= te) ex = handNote(s.extra[1], s.extra[2], s.extra[3], pr(t, te, te + .8), dark ? '#F3EEE4' : 'var(--a2)', -5, 78); }
+  return scene(b, t, u, ink, dark) + ex;
+}
+function scene(b, t, u, ink, dark) {
+  const s = b.sc;
+  switch (s.type) {
+    case 'hook': {
+      const tt = b.wt(s.dark_at), pre = t < tt - .02;
+      if (pre) return wave(540, 1050, 760, 330, t, '#1B1A18', 30).replace(/^/, '<svg width="1080" height="1920" style="position:absolute">') + '</svg>' + bigWord(s.big, 430, 300, 'var(--a1)', pr(t, b.wt(1) - .1, b.wt(1) + .5)) + handNote('یه صدا…', 640, 250, pr(t, 0, .9), ink, -5);
+      const k = pr(t, tt, tt + .45);
+      return bigWord(s.then[1], 560, 230, '#F3EEE4', k) + svg(markerPath('M 180 900 C 360 860, 700 950, 900 880', pr(t, tt + .25, tt + .8), 'var(--a1)', 16));
+    }
+    case 'logo': {
+      const tn = b.wt(s.note[0]);
+      let r = bigWord('Dessa', 300, 250, 'var(--a2)', pr(t, b.a, b.a + .5)) + (t < b.wt(4) + .2 ? `<svg width="1080" height="1920" style="position:absolute;opacity:${(1 - pr(t, b.wt(4) - .2, b.wt(4) + .2)).toFixed(2)}">${wave(540, 860, 760, 300, t, '#2F6BFF', 30)}</svg>` : '');
+      r += `<div style="color:${ink}">${blockMark(410, 720, 260, b.wt(4) - .2, t)}</div>`;
+      r += wordmark(370, 1030, 340, ink, pr(t, b.wt(5) - .3, b.wt(5) + .2));
+      if (t >= tn - .05) r += handNote(s.note[1], 120, 1210, pr(t, tn - .05, tn + .9), 'var(--a1)', -3, 78) + svg(markerPath('M 360 1200 C 420 1150, 480 1130, 520 1110', pr(t, tn + .2, tn + .7), 'var(--a1)', 10));
+      return r;
+    }
+    case 'bubble': {
+      const tk = b.wt(b.words.findIndex(w => w.k)); const m = pr(t, tk - .1, tk + .5);
+      const inner = m < .5 ? wave(0, 0, 520, 200 * (1 - m * 2), t, '#1B1A18', 22) : Array.from({length: 4}, (_, i) => `<rect x="-260" y="${-90 + i * 52}" width="${(520 - (i === 3 ? 200 : 0)) * ez.out(cl((m - .5) * 2 - i * .1))}" height="26" rx="13" fill="#C9C2B6"/>`).join('');
+      return mic(250, 1260, .9, pr(t, b.a, b.a + .5)) + bubble(600, 640, 640, 360, pr(t, b.a + .2, b.a + .7), inner) + (t >= tk - .1 ? bigWord(s.big, 1040, 210, 'var(--a2)', m) : '');
+    }
+    case 'ball': {
+      let r = bin(540, 1130, 1.25);
+      s.drop.forEach((w, i) => { const t0 = b.L.start + .5 + i * .38, f = fall(t - t0, 120, 980 - i * 6, .35), rot = (i % 2 ? 1 : -1) * (12 + i * 9) * cl((t - t0) * 2);
+        if (t >= t0) { const x = 300 + i * 160, sink = f.hit >= 0 && t - t0 > f.hit + .55 ? cl((t - t0 - f.hit - .55) * 3) : 0;
+          r += `<div class="tag" style="left:${x - 80}px;top:${(f.y + sink * 160).toFixed(1)}px;transform:rotate(${rot.toFixed(1)}deg);opacity:${1 - sink}">${w}</div>`; } });
+      return r + bin(540, 1130, 1.25).replace('<g ', '<g opacity=".0" ') + bigWord('دور ریخته می‌شه', 300, 150, 'var(--a1)', pr(t, b.wt(b.words.findIndex(w => w.k)) - .1, b.wt(b.words.findIndex(w => w.k)) + .4));
+    }
+    case 'type': {
+      const ik = b.words.findIndex(w => w.k), tk = b.wt(ik);
+      const lead = b.words.slice(0, ik).map(w => w.w).join(' ');
+      return `<div class="big" style="top:420px;font-size:84px;font-weight:500;color:${ink};opacity:${cl(u * 3)};transform:translateY(${((1 - ez.out(cl(u * 2))) * 30).toFixed(1)}px)">${lead.length > 26 ? lead.split(' ').slice(-4).join(' ') : lead}</div>` +
+        bigWord(s.big, 640, Math.min(300, Math.floor(1400 / s.big.length)), 'var(--a1)', pr(t, tk - .08, tk + .45)) + svg(markerPath('M 170 1010 C 400 1060, 690 960, 920 1020', pr(t, tk + .3, tk + .9), '#F3EEE4', 14));
+    }
+    case 'wave': {
+      const ik = b.words.findIndex(w => w.k), tk = b.wt(ik), ts = b.wt(b.words.findIndex(w => w.w.startsWith('متن')));
+      return `<svg width="1080" height="1920" style="position:absolute">${wave(540, 1060, 860, 420, t, 'var(--a2)', 34)}</svg>` + bigWord(s.big, 380, 190, ink, pr(t, tk - .1, tk + .45)) +
+        (t >= ts - .2 ? `<div class="hand" style="left:400px;top:640px;font-size:120px;color:${ink};transform:rotate(-6deg)">${s.strike}</div>` + svg(markerPath('M 380 730 L 700 690', pr(t, ts, ts + .35), 'var(--a1)', 18)) : '');
+    }
+    case 'notes': {
+      const list = Array.isArray(s.notes[0]) ? s.notes : [s.notes];
+      const cols = ['#FFE27A', '#FFB4A2', '#BFD3FF'], pos = [[600, 330, -6], [160, 640, 5], [560, 960, -3]];
+      let r = `<svg width="1080" height="1920" style="position:absolute">${wave(540, 820, 700, 240, t, dark ? '#F3EEE4' : '#1B1A18', 26)}</svg>`;
+      if (s.el === 'lens') r += lens(540, 820, 1.2, pr(t, b.a, b.a + .5), -20 + Math.sin(t) * 6);
+      list.forEach(([wi, txt], i) => { const tn = b.wt(wi) - .05; if (t < tn) return; const k = pr(t, tn, tn + .35), e = ez.back(k), [sx, sy] = squash(k - .3), p = pos[i % 3];
+        r += `<div class="sticky" style="left:${p[0]}px;top:${p[1]}px;background:${cols[i % 3]};transform:rotate(${p[2] + (1 - e) * 20}deg) scale(${(sx * (1.6 - .6 * e)).toFixed(3)},${(sy * (1.6 - .6 * e)).toFixed(3)});opacity:${cl(k * 3)}">${txt}</div>`; });
+      return r;
+    }
+    case 'duplex': {
+      const t1 = b.wt(0), t2 = b.wt(b.words.findIndex((w, i) => i > 2 && w.k));
+      return `<svg width="1080" height="1920" style="position:absolute">${wave(540, 560, 820, 220 * cl((t - t1) * 3), t, 'var(--a2)', 30)}${wave(540, 1080, 820, 220 * cl((t - t2) * 3), t + 1.7, 'var(--a1)', 30, 2)}</svg>` +
+        `<div class="hand" style="left:610px;top:330px;font-size:84px;color:var(--a2)">گوش می‌ده</div><div class="hand" style="left:600px;top:1210px;font-size:84px;color:var(--a1);opacity:${cl((t - t2) * 3)}">حرف می‌زنه</div>` +
+        svg(markerPath('M 300 700 C 260 780, 260 860, 300 940', pr(t, t1 + .3, t1 + .8), ink, 10) + markerPath('M 780 940 C 820 860, 820 780, 780 700', pr(t, t2, t2 + .5), ink, 10));
+    }
+    case 'device': {
+      const tn = b.wt(s.note[0]);
+      return laptop(540, 1060, 1.1, t, pr(t, b.a, b.a + .5)) + bigWord('روی خودِ لپ‌تاپ', 300, 150, ink, pr(t, b.a + .3, b.a + .8)) + (t >= tn - .05 ? handNote(s.note[1], 140, 1240, pr(t, tn - .05, tn + .8), 'var(--a1)', -4, 80) : '');
+    }
+    case 'end': {
+      // the question: two voices side by side, one human, one Dessa — which is which?
+      const ik = b.words.findIndex(w => w.k), tk = b.wt(ik);
+      return `<svg width="1080" height="1920" style="position:absolute">${wave(540, 560, 820, 240, t, '#1B1A18', 30)}${wave(540, 1000, 820, 240, t + 2.3, 'var(--a2)', 30, 1)}</svg>` +
+        handNote('آدم', 820, 290, pr(t, b.a, b.a + .6), '#1B1A18', -4, 84) + handNote('Dessa', 760, 730, pr(t, b.a + .3, b.a + .9), 'var(--a2)', -4, 84) +
+        bigWord('؟', 1130, 220, 'var(--a1)', pr(t, tk - .1, tk + .4));
+    }
+  }
+  ISSUES.push('unknown scene ' + s.type); return '';
+}
+
+function endCard(u, ink) {
+  // the ball drops onto the mark, the mark builds, the wordmark lands, then the question
+  const f = fall(u, -160, 560, .45, 6200), [sx, sy] = squash(f.hit >= 0 ? u - f.hit : -1);
+  const ball = u < 1.2 ? `<div style="position:absolute;left:500px;top:${f.y.toFixed(1)}px;width:80px;height:80px;border-radius:50%;background:var(--a1);transform:scale(${sx},${sy});opacity:${1 - pr(u, 1, 1.2)}"></div>` : '';
+  const q = (S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--a1)">$1</span>');
+  return ball + `<div style="color:${ink}">${blockMark(450, 640, 180, .45, u)}</div>` + wordmark(400, 860, 280, ink, pr(u, .8, 1.2)) +
+    `<div class="big" style="top:1060px;font-size:76px;color:${ink};opacity:${pr(u, 1.1, 1.5)}">${q}</div>` +
+    `<div class="big" style="top:1220px;font-size:52px;font-weight:500;color:${ink};opacity:${pr(u, 1.4, 1.8)}">${S.end_sub || ''}</div>` +
+    `<div class="big" style="top:1330px;font-size:40px;font-weight:500;letter-spacing:3px;color:${ink};opacity:${pr(u, 1.6, 2)}" dir="ltr">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;
+}
+
+function caption(b, t, dark, endOn) {
+  const sub = $('sub');
+  if (endOn || t > b.L.end + .3) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
+  const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + c0 + dark;
+  if (sub._k !== key) { sub._k = key; const lat = w => /^[A-Za-z0-9.\-]+[،,.!?؟…؛]*$/.test(w.w); const gs = [];
+    ch.forEach((w, q) => { const g = gs[gs.length - 1]; if (g && lat(w) && g.l) { g.w += ' ' + w.w; g.k = g.k || w.k; } else gs.push({w: w.w, k: w.k, i: q, l: lat(w)}); });
+    sub.innerHTML = `<span class="pill" style="background:${dark ? '#F3EEE4' : '#1B1A18'};color:${dark ? '#1B1A18' : '#F3EEE4'}">${gs.map(g => `<span class="w" data-i="${g.i}" ${g.l ? 'dir="ltr"' : ''} style="${g.k ? 'color:var(--a1)' : ''}">${g.w}</span>`).join(' ')}</span>`; }
+  sub.querySelectorAll('.w').forEach(el => { const tw = b.wt(c0 + +el.dataset.i), k = ez.out(pr(t, tw - .05, tw + .15)); el.style.opacity = .25 + .75 * k; });
+}
+window.seek = seek;
+</script>
+</body>
+</html>
