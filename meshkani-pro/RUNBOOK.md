@@ -703,6 +703,9 @@ narrator talks, nothing attractive in the picture").
      the built prompts; prompt `089` is `news-reel/glass.html`).
 
    §4.0 applies: never a one-diagram/zoom-map prompt for a news story.
+   **A new prompt gets its own engine built from that prompt's look** (user rule 2026-10-25): never copy
+   another engine and rename it (REEL-010 used prompt 019 on a 92 % copy of the 211 engine and looked like the
+   reels before it; the gate now rejects that). Full-bleed photo slideshows are at most 1 reel in 3.
    Write the script so it fits the prompt's structure: one narration beat per section or shot, with
    `beats[].shot` naming that section. A newly built engine file is committed and pushed to branch
    `claude/ecstatic-davinci-1lqsug`, with a line added to `news-reel/pm/README.md`, so the next reel can
@@ -773,6 +776,9 @@ narrator talks, nothing attractive in the picture").
    - **Clear before clever (user rule 2026-10-24):** a viewer who has not seen the news must understand the
      headline at once. No unexplained nicknames or riddles («اردک‌ها» for robots, «۳۰ ساعت تنها چی‌کار
      می‌کنه؟» without a subject); speak to the viewer («اگه تو… چی‌کار می‌کنی؟») or name the real thing.
+   - **Big headline (user rule 2026-10-25):** the headline is rendered at 112–150 px and has at most 9 words
+     (4–7 read best); `cover_render.mjs` exits 5 when it cannot fit, so shorten it. It writes
+     `cover_report.json` (font, words, position, md5) which the gate checks.
    - Render with `node news-reel/cover_render.mjs --dir=work/story`, which writes `cover.jpg` and the 4:5
      preview `cover_grid.jpg`. Exit 5 means a missing image or a headline that is too long; shorten it.
    - **Headline system (user rule 2026-10-24, mandatory):** follow `meshkani-pro/HEADLINES.md`.
@@ -797,6 +803,24 @@ narrator talks, nothing attractive in the picture").
      the slot file and the Reels Notes column. Insights (§6) track whether a cover's headline type wins
      reach.
 4. `python3 news-reel/story_cut.py --dir work/story` → `story.mp4` (≤ 60 s) for the Story share.
+5. **Independent critic (user rule 2026-10-25, blocking).** You never grade your own reel. Launch a fresh
+   subagent (Agent tool, general-purpose, no shared context) and give it only: `cover.jpg`, `cover_grid.jpg`,
+   `qa/contact.jpg`, the contact sheets of the previous 3 reels (download them from their packages), the
+   headline and a 2-line story summary. Ask for five 1–10 scores with one-line reasons, as JSON:
+   `cover_stop_power` (would a Persian scroller stop for this thumbnail in Explore?), `headline_clarity`
+   (understood at once by someone who has not seen the news; big and readable at thumbnail size),
+   `hook` (first 2 s), `visual_match` (each second shows what is said), `style_distinct` (clearly a different
+   look from the previous 3 reels). Save it as `work/story/critic.json` `{"scores":{…},"notes":{…}}`.
+6. **Gate (user rule 2026-10-25, blocking):** `story.json` must carry `content_id`, `motion_prompt`
+   (catalog id), `engine` (the page you rendered with), `motion_category` and `layout`. Download
+   `_automation/motion_history.json` (`config.json → google.motion_history_id`) and run
+   `python3 news-reel/reel_gate.py --dir work/story --history motion_history.json`. It re-checks attention
+   (reel_qa), that `cover.jpg` is the rendered designed cover (md5 vs `cover_report.json`, never a video
+   frame), headline ≥ 112 px and ≤ 9 words, cover position ≠ previous reel, prompt and engine not in the last
+   10 reels, engine not a renamed copy of a recent engine (> 60 % same code), category ≠ previous reel, and
+   critic scores all ≥ 7. Exit 3 → fix (new headline/cover, real new engine, re-render) and re-run the critic
+   and the gate; at most 2 rounds. Still failing → status `FAILED` with the gate reasons: a weak reel is
+   skipped, never published. Save `gate.json` to the package and `gate.history_entry` to the slot file.
 
 ### 4.5 Storage, caption, sheet
 1. Content ID `REEL-NNN`. Drive: `YYYY-MM-DD_REEL-NNN` under `ریلز` (`google.reels_folder_id`) with
@@ -827,6 +851,11 @@ narrator talks, nothing attractive in the picture").
    → stop; missing / `FAILED` / `SKIPPED_*` → log, stop.
 3. Cap: at most 3 reels a day and never two for the same slot (slot files + live media). Identity and publishing limit as §2.1
    (limit ≥ 1). Duplicate guard: last 10 media — a REELS item with this caption → record it, done.
+3b. **Publish-time gate (user rule 2026-10-25, blocking).** Download the reel MP4 and the cover JPG from Drive
+   (the exact files you will publish), the package's `story.json`, `cover_report.json` and `critic.json`, and
+   `_automation/motion_history.json` (`config.json → google.motion_history_id`); run `python3 news-reel/reel_gate.py --dir <pkg> --history
+   motion_history.json --reel <reel.mp4> --cover <cover.jpg>`. Exit 3 → status `SKIPPED_QA`, log the reasons,
+   do not publish. After a verified publish, append `gate.history_entry` to `motion_history.json` on Drive.
 4. `tehran.py wait-until <slot>` (09:00 or 15:00); `check-deadline <slot_key>` must exit 0. `DRY_RUN` → stop here.
 5. `share_public` the MP4 and the cover. Re-check Kill Switch. `INSTAGRAM_POST_IG_USER_MEDIA` with
    `ig_user_id`, `media_type: REELS`, `video_url: public_image_url(video_id)`, `cover_url:

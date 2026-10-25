@@ -1,4 +1,5 @@
-// Render the reel cover (news-reel/cover.html + <dir>/cover.json) to <dir>/cover.jpg, plus a 4:5 grid-crop preview.
+// Render the reel cover (news-reel/cover.html + <dir>/cover.json) to <dir>/cover.jpg, plus a 4:5 grid-crop preview
+// and <dir>/cover_report.json {font_px, pos, words, lines, title, md5, issues}.
 //   node news-reel/cover_render.mjs --dir=work/story
 import { chromium } from 'playwright';
 import { execFileSync } from 'node:child_process';
@@ -15,9 +16,14 @@ const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('r
 await page.goto(`http://127.0.0.1:${server.address().port}/news-reel/cover.html?dir=${encodeURIComponent(rel)}`);
 await page.evaluate(() => window.ready);
 const issues = await page.evaluate(() => window.ISSUES);
+const report = await page.evaluate(() => window.REPORT || {});
 const out = path.join(dir, 'cover.jpg');
 await page.screenshot({path: out, type: 'jpeg', quality: 92});
 await browser.close(); server.close();
 execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', out, '-vf', 'crop=1080:1350:0:285,scale=540:-1', path.join(dir, 'cover_grid.jpg')]);
+// the gate (reel_gate.py) checks the uploaded cover against this md5, so a frame or an old cover can never slip through
+report.md5 = (await import('node:crypto')).createHash('md5').update(fs.readFileSync(out)).digest('hex');
+report.issues = [...errors, ...issues];
+fs.writeFileSync(path.join(dir, 'cover_report.json'), JSON.stringify(report, null, 1));
 if (errors.length || issues.length) { console.log('ISSUES:\n  ' + [...errors, ...issues].join('\n  ')); process.exit(5); }
 console.log(out);

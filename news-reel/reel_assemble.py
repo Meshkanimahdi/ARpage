@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Join the logo intro with the rendered reel and mix narration, music and effects.
 
-  python3 news-reel/reel_assemble.py --dir work/reel-2026-10-20   ->  <dir>/reel.mp4 (+ <dir>/cover.jpg)
+  python3 news-reel/reel_assemble.py --dir work/reel-2026-10-20   ->  <dir>/reel.mp4 (+ <dir>/frame_cover.jpg, a video frame; never the designed cover.jpg)
 
 Needs <dir>/timeline.json (reel_voice.mjs), <dir>/out/news.mp4 and <dir>/out/scenes.json (reel_render.mjs).
 Music: <dir>/music.mp3 if present; otherwise generated once from spec.music_prompt with ElevenLabs
@@ -96,12 +96,12 @@ def main():
         '-af', 'alimiter=limit=0.8:level=false', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-shortest', '-movflags', '+faststart', str(d / 'reel.mp4'))
     # cover: a frame from the first news hook (after the logo)
     ct = spec.get('cover_t', START + 1.6)
-    run('ffmpeg', '-y', '-loglevel', 'error', '-ss', str(ct), '-i', str(d / 'reel.mp4'), '-frames:v', '1', '-q:v', '2', str(d / 'cover.jpg'))
+    run('ffmpeg', '-y', '-loglevel', 'error', '-ss', str(ct), '-i', str(d / 'reel.mp4'), '-frames:v', '1', '-q:v', '2', str(d / 'frame_cover.jpg'))   # never cover.jpg: that is the designed cover (cover_render.mjs)
     st = subprocess.run(['ffmpeg', '-hide_banner', '-i', str(d / 'reel.mp4'), '-af', 'ebur128=peak=true', '-f', 'null', '-'], capture_output=True, text=True).stderr
     lufs = [l.split()[1] for l in st.splitlines() if l.strip().startswith('I:')][-1]
     peak = [l.split()[1] for l in st.splitlines() if l.strip().startswith('Peak:')][-1]
     report = {'file': str(d / 'reel.mp4'), 'duration': round(probe(d / 'reel.mp4'), 2), 'lufs': float(lufs), 'true_peak_dbfs': float(peak),
-              'bytes': (d / 'reel.mp4').stat().st_size, 'cover': str(d / 'cover.jpg')}
+              'bytes': (d / 'reel.mp4').stat().st_size, 'frame_cover': str(d / 'frame_cover.jpg')}
     (d / 'reel.json').write_text(json.dumps(report, indent=1))
     print(json.dumps(report))
     if report['duration'] > (57 if START == 0 else 61) or report['lufs'] > -12 or report['lufs'] < -15.5 or report['true_peak_dbfs'] > -1.0:
