@@ -34,7 +34,7 @@
 <body>
 <div id="root">
   <div id="cam"><div id="stage"></div></div>
-  <svg id="grain" width="1080" height="1920"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 .2  0 0 0 0 .18  0 0 0 0 .25  0 0 0 -1.6 1.05"/></filter><rect width="1080" height="1920" filter="url(#gr)"/></svg>
+  <svg id="grain" width="1080" height="1920"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 .2  0 0 0 0 .18  0 0 0 0 .25  0 0 0 -1.6 1.05"/></filter><rect width="1080" height="1920" filter="url(#gr)"/><defs><pattern id="tooth" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="6" cy="6" r="2.6" fill="#1D1A2F"/></pattern></defs><rect width="1080" height="1920" fill="url(#tooth)" opacity=".16"/></svg>
   <div id="sub"></div>
 </div>
 <script src="/logo-motion/node_modules/gsap/dist/gsap.min.js"></script>
@@ -69,7 +69,11 @@ function type(txt, y, size, a, b, k, off, ltr = false) {
 function blocks(seed, k, t) {
   const cols = ['pink', 'yel', 'blue', 'green'], c1 = cols[seed % 4], c2 = cols[(seed + 1) % 4], c3 = cols[(seed + 2) % 4], e = spring(k);
   const r1 = 520 * e, r2 = 380 * e, w = Math.sin(t * 1.3) * 18;
-  return `<svg class="L" viewBox="0 0 1080 1920">${HT}
+  // riso poster screen: a coarse halftone whose dot size runs as a diagonal gradient (visible at phone size, never a flat empty ground)
+  let dots = ''; const c4 = INK[cols[(seed + 3) % 4]], sh = (seed % 3) * .7;
+  for (let y = 32; y < 1920; y += 64) for (let x = 32 + ((y / 64) % 2) * 32; x < 1080; x += 64) {
+    const f = .5 + .5 * Math.sin((x * .9 + y * .55) / 260 + sh + t * .6); dots += `<circle cx="${x}" cy="${y}" r="${(5 + 17 * f * e).toFixed(1)}"/>`; }
+  return `<svg class="L" viewBox="0 0 1080 1920">${HT}<g fill="${c4}" opacity=".32">${dots}</g>
     <circle cx="${seed % 2 ? 1060 : 20}" cy="${200 + w}" r="${r1}" fill="${INK[c1]}" opacity=".9"/>
     <rect x="${seed % 2 ? -120 : 640}" y="${1300 - 260 * e}" width="620" height="${760 * e}" fill="url(#ht-${c2})" transform="rotate(${seed % 2 ? 8 : -8} 540 1500)"/>
     <circle cx="${seed % 2 ? 60 : 1000}" cy="${1700 - w}" r="${r2}" fill="${INK[c3]}" opacity=".85"/></svg>`;
