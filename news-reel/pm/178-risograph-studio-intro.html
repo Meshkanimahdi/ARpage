@@ -209,34 +209,34 @@ function scene(b, t, u, si, off) {
       return r;
     }
     case 'hook2': {
-      // frame 0 is already the payoff: a real hairstyle photo as a Pin, a tap on the red «Get the Guide», and the result card
-      // (time · cost · upkeep) slams in; then «چقدر خرج؟» stamps over it; then the call-out to hairdressers
+      // frame 0: a huge two-line promise over a bright, large real subject (face + whole hairstyle + her inspiration photo);
+      // the Pinterest «Get the Guide» tap is secondary; at ~1.2 s the time · cost · upkeep card slams in; then the call-out
       const t1 = kt[0], t2 = s.extra_hits ? b.wt(s.extra_hits[0]) : t1 + 1.5;
-      const tap = A + .25, slam = A + .55, z = 1.04 + .06 * io(pr(t, A, t1));
-      const card = (kk) => { const e = spring(kk), y = mix(1920, 960, ex(kk));
-        let q = `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(0 ${(y - 960).toFixed(1)}) rotate(${(-3 + 3 * e).toFixed(2)} 540 1260)"><rect x="126" y="976" width="860" height="430" rx="36" fill="${INK.ink}"/><rect x="110" y="960" width="860" height="430" rx="36" fill="#FFFDF8"/><rect x="110" y="960" width="860" height="96" rx="36" fill="${INK.red}"/>`;
-        [['زمان', INK.yel, .1], ['هزینه', INK.pink, .25], ['نگهداری', INK.green, .4]].forEach(([w, c], i) => { const ki = ex(pr(kk, .15 + i * .15, .45 + i * .15));
-          q += `<rect x="150" y="${1076 + i * 100}" width="${(780 * ki).toFixed(1)}" height="82" rx="41" fill="${c}"/><path d="M 180 ${1117 + i * 100} l 20 20 l 36 -44" stroke="${INK.ink}" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(kk, .35 + i * .15, .6 + i * .15))).toFixed(3)}"/>`; });
-        q += `</g></svg><div dir="ltr" style="position:absolute;left:150px;top:${(y + 12).toFixed(1)}px;font:900 58px V;color:#fff">Beauty Guide</div>`;
-        [['زمان', 0], ['هزینه', 1], ['نگهداری', 2]].forEach(([w, i]) => { const ki = ex(pr(kk, .2 + i * .15, .5 + i * .15)); q += `<div style="position:absolute;right:${150 + 0}px;top:${(y + 124 + i * 100).toFixed(1)}px;font:900 56px V;color:${INK.ink};opacity:${ki.toFixed(2)}">${w}</div>`; });
+      const tap = A + .4, slam = A + 1.2;
+      const card = (kk) => { const e = spring(kk), y = mix(1920, 990, ex(kk));
+        let q = `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(0 ${(y - 990).toFixed(1)}) rotate(${(-3 + 3 * e).toFixed(2)} 540 1200)"><rect x="96" y="1006" width="920" height="430" rx="36" fill="${INK.ink}"/><rect x="80" y="990" width="920" height="430" rx="36" fill="#FFFDF8"/><rect x="80" y="990" width="920" height="100" rx="36" fill="${INK.red}"/>`;
+        [INK.yel, INK.pink, INK.green].forEach((c, i) => { const ki = ex(pr(kk, .1 + i * .12, .4 + i * .12));
+          q += `<rect x="120" y="${1108 + i * 102}" width="${(840 * ki).toFixed(1)}" height="88" rx="44" fill="${c}"/><path d="M 150 ${1150 + i * 102} l 22 22 l 40 -48" stroke="${INK.ink}" stroke-width="14" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(kk, .3 + i * .12, .55 + i * .12))).toFixed(3)}"/>`; });
+        q += `</g></svg><div dir="ltr" style="position:absolute;left:120px;top:${(y + 14).toFixed(1)}px;font:900 62px V;color:#fff">Beauty Guide</div>`;
+        ['زمان', 'هزینه', 'نگهداری'].forEach((w, i) => { const ki = ex(pr(kk, .15 + i * .12, .45 + i * .12)); q += `<div style="position:absolute;right:120px;top:${(y + 112 + i * 102).toFixed(1)}px;font:900 66px/1.2 V;color:${INK.ink};opacity:${ki.toFixed(2)}">${w}</div>`; });
         return q; };
       if (t < t2 - .05) {
-        // the Pin: a real photo in a rounded card, pushing in, with the red button
-        const sh = t < t1 ? 0 : Math.exp(-9 * (t - t1)) * 18;
-        r = `<div style="position:absolute;inset:0;background:${INK.pink}"></div>` + blocks(si, 1, t);
-        r += `<div style="position:absolute;left:100px;top:${(150 - sh).toFixed(1)}px;width:880px;height:1100px;border-radius:44px;overflow:hidden;box-shadow:18px 18px 0 ${INK.ink};transform:scale(${z.toFixed(3)}) rotate(-2deg)"><img src="${U('el/' + s.photo)}" style="width:100%;height:100%;object-fit:cover;transform:scale(${(1.08 - .08 * io(pr(t, A, t2))).toFixed(3)})"></div>`;
-        r += logo(880, 240, 110, 1);
-        const press = t >= tap ? Math.exp(-10 * (t - tap)) : 0, bk = t < slam + .2 ? 1 : 1 - ex(pr(t, slam + .2, slam + .5));
-        if (bk > .02) r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(540 1110) scale(${(bk * (1 - .14 * press)).toFixed(3)})"><rect x="-260" y="-70" width="520" height="140" rx="70" fill="${INK.red}"/><text x="0" y="22" text-anchor="middle" font-family="V" font-weight="900" font-size="60" fill="#fff">Get the Guide</text></g></svg>` + cursor(620, 1130, t, tap);
-        if (t >= slam) r += card(pr(t, slam, slam + .6));
-        if (t >= t1 - .05) { const k2 = pr(t, t1 - .05, t1 + .3); r += `<div class="t" style="top:40px;font-size:150px;color:#fff;mix-blend-mode:normal;text-shadow:10px 10px 0 ${INK.ink};transform:rotate(-4deg) scale(${spring(k2).toFixed(3)})">چقدر خرج؟</div>`; }
+        const z = 1.0 + .06 * io(pr(t, A, t2));
+        r = `<div style="position:absolute;inset:0;background:#FFE6F2"></div>` + blocks(si, 1, t).replace('opacity=".32"', 'opacity=".18"');
+        r += `<div style="position:absolute;left:30px;top:450px;width:1020px;height:950px;border-radius:44px;overflow:hidden;box-shadow:16px 16px 0 ${INK.ink}"><img src="${U('el/' + s.photo)}" style="width:100%;height:100%;object-fit:cover;object-position:18% 40%;transform:scale(${z.toFixed(3)});transform-origin:45% 35%"></div>`;
+        r += logo(110, 530, 96, 1);
+        const press = t >= tap ? Math.exp(-10 * (t - tap)) : 0, bk = t < slam ? 1 : 1 - ex(pr(t, slam, slam + .3));
+        if (bk > .02) r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(800 1300) scale(${(.8 * bk * (1 - .14 * press)).toFixed(3)})"><rect x="-230" y="-62" width="460" height="124" rx="62" fill="${INK.red}"/><text x="0" y="20" text-anchor="middle" font-family="V" font-weight="900" font-size="54" fill="#fff">Get the Guide</text></g></svg>` + cursor(860, 1310, t, tap);
+        if (t >= slam) r += card(pr(t, slam, slam + .55));
+        // the promise, huge and readable from frame 0; replaced by «چقدر خرج؟» on the keyword
+        if (t < t1 - .05) r += `<div class="t" style="top:120px;font-size:124px;color:${INK.ink};mix-blend-mode:normal">عکس مدل مو بده،</div><div class="t" style="top:275px;font-size:124px;color:${INK.ink};mix-blend-mode:normal"><span style="background:${INK.red};color:#fff;padding:0 .18em .05em;border-radius:.15em">قیمتش</span> رو بگیر</div>`;
+        else { const k2 = pr(t, t1 - .05, t1 + .3); r += `<div class="t" style="top:150px;font-size:150px;color:${INK.red};mix-blend-mode:normal;text-shadow:8px 8px 0 ${INK.ink};transform:scale(${spring(k2).toFixed(3)})">چقدر خرج؟</div>`; }
         return r;
       }
-      // the call-out, printed over the riso world with the card still in hand
       r += card(1);
-      r += `<div style="position:absolute;left:140px;top:300px;width:420px;height:525px;border-radius:30px;overflow:hidden;box-shadow:12px 12px 0 ${INK.ink};transform:rotate(-5deg)"><img src="${U('el/' + s.photo)}" style="width:100%;height:100%;object-fit:cover"></div>`;
+      r += `<div style="position:absolute;left:140px;top:300px;width:420px;height:525px;border-radius:30px;overflow:hidden;box-shadow:12px 12px 0 ${INK.ink};transform:rotate(-5deg)"><img src="${U('el/' + s.photo)}" style="width:100%;height:100%;object-fit:cover;object-position:40% 30%"></div>`;
       r += chip(560, 520, 'مشتریِ بعدی‌تون', INK.yel, INK.ink, 76, pr(t, t2 + .15, t2 + .5), 4);
-      return r + type('آرایشگرها!', 90, 200, INK.blue, INK.pink, pr(t, t2 - .05, t2 + .3), off);
+      return r + type('آرایشگرها!', 140, 190, INK.blue, INK.pink, pr(t, t2 - .05, t2 + .3), off);
     }
     case 'brand': {
       // the red dot grows into the real logo; the product name prints in passes
