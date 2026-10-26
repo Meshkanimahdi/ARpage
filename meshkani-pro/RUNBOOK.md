@@ -210,7 +210,7 @@ Use WebSearch/WebFetch, English first, local language if needed:
 > خبر هم‌سطح ترجیح بده. اگر خبر مناسب نیست، خروجی را «خبر مناسب پیدا نشد» قرار بده؛ خبر یا
 > آمار نساز.
 
-- **Search window: the last 7 days** (user rule 2026-10-24; it was 24–48 h). The event or announcement must
+- **Search window: the last 7 days** (user rule 2026-10-24; it was 24–48 h); when no story fits the day's brief (field rotation, audience, group) inside 7 days, widen to **the last 30 days** (user rule 2026-10-26) and log `window=30d`. The event or announcement must
   be inside the last 7 Tehran days; prefer the freshest of two equal stories, and never repeat a story
   already covered (check 14 posts and 14 reels).
 - Aim for 15–30 candidates across many fields from `config.json → sectors`
@@ -705,7 +705,7 @@ narrator talks, nothing attractive in the picture").
    debate), make one of the week's reels in this format — about 1–2 a week, never two days running.
 1. History: `Reels` tab (last 14 rows: topic, and angle/shape/preset/voice in Notes), the last 7 days
    of posts, and the previous reel's slot file `creative`.
-2. Find 8–15 candidates trending in AI in the **last 7 days** (user rule 2026-10-24) (WebSearch across outlets, launches, viral
+2. Find 8–15 candidates trending in AI in the **last 7 days** (user rule 2026-10-24; widen to 30 days when nothing fits, 2026-10-26). **Topic cooldown (user rule 2026-10-26):** the field/topic family (robots, work automation, beauty, health, money…) must differ from the last 4 reels and from the last 2 days of posts; robots/automation two days running is a failure. Record `field` and `recent_fields` in story.json; reel_gate.py checks it (WebSearch across outlets, launches, viral
    demos, agent case studies, studies, statements; primary sources through Drive when WebFetch is
    blocked, §1.3). Drop rumours and anything you cannot attribute.
 3. Read `_automation/insights.json` (§6). Score each candidate for hook strength, broad appeal for a

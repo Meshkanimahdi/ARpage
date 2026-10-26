@@ -110,6 +110,13 @@ def main():
         if not cat: fails.append('story.json must name motion_category (UI, TYPE, EDIT, STORY, 3D, EXPL, …)')
         elif hist and hist[-1].get('category') == cat: fails.append(f'category {cat} repeats the previous reel')
 
+    # 4b. topic cooldown (user rule 2026-10-26: robots/workers two days running): the field must differ from the
+    # last 4 reels (≈ 36 h), and from the posts of the last 2 days when the run passes them in story.json → recent_fields
+    fld = story.get('field', '')
+    recent = [h.get('field', '') for h in hist[-4:]] + list(story.get('recent_fields', []))
+    if not fld: fails.append('story.json must name field (topic family, e.g. beauty, robotics, health, money)')
+    elif fld in recent: fails.append(f'field {fld} repeats a recent reel/post ({recent})')
+
     # 5. independent critic
     cp = d / 'critic.json'
     if not cp.exists():
@@ -122,7 +129,7 @@ def main():
 
     out = {'pass': not fails, 'fails': fails, 'info': info,
            'history_entry': {'reel': story.get('content_id', ''), 'date': story.get('date', ''), 'prompt': pid, 'engine': eng,
-                             'category': cat, 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else '')}}
+                             'category': cat, 'field': story.get('field', ''), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else '')}}
     (d / 'gate.json').write_text(json.dumps(out, ensure_ascii=False, indent=1))
     print(json.dumps(out, ensure_ascii=False))
     sys.exit(0 if not fails else 3)
