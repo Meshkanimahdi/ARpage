@@ -656,7 +656,10 @@ narrator talks, nothing attractive in the picture").
    background, and no text is truncated.
 3. **Rhythm.** A new shot or a clear camera change every 1.5–3 s; no still picture longer than 1.5 s,
    except a final CTA of at most 2 s. Cut on action. Length 40–55 s (the 60–92 s ranges below are replaced).
-4. **Hook in 2 seconds.** The first frame is the strongest picture of the reel, already moving, and the first
+4. **Hook in 2 seconds.** (User rule 2026-10-26, after REEL-013 failed the critic's hook score twice:) from frame 0 a huge,
+   readable Persian hook line (≥ 120 px, ≤ 2 short lines, never clipped, inside the safe area) over a bright, large
+   subject (≥ 60 % of the frame); never a tight dark crop, small buttons or tiny card words as the opening.
+   The first frame is the strongest picture of the reel, already moving, and the first
    spoken line is the cover headline's angle (HEADLINES.md), never a slow lead-in like «یه آزمایش واقعی از…»
    ("a real experiment from…").
 5. **Motion prompt fit and variety.** One-diagram/zoom-map prompts (for example pm/168, 194) are only for list
