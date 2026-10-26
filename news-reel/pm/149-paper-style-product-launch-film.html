@@ -82,7 +82,11 @@ window.ready = (async () => {
   }
   B.forEach((b, i) => { b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
   // preload images and svgs used by the scenes
-  ST = {mark: await (await fetch(U('el/block_mark.svg'))).text(), word: await (await fetch(U('el/block_wordmark.svg'))).text()};
+  ST = {mark: '', word: ''};
+  if (!S.brand) ST = {mark: await (await fetch(U('el/block_mark.svg'))).text(), word: await (await fetch(U('el/block_wordmark.svg'))).text()};
+  // real photos used by the scenes (el/<name>.jpg), preloaded so the first frame already shows them
+  const imgs = [...new Set(S.beats.map(b => (b.scene || {}).img).filter(Boolean))];
+  await Promise.all(imgs.map(n => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + n + '.jpg'); })));
   await document.fonts.ready; await Promise.all(['500 40px V', '900 40px V', '700 40px H'].map(f => document.fonts.load(f, 'صدای Dessa')));
   window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
   // one scene per idea: the beat start and each keyword hit inside it (a new idea every 1.5–2 s)
@@ -173,6 +177,15 @@ function blockMark(x, y, size, t0, t) {
 }
 function wordmark(x, y, w, col, k) { return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;color:${col};opacity:${cl(k * 2)};transform:translateY(${((1 - ez.out(cl(k))) * 40).toFixed(1)}px)">${ST.word.replace(/fill="black"/g, `fill="${col}"`).replace('width="116" height="35"', `width="${w}" height="${(w * 35 / 116).toFixed(0)}"`)}</div>`; }
 
+const fa = n => String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]).replace('.', '٫');
+const bi0 = b => B[0] === b;
+// a real photo as a glossy print taped onto the paper (white border, tape strip, drop shadow); z zooms inside the print
+function print(name, x, y, w, rot, k, z = 1, origin = '50% 50%') {
+  const e = ez.back(cl(k)), hgt = Math.round(w * 1.2);
+  return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${hgt}px;padding:22px 22px 70px;background:#fff;box-shadow:0 22px 40px rgba(0,0,0,.25);transform:rotate(${rot}deg) scale(${e.toFixed(3)});opacity:${cl(k * 3)}">
+    <div style="width:100%;height:100%;overflow:hidden;background:#111"><img src="${U('el/' + name + '.jpg')}" style="width:100%;height:100%;object-fit:cover;transform:scale(${z.toFixed(3)});transform-origin:${origin}"></div>
+    <div style="position:absolute;left:${w / 2 - 90}px;top:-30px;width:180px;height:60px;background:rgba(240,226,180,.82);transform:rotate(-3deg)"></div></div>`;
+}
 function render(b, t, u, ink, dark) {
   const s = b.sc; let ex = '';
   if (s.extra) { const te = b.wt(s.extra[0]) - .05; if (t >= te) ex = handNote(s.extra[1], s.extra[2], s.extra[3], pr(t, te, te + .8), dark ? '#F3EEE4' : 'var(--a2)', -5, 78); }
@@ -223,6 +236,7 @@ function scene(b, t, u, ink, dark) {
       let prop = `<svg width="1080" height="1920" style="position:absolute;opacity:.5">${wave(540, 1240, 900, 300, t, '#F3EEE4', 32)}</svg>`;
       if (s.prop === 'mute') prop += svg(markerPath('M 150 1420 L 930 1060', pr(t, b.a + .4, b.a + 1), 'var(--a1)', 22));
       if (s.prop === 'lock') { const k = ez.back(pr(t, b.a + .2, b.a + .7)); prop += svg(`<g transform="translate(540 1250) scale(${k.toFixed(3)})"><path d="M -90 -40 V -110 A 90 90 0 0 1 90 -110 V -40" fill="none" stroke="#F3EEE4" stroke-width="34"/><rect x="-150" y="-40" width="300" height="230" rx="30" fill="var(--a1)"/><circle cx="0" cy="60" r="26" fill="#1F1D1B"/></g>`); }
+      if (s.prop === 'speed') { const nd = -70 + 140 * ez.out(pr(t, b.a, b.a + 1)); prop = svg(`<g transform="translate(540 1300)"><path d="M -300 0 A 300 300 0 0 1 300 0" fill="none" stroke="#F3EEE4" stroke-width="30" stroke-linecap="round"/><line x1="0" y1="0" x2="0" y2="-250" stroke="var(--a1)" stroke-width="18" stroke-linecap="round" transform="rotate(${nd.toFixed(1)})"/><circle r="30" fill="#F3EEE4"/></g>` + markerPath('M 200 1380 L 880 1060', pr(t, tk + .4, tk + .9), 'var(--a1)', 24)); }
       if (s.prop === 'twin') prop = `<svg width="1080" height="1920" style="position:absolute">${wave(540, 1180, 900, 260, t, '#F3EEE4', 32)}${wave(540, 1300, 900, 260, t + .05, 'var(--a1)', 32, .1)}</svg>`;
       return prop + `<div class="big" style="top:420px;font-size:84px;font-weight:500;color:${ink};opacity:${cl(u * 3)};transform:translateY(${((1 - ez.out(cl(u * 2))) * 30).toFixed(1)}px)">${lead.length > 26 ? lead.split(' ').slice(-4).join(' ') : lead}</div>` +
         bigWord(s.big, 640, Math.min(300, Math.floor(1400 / s.big.length)), 'var(--a1)', pr(t, tk - .08, tk + .45)) + svg(markerPath('M 170 1010 C 400 1060, 690 960, 920 1020', pr(t, tk + .3, tk + .9), '#F3EEE4', 14));
@@ -251,6 +265,129 @@ function scene(b, t, u, ink, dark) {
       const tn = b.wt(s.note[0]);
       return laptop(540, 1060, 1.1, t, pr(t, b.a, b.a + .5)) + bigWord('روی خودِ لپ‌تاپ', 300, 150, ink, pr(t, b.a + .3, b.a + .8)) + (t >= tn - .05 ? handNote(s.note[1], 140, 1240, pr(t, tn - .05, tn + .8), 'var(--a1)', -4, 80) : '');
     }
+    case 'photo': {
+      // the real product, printed and taped on paper; a counter rolls up to the number in the sentence
+      const ik = b.words.findIndex(w => w.k), tk = b.wt(ik), after = t >= tk - .05;
+      const k = bi0(b) ? 1 : pr(t, b.a, b.a + .45), z = after ? mix(1.06, 1.3, ez.out(pr(t, tk - .05, tk + .6))) : mix(1.45, 1.02, ez.io(pr(t, b.a, tk)));
+      const sw = after ? 0 : Math.sin((t - b.a) * 5.5) * 3 * (1 - pr(t, b.a, tk));
+      let r = print(s.img, after ? 130 : 190 + sw * 6, after ? 170 : 210, after ? 820 : 700, after ? 2 : -4 + sw, k, z, after ? '50% 78%' : '50% 82%');
+      if (!after) for (let i = 0; i < 5; i++) { const q = ((t - b.a) * 2.2 + i / 5) % 1; r += svg(`<line x1="${150 + i * 190}" y1="${120 + q * 1200}" x2="${150 + i * 190}" y2="${230 + q * 1200}" stroke="#1B1A18" stroke-width="7" stroke-linecap="round" opacity="${(.5 * (1 - q)).toFixed(2)}"/>`); }
+      const n = Math.round(s.count * ez.io(pr(t, b.a + .2, tk + .35)));
+      r += `<div class="big" style="top:${after ? 1215 : 1170}px;font-size:${after ? 200 : 170}px;color:var(--a1);text-shadow:0 10px 0 rgba(0,0,0,.08)">${fa(n)}</div>`;
+      if (after) r += handNote('در ساعت!', 80, 40, pr(t, tk + .1, tk + .8), 'var(--ink)', -6, 80) + svg(markerPath('M 260 1425 C 420 1450, 700 1405, 830 1430', pr(t, tk + .3, tk + .9), 'var(--a1)', 16));
+      else if (t >= b.wt(s.note[0]) - .05) r += handNote(s.note[1], 650, 150, pr(t, b.wt(s.note[0]) - .05, b.wt(s.note[0]) + .6), 'var(--a2)', -5, 96);
+      return r;
+    }
+    case 'versus': {
+      const ik = b.words.findIndex(w => w.k), tk = b.wt(ik), floor = 1220;
+      const hR = 760 * ez.out(pr(t, b.a, b.a + .6)), hH = 760 * .4 * ez.back(pr(t, tk - .05, tk + .5));
+      let r = svg(`${shadow}<g filter="url(#ds)"><rect x="170" y="${floor - hR}" width="300" height="${hR}" rx="18" fill="var(--a1)"/><rect x="610" y="${floor - hH}" width="300" height="${hH}" rx="18" fill="var(--a2)"/></g><line x1="110" x2="970" y1="${floor + 4}" y2="${floor + 4}" stroke="#1B1A18" stroke-width="10" stroke-linecap="round"/>`);
+      r += `<div class="tag" style="left:200px;top:${floor - hR - 130}px;font-size:76px">${fa(1500)}</div>`;
+      if (t >= tk - .05) r += `<div class="tag" style="left:640px;top:${floor - hH - 130}px;font-size:76px;opacity:${cl((t - tk) * 4)}">${fa(600)}</div>`;
+      r += handNote('ربات', 230, 1235, 1, 'var(--a1)', -3, 90) + (t >= tk - .3 ? handNote('آدم', 690, 1235, pr(t, tk - .3, tk + .4), 'var(--a2)', 4, 90) : '');
+      return r + `<div class="big" style="top:200px;font-size:110px;color:${ink};opacity:${cl(u * 3)}">ساعتی چندتا؟</div>`;
+    }
+    case 'brand': {
+      // the name in Latin type (no official logo file found), then the valuation as a growing paper stack
+      const ik = b.words.findIndex(w => w.k), tk = b.wt(ik), after = t >= tk - .05;
+      const k = pr(t, b.a, b.a + .5), e = ez.back(k), [sx, sy] = squash(k - .35);
+      let r = `<div class="big" dir="ltr" style="top:${after ? 250 : 560}px;font-size:${after ? 200 : 330}px;letter-spacing:-6px;color:${ink};transform:scale(${(sx * e).toFixed(3)},${(sy * e).toFixed(3)})">${S.brand}</div>` +
+        `<div class="big" dir="ltr" style="top:${after ? 470 : 920}px;font-size:${after ? 46 : 64}px;font-weight:500;letter-spacing:${after ? 18 : 26}px;color:${ink};opacity:${cl(k * 2)}">${S.brand_sub || ''}</div>`;
+      if (after) {
+        for (let i = 0; i < 9; i++) { const ti = tk + i * .09, kk = ez.back(pr(t, ti, ti + .3)); if (t < ti) break;
+          r += `<div style="position:absolute;left:${290 + (i % 2 ? 14 : -10)}px;top:${1110 - i * 58 - (1 - kk) * 220}px;width:500px;height:52px;border-radius:8px;background:#9CC59A;border:4px solid #5E8F5B;transform:rotate(${(i % 3 - 1) * 2}deg);box-shadow:0 6px 0 rgba(0,0,0,.1)"></div>`; }
+        r += bigWord(`${fa('1.45')} میلیارد دلار`, 1200, 120, 'var(--a1)', pr(t, tk + .2, tk + .7));
+      }
+      return r;
+    }
+    case 'founders': {
+      const kis = b.words.map((w, i) => w.k && (i === 0 || !b.words[i - 1].k) ? i : -1).filter(i => i >= 0), t1 = b.wt(kis[0]), t2 = b.wt(kis[1]);
+      const card = (x, y, rot, title, sub, kk, col) => { const e = ez.back(kk), [sx, sy] = squash(kk - .3); return `<div style="position:absolute;left:${x}px;top:${y}px;width:760px;height:330px;background:#fff;border-radius:14px;box-shadow:0 16px 34px rgba(0,0,0,.18);transform:rotate(${rot}deg) scale(${(sx * e).toFixed(3)},${(sy * e).toFixed(3)});opacity:${cl(kk * 3)}">
+        <div dir="ltr" style="position:absolute;left:0;right:0;top:56px;text-align:center;font:900 ${title.length > 6 ? 84 : 150}px V;white-space:nowrap;color:${col}">${title}</div><div style="position:absolute;left:0;right:0;top:220px;text-align:center;font:700 70px H;color:#1B1A18">${sub}</div>
+        <div style="position:absolute;left:350px;top:-22px;width:60px;height:60px;border-radius:50%;background:${col};box-shadow:0 6px 8px rgba(0,0,0,.25)"></div></div>`; };
+      return `<div class="big" style="top:190px;font-size:104px;color:${ink};opacity:${cl(u * 3)}">سازنده‌ها</div>` + card(240, 420, -4, 'MIT', 'استاد دانشگاه', bi0(b) ? 1 : pr(t, b.a, b.a + .45), 'var(--a1)') + (t >= t2 - .1 ? card(80, 880, 3, 'Google DeepMind', 'محقق سابق', pr(t, t2 - .1, t2 + .4), 'var(--a2)') : '');
+    }
+    case 'touch': {
+      // the real gripper, close; rings of touch spread from the fingertips
+      const k = pr(t, b.a, b.a + .4); let r = print(s.img, 190, 200, 700, -2, k, mix(1.05, 1.2, pr(t, b.a, b.b)), '50% 70%');
+      let rings = ''; for (let i = 0; i < 3; i++) { const q = ((t - b.a) * 1.4 + i / 3) % 1; rings += `<circle cx="560" cy="820" r="${60 + q * 300}" fill="none" stroke="#FF5A36" stroke-width="${10 * (1 - q)}" opacity="${1 - q}"/>`; }
+      return r + svg(rings) + bigWord('لمس', 1150, 230, 'var(--a1)', pr(t, b.a + .1, b.a + .5));
+    }
+    case 'force': {
+      const kis = b.words.map((w, i) => w.k && (i === 0 || !b.words[i - 1].k) ? i : -1).filter(i => i >= 0), t1 = b.wt(kis[0]), t2 = b.wt(kis[1]);
+      if (t < t2 - .05) {
+        // a paper eye: vision only
+        const k = ez.back(pr(t, b.a, b.a + .5)), look = Math.sin(t * 3) * 40;
+        let r = svg(`${shadow}<g filter="url(#ds)" transform="translate(540 820) scale(${k.toFixed(3)})"><path d="M -380 0 Q 0 -300 380 0 Q 0 300 -380 0 Z" fill="#fff"/><circle cx="${look}" r="130" fill="var(--a2)"/><circle cx="${look}" r="60" fill="#1B1A18"/><circle cx="${look + 30}" cy="-34" r="20" fill="#fff"/></g>`);
+        r += `<div class="big" style="top:250px;font-size:96px;font-weight:500;color:${ink};opacity:${cl(u * 3)}">بیشترِ ربات‌ها</div>`;
+        if (t >= t1 - .05) r += bigWord('فقط چشم', 1110, 170, ink, pr(t, t1 - .05, t1 + .4));
+        return r;
+      }
+      // Eka: the real hand with a force gauge filling as it squeezes
+      const k = pr(t, t2 - .05, t2 + .4), f = .2 + .55 * Math.abs(Math.sin((t - t2) * 3));
+      let r = print('grip', 110, 260, 560, -3, k, 1.1, '50% 70%');
+      r += svg(`${shadow}<g filter="url(#ds)"><rect x="770" y="300" width="160" height="760" rx="80" fill="#fff"/><rect x="800" y="${330 + 700 * (1 - f)}" width="100" height="${700 * f}" rx="50" fill="var(--a1)"/></g>`);
+      r += handNote('فشار', 790, 1080, pr(t, t2, t2 + .6), 'var(--a1)', -5, 74);
+      return r + bigWord('حس می‌کنه', 1160, 190, 'var(--a2)', pr(t, t2, t2 + .45));
+    }
+    case 'berry': {
+      const kis = b.words.map((w, i) => w.k && (i === 0 || !b.words[i - 1].k) ? i : -1).filter(i => i >= 0), t1 = b.wt(kis[0]), t2 = b.wt(kis[1]);
+      const close = ez.out(pr(t, t1 + .2, t2 - .1)), gap = mix(330, 112, close), squeeze = t > t2 - .1 ? Math.sin((t - t2) * 18) * Math.exp(-(t - t2) * 5) * 6 : 0;
+      let berry = ''; const pts = [[0, -60], [-50, -30], [50, -30], [-60, 25], [0, 0], [60, 25], [-30, 75], [30, 75], [0, 120]];
+      pts.forEach(([x, y]) => berry += `<circle cx="${x}" cy="${y}" r="44" fill="#D2244B"/><circle cx="${x - 12}" cy="${y - 14}" r="10" fill="#fff" opacity=".45"/>`);
+      const kb = ez.back(pr(t, b.a, b.a + .4));
+      let r = svg(`${shadow}<g filter="url(#ds)"><g transform="translate(540 900) scale(${(kb * (1 + squeeze / 200)).toFixed(3)},${kb.toFixed(3)})">${berry}<path d="M -40 -100 Q 0 -150 40 -100 Q 0 -120 -40 -100" fill="#3E8E41"/></g>
+        <g transform="translate(${540 - gap} 900)"><rect x="-150" y="-90" width="150" height="180" rx="30" fill="#2a2a2e"/><rect x="-170" y="-260" width="40" height="300" rx="14" fill="#cfd2d6"/></g>
+        <g transform="translate(${540 + gap} 900)"><rect x="0" y="-90" width="150" height="180" rx="30" fill="#2a2a2e"/><rect x="130" y="-260" width="40" height="300" rx="14" fill="#cfd2d6"/></g>
+        <rect x="${540 - gap - 190}" y="610" width="${2 * gap + 380}" height="50" rx="20" fill="#cfd2d6"/></g>`);
+      r += bigWord('تمشک', 270, 190, '#D2244B', pr(t, t1 - .1, t1 + .4));
+      if (t >= t2 - .1) r += bigWord('لهش نکرد', 1150, 180, 'var(--a2)', pr(t, t2 - .1, t2 + .4)) + svg(markerPath('M 790 640 L 850 710 L 980 520', pr(t, t2 + .2, t2 + .6), '#3E8E41', 20));
+      return r;
+    }
+    case 'rush': {
+      // the real arm flies at a paper hand and brakes at the last moment
+      const ik = b.words.findIndex(w => w.k), tk = b.wt(ik), mv = ez.out(pr(t, b.a + .2, tk));
+      const x = mix(1100, 360, mv), touch = t >= tk - .05;
+      let r = svg(`<g transform="translate(110 1080)" opacity=".95"><path d="M 0 140 L 0 -40 Q 0 -70 30 -70 Q 60 -70 60 -40 L 60 -150 Q 60 -180 90 -180 Q 120 -180 120 -150 L 120 -170 Q 120 -200 150 -200 Q 180 -200 180 -170 L 180 -150 Q 180 -180 210 -180 Q 240 -180 240 -150 L 240 60 Q 240 140 160 160 L 40 160 Z" fill="#F2C9A0" stroke="#1B1A18" stroke-width="8"/></g>`);
+      if (!touch) for (let i = 0; i < 4; i++) r += svg(markerPath(`M ${x + 470 + i * 30} ${700 + i * 90} L ${x + 640 + i * 30} ${700 + i * 90}`, pr(t, b.a + .3, b.a + .6), ink, 9));
+      r += print(s.img, x, 260, 560, touch ? 0 : -8, 1, 1.05, '50% 55%');
+      if (touch) { const q = pr(t, tk - .05, tk + .8); r += svg(`<circle cx="330" cy="1000" r="${40 + q * 200}" fill="none" stroke="#FF5A36" stroke-width="${12 * (1 - q)}"/>`) + bigWord('آروم', 1180, 210, 'var(--a1)', pr(t, tk - .05, tk + .4)); }
+      return r;
+    }
+    case 'clock': {
+      const ik = b.words.findIndex(w => w.k), tk = b.wt(ik), sp = t < tk ? 900 : 60, a = (t - b.a) * sp;
+      const k = ez.back(pr(t, b.a, b.a + .45));
+      let ticks = ''; for (let i = 0; i < 12; i++) ticks += `<line x1="0" y1="-300" x2="0" y2="-260" stroke="#1B1A18" stroke-width="12" stroke-linecap="round" transform="rotate(${i * 30})"/>`;
+      let r = svg(`${shadow}<g filter="url(#ds)" transform="translate(540 820) scale(${k.toFixed(3)})"><circle r="340" fill="#fff"/>${ticks}<line x1="0" y1="0" x2="0" y2="-170" stroke="#1B1A18" stroke-width="22" stroke-linecap="round" transform="rotate(${(a / 12).toFixed(1)})"/><line x1="0" y1="0" x2="0" y2="-250" stroke="var(--a1)" stroke-width="12" stroke-linecap="round" transform="rotate(${a.toFixed(1)})"/><circle r="22" fill="#1B1A18"/></g>`);
+      r += `<div class="big" style="top:210px;font-size:110px;color:${ink};opacity:${cl(u * 3)}">شبیه‌ساز</div>`;
+      if (t >= tk - .05) r += bigWord('چند دقیقه', 1220, 190, 'var(--a1)', pr(t, tk - .05, tk + .4));
+      return r;
+    }
+    case 'meter': {
+      const ik = b.words.findIndex(w => w.k), tk = b.wt(ik), q = ez.out(pr(t, b.a + .1, tk + .5)) * s.pct / 100;
+      let r = svg(`${shadow}<g filter="url(#ds)"><circle cx="540" cy="830" r="330" fill="#fff"/></g><circle cx="540" cy="830" r="260" fill="none" stroke="#E4DDD0" stroke-width="60"/>` +
+        `<circle cx="540" cy="830" r="260" fill="none" stroke="var(--a2)" stroke-width="60" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - q).toFixed(3)}" transform="rotate(-90 540 830)"/>`);
+      r += `<div class="big" style="top:720px;font-size:200px;color:${ink}">٪${fa(Math.round(q * 100))}</div>`;
+      return r + handNote('درست برمی‌داره', 260, 1240, pr(t, tk + .3, tk + 1.1), 'var(--a1)', -3, 92);
+    }
+    case 'retry': {
+      const ik = b.words.findIndex(w => w.k), tk = b.wt(ik), td = b.wt(s.dark_at);
+      if (t >= td - .02) return bigWord('ترسناک', 620, 280, 'var(--a1)', pr(t, td, td + .45)) + handNote('شبیهِ آدم', 300, 1050, pr(t, td + .3, td + 1.1), '#F3EEE4', -4, 110);
+      // a ball tries to hop onto a step, falls back, tries again
+      const per = 1.1, ph = ((t - b.a) % per) / per, n = Math.floor((t - b.a) / per), up = Math.sin(ph * Math.PI);
+      const x = mix(260, 520 + n * 20, ph), y = 1180 - up * (360 + n * 30);
+      let r = svg(`${shadow}<g filter="url(#ds)"><rect x="600" y="900" width="420" height="380" rx="12" fill="#fff"/></g><line x1="60" x2="1020" y1="1290" y2="1290" stroke="#1B1A18" stroke-width="10"/>`);
+      r += `<div style="position:absolute;left:${x - 60}px;top:${y - 60}px;width:120px;height:120px;border-radius:50%;background:var(--a1)"></div>`;
+      r += `<div class="big" style="top:300px;font-size:110px;color:${ink};opacity:${cl(u * 3)}">بار اول نشد؟</div>`;
+      return r + (t >= tk - .05 ? bigWord('دوباره', 520, 170, 'var(--a2)', pr(t, tk - .05, tk + .4)) + handNote(`بار ${fa(n + 1)}`, 680, 800, 1, ink, -4, 70) : '');
+    }
+    case 'ask': {
+      const ik = b.words.findIndex(w => w.k), tk = b.wt(ik);
+      let r = print('robot', 590, 420, 400, 4, pr(t, b.a + .2, b.a + .6), 1.05, '50% 40%');
+      r += svg(`<g transform="translate(240 700)" opacity="${cl((t - b.a) * 3)}"><circle cy="-130" r="90" fill="#F2C9A0" stroke="#1B1A18" stroke-width="8"/><path d="M -150 230 Q -150 -10 0 -10 Q 150 -10 150 230 Z" fill="var(--a2)" stroke="#1B1A18" stroke-width="8"/></g>`);
+      r += handNote('آدم', 160, 980, pr(t, b.a, b.a + .6), 'var(--a2)', -4, 96) + handNote(S.brand, 720, 960, pr(t, b.a + .3, b.a + .9), 'var(--a1)', -4, 96);
+      return r + bigWord('؟', 1130, 260, 'var(--a1)', pr(t, tk - .1, tk + .4));
+    }
     case 'end': {
       // the question: two voices side by side, one human, one Dessa — which is which?
       const ik = b.words.findIndex(w => w.k), tk = b.wt(ik);
@@ -267,8 +404,10 @@ function endCard(u, ink) {
   const f = fall(u, -160, 560, .45, 6200), [sx, sy] = squash(f.hit >= 0 ? u - f.hit : -1);
   const ball = u < 1.2 ? `<div style="position:absolute;left:500px;top:${f.y.toFixed(1)}px;width:80px;height:80px;border-radius:50%;background:var(--a1);transform:scale(${sx},${sy});opacity:${1 - pr(u, 1, 1.2)}"></div>` : '';
   const q = (S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--a1)">$1</span>');
-  return ball + `<div style="color:${ink}">${blockMark(450, 640, 180, .45, u)}</div>` + wordmark(400, 860, 280, ink, pr(u, .8, 1.2)) +
-    `<div class="big" style="top:1060px;font-size:76px;color:${ink};opacity:${pr(u, 1.1, 1.5)}">${q}</div>` +
+  const mk = S.brand ? `<div class="big" dir="ltr" style="top:640px;font-size:220px;letter-spacing:-5px;color:${ink};opacity:${pr(u, .4, .6)};transform:scale(${ez.back(pr(u, .4, .8)).toFixed(3)})">${S.brand}</div><div class="big" dir="ltr" style="top:900px;font-size:44px;font-weight:500;letter-spacing:20px;color:${ink};opacity:${pr(u, .8, 1.2)}">${S.brand_sub || ''}</div>`
+    : `<div style="color:${ink}">${blockMark(450, 640, 180, .45, u)}</div>` + wordmark(400, 860, 280, ink, pr(u, .8, 1.2));
+  return ball + mk +
+    `<div class="big" style="top:1060px;font-size:${Math.min(76, Math.floor(1500 / (S.end_text || 'x').length))}px;color:${ink};opacity:${pr(u, 1.1, 1.5)}">${q}</div>` +
     `<div class="big" style="top:1220px;font-size:52px;font-weight:500;color:${ink};opacity:${pr(u, 1.4, 1.8)}">${S.end_sub || ''}</div>` +
     `<div class="big" style="top:1330px;font-size:40px;font-weight:500;letter-spacing:3px;color:${ink};opacity:${pr(u, 1.6, 2)}" dir="ltr">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;
 }
