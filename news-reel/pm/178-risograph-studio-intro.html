@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — risograph studio intro (prompt 178)</title>
+<!-- Skill motion-graphy-2026, prompt 178 "Risograph studio intro" (HAND), built as its own engine.
+     Look from the prompt: Risograph print — spot inks laid as separate passes (multiply), misregistration that shifts on
+     every beat, fine grain and halftone dots, one typeface, one accent (red) used only on the through-line object and the
+     key word, the real product UI rebuilt as vector layers driven by a cursor with real taps, screen-studio camera pushes
+     (1.0 → 1.04 per scene, each scene starts at the zoom the last ended on), springs with a small overshoot, nothing
+     appearing from nothing (grows, unfolds or is revealed by a mask). Brand-colour input slot = a loud multi-ink riso
+     palette (fluoro pink, yellow, blue, green + red accent) for a maximalist look.
+     Page standards: 1080x1920, Persian narration (eleven_v4) with a word-by-word caption, music bed at 120 BPM.
+     Data: story.json beats[{id, text, scene{type}}], brand, product, end_text, end_sub; el/<brand logo>.png.
+     Pure seek(t): every style is computed from t, no CSS animations, timers or Math.random. -->
+<style>
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-600-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --paper: #F4EFE6; --pink: #FF48B0; --yel: #FFE800; --blue: #0078BF; --green: #00A95C; --red: #E60023; --ink: #1D1A2F; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
+  #root { position: absolute; inset: 0; overflow: hidden; background: var(--paper); font-family: V; font-weight: 900; }
+  #cam { position: absolute; inset: 0; transform-origin: 540px 860px; }
+  #stage { position: absolute; inset: 0; }
+  .L { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; mix-blend-mode: multiply; }
+  .t { position: absolute; left: 0; right: 0; text-align: center; line-height: 1.05; white-space: nowrap; mix-blend-mode: multiply; }
+  #grain { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: .5; }
+  #sub { position: absolute; left: 60px; right: 60px; top: 1450px; height: 150px; display: flex; align-items: center; justify-content: center; }
+  #sub .pill { padding: 10px 34px 20px; border-radius: 18px; font: 900 60px/1.3 V; white-space: nowrap; background: var(--ink); color: var(--paper); box-shadow: 8px 8px 0 var(--pink); }
+  #sub .w { display: inline-block; margin: 0 .13em; }
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="cam"><div id="stage"></div></div>
+  <svg id="grain" width="1080" height="1920"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 .2  0 0 0 0 .18  0 0 0 0 .25  0 0 0 -1.6 1.05"/></filter><rect width="1080" height="1920" filter="url(#gr)"/></svg>
+  <div id="sub"></div>
+</div>
+<script src="/logo-motion/node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const U = s => s.startsWith('/') ? s : DIR + s, $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), mix = (a, b, k) => a + (b - a) * k, pr = (t, a, b) => cl((t - a) / (b - a));
+const ex = k => 1 - Math.pow(2, -10 * cl(k));                                  // exponential ease-out
+const spring = k => { k = cl(k); return 1 - Math.exp(-7 * k) * Math.cos(9 * k) * (1 - k * .2); };   // small overshoot (~8%)
+const io = gsap.parseEase('power2.inOut');
+const INK = {pink: '#FF48B0', yel: '#FFE800', blue: '#0078BF', green: '#00A95C', red: '#E60023', ink: '#1D1A2F'};
+const fa = n => String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const ISSUES = [];
+let S, TL, B = [], END = 50, ZOOM = [];
+
+// misregistration: each beat shifts the second ink pass a few px (deterministic per beat)
+const mis = i => { const a = (i * 2.399) % (Math.PI * 2); return [Math.round(Math.cos(a) * 9), Math.round(Math.sin(a) * 7)]; };
+// an SVG layer printed as two riso passes: the shape in ink A, the same shape offset in ink B underneath (multiply)
+function riso(inner, a, b, off) {
+  const ia = inner.replace(/INK/g, a), ib = inner.replace(/INK/g, b);
+  return `<svg class="L" viewBox="0 0 1080 1920" style="transform:translate(${off[0]}px,${off[1]}px)">${ib}</svg><svg class="L" viewBox="0 0 1080 1920">${ia}</svg>`;
+}
+// halftone dot pattern in a given ink
+const HT = `<defs>${Object.entries(INK).map(([k, c]) => `<pattern id="ht-${k}" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(22)"><circle cx="7" cy="7" r="4.2" fill="${c}"/></pattern>`).join('')}</defs>`;
+// big type in one ink with a ghost pass in another ink, revealed by a mask that wipes in reading order (RTL: from the right)
+function type(txt, y, size, a, b, k, off, ltr = false) {
+  const m = cl(k) * 100, clip = ltr ? `inset(0 ${100 - m}% 0 0)` : `inset(0 0 0 ${100 - m}%)`, d = ltr ? 'dir="ltr"' : '';
+  return `<div class="t" ${d} style="top:${y}px;font-size:${size}px;color:${b};transform:translate(${off[0]}px,${off[1]}px);clip-path:${clip}">${txt}</div>` +
+         `<div class="t" ${d} style="top:${y}px;font-size:${size}px;color:${a};clip-path:${clip}">${txt}</div>`;
+}
+// flat maximal colour blocks behind each scene (scaled past the frame edges), grown with a spring
+function blocks(seed, k, t) {
+  const cols = ['pink', 'yel', 'blue', 'green'], c1 = cols[seed % 4], c2 = cols[(seed + 1) % 4], c3 = cols[(seed + 2) % 4], e = spring(k);
+  const r1 = 520 * e, r2 = 380 * e, w = Math.sin(t * 1.3) * 18;
+  return `<svg class="L" viewBox="0 0 1080 1920">${HT}
+    <circle cx="${seed % 2 ? 1060 : 20}" cy="${200 + w}" r="${r1}" fill="${INK[c1]}" opacity=".9"/>
+    <rect x="${seed % 2 ? -120 : 640}" y="${1300 - 260 * e}" width="620" height="${760 * e}" fill="url(#ht-${c2})" transform="rotate(${seed % 2 ? 8 : -8} 540 1500)"/>
+    <circle cx="${seed % 2 ? 60 : 1000}" cy="${1700 - w}" r="${r2}" fill="${INK[c3]}" opacity=".85"/></svg>`;
+}
+// cursor (a fingertip pointer) with a tap ring when it clicks at time tc
+function cursor(x, y, t, tc) {
+  const press = tc !== undefined && t >= tc ? Math.exp(-8 * (t - tc)) : 0, ring = tc !== undefined && t >= tc ? pr(t, tc, tc + .5) : 1;
+  return `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${ring < 1 ? `<circle cx="${x}" cy="${y}" r="${30 + ring * 90}" fill="none" stroke="${INK.ink}" stroke-width="${8 * (1 - ring)}"/>` : ''}
+    <g transform="translate(${x} ${y}) scale(${1 - .18 * press})"><path d="M0 0 L0 74 L18 58 L32 90 L46 84 L32 52 L56 52 Z" fill="${INK.paper || '#fff'}" stroke="${INK.ink}" stroke-width="6" stroke-linejoin="round"/></g></svg>`;
+}
+
+window.ready = (async () => {
+  S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json();
+  END = TL.total;
+  const shown = t => t.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/);
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) { ISSUES.push('no timing for ' + bt.id); continue; }
+    const raw = shown(bt.text); let on = false;
+    const words = raw.map(w => { const st = w.startsWith('*') || w.startsWith('«*'); if (st) on = true; const k = on || /\*/.test(w); if (/\*[.…،؛!؟?»]*$/.test(w)) on = false; return {w: w.replace(/\*/g, ''), k}; });
+    const wt = j => { const i = Math.round(cl(j / Math.max(1, words.length - 1)) * (L.words.length - 1)); return (L.words[i] || [L.start])[0]; };
+    const kis = words.map((w, i) => w.k && (i === 0 || !words[i - 1].k) ? i : -1).filter(i => i >= 0);
+    B.push({bt, sc: bt.scene || {}, L, words, wt, kis, kt: kis.map(wt)});
+  }
+  B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
+  await new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + (S.logo || 'pinterest.png')); });
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'آرایشگرها Beauty')));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  const SC = [];
+  for (const b of B) {
+    const pts = [b.a, ...b.kt.filter(h => h > b.a + .9 && h < b.b - .9)];
+    if (b.sc.extra_hits) b.sc.extra_hits.forEach(j => { const h = b.wt(j); if (h > b.a + .9 && h < b.b - .9) pts.push(h); });
+    const ps = [...new Set(pts.map(x => +x.toFixed(2)))].sort((p, q) => p - q);
+    ps.forEach((p, i) => SC.push({t0: p, t1: i + 1 < ps.length ? ps[i + 1] : b.b, type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: i ? [[p, 'hit', .35]] : [[p, 'whoosh', .3]]}));
+  }
+  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .2, 'hit', .5]]});
+  window.SCENES = SC;
+  for (const s of SC) if (s.t1 - s.t0 > 3.2) ISSUES.push(`idea ${s.bg} holds ${(s.t1 - s.t0).toFixed(1)} s (> 3): add a hit`);
+  seek(0);
+})();
+function seek(t) {
+  if (!B.length) return;
+  let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
+  const endOn = t >= TL.end_start, b = B[bi];
+  let si = 0, sc = (window.SCENES || [])[0] || {t0: 0, t1: 1}; (window.SCENES || []).forEach((s, i) => { if (t >= s.t0) { si = i; sc = s; } });
+  // screen-studio camera: each idea pushes 1.0 → 1.04, plus a short exponential kick on every new idea
+  const k = pr(t, sc.t0, sc.t1), kick = Math.exp(-9 * (t - sc.t0)) * .035;
+  $('cam').style.transform = `scale(${(1 + .04 * io(k) + kick).toFixed(4)})`;
+  const off = mis(si);
+  const h = endOn ? endCard(t - TL.end_start, t, off) : scene(b, t, t - b.a, si, off);
+  const st = $('stage'); if (st._h !== h) { st._h = h; st.innerHTML = h; }
+  caption(b, t, endOn);
+}
+function caption(b, t, endOn) {
+  const sub = $('sub');
+  if (endOn || t > b.L.end + .3) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
+  const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + c0;
+  if (sub._k !== key) { sub._k = key; const lat = w => /^[«]?[A-Za-z0-9.\-]+[،,.!?؟…؛»]*$/.test(w.w); const gs = [];
+    ch.forEach((w, q) => { const g = gs[gs.length - 1]; if (g && lat(w) && g.l) { g.w += ' ' + w.w; g.k = g.k || w.k; } else gs.push({w: w.w, k: w.k, i: q, l: lat(w)}); });
+    sub.innerHTML = `<span class="pill">${gs.map(g => `<span class="w" data-i="${g.i}" ${g.l ? 'dir="ltr"' : ''} style="${g.k ? 'color:#FF48B0' : ''}">${g.w}</span>`).join(' ')}</span>`; }
+  sub.querySelectorAll('.w').forEach(el => { const tw = b.wt(c0 + +el.dataset.i), k = ex(pr(t, tw - .05, tw + .2)); el.style.opacity = .3 + .7 * k; });
+}
+// ---- riso props, all vector ----
+const dot = (x, y, r) => `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><circle cx="${x}" cy="${y}" r="${Math.max(0, r)}" fill="${INK.red}"/><circle cx="${x - r * .3}" cy="${y - r * .3}" r="${Math.max(0, r * .18)}" fill="#fff" opacity=".25"/></svg>`;
+// a hair Pin: face + bob with balayage ends (halftone yellow over blue), drawn inside a rounded card
+function hairArt(x, y, w, h, seed = 0) {
+  const cx = x + w / 2, cy = y + h * .52, s = w / 400;
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${28 * s}" fill="INK"/>`.replace('INK', seed % 2 ? INK.yel : INK.pink) +
+    `<g transform="translate(${cx} ${cy}) scale(${s})">
+      <path d="M -150 -40 C -160 -200, 160 -200, 150 -40 L 165 150 C 120 175, 60 160, 40 120 L -40 120 C -60 160, -120 175, -165 150 Z" fill="${INK.blue}"/>
+      <path d="M -165 70 L 165 70 L 165 150 C 120 175, 60 160, 40 120 L -40 120 C -60 160, -120 175, -165 150 Z" fill="url(#ht-yel)"/>
+      <ellipse cx="0" cy="10" rx="92" ry="118" fill="#F6C9A8"/>
+      <path d="M -100 -60 C -60 -150, 80 -150, 110 -40 C 40 -90, -40 -90, -100 -60 Z" fill="${INK.blue}"/>
+      <circle cx="-34" cy="10" r="9" fill="${INK.ink}"/><circle cx="34" cy="10" r="9" fill="${INK.ink}"/><path d="M -24 62 Q 0 80 24 62" stroke="${INK.red}" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <path d="M -50 150 L 50 150 L 70 230 L -70 230 Z" fill="#F6C9A8"/><path d="M -190 300 Q 0 180 190 300 L 190 330 L -190 330 Z" fill="${INK.green}"/></g>`;
+}
+// a nail Pin: a hand with almond nails
+function nailArt(x, y, w, h, seed = 1, nailCol = INK.red) {
+  const s = w / 400, cx = x + w / 2, cy = y + h * .6;
+  let fingers = ''; [-105, -35, 35, 105].forEach((fx, i) => { const L = [170, 210, 200, 160][i];
+    fingers += `<rect x="${fx - 30}" y="${-L}" width="60" height="${L + 40}" rx="30" fill="#F6C9A8"/><path d="M ${fx - 22} ${-L + 52} C ${fx - 24} ${-L + 8}, ${fx - 6} ${-L - 22}, ${fx} ${-L - 26} C ${fx + 6} ${-L - 22}, ${fx + 24} ${-L + 8}, ${fx + 22} ${-L + 52} Z" fill="${nailCol}"/><path d="M ${fx - 8} ${-L} q 4 -16 10 -18" stroke="#fff" stroke-width="6" opacity=".6" fill="none"/>`; });
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${28 * s}" fill="${seed % 2 ? INK.blue : INK.green}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${28 * s}" fill="url(#ht-pink)" opacity=".5"/>` +
+    `<g transform="translate(${cx} ${cy}) scale(${s})">${fingers}<rect x="-140" y="10" width="280" height="200" rx="70" fill="#F6C9A8"/><path d="M 140 60 Q 200 40 190 140 L 130 160 Z" fill="#F6C9A8"/></g>`;
+}
+// phone frame (vector) at x,y with width w; inner svg drawn in phone coords 0..w
+function phone(x, y, w, inner, k = 1) {
+  const h = w * 2.05, e = spring(k);
+  return `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(${x + w / 2} ${y + h / 2}) scale(${e.toFixed(3)}) translate(${-w / 2} ${-h / 2})">
+    <rect x="-18" y="-18" width="${w + 36}" height="${h + 36}" rx="70" fill="${INK.ink}"/><rect x="0" y="0" width="${w}" height="${h}" rx="54" fill="#FFFDF8"/>
+    <svg x="0" y="0" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${inner}</svg><rect x="${w / 2 - 70}" y="14" width="140" height="34" rx="17" fill="${INK.ink}"/></g></svg>`;
+}
+const chip = (x, y, txt, bg, fg, size, k, rot = 0, ltr = false) => { const e = spring(k);
+  return `<div style="position:absolute;left:${x}px;top:${y}px;padding:${size * .2}px ${size * .5}px ${size * .32}px;border-radius:${size * .4}px;background:${bg};color:${fg};font:900 ${size}px V;white-space:nowrap;box-shadow:10px 10px 0 ${INK.ink};transform:rotate(${rot}deg) scale(${e.toFixed(3)});transform-origin:50% 50%;opacity:${cl(k * 4)}" ${ltr ? 'dir="ltr"' : ''}>${txt}</div>`; };
+function scene(b, t, u, si, off) {
+  const s = b.sc, kt = b.kt, A = b.a;
+  let r = blocks(si, pr(t, (window.SCENES[si] || {}).t0 || 0, ((window.SCENES[si] || {}).t0 || 0) + .5), t);
+  switch (s.type) {
+    case 'hook': {
+      // call-out stamped from frame 0, pins flying in; then the old line «شبیه این عکس؟» that the red dot punches through
+      const t1 = kt[0];
+      if (t < t1 - .05) {
+        const k = b.i === 0 ? cl(.55 + u * 1.2) : pr(t, A, A + .4);
+        [[60, 560, 300, 400, -9, 'h'], [720, 520, 300, 400, 8, 'n'], [380, 1000, 320, 420, -3, 'h']].forEach(([x, y, w, h, rot, kind], i) => {
+          const e = spring(pr(t, A + i * .18, A + i * .18 + .5) + (b.i === 0 ? .35 : 0)), dy = Math.sin(t * 2 + i) * 14;
+          r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(${x + w / 2} ${y + h / 2 + dy}) rotate(${rot + (1 - e) * 30}) scale(${e.toFixed(3)}) translate(${-x - w / 2} ${-y - h / 2})">${kind === 'h' ? hairArt(x, y, w, h, i) : nailArt(x, y, w, h, i)}</g></svg>`; });
+        const tx = b.wt(1); if (t >= tx - .05) r += chip(250, 1180, 'مشتریِ بعدی‌تون…', INK.yel, INK.ink, 92, pr(t, tx - .05, tx + .35), -3);
+        return r + type('آرایشگرها!', 170, 230, INK.blue, INK.pink, k, off);
+      }
+      const k = pr(t, t1 - .05, t1 + .35), tp = t1 + .55, hit = t >= tp;
+      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(540 1000) rotate(-4) scale(${spring(k).toFixed(3)}) translate(-540 -1000)">${hairArt(290, 700, 500, 640, 0)}</g></svg>`;
+      const split = hit ? ex(pr(t, tp, tp + .35)) * 80 : 0;
+      r += `<div style="position:absolute;inset:0;clip-path:inset(0 0 50% 0);transform:translateY(${-split}px)">${type('شبیه این عکس؟', 330, 150, INK.ink, INK.pink, k * 1.4, off)}</div>`;
+      r += `<div style="position:absolute;inset:0;clip-path:inset(50% 0 0 0);transform:translateY(${split}px)">${type('شبیه این عکس؟', 330, 150, INK.ink, INK.pink, k * 1.4, off)}</div>`;
+      // the through-line object: the red Guide dot flies in and punches through the line
+      const fx = mix(-120, 540, ex(pr(t, t1 + .2, tp))), fy = mix(560, 420, ex(pr(t, t1 + .2, tp)));
+      if (t >= t1 + .2) r += dot(fx, fy, hit ? 70 + 20 * spring(pr(t, tp, tp + .4)) : 60);
+      if (hit) r += svg2(`<path d="M 200 430 L 880 410" stroke="${INK.red}" stroke-width="22" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(t, tp, tp + .3))).toFixed(3)}"/>`);
+      return r;
+    }
+    case 'brand': {
+      // the red dot grows into the real logo; the product name prints in passes
+      const t1 = kt[0], g = spring(pr(t, A, A + .6));
+      r += dot(540, 640, 90 + 150 * g) + logo(540, 640, 300 * g, pr(t, A + .2, A + .5));
+      r += type(S.brand, 930, 120, INK.ink, INK.yel, pr(t, A + .2, A + .7), off, true);
+      if (t >= t1 - .05) { const k = pr(t, t1 - .05, t1 + .4); r += type('BEAUTY', 1090, 190, INK.pink, INK.blue, k, off, true) + type('GUIDES', 1270, 190, INK.blue, INK.pink, pr(t, t1 + .1, t1 + .55), [-off[0], -off[1]], true); }
+      return r;
+    }
+    case 'grid': {
+      // the real flow rebuilt as vectors: a masonry grid of Pins, a tap opens one, a tap on the red «Get the Guide»
+      const tOpen = b.wt(7), t1 = kt[0], W = 560, X = 260, Y = 220, open = ez2(pr(t, tOpen, tOpen + .45));
+      let inner = '';
+      const cards = [[24, 140, 248, 330, 'h'], [288, 140, 248, 250, 'n'], [24, 486, 248, 260, 'n'], [288, 406, 248, 340, 'h'], [24, 762, 248, 300, 'h'], [288, 762, 248, 300, 'n']];
+      cards.forEach(([x, y, w, h, kind], i) => { if (i === 0 && open > 0) return; const e = spring(pr(t, A + i * .08, A + i * .08 + .4));
+        inner += `<g transform="translate(${x + w / 2} ${y + h / 2}) scale(${e.toFixed(3)}) translate(${-x - w / 2} ${-y - h / 2})">${kind === 'h' ? hairArt(x, y, w, h, i) : nailArt(x, y, w, h, i)}</g>`; });
+      inner += `<text x="${W / 2}" y="100" text-anchor="middle" font-family="V" font-weight="900" font-size="40" fill="${INK.ink}">Beauty</text>`;
+      if (open > 0) { const x = mix(24, 0, open), y = mix(140, 0, open), w = mix(248, W, open), h = mix(330, W * 2.05, open);
+        inner += hairArt(x, y, w, h * .78, 0);
+        const bk = spring(pr(t, tOpen + .3, tOpen + .7)), press = t >= t1 ? Math.exp(-8 * (t - t1)) : 0;
+        inner += `<g transform="translate(${W / 2} ${W * 2.05 * .88}) scale(${(bk * (1 - .12 * press)).toFixed(3)})"><rect x="-210" y="-56" width="420" height="112" rx="56" fill="${INK.red}"/><text x="0" y="16" text-anchor="middle" font-family="V" font-weight="900" font-size="46" fill="#fff">Get the Guide</text></g>`; }
+      r += phone(X, Y, W, inner, pr(t, A, A + .4));
+      const p0 = [900, 1500], p1 = [X + 140, Y + 300], p2 = [X + W / 2 + 60, Y + W * 2.05 * .88 + 10];
+      const m1 = ex(pr(t, A + .3, tOpen - .05)), m2 = ex(pr(t, tOpen + .5, t1 - .05));
+      const cx = t < tOpen + .5 ? mix(p0[0], p1[0], m1) : mix(p1[0], p2[0], m2), cy = t < tOpen + .5 ? mix(p0[1], p1[1], m1) : mix(p1[1], p2[1], m2);
+      r += cursor(cx, cy, t, t >= t1 - .05 ? t1 : tOpen);
+      if (t >= t1 + .1) r += type('Get the Guide', 60, 120, INK.red, INK.pink, pr(t, t1 + .1, t1 + .5), off, true);
+      return r;
+    }
+    case 'scan': {
+      // AI reads the look: a scan bar sweeps the Pin, tags pop where it finds hair cut, colour, nail shape, finish
+      const sweep = ((t - A) * .9) % 1;
+      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}${hairArt(120, 260, 520, 680, 1)}${nailArt(470, 820, 480, 560, 0)}
+        <rect x="80" y="${240 + sweep * 1180}" width="920" height="16" fill="${INK.green}" opacity=".9"/><rect x="80" y="${240 + sweep * 1180 - 70}" width="920" height="70" fill="url(#ht-green)" opacity=".5"/></svg>`;
+      const tags = [[A + .2, 'مدل', 560, 330, INK.yel, INK.ink], [kt[0], 'رنگ مو', 520, 760, INK.pink, INK.ink], [kt[1] - .5, 'فرم ناخن', 90, 1000, INK.blue, '#fff'], [kt[1], 'براقی', 120, 1220, INK.yel, INK.ink]];
+      tags.forEach(([tt, txt, x, y, bg, fg], i) => { if (t >= tt - .05) r += chip(x, y, txt, bg, fg, 70, pr(t, tt - .05, tt + .35), i % 2 ? 4 : -4); });
+      return r + type('هوش مصنوعی می‌بینه', 90, 104, INK.ink, INK.green, pr(t, A, A + .5), off);
+    }
+    case 'guide': {
+      // the red dot unfolds into the guide card
+      const t1 = kt[0], g = ex(pr(t, A, A + .6)), w = mix(140, 860, g), h = mix(140, 1060, g), x = 540 - w / 2, y = 300;
+      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><rect x="${x + 16}" y="${y + 16}" width="${w}" height="${h}" rx="${mix(70, 40, g)}" fill="${INK.ink}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${mix(70, 40, g)}" fill="#FFFDF8"/><rect x="${x}" y="${y}" width="${w}" height="${mix(140, 170, g)}" rx="${mix(70, 40, g)}" fill="${INK.red}"/></svg>`;
+      if (g > .8) { r += `<div class="t" dir="ltr" style="top:${y + 40}px;font-size:80px;color:#fff;mix-blend-mode:normal">Beauty Guide</div>`;
+        r += chip(170, 560, 'سرِ سالن بگو:', INK.yel, INK.ink, 88, pr(t, A + .5, A + .9), -2);
+        [0, 1, 2].forEach(i => { const k = ex(pr(t, A + .7 + i * .2, A + 1.1 + i * .2)); r += `<div style="position:absolute;left:200px;top:${800 + i * 130}px;width:${680 * k}px;height:52px;border-radius:26px;background:${[INK.pink, INK.blue, INK.green][i]};mix-blend-mode:multiply"></div>`; }); }
+      if (t >= t1 - .05) r += type('چی بخوای؟', 1220, 200, INK.red, INK.pink, pr(t, t1 - .05, t1 + .4), off);
+      return r;
+    }
+    case 'terms': {
+      // the stylist's own words, each with its swatch
+      const sw = [
+        ['balayage', INK.pink, `<rect x="0" y="0" width="200" height="200" rx="30" fill="${INK.blue}"/><path d="M 0 110 L 200 60 L 200 200 L 0 200 Z" fill="url(#ht-yel)"/><path d="M 0 150 L 200 120 L 200 200 L 0 200 Z" fill="${INK.yel}"/>`],
+        ['root melt', INK.yel, `<rect x="0" y="0" width="200" height="200" rx="30" fill="${INK.pink}"/><rect x="0" y="0" width="200" height="80" rx="30" fill="${INK.ink}"/><rect x="0" y="50" width="200" height="60" fill="url(#ht-blue)"/>`],
+        ['almond', INK.blue, `<rect x="0" y="0" width="200" height="200" rx="30" fill="${INK.green}"/><path d="M 70 170 C 66 90, 90 40, 100 30 C 110 40, 134 90, 130 170 Z" fill="${INK.red}"/>`]];
+      r += type('به زبونِ آرایشگرها', 120, 100, INK.ink, INK.yel, pr(t, A, A + .5), off);
+      sw.forEach(([w, bg, art], i) => { const wi = b.words.findIndex(x => x.w.toLowerCase().startsWith(w.split(' ')[0])), tt = wi >= 0 ? b.wt(wi) : A + .5 + i * .6; if (t < tt - .1) return;
+        const k = pr(t, tt - .1, tt + .35), y = 300 + i * 370;
+        r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(${i % 2 ? 90 : 690} ${y}) scale(${(1.5 * spring(k)).toFixed(3)})">${art}</g></svg>`;
+        r += chip(i % 2 ? 450 : 90, y + 80, w, bg, i === 2 ? '#fff' : INK.ink, 112, k, i % 2 ? 3 : -3, true); });
+      return r;
+    }
+    case 'rows': {
+      // the guide's rows tick on one per keyword: appointment, time, cost, upkeep
+      const rows = [['چی پیش میاد', INK.pink, 'cal'], ['چقدر وقت', INK.yel, 'clock'], ['چقدر هزینه', INK.green, 'tag'], ['کِی ترمیم', INK.blue, 'loop']];
+      r += type('توی گاید', 110, 110, INK.red, INK.pink, pr(t, A, A + .4), off);
+      rows.forEach(([txt, col, ic], i) => { const tt = kt[i] === undefined ? A + .4 + i * .7 : kt[i]; if (t < tt - .15) return;
+        const k = pr(t, tt - .15, tt + .3), y = 330 + i * 250, e = ex(k);
+        const icon = {cal: `<rect x="-60" y="-50" width="120" height="110" rx="14" fill="${INK.ink}"/><rect x="-48" y="-18" width="96" height="66" fill="#fff"/><rect x="-30" y="0" width="22" height="22" fill="${INK.red}"/>`,
+          clock: `<circle r="62" fill="${INK.ink}"/><circle r="50" fill="#fff"/><line x1="0" y1="0" x2="0" y2="-38" stroke="${INK.ink}" stroke-width="10" stroke-linecap="round" transform="rotate(${(t * 400) % 360})"/><line x1="0" y1="0" x2="26" y2="0" stroke="${INK.red}" stroke-width="10" stroke-linecap="round"/>`,
+          tag: `<path d="M -60 -40 L 30 -40 L 66 0 L 30 40 L -60 40 Z" fill="${INK.ink}"/><circle cx="34" cy="0" r="10" fill="#fff"/><text x="-14" y="18" text-anchor="middle" font-family="V" font-weight="900" font-size="46" fill="#fff">$</text>`,
+          loop: `<path d="M -40 -30 A 50 50 0 1 1 -50 20" fill="none" stroke="${INK.ink}" stroke-width="16" transform="rotate(${t * 220})"/><path d="M -70 0 L -50 30 L -26 4 Z" fill="${INK.ink}" transform="rotate(${t * 220})"/>`}[ic];
+        r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><rect x="${110 + 16}" y="${y + 16}" width="${860 * e}" height="190" rx="30" fill="${INK.ink}"/><rect x="110" y="${y}" width="${860 * e}" height="190" rx="30" fill="${col}"/><g transform="translate(${880} ${y + 95}) scale(${spring(k).toFixed(3)})">${icon}</g>
+          <path d="M 180 ${y + 95} l 28 30 l 50 -64" stroke="${INK.ink}" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(t, tt + .1, tt + .4))).toFixed(3)}"/></svg>`;
+        r += `<div style="position:absolute;left:300px;top:${y + 38}px;font:900 84px V;color:${INK.ink};clip-path:inset(0 0 0 ${(100 - e * 100).toFixed(1)}%)">${txt}</div>`; });
+      return r;
+    }
+    case 'home': {
+      // products and step-by-step at home
+      const t1 = kt[0];
+      [[160, INK.pink, 'tube'], [440, INK.blue, 'bottle'], [720, INK.green, 'jar']].forEach(([x, col, kind], i) => { const k = spring(pr(t, A + i * .15, A + i * .15 + .45)), dy = Math.sin(t * 3 + i) * 10;
+        const art = kind === 'tube' ? `<rect x="-55" y="-170" width="110" height="300" rx="20" fill="${col}"/><rect x="-40" y="130" width="80" height="50" fill="${INK.ink}"/>` : kind === 'bottle' ? `<rect x="-80" y="-120" width="160" height="300" rx="40" fill="${col}"/><rect x="-26" y="-190" width="52" height="80" fill="${INK.ink}"/><rect x="-60" y="-40" width="120" height="90" fill="url(#ht-yel)"/>` : `<rect x="-95" y="-40" width="190" height="200" rx="34" fill="${col}"/><rect x="-105" y="-100" width="210" height="70" rx="20" fill="${INK.ink}"/>`;
+        r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(${x + 100} ${560 + dy}) scale(${k.toFixed(3)})">${art}</g></svg>`; });
+      if (t >= t1 - .1) [0, 1, 2].forEach(i => { const tt = t1 - .1 + i * .25; if (t >= tt) r += chip(130 + i * 290, 860, fa(i + 1), [INK.yel, INK.pink, INK.blue][i], INK.ink, 150, pr(t, tt, tt + .35), (i - 1) * 6); });
+      return r + (t >= t1 ? type('توی خونه', 1150, 180, INK.red, INK.yel, pr(t, t1, t1 + .4), off) : type('محصولاتش', 140, 130, INK.ink, INK.pink, pr(t, A, A + .4), off));
+    }
+    case 'quote': {
+      const t1 = kt[0], q = spring(pr(t, A, A + .5));
+      r += `<div class="t" style="top:120px;font-size:${520 * q}px;color:${INK.pink};line-height:.8">«</div>`;
+      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(540 820) scale(${q.toFixed(3)})"><path d="M -400 -220 h 800 a 40 40 0 0 1 40 40 v 300 a 40 40 0 0 1 -40 40 h -500 l -110 100 l 20 -100 h -210 a 40 40 0 0 1 -40 -40 v -300 a 40 40 0 0 1 40 -40 z" fill="${INK.yel}" stroke="${INK.ink}" stroke-width="14"/>` +
+        (t < t1 ? `<path d="M -300 -40 c 40 -80 80 80 120 0 s 80 -80 120 0 s 80 80 120 0 s 80 -80 120 0 s 60 60 100 0" fill="none" stroke="${INK.ink}" stroke-width="18" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(t, A + .3, A + 1.2))).toFixed(3)}"/>` : '') + `</g></svg>`;
+      r += type('سلیقه داری؛', 1180, 130, INK.ink, INK.blue, pr(t, A + .3, A + .8), off);
+      if (t >= t1 - .05) r += `<div class="t" style="top:700px;font-size:190px;color:${INK.red};mix-blend-mode:normal;transform:scale(${spring(pr(t, t1 - .05, t1 + .35)).toFixed(3)})">کلمه‌ش!</div>`;
+      return r;
+    }
+    case 'avail': {
+      const t1 = kt[0], t2 = kt[1];
+      let inner = `<rect width="440" height="902" fill="${INK.pink}"/><rect width="440" height="902" fill="url(#ht-yel)" opacity=".6"/><circle cx="220" cy="420" r="${80 * spring(pr(t, A + .2, A + .6))}" fill="${INK.red}"/>`;
+      r += phone(t >= t2 - .05 ? mix(320, 90, ex(pr(t, t2 - .05, t2 + .4))) : 320, 300, 440, inner, pr(t, A, A + .4));
+      if (t >= t1 - .05) r += chip(560, 240, 'iPhone', INK.yel, INK.ink, 110, pr(t, t1 - .05, t1 + .35), 4, true);
+      if (t >= t2 - .05) { const k = pr(t, t2 - .05, t2 + .4), e = spring(k);
+        let st = ''; for (let i = 0; i < 7; i++) st += `<rect x="0" y="${i * 46}" width="420" height="23" fill="${INK.red}"/>`;
+        r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(600 640) rotate(-5) scale(${e.toFixed(3)})"><rect width="420" height="300" fill="#fff" stroke="${INK.ink}" stroke-width="12"/>${st}<rect width="190" height="160" fill="${INK.blue}"/><rect width="190" height="160" fill="url(#ht-yel)" opacity=".7"/></g></svg>`;
+        r += type('فقط آمریکا', 1080, 150, INK.blue, INK.pink, k, off); }
+      return r + type('فعلاً', 120, 120, INK.ink, INK.green, pr(t, A, A + .4), off);
+    }
+    case 'ask': {
+      // the stylist's scissors vs the client's full guide card; the red dot becomes the question mark's dot
+      const t1 = kt[0], t2 = kt[1] === undefined ? t1 + 1.2 : kt[1], sn = Math.sin(t * 9) * 14;
+      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(270 640) scale(${spring(pr(t, A, A + .45)).toFixed(3)})"><g transform="rotate(${sn})"><ellipse cx="-60" cy="140" rx="54" ry="40" fill="none" stroke="${INK.blue}" stroke-width="22"/><path d="M -40 110 L 120 -160" stroke="${INK.ink}" stroke-width="26" stroke-linecap="round"/></g><g transform="rotate(${-sn})"><ellipse cx="60" cy="140" rx="54" ry="40" fill="none" stroke="${INK.pink}" stroke-width="22"/><path d="M 40 110 L -120 -160" stroke="${INK.ink}" stroke-width="26" stroke-linecap="round"/></g></g>
+        <g transform="translate(790 640) rotate(6) scale(${spring(pr(t, t1 - .1, t1 + .35)).toFixed(3)})"><rect x="-190" y="-250" width="380" height="500" rx="30" fill="#FFFDF8" stroke="${INK.ink}" stroke-width="12"/><rect x="-190" y="-250" width="380" height="100" rx="30" fill="${INK.red}"/>${[0, 1, 2, 3].map(i => `<rect x="-140" y="${-110 + i * 80}" width="${[260, 200, 240, 160][i]}" height="34" rx="17" fill="${[INK.pink, INK.blue, INK.green, INK.yel][i]}"/>`).join('')}</g></svg>`;
+      r += chip(150, 980, 'آرایشگر', INK.yel, INK.ink, 80, pr(t, A + .2, A + .6), -4) + (t >= t1 - .1 ? chip(640, 980, 'مشتری', INK.pink, INK.ink, 80, pr(t, t1 - .1, t1 + .3), 4) : '');
+      if (t >= t2 - .1) { const k = pr(t, t2 - .1, t2 + .4); r += `<div class="t" style="top:1060px;font-size:330px;color:${INK.blue};transform:scale(${spring(k).toFixed(3)})">؟</div>` + dot(540, 1400, 40 * spring(k)) + type('راحت‌تر یا سخت‌تر', 120, 110, INK.ink, INK.pink, k, off); }
+      else if (t >= b.wt(9) - .05) r += type('راحت‌تر؟', 120, 150, INK.green, INK.yel, pr(t, b.wt(9) - .05, b.wt(9) + .35), off);
+      else r += type('نقشه‌ی کامل', 120, 130, INK.red, INK.yel, pr(t, t1 - .1, t1 + .4), off);
+      return r;
+    }
+  }
+  ISSUES.push('unknown scene ' + s.type); return r;
+}
+const logo = (x, y, d, o) => `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal;opacity:${o}"><circle cx="${x}" cy="${y}" r="${d / 2 + 14}" fill="#fff"/><image href="${U('el/' + (S.logo || 'pinterest.png'))}" x="${x - d / 2}" y="${y - d / 2}" width="${d}" height="${d}"/></svg>`;
+const svg2 = inner => `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${inner}</svg>`;
+const ez2 = k => io(cl(k));
+function endCard(u, t, off) {
+  // the through-line dot becomes the real logo, the name prints in passes, then the question
+  const g = spring(pr(u, 0, .5)), q = (S.end_text || '').replace(/\*([^*]+)\*/g, `<span style="color:${INK.red}">$1</span>`);
+  let r = blocks(3, pr(u, 0, .4), t) + dot(540, 640, 150 * g) + logo(540, 640, 300 * g, pr(u, .15, .4));
+  r += type(`${S.brand} ${S.product}`, 860, 90, INK.ink, INK.pink, pr(u, .2, .6), off, true);
+  r += `<div class="t" style="top:1020px;font-size:${Math.min(100, Math.floor(1700 / (S.end_text || 'x').length))}px;color:${INK.ink};opacity:${pr(u, .4, .7)}">${q}</div>`;
+  r += `<div class="t" style="top:1190px;font-size:60px;font-weight:600;color:${INK.ink};opacity:${pr(u, .6, .9)}">${S.end_sub || ''}</div>`;
+  return r + `<div class="t" dir="ltr" style="top:1300px;font-size:44px;letter-spacing:4px;color:${INK.blue};opacity:${pr(u, .8, 1.1)}">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;
+}
+window.seek = seek;
+
+
+
+</script>
+</body>
+</html>

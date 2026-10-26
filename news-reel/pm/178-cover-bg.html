@@ -1,0 +1,35 @@
+<!doctype html><html><head><meta charset="utf-8"><title>cover bg 178</title>
+<!-- Cover background for prompt 178 reels, drawn in code (no text): riso spot inks, halftone, misregistration, the hair and nail Pins and the red Guide dot from the reel. -->
+<style>html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#F4EFE6} svg{position:absolute;left:0;top:0} .m{mix-blend-mode:multiply}</style></head><body>
+<script>
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const INK = {pink: '#FF48B0', yel: '#FFE800', blue: '#0078BF', green: '#00A95C', red: '#E60023', ink: '#1D1A2F'};
+const HT = `<defs>${Object.entries(INK).map(([k, c]) => `<pattern id="ht-${k}" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(22)"><circle cx="7" cy="7" r="4.2" fill="${c}"/></pattern>`).join('')}</defs>`;
+function hairArt(x, y, w, h, seed = 0) {
+  const cx = x + w / 2, cy = y + h * .52, s = w / 400;
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${28 * s}" fill="INK"/>`.replace('INK', seed % 2 ? INK.yel : INK.pink) +
+    `<g transform="translate(${cx} ${cy}) scale(${s})">
+      <path d="M -150 -40 C -160 -200, 160 -200, 150 -40 L 165 150 C 120 175, 60 160, 40 120 L -40 120 C -60 160, -120 175, -165 150 Z" fill="${INK.blue}"/>
+      <path d="M -165 70 L 165 70 L 165 150 C 120 175, 60 160, 40 120 L -40 120 C -60 160, -120 175, -165 150 Z" fill="url(#ht-yel)"/>
+      <ellipse cx="0" cy="10" rx="92" ry="118" fill="#F6C9A8"/>
+      <path d="M -100 -60 C -60 -150, 80 -150, 110 -40 C 40 -90, -40 -90, -100 -60 Z" fill="${INK.blue}"/>
+      <circle cx="-34" cy="10" r="9" fill="${INK.ink}"/><circle cx="34" cy="10" r="9" fill="${INK.ink}"/><path d="M -24 62 Q 0 80 24 62" stroke="${INK.red}" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <path d="M -50 150 L 50 150 L 70 230 L -70 230 Z" fill="#F6C9A8"/><path d="M -190 300 Q 0 180 190 300 L 190 330 L -190 330 Z" fill="${INK.green}"/></g>`;
+}
+function nailArt(x, y, w, h, seed = 1, nailCol = INK.red) {
+  const s = w / 400, cx = x + w / 2, cy = y + h * .6;
+  let fingers = ''; [-105, -35, 35, 105].forEach((fx, i) => { const L = [170, 210, 200, 160][i];
+    fingers += `<rect x="${fx - 30}" y="${-L}" width="60" height="${L + 40}" rx="30" fill="#F6C9A8"/><path d="M ${fx - 22} ${-L + 52} C ${fx - 24} ${-L + 8}, ${fx - 6} ${-L - 22}, ${fx} ${-L - 26} C ${fx + 6} ${-L - 22}, ${fx + 24} ${-L + 8}, ${fx + 22} ${-L + 52} Z" fill="${nailCol}"/><path d="M ${fx - 8} ${-L} q 4 -16 10 -18" stroke="#fff" stroke-width="6" opacity=".6" fill="none"/>`; });
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${28 * s}" fill="${seed % 2 ? INK.blue : INK.green}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${28 * s}" fill="url(#ht-pink)" opacity=".5"/>` +
+    `<g transform="translate(${cx} ${cy}) scale(${s})">${fingers}<rect x="-140" y="10" width="280" height="200" rx="70" fill="#F6C9A8"/><path d="M 140 60 Q 200 40 190 140 L 130 160 Z" fill="#F6C9A8"/></g>`;
+}
+
+const g=(inner,cls='')=>`<svg class="${cls}" width="1080" height="1920" viewBox="0 0 1080 1920">${HT}${inner}</svg>`;
+document.body.innerHTML =
+ g(`<circle cx="1000" cy="900" r="560" fill="${INK.yel}"/><circle cx="40" cy="1500" r="460" fill="${INK.green}"/><rect x="-80" y="760" width="700" height="900" fill="url(#ht-pink)" transform="rotate(-8 300 1200)"/><circle cx="900" cy="1820" r="380" fill="${INK.blue}"/>`,'m') +
+ g(`<rect x="0" y="0" width="1080" height="700" fill="${INK.ink}"/><rect x="0" y="0" width="1080" height="700" fill="url(#ht-blue)" opacity=".35"/>`) +
+ g(`<g transform="translate(560 1260) rotate(-6) translate(-560 -1260)"><rect x="168" y="788" width="560" height="720" rx="40" fill="${INK.ink}"/>${hairArt(150,770,560,720,0)}</g>`) +
+ g(`<g transform="translate(860 1420) rotate(9) translate(-860 -1420)"><rect x="668" y="1128" width="380" height="460" rx="30" fill="${INK.ink}"/>${nailArt(650,1110,380,460,1)}</g>`) +
+ g(`<circle cx="230" cy="840" r="120" fill="${INK.red}"/><circle cx="196" cy="806" r="22" fill="#fff" opacity=".3"/>`) +
+ g(`<rect x="0" y="0" width="1080" height="1920" filter="url(#n)" opacity=".35"/><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="5"/><feColorMatrix values="0 0 0 0 .2 0 0 0 0 .18 0 0 0 0 .25 0 0 0 -1.6 1.05"/></filter>`,'m');
+</script></body></html>
