@@ -26,10 +26,13 @@ function nailArt(x, y, w, h, seed = 1, nailCol = INK.red) {
 
 const g=(inner,cls='')=>`<svg class="${cls}" width="1080" height="1920" viewBox="0 0 1080 1920">${HT}${inner}</svg>`;
 document.body.innerHTML =
- g(`<circle cx="1000" cy="900" r="560" fill="${INK.yel}"/><circle cx="40" cy="1500" r="460" fill="${INK.green}"/><rect x="-80" y="760" width="700" height="900" fill="url(#ht-pink)" transform="rotate(-8 300 1200)"/><circle cx="900" cy="1820" r="380" fill="${INK.blue}"/>`,'m') +
- g(`<rect x="0" y="0" width="1080" height="700" fill="${INK.ink}"/><rect x="0" y="0" width="1080" height="700" fill="url(#ht-blue)" opacity=".35"/>`) +
- g(`<g transform="translate(560 1260) rotate(-6) translate(-560 -1260)"><rect x="168" y="788" width="560" height="720" rx="40" fill="${INK.ink}"/>${hairArt(150,770,560,720,0)}</g>`) +
- g(`<g transform="translate(860 1420) rotate(9) translate(-860 -1420)"><rect x="668" y="1128" width="380" height="460" rx="30" fill="${INK.ink}"/>${nailArt(650,1110,380,460,1)}</g>`) +
- g(`<circle cx="230" cy="840" r="120" fill="${INK.red}"/><circle cx="196" cy="806" r="22" fill="#fff" opacity=".3"/>`) +
+ g(`<circle cx="1000" cy="1000" r="560" fill="${INK.yel}"/><circle cx="40" cy="1560" r="460" fill="${INK.green}"/><rect x="-80" y="820" width="700" height="900" fill="url(#ht-pink)" transform="rotate(-8 300 1200)"/><circle cx="900" cy="1840" r="380" fill="${INK.blue}"/>`,'m') +
+ g(`<rect x="0" y="0" width="1080" height="720" fill="${INK.ink}"/><g fill="${INK.blue}" opacity=".55">${Array.from({length: 12*18}, (_, n) => { const x = 30 + (n % 18) * 60 + (Math.floor(n / 18) % 2) * 30, y = 30 + Math.floor(n / 18) * 60, f = .5 + .5 * Math.sin((x + y) / 200); return `<circle cx="${x}" cy="${y}" r="${4 + 12 * f}"/>`; }).join('')}</g>`) +
+ g(`<g transform="translate(330 1260) rotate(-7) translate(-330 -1260)"><rect x="98" y="878" width="480" height="620" rx="36" fill="${INK.ink}"/>${hairArt(80,860,480,620,0)}</g>`) +
+ g(`<path d="M 560 1150 C 620 1090, 660 1090, 700 1120" stroke="${INK.ink}" stroke-width="18" fill="none" stroke-linecap="round"/><path d="M 690 1090 L 730 1130 L 680 1150 Z" fill="${INK.ink}"/>`) +
+ g(`<g transform="translate(830 1330) rotate(6) translate(-830 -1330)"><rect x="638" y="958" width="400" height="560" rx="30" fill="${INK.ink}"/><rect x="620" y="940" width="400" height="560" rx="30" fill="#FFFDF8"/><rect x="620" y="940" width="400" height="110" rx="30" fill="${INK.red}"/>
+   <rect x="660" y="1100" width="300" height="70" rx="35" fill="${INK.pink}"/><rect x="660" y="1200" width="240" height="70" rx="35" fill="${INK.yel}"/><rect x="660" y="1300" width="280" height="70" rx="35" fill="${INK.blue}"/>
+   <path d="M 700 1440 C 696 1400, 712 1380, 720 1374 C 728 1380, 744 1400, 740 1440 Z" fill="${INK.red}"/><path d="M 780 1440 C 776 1400, 792 1380, 800 1374 C 808 1380, 824 1400, 820 1440 Z" fill="${INK.red}"/></g>`) +
+ g(`<circle cx="590" cy="900" r="90" fill="${INK.red}"/><circle cx="562" cy="872" r="18" fill="#fff" opacity=".3"/>`) +
  g(`<rect x="0" y="0" width="1080" height="1920" filter="url(#n)" opacity=".35"/><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="5"/><feColorMatrix values="0 0 0 0 .2 0 0 0 0 .18 0 0 0 0 .25 0 0 0 -1.6 1.05"/></filter>`,'m');
 </script></body></html>
