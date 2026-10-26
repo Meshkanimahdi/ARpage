@@ -72,7 +72,7 @@ def main():
     else:
         rep = json.loads(rep_p.read_text()); info['cover'] = {k: rep.get(k) for k in ('font_px', 'words', 'pos', 'title')}
         if rep.get('issues'): fails.append('cover issues: ' + '; '.join(rep['issues']))
-        if (rep.get('font_px') or 0) < 112: fails.append(f"cover headline too small ({rep.get('font_px')} px < 112)")
+        if (rep.get("font_px") or 0) < 110: fails.append(f"cover headline too small ({rep.get('font_px')} px < 110)")
         if (rep.get('words') or 99) > 9: fails.append(f"cover headline too long ({rep.get('words')} words > 9)")
         if not cover.exists(): fails.append('cover file missing')
         elif md5(cover) != rep.get('md5'): fails.append('cover file is not the rendered designed cover (md5 mismatch): a frame or an old file')

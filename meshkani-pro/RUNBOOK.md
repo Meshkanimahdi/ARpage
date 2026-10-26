@@ -808,6 +808,11 @@ narrator talks, nothing attractive in the picture").
    - **Clear before clever (user rule 2026-10-24):** a viewer who has not seen the news must understand the
      headline at once. No unexplained nicknames or riddles («اردک‌ها» for robots, «۳۰ ساعت تنها چی‌کار
      می‌کنه؟» without a subject); speak to the viewer («اگه تو… چی‌کار می‌کنی؟») or name the real thing.
+   - **The cover is its own design, never the video's look (user rule 2026-10-26).** It is the first hook, so it is
+     always a premium photoreal thumbnail aimed at the reel's audience (for a female audience: a real, attractive,
+     on-topic person or product, warm rich colour, beauty-campaign light), with a big plain headline and the real
+     logo. Even when the reel is riso, paper, clay, kinetic type or UI, the cover is not drawn in that style.
+     One `gen_image.py --kind story` background (≈ $0.05).
    - **Big headline (user rule 2026-10-25):** the headline is rendered at 112–150 px and has at most 9 words
      (4–7 read best); `cover_render.mjs` exits 5 when it cannot fit, so shorten it. It writes
      `cover_report.json` (font, words, position, md5) which the gate checks.
