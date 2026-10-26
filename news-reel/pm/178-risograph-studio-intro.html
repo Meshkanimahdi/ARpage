@@ -98,7 +98,7 @@ window.ready = (async () => {
     B.push({bt, sc: bt.scene || {}, L, words, wt, kis, kt: kis.map(wt)});
   }
   B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
-  await new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + (S.logo || 'pinterest.png')); });
+  await Promise.all([S.logo || 'pinterest.png', ...S.beats.map(b => (b.scene || {}).photo).filter(Boolean)].map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + f); })));
   await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'آرایشگرها Beauty')));
   window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
   const SC = [];
@@ -177,8 +177,18 @@ function scene(b, t, u, si, off) {
       if (t < t1 - .05) {
         // payoff first: a big Pin, the red dot hits it and unfolds a salon guide with the stylist's words — inside the first second
         const k = b.i === 0 ? cl(.55 + u * 1.2) : pr(t, A, A + .4), dy = Math.sin(t * 2) * 10;
+        if (s.photo && t < A + 1.5) {
+          // opening: the real-looking salon moment (the client holding her inspiration photo); the red dot taps her phone,
+          // the camera whips into the phone screen and match-cuts to the Pin card below
+          const z = mix(1, 2.7, Math.pow(pr(t, A + .75, A + 1.5), 2.2)), S2 = 2.7 * z, Fx = mix(400, 210, ex(pr(t, A + .5, A + 1.2))), Fy = mix(370, 340, ex(pr(t, A + .5, A + 1.2)));
+          const ox = 540 - Fx * S2, oy = 900 - Fy * S2, px = ox + 210 * S2, py = oy + 340 * S2, bl = 8 * pr(t, A + 1.1, A + 1.5);
+          let q = `<div style="position:absolute;inset:0;overflow:hidden;background:#000"><img src="${U('el/' + s.photo)}" style="position:absolute;left:${ox.toFixed(1)}px;top:${oy.toFixed(1)}px;width:${(1080 * S2).toFixed(1)}px;height:${(780 * S2).toFixed(1)}px;filter:blur(${bl.toFixed(1)}px)"></div>`;
+          q += `<div style="position:absolute;left:0;right:0;top:0;height:420px;background:linear-gradient(#000c,#0000)"></div>`;
+          const tdot = A + .45; if (t >= tdot) { const kd = ex(pr(t, tdot, tdot + .35)); q += dot(mix(1180, px, kd), mix(300, py, kd), 46 + 10 * spring(pr(t, tdot + .35, tdot + .6))); }
+          return q + `<div class="t" style="top:120px;font-size:200px;color:#fff;mix-blend-mode:normal;text-shadow:10px 10px 0 ${INK.pink}">آرایشگرها!</div>`;
+        }
         r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(330 ${880 + dy}) rotate(-6)"><rect x="-252" y="-332" width="520" height="680" rx="36" fill="${INK.ink}"/>${hairArt(-270, -350, 520, 680, 0)}</g></svg>`;
-        const td = .35, tg = .8, fx = mix(1200, 520, ex(pr(t, td - .3, td))), fy = mix(400, 640, ex(pr(t, td - .3, td)));
+        const td = s.photo ? A + 1.55 : .35, tg = s.photo ? A + 1.75 : .8, fx = mix(1200, 520, ex(pr(t, td - .3, td))), fy = mix(400, 640, ex(pr(t, td - .3, td)));
         const g = ex(pr(t, tg - .1, tg + .35));
         if (t < tg) r += dot(fx, fy, 70);
         else { const w = mix(140, 470, g), hh = mix(140, 640, g), x = 560, y = 620;
@@ -200,7 +210,7 @@ function scene(b, t, u, si, off) {
     }
     case 'brand': {
       // the red dot grows into the real logo; the product name prints in passes
-      const t1 = kt[0], g = spring(.35 + pr(t, A, A + .5));
+      const t1 = kt[0], g = spring(.6 + pr(t, A, A + .4));
       r += dot(540, 640, 90 + 150 * g) + logo(540, 640, 300 * g, pr(t, A, A + .2));
       r += type(S.brand, 930, 120, INK.ink, INK.yel, pr(t, A, A + .4), off, true) + (t < t1 - .05 ? type('هوش مصنوعیِ تازه', 1110, 110, INK.red, INK.pink, pr(t, A + .1, A + .5), off) : '');
       if (t >= t1 - .05) { const k = pr(t, t1 - .05, t1 + .4); r += type('BEAUTY', 1090, 190, INK.pink, INK.blue, k, off, true) + type('GUIDES', 1270, 190, INK.blue, INK.pink, pr(t, t1 + .1, t1 + .55), [-off[0], -off[1]], true); }
@@ -237,7 +247,7 @@ function scene(b, t, u, si, off) {
     }
     case 'guide': {
       // the red dot unfolds into the guide card
-      const t1 = kt[0], g = ex(pr(t, A, A + .6)), w = mix(140, 860, g), h = mix(140, 1060, g), x = 540 - w / 2, y = 300;
+      const t1 = kt[0], g = ex(pr(t, A - .25, A + .35)), w = mix(140, 860, g), h = mix(140, 1060, g), x = 540 - w / 2, y = 300;
       r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><rect x="${x + 16}" y="${y + 16}" width="${w}" height="${h}" rx="${mix(70, 40, g)}" fill="${INK.ink}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${mix(70, 40, g)}" fill="#FFFDF8"/><rect x="${x}" y="${y}" width="${w}" height="${mix(140, 170, g)}" rx="${mix(70, 40, g)}" fill="${INK.red}"/></svg>`;
       if (g > .8) { r += `<div class="t" dir="ltr" style="top:${y + 40}px;font-size:80px;color:#fff;mix-blend-mode:normal">Beauty Guide</div>`;
         r += chip(170, 560, 'سرِ سالن بگو:', INK.yel, INK.ink, 88, pr(t, A + .5, A + .9), -2);
@@ -253,7 +263,7 @@ function scene(b, t, u, si, off) {
         ['almond', INK.blue, `<rect x="0" y="0" width="200" height="200" rx="30" fill="${INK.green}"/><path d="M 70 170 C 66 90, 90 40, 100 30 C 110 40, 134 90, 130 170 Z" fill="${INK.red}"/>`]];
       r += type('به زبونِ آرایشگرها', 120, 100, INK.ink, INK.yel, pr(t, A, A + .5), off);
       sw.forEach(([w, bg, art], i) => { const wi = b.words.findIndex(x => x.w.toLowerCase().startsWith(w.split(' ')[0])), tt = wi >= 0 ? b.wt(wi) : A + .5 + i * .6;
-        if (t < tt - .1) { const y0 = 300 + i * 370; r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(${i % 2 ? 90 : 690} ${y0}) scale(${(1.5 * spring(pr(t, A + i * .15, A + i * .15 + .4))).toFixed(3)})" opacity=".45">${art}</g></svg>` + `<div style="position:absolute;left:${i % 2 ? 450 : 90}px;top:${y0 + 80}px;width:420px;height:150px;border:8px dashed ${INK.ink};border-radius:44px;opacity:.5"></div>`; return; }
+        if (t < tt - .1) { const y0 = 300 + i * 370; r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(${i % 2 ? 90 : 690} ${y0}) scale(${(1.5 * spring(pr(t, A + i * .15, A + i * .15 + .4))).toFixed(3)})" opacity=".45">${art}</g></svg>` + `<div style="position:absolute;left:${i % 2 ? 450 : 90}px;top:${y0 + 80}px;width:420px;height:150px;background:${bg};border-radius:44px;opacity:.55;box-shadow:10px 10px 0 ${INK.ink}"></div>`; return; }
         const k = pr(t, tt - .1, tt + .35), y = 300 + i * 370;
         r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(${i % 2 ? 90 : 690} ${y}) scale(${(1.5 * spring(k)).toFixed(3)})">${art}</g></svg>`;
         r += chip(i % 2 ? 450 : 90, y + 80, w, bg, i === 2 ? '#fff' : INK.ink, 112, k, i % 2 ? 3 : -3, true); });
@@ -263,7 +273,7 @@ function scene(b, t, u, si, off) {
       // the guide's rows tick on one per keyword: appointment, time, cost, upkeep
       const rows = [['چی پیش میاد', INK.pink, 'cal'], ['چقدر وقت', INK.yel, 'clock'], ['چقدر هزینه', INK.green, 'tag'], ['کِی ترمیم', INK.blue, 'loop']];
       r += type('توی گاید', 110, 110, INK.red, INK.pink, pr(t, A, A + .4), off);
-      rows.forEach(([txt, col, ic], i) => { const tt = kt[i] === undefined ? A + .4 + i * .7 : kt[i]; if (t < tt - .15) { r += `<div style="position:absolute;left:110px;top:${330 + i * 250}px;width:860px;height:190px;border:10px dashed ${col};border-radius:30px;box-sizing:border-box;transform:scaleX(${spring(pr(t, A + i * .1, A + i * .1 + .4)).toFixed(3)})"></div>`; return; }
+      rows.forEach(([txt, col, ic], i) => { const tt = kt[i] === undefined ? A + .4 + i * .7 : kt[i]; if (t < tt - .15) { r += `<div style="position:absolute;left:110px;top:${330 + i * 250}px;width:860px;height:190px;background:${col};opacity:.45;border-radius:30px;transform:scaleX(${spring(pr(t, A + i * .1, A + i * .1 + .4)).toFixed(3)})"></div>`; return; }
         const k = pr(t, tt - .15, tt + .3), y = 330 + i * 250, e = ex(k);
         const icon = {cal: `<rect x="-60" y="-50" width="120" height="110" rx="14" fill="${INK.ink}"/><rect x="-48" y="-18" width="96" height="66" fill="#fff"/><rect x="-30" y="0" width="22" height="22" fill="${INK.red}"/>`,
           clock: `<circle r="62" fill="${INK.ink}"/><circle r="50" fill="#fff"/><line x1="0" y1="0" x2="0" y2="-38" stroke="${INK.ink}" stroke-width="10" stroke-linecap="round" transform="rotate(${(t * 400) % 360})"/><line x1="0" y1="0" x2="26" y2="0" stroke="${INK.red}" stroke-width="10" stroke-linecap="round"/>`,
