@@ -15,6 +15,7 @@ Checks (any failure = exit 3, reasons in <dir>/gate.json):
      cover file's md5 equals the report's md5; the cover is not a frame of the reel;
   3. cover position differs from the previous reel's (history);
   4. motion variety: story.json `motion_prompt` (catalog id) and `engine` (news-reel/pm/<file>.html) are set;
+     its prompt family (pm/families.json: renamed twins of one prompt) was not used in the last 10 reels;
      the engine file name starts with that id (a prompt may not borrow another prompt's engine); neither the
      id nor the engine was used in the last 10 reels of the history; the category differs from the previous reel;
   5. critic: <dir>/critic.json from an independent reviewer (RUNBOOK §4.4) with every score ≥ 7.
@@ -96,6 +97,12 @@ def main():
         used_p = [h.get('prompt', '').split('-')[0] for h in last10]
         used_e = [Path(h.get('engine', '')).name for h in last10]
         if pid_num in used_p: fails.append(f'prompt {pid_num} was used in the last 10 reels')
+        # many catalog prompts are the same text under another name (pm/families.json): block the family too
+        fp = HERE / 'pm' / 'families.json'
+        fam = json.loads(fp.read_text())['family'] if fp.exists() else {}
+        mine_f = fam.get(pid_num, pid_num)
+        twins = [p for p in used_p if p and fam.get(p, p) == mine_f and p != pid_num]
+        if twins: fails.append(f'prompt {pid_num} is the same prompt family ({mine_f}) as {twins[0]}, used in the last 10 reels')
         if base in used_e: fails.append(f'engine {base} was used in the last 10 reels')
         # a new engine must really be new: not a renamed copy of an engine used in the last 10 reels
         ep = (HERE.parent / eng) if not Path(eng).is_absolute() else Path(eng)

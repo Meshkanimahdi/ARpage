@@ -686,6 +686,32 @@ narrator talks, nothing attractive in the picture").
    Exit 3 is a FAIL: fix and re-render, never publish. Then Read `qa/contact.jpg` (1 frame per second) and
    check each second against the narration for cropped elements, cut-off text, and a picture that does not
    match its sentence. Record `qa.attention` (the qa.json numbers) in the slot file.
+9. **Dynamic rotation list (user rule 2026-10-26).** Mahdi: «سبک والمارت نمیخوام باز بعدی ها دقیقا همون
+   پرامپت رو کپی کنه… بهترینهاشن که پویا هستند رو انتخاب کن برای ریلز ها» ("I don't want the next reels to copy
+   the Walmart prompt; pick the best dynamic ones"). Walmart (089) was only an example of good energy, not a
+   template: never rebuild 089 or copy its glass look. The 230 catalog prompts are only 78 different prompts
+   (many are the same text under another name: 019 = 211 = 184, 105 = the 001 showreel; see
+   `news-reel/pm/families.json`), and the gate blocks a prompt whose **family** was used in the last 10 reels.
+   Choose each reel's prompt from this list, in order, skipping one whose family or category is blocked,
+   or whose look does not fit the story. Each one gets its own engine built from its own prompt text:
+   | # | prompt | category | why it is dynamic / when to use it |
+   |---|---|---|---|
+   | 1 | `032-chaotic-claude-pov-video` | EDIT | 140 BPM, fast cuts, stacked captions, zooms and hits on the beat, one running joke; native 1080x1920. Viral/funny news |
+   | 2 | `095-gravitydex-anime-hype-edit` (family 064: 142, 175, 199…) | ANIME/UI | 15 s hype edit on the beat, real UI and brand. Product launches |
+   | 3 | `074-engraving-style-claude-ad` | EDIT | fast ad, bold light mode, elements painted over real photos. Brand or company news |
+   | 4 | `191-speech-built-as-architecture` | TYPE | every spoken line rebuilds the frame's architecture; made for a voiced script. Opinion/insight news |
+   | 5 | `219-uk-dubstep-track-with-ascii-visuals` | MUSIC | bold two-colour geometry hit by the bass; drive the hits from the voice beats. Tech/AI breakthroughs |
+   | 6 | `155-photo-print-app-launch-film` | UI | one continuous take, a black shape floods the frame into the next scene, springs, bars. Apps and consumer products |
+   | 7 | `020-beat-synced-bouncing-3d-ball` (family 016: 212) | 3D | three.js, Blender quality, beat-synced fall through scenes, humour. A journey/"from A to B" story |
+   | 8 | `079-fiery-samurai-kata` | ANIME | one figure, a strike per bar, weight and follow-through, fiery display. A person/founder/hero story |
+   | 9 | `160-pixel-art-llm-history` | PIXEL | strict-grid pixel art, escalating gag. History/"how we got here" news |
+   | 10 | `086-food-craving-launch-film` | UI | one continuous take, photo result cards. Food, beauty, lifestyle, women's topics |
+   | 11 | `225-what-happens-in-one-second` (family: 226) | TOPIC | everything that happens in one second, shapes/type morph into each other. Big numbers/scale news |
+   | 12 | `120-morphing-ui-states-loop` (family: 185, 186) | UI | one shape never cut, morphing through states. A product with several features |
+   | reserve | `112-lightspark-social-promo-video`, `163-porco-rosso-sunset-dogfight` (3D cinematic), `050-collision-driven-music-machine`, the `001` showreel family | | when the 12 above are blocked |
+   Already used (blocked until 10 other reels): 089, 168, 211 family (013, 019, 184), 105 (001 family), 149, 178
+   (147 family). The 40–55 s, hook, storyboard and gate rules above stay; a 15–30 s prompt is stretched by
+   giving each voiced beat its own section in that prompt's look, not by repeating sections.
 
 ### 4.1 Preconditions
 1. Setup (§0.1), control (§0.2). Slot: `python3 meshkani-pro/scripts/tehran.py reel prepare`; none →

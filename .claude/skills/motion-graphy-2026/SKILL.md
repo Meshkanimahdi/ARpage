@@ -126,6 +126,10 @@ If a prompt cannot hold the story without breaking its structure, pick another p
 
 ## Rotation
 - Never use the same prompt twice within 14 days (check `catalog.json` against the slot files and the sheet).
+- **Prompt families (2026-10-26):** the 230 prompts are only 78 different texts; renamed twins are one family
+  (`news-reel/pm/families.json`, e.g. 019 = 211 = 184). A twin of a recently used prompt counts as the same prompt.
+- **meshkani.pro reels pick from the dynamic rotation list** in `meshkani-pro/RUNBOOK.md` §4.0 rule 9 (032, 095,
+  074, 191, 219, 155, 020, 079, 160, 086, 225, 120). Walmart/089 was an example of energy, never a template to copy.
 - Never use the same category in two reels in a row. Across a week, use at least 4 categories.
 - Reusing an already-built `news-reel/pm/<id>.html` saves time and counts as using that prompt.
 - Build time: give the 09:00 reel (prepared from 21:45) any prompt. For the 15:00 reel (prepared from
