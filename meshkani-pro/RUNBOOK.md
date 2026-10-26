@@ -840,7 +840,7 @@ narrator talks, nothing attractive in the picture").
    `qa/contact.jpg`, the contact sheets of the previous 3 reels (download them from their packages), the
    headline and a 2-line story summary. Ask for five 1–10 scores with one-line reasons, as JSON:
    `cover_stop_power` (would a Persian scroller stop for this thumbnail in Explore?), `headline_clarity`
-   (understood at once by someone who has not seen the news; big and readable at thumbnail size),
+   (understood at once by someone who has not seen the news; big and readable at thumbnail size; **≤ 4 when such a person cannot say in one plain sentence what it means**, e.g. metaphors like «دستور آرایشگاه» or «اردک‌ها» for robots, user rule 2026-10-26),
    `hook` (first 2 s), `visual_match` (each second shows what is said), `style_distinct` (clearly a different
    look from the previous 3 reels). Save it as `work/story/critic.json` `{"scores":{…},"notes":{…}}`.
 6. **Gate (user rule 2026-10-25, blocking):** `story.json` must carry `content_id`, `motion_prompt`
