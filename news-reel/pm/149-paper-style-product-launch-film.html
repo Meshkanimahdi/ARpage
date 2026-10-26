@@ -268,14 +268,18 @@ function scene(b, t, u, ink, dark) {
     case 'photo': {
       // the real product, printed and taped on paper; a counter rolls up to the number in the sentence
       const ik = b.words.findIndex(w => w.k), tk = b.wt(ik), after = t >= tk - .05;
-      if (s.hook && t < b.wt(s.hook) - .05) {
-        // opening: the full-bleed moment of the cover (arm snatches the parcel from a worker's hand), pushing in and shaking, a huge counter racing
-        const q = pr(t, b.a, b.wt(s.hook)), z = mix(1.32, 1.04, ez.out(q)), sh = Math.sin(t * 31) * 5 * (1 - q);
-        const n0 = Math.round(1500 * ez.io(pr(t, b.a, tk + .35)));
-        return `<div style="position:absolute;left:-40px;top:-40px;width:1160px;height:2000px;overflow:hidden;transform:translate(${sh.toFixed(1)}px,${(sh * .6).toFixed(1)}px)"><img src="${U('el/' + s.hook_img + '.jpg')}" style="width:100%;height:100%;object-fit:cover;transform:scale(${z.toFixed(3)});transform-origin:45% 72%"></div>` +
-          `<div style="position:absolute;inset:0;background:linear-gradient(#000c,#0000 38%,#0000 70%,#0008)"></div>` +
-          `<div class="big" style="top:150px;font-size:290px;color:#FF7A2F;text-shadow:0 12px 30px #000a">${fa(n0)}</div>` +
-          handNote('جنس در ساعت', 300, 480, pr(t, b.a + .15, b.a + .8), '#F3EEE4', -4, 92);
+      if (s.hook && t < tk - .05) {
+        // opening: the full-bleed moment of the cover — a whip zoom out from the gripper snatching the parcel, then a push toward the worker's hand;
+        // the stakes are on screen from frame 0: «ربات ۱۵۰۰» vs «تو ۶۰۰» per hour
+        const w = ez.out(pr(t, b.a, b.a + .7)), q = pr(t, b.a + .7, tk), z = mix(1.9, 1.05, w) + .12 * ez.io(q), sh = Math.sin(t * 31) * 6 * (1 - w);
+        const ox = mix(48, 30, ez.io(q)), th = b.wt(s.hook) - .05;
+        let r = `<div style="position:absolute;left:-40px;top:-40px;width:1160px;height:2000px;overflow:hidden;transform:translate(${sh.toFixed(1)}px,${(sh * .6).toFixed(1)}px) rotate(${(mix(-4, 0, w)).toFixed(2)}deg)"><img src="${U('el/' + s.hook_img + '.jpg')}" style="width:100%;height:100%;object-fit:cover;transform:scale(${z.toFixed(3)});transform-origin:${ox.toFixed(1)}% 74%;filter:blur(${(6 * (1 - w)).toFixed(1)}px)"></div>` +
+          `<div style="position:absolute;inset:0;background:linear-gradient(#000d,#0000 40%,#0000 66%,#0009)"></div>`;
+        const k1 = ez.back(pr(t, b.a, b.a + .35)), [sx, sy] = squash(pr(t, b.a, b.a + .35) - .4);
+        r += `<div class="big" style="top:110px;font-size:250px;color:#FF7A2F;text-shadow:0 12px 30px #000a;transform:scale(${(k1 * sx).toFixed(3)},${(k1 * sy).toFixed(3)})">ربات ${fa(1500)}</div>` +
+          handNote('جنس در ساعت', 330, 410, pr(t, b.a + .1, b.a + .6), '#F3EEE4', -4, 84);
+        if (t >= th) { const k2 = ez.back(pr(t, th, th + .35)); r += `<div style="position:absolute;left:40px;top:1060px;padding:10px 34px 18px;border-radius:22px;background:#F3EEE4;color:#1B1A18;font:900 120px V;transform:rotate(-5deg) scale(${k2.toFixed(3)})">تو ${fa(600)}</div>`; }
+        return r;
       }
       const k = bi0(b) ? 1 : pr(t, b.a, b.a + .45), z = after ? mix(1.06, 1.3, ez.out(pr(t, tk - .05, tk + .6))) : mix(1.45, 1.02, ez.io(pr(t, b.a, tk)));
       const sw = after ? 0 : Math.sin((t - b.a) * 5.5) * 3 * (1 - pr(t, b.a, tk));
