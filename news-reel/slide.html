@@ -40,6 +40,10 @@
   #foot { position: absolute; left: 8%; right: 8%; display: flex; justify-content: space-between; align-items: center; font: 800 30px Vaz; color: rgba(255,255,255,.88); direction: ltr; }
   #foot .n { direction: rtl; background: rgba(0,0,0,.35); border-radius: 999px; padding: 4px 18px 8px; }
   #concept { font: 500 24px Vaz; color: rgba(255,255,255,.75); }
+  /* light key (item.light, 2026-10-27): white shade, dark type, so the grid can alternate dark/light */
+  #c.light .title, #c.light .body, #c.light .label, #c.light .quote, #c.light .who { color: #141414; text-shadow: none; }
+  #c.light .title b { color: #fff; }
+  #c.light #foot, #c.light #foot * { color: rgba(20,20,20,.78) !important; text-shadow: none !important; }
 </style>
 </head>
 <body>
@@ -61,6 +65,9 @@ window.ready = (async () => {
   $('bg').src = url(it.bg);
   const pos = it.pos || (it.kind === 'hook' ? 'bottom' : 'bottom');
   const top = story ? 300 : Math.round(H * 0.07), bottom = story ? H - 300 : Math.round(H * 0.84);
+  if (it.light) { c.classList.add('light'); $('shade').style.background = pos === 'top'
+    ? 'linear-gradient(0deg, rgba(255,255,255,0) 30%, rgba(255,255,255,.75) 58%, rgba(255,255,255,.96) 100%)'
+    : 'linear-gradient(180deg, rgba(255,255,255,0) 28%, rgba(255,255,255,.78) 55%, rgba(255,255,255,.97) 100%)'; } else
   $('shade').style.background = pos === 'top'
     ? 'linear-gradient(0deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.55) 62%, rgba(0,0,0,.85) 100%)'
     : 'linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.55) 58%, rgba(0,0,0,.88) 100%)';
