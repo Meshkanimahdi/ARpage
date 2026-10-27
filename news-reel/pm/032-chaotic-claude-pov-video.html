@@ -102,6 +102,22 @@ function photo(img, x, t, inner = '', dim = 0) {
     `<img src="${src('raw/' + img + '.png')}" style="position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover">` +
     (dim ? `<div class="ab" style="inset:0;background:rgba(0,0,0,${dim})"></div>` : '') + inner + '</div>';
 }
+// designed ground for every non-hook scene (RUNBOOK §4.0 rule 2b): deep gradient, drifting glows, a parallax dot
+// grid; the photo is one layer inside a glowing tilted card with a light sweep, never the whole scene
+const GLOW = ['#FF3D8B', '#10A37F', '#FFB020', '#4D7CFE', '#9B5DE5', '#00BBF9'];
+function ground(t, i) {
+  const g = GLOW[i % GLOW.length], g2 = GLOW[(i + 3) % GLOW.length], a = t * .6 + i;
+  return `<div class="ab" style="inset:0;background:radial-gradient(900px 700px at ${(540 + 300 * Math.sin(a)).toFixed(0)}px ${(520 + 160 * Math.cos(a * .8)).toFixed(0)}px, ${g}66, transparent 70%),radial-gradient(800px 800px at ${(540 - 320 * Math.sin(a * .7)).toFixed(0)}px ${(1500 + 120 * Math.sin(a)).toFixed(0)}px, ${g2}55, transparent 70%),linear-gradient(160deg,#120D26,#07060F 60%,#0E1324)"></div>` +
+    `<svg class="ab" width="1080" height="1920" style="left:0;top:0;opacity:.35"><defs><pattern id="dg${i}" width="54" height="54" patternUnits="userSpaceOnUse" patternTransform="translate(${(t * 24 % 54).toFixed(1)} ${(t * 40 % 54).toFixed(1)})"><circle cx="2" cy="2" r="2.4" fill="#fff"/></pattern></defs><rect width="1080" height="1920" fill="url(#dg${i})"/></svg>`;
+}
+function framed(img, x, t, dim = 0) {
+  const k = inOut(ramp(t, x.a, x.z)), e = outQ(ramp(t, x.a - .05, x.a + .35)), side = x.i % 2 ? 1 : -1, g = GLOW[x.i % GLOW.length];
+  const sweep = ((t - x.a) * 900) % 2600 - 700;
+  return ground(t, x.i) + `<div class="ab" style="left:80px;top:240px;width:920px;height:1010px;border-radius:56px;overflow:hidden;transform:perspective(1800px) rotateY(${(side * 8 * (1 - e)).toFixed(2)}deg) rotate(${(side * lerp(3, 1.5, k)).toFixed(2)}deg) scale(${lerp(.84, 1, e).toFixed(3)});box-shadow:0 0 0 7px rgba(255,255,255,.92),0 50px 120px rgba(0,0,0,.65),0 0 160px ${g}aa">` +
+    `<img src="${src('raw/' + img + '.png')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(${lerp(1.16, 1.03, k).toFixed(4)}) translateX(${(side * lerp(-14, 14, k)).toFixed(1)}px)">` +
+    `<div class="ab" style="inset:0;background:rgba(0,0,0,${dim})"></div>` +
+    `<div class="ab" style="top:-200px;bottom:-200px;width:220px;left:${sweep.toFixed(0)}px;transform:rotate(18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent)"></div></div>`;
+}
 const shade = (top = .55, bot = .8) => `<div class="ab" style="inset:0;background:linear-gradient(rgba(0,0,0,${top}),rgba(0,0,0,0) 30%,rgba(0,0,0,0) 55%,rgba(0,0,0,${bot}))"></div>`;
 const logoImg = (size, extra = '') => `<img src="${src('el/' + LOGO())}" style="width:${size}px;height:${size}px;border-radius:${size * .22}px;background:#fff;${extra}">`;
 // the chatbot's own chat UI, rebuilt as vectors (white, its real logo as the avatar)
@@ -168,7 +184,7 @@ function shakeAt(x, t) {
 // stacked meme captions: the spoken chunk big, the previous chunk stacked above it, smaller and tilted
 function captions(x, t) {
   const ty = x.s.type;
-  if (ty === 'hook') return `<div style="position:absolute;inset:0;transform:translateY(${(24 * (1 - outQ(ramp(t, 0, .3)))).toFixed(1)}px)">` + memeLine('ChatGPT همیشه', 1380, 124, 1, -1.5) + `<div class="mid" style="top:1545px"><span class="meme" style="font-size:124px;vertical-align:middle">می‌گه </span><span style="display:inline-block;vertical-align:middle;padding:0 34px 18px;border-radius:30px;background:var(--y);color:#0D0D0D;font-size:124px;transform:rotate(${(-2 + 3 * Math.exp(-8 * Math.max(0, t - .45)) * (t > .45 ? 1 : 0)).toFixed(2)}deg) scale(${(t < .45 ? 1 : 1 + .14 * Math.exp(-9 * (t - .45)) * Math.cos((t - .45) * 18) + .1 * Math.exp(-8 * Math.abs(t - x.at(3))) * (t > x.at(3) - .1 ? 1 : 0)).toFixed(3)})">حق با توئه؟</span></div></div>`;
+  if (ty === 'hook') return `<div style="position:absolute;inset:0;transform:translateY(${(24 * (1 - outQ(ramp(t, 0, .3)))).toFixed(1)}px)">` + memeLine('ChatGPT همیشه', 70, 128, 1, -1.5) + `<div class="mid" style="top:236px"><span class="meme" style="font-size:128px;vertical-align:middle">می‌گه </span><span style="display:inline-block;vertical-align:middle;padding:0 34px 18px;border-radius:30px;background:var(--y);color:#0D0D0D;font-size:128px;box-shadow:0 12px 0 rgba(0,0,0,.35);transform:rotate(${(-2 + 3 * Math.exp(-8 * Math.max(0, t - .45)) * (t > .45 ? 1 : 0)).toFixed(2)}deg) scale(${(t < .45 ? 1 : 1 + .14 * Math.exp(-9 * (t - .45)) * Math.cos((t - .45) * 18) + .1 * Math.exp(-8 * Math.abs(t - x.at(3))) * (t > x.at(3) - .1 ? 1 : 0)).toFixed(3)})">حق با توئه؟</span></div></div>`;
   if (ty === 'prompt' || ty === 'ask' || t > x.L.end + .35) return '';
   const W = x.shown, n = W.length; let j = 0; for (let q = 0; q < n; q++) if (t >= W[q].t - .05) j = q;
   const per = 3, c0 = Math.floor(j / per) * per, now = W.slice(c0, Math.min(n, c0 + per)), prev = c0 ? W.slice(c0 - per, c0) : [];
@@ -186,18 +202,18 @@ function draw(x, t) {
       // headline sits in the caption layer; a red «واقعاً؟» slams in at 1.3 s (no number before it is spoken)
       const W = 480, H = 1000, kb = ramp(t, A + .25, A + .45), k2 = ramp(t, A + .75, A + .95);
       const ui = `<div class="ab" style="left:0;top:0;width:${W}px;height:${H}px;transform-origin:0 0;transform:${quad(W, H, s.screen)};background:#fff;overflow:hidden">` +
-        `<div style="position:absolute;right:22px;top:150px;padding:18px 30px 26px;border-radius:34px;background:#ECECF1;color:#0D0D0D;font:900 54px/1.3 V;white-space:nowrap">${s.user}</div>` +
+        `<div style="position:absolute;left:0;right:0;top:40px;display:flex;justify-content:center">${chatTop(30)}</div>` +
+        `<div style="position:absolute;right:22px;top:150px;padding:18px 30px 26px;border-radius:34px;background:#ECECF1;color:#0D0D0D;font:900 64px/1.3 V;white-space:nowrap">${s.user}</div>` +
         (kb <= 0 ? `<div style="position:absolute;left:20px;top:360px;display:flex;gap:16px;align-items:center">${logoImg(64)}${[0, 1, 2].map(i => `<span style="display:inline-block;width:26px;height:26px;border-radius:50%;background:#8E8EA0;opacity:${(.4 + .6 * Math.abs(Math.sin(t * 9 - i))).toFixed(2)}"></span>`).join('')}</div>` : '') +
-        (kb > 0 ? `<div style="position:absolute;left:20px;right:20px;top:340px;display:flex;gap:14px;align-items:flex-start;transform:scale(${pop(kb).toFixed(3)});transform-origin:0 0">${logoImg(64)}<div style="font:900 72px/1.2 V;color:#0D0D0D;white-space:nowrap">کاملاً<br><span style="color:var(--teal)">حق با توئه!</span></div></div>` : '') +
+        (kb > 0 ? `<div style="position:absolute;left:20px;right:20px;top:340px;display:flex;gap:14px;align-items:flex-start;transform:scale(${pop(kb).toFixed(3)});transform-origin:0 0">${logoImg(64)}<div style="font:900 72px/1.2 V;color:#0D0D0D;white-space:nowrap">معلومه!<br><span style="color:var(--teal)">تو نابغه‌ای!</span></div></div>` : '') +
         (k2 > 0 ? `<div style="position:absolute;left:98px;right:20px;top:600px;font:900 72px/1.2 V;color:#0D0D0D;white-space:nowrap;transform:scale(${pop(k2).toFixed(3)});transform-origin:0 0">ایده‌ت<br><span style="color:var(--teal)">بی‌نقصه!</span></div>` : '') +
         `</div>`;
-      return `<div class="ab" style="inset:0;transform:translateY(-90px)">${photo(s.img, x, t, ui)}</div>` + shade(.45, .95) +
-        `<div class="mid" style="top:70px"><span style="display:inline-flex;align-items:center;gap:22px;padding:14px 36px 18px;border-radius:999px;background:#fff;box-shadow:0 14px 34px rgba(0,0,0,.35)">${chatTop(52)}</span></div>` +
-        chip('واقعاً؟', 660, 1100, 110, 'var(--red)', '#fff', ramp(t, A + 1.3, A + 1.5), 8);
+      return `<div class="ab" style="inset:0;transform:scale(1.25);transform-origin:540px 0">${photo(s.img, x, t, ui)}</div>` + `<div class="ab" style="inset:0;background:linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.35) 24%,rgba(0,0,0,0) 34%)"></div>` +
+        chip('واقعاً؟', 40, 1330, 150, 'var(--red)', '#fff', ramp(t, A + 1.0, A + 1.2), -8);
     }
     case 'pov': {
       const k = ramp(t, A, A + .3), ty = ramp(t, A + .3, at(5)) * (t < at(6) ? 1 : 0);
-      return photo(s.img, x, t, '', .35) + chip('POV:', 90, 170, 120, 'var(--y)', '#0D0D0D', ramp(t, A, A + .2), -6, true) +
+      return framed(s.img, x, t, .35) + chip('POV:', 90, 170, 120, 'var(--y)', '#0D0D0D', ramp(t, A, A + .2), -6, true) +
         `<div class="ab" style="left:90px;top:400px;width:900px;height:760px;border-radius:48px;background:#fff;box-shadow:0 30px 70px rgba(0,0,0,.5);transform:translateY(${((1 - outQ(k)) * 500).toFixed(0)}px) rotate(${lerp(6, -1.5, outQ(k)).toFixed(2)}deg)">` +
         `<div style="position:absolute;left:0;right:0;top:44px;display:flex;justify-content:center">${chatTop(56)}</div>` +
         `<div style="position:absolute;left:44px;right:44px;top:200px;height:2px;background:#E5E5EA"></div>` +
@@ -207,27 +223,27 @@ function draw(x, t) {
     }
     case 'joke': {
       const ts = at(s.stamp_at), ku = ramp(t, A + .05, A + .3), kt = ramp(t, ts - .02, ts + .25);
-      return photo(s.img, x, t, '', .2) + shade(.35, .6) +
+      return framed(s.img, x, t, .2) +
         userBub(s.user, 60, 300, ku, 60) +
         botBub(s.ai, 60, 520, kt, 64, t > A + .5 && kt <= 0 ? t : 0) +
         stamp(s.stamp, 800, ramp(t, ts + .08, ts + .5)) + burst(540, 900, ramp(t, ts + .1, ts + 1.1), 18, 'var(--y)', 'dot');
     }
     case 'study': {
       const tn = at(s.n_at), kc = ramp(t, A, A + .3);
-      return photo(s.img, x, t, '', .3) + shade(.3, .6) +
+      return framed(s.img, x, t, .3) +
         `<div class="mid" style="top:200px"><span dir="ltr" style="display:inline-block;padding:18px 60px 26px;background:#fff;color:#B31B1B;font:700 150px/1 Georgia,'DejaVu Serif',serif;letter-spacing:-2px;border-radius:18px;transform:scale(${lerp(1.8, 1, outQ(kc)).toFixed(3)}) rotate(-2deg);box-shadow:0 20px 50px rgba(0,0,0,.45)">Science</span></div>` +
         tiles(s.n, 520, ramp(t, tn - .05, tn + .6)) + chip(`${faNum(s.n)} چت‌بات`, 330, 1060, 92, 'var(--pink)', '#fff', ramp(t, tn, tn + .25), 3);
     }
     case 'num': {
       const tb = at(s.big_at), kv = ramp(t, tb - .05, tb + .35), v = Math.round(49 * outQ(kv)), kb = ramp(t, at(5) - .05, at(5) + .5);
-      return photo(s.img, x, t, '', .45) +
+      return framed(s.img, x, t, .45) +
         (kv > 0 ? `<div class="mid meme" style="top:230px;font-size:330px;color:var(--y);transform:scale(${lerp(1.6, 1, outQ(kv)).toFixed(3)})">${faNum(v)}٪</div>` : '') +
         (kv > 0 ? `<div class="mid meme" style="top:640px;font-size:84px">بیشتر تأیید</div>` : '') +
         `<div class="ab" style="left:110px;top:860px;width:${(860 * outQ(kb)).toFixed(0)}px;height:120px;border-radius:24px;background:var(--y)"></div><div class="ab" style="right:130px;top:880px;font-size:62px;color:#0D0D0D;opacity:${kb}">چت‌بات‌ها</div>` +
         `<div class="ab" style="left:110px;top:1020px;width:${(860 / 1.49 * outQ(kb)).toFixed(0)}px;height:120px;border-radius:24px;background:#fff"></div><div class="ab" style="left:${110 + 860 / 1.49 - 250}px;top:1040px;font-size:62px;color:#0D0D0D;opacity:${kb}">آدما</div>`;
     }
     case 'harm': {
-      let h = photo(s.img, x, t, '', .3) + shade(.4, .6);
+      let h = framed(s.img, x, t, .3);
       s.tags.forEach(([w, i], j) => { const tt = at(i), y = 330 + j * 420;
         h += chip(w, j ? 560 : 120, y, 130, 'var(--red)', '#fff', ramp(t, tt - .05, tt + .2), j ? 4 : -4) +
           chip('✓ تأیید', j ? 600 : 160, y + 200, 80, 'var(--teal)', '#fff', ramp(t, tt + .3, tt + .55), j ? -8 : 8); });
@@ -235,7 +251,7 @@ function draw(x, t) {
     }
     case 'trust': {
       const tm = at(s.meter_at), km = outQ(ramp(t, tm - .05, tm + .6)), ang = lerp(-80, 70, km);
-      return photo(s.img, x, t, '', .25) + shade(.35, .55) +
+      return framed(s.img, x, t, .25) +
         `<svg class="ab" width="1080" height="1920" style="left:0;top:0"><path d="M 190 900 A 350 350 0 0 1 890 900" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="70" stroke-linecap="round"/>` +
         `<path d="M 190 900 A 350 350 0 0 1 890 900" fill="none" stroke="var(--pink)" stroke-width="70" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - lerp(.08, .95, km)).toFixed(3)}"/>` +
         `<g transform="translate(540 900) rotate(${ang.toFixed(1)})"><rect x="-14" y="-330" width="28" height="330" rx="14" fill="#fff"/></g><circle cx="540" cy="900" r="46" fill="#fff"/></svg>` +
@@ -243,13 +259,13 @@ function draw(x, t) {
     }
     case 'lab': {
       const tn = at(s.n_at), tnm = at(s.name_at);
-      return photo(s.img, x, t, '', .3) + shade(.3, .6) +
+      return framed(s.img, x, t, .3) +
         (t >= tnm - .1 ? `<div class="mid" style="top:200px"><span dir="ltr" style="display:inline-block;padding:20px 54px 28px;background:#003057;color:#B3A369;font:900 120px V;border-radius:24px;transform:scale(${lerp(1.7, 1, outQ(ramp(t, tnm - .1, tnm + .25))).toFixed(3)}) rotate(2deg);box-shadow:0 20px 50px rgba(0,0,0,.45)">Georgia Tech</span></div>` : '') +
         tiles(s.n, 520, ramp(t, tn - .05, tn + .5)) + chip(`${faNum(s.n)} مدل`, 380, 1050, 92, 'var(--y)', '#0D0D0D', ramp(t, tn, tn + .25), -3);
     }
     case 'drop': {
       const tb = at(s.big_at), kr = ramp(t, A, A + .3), kd = outQ(ramp(t, tb - .05, tb + .45)), hgt = lerp(700, 182, kd);
-      return photo(s.img, x, t, '', .4) +
+      return framed(s.img, x, t, .4) +
         `<div class="ab" style="left:90px;top:170px;width:900px;height:150px;border-radius:75px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 50px;box-sizing:border-box;transform:scale(${pop(kr).toFixed(3)});box-shadow:0 20px 50px rgba(0,0,0,.4)">` +
         `<span style="font:900 64px V;color:#0D0D0D">«${s.rule}»</span><span style="width:96px;height:96px;border-radius:50%;background:#0D0D0D;display:flex;align-items:center;justify-content:center"><svg width="44" height="50" viewBox="0 0 44 50"><path d="M22 46 V6 M6 22 L22 6 L38 22" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>` +
         `<div class="ab" style="left:150px;top:${1130 - hgt}px;width:260px;height:${hgt}px;border-radius:30px 30px 0 0;background:var(--red)"></div>` +
@@ -260,7 +276,7 @@ function draw(x, t) {
       // the copyable prompt: typed in as it is spoken, then copied
       const kc = ramp(t, A, A + .35), done = s.type === 'prompt' ? ramp(t, x.L.end - .3, x.L.end) : 0;
       const words = s.type === 'prompt' ? x.shown.map(w => `<span style="opacity:${t >= w.t - .05 ? 1 : .12}">${w.w.replace(/[«»]/g, '')}</span>`).join(' ') : `<span style="opacity:.3">${((BEATS[x.i + 1] || {}).s || {}).prompt_fa || '…'}</span>`;
-      return photo(s.img, x, t, '', .45) +
+      return framed(s.img, x, t, .45) +
         `<div class="ab" style="left:70px;top:${lerp(1900, 330, outQ(kc)).toFixed(0)}px;width:940px;border-radius:44px;background:#fff;color:#0D0D0D;box-shadow:0 30px 80px rgba(0,0,0,.55);padding:40px 50px 50px;box-sizing:border-box">` +
         `<div style="display:flex;justify-content:space-between;align-items:center">${chatTop(42)}<span style="padding:12px 30px 18px;border-radius:24px;background:${done > 0 ? 'var(--teal)' : '#0D0D0D'};color:#fff;font:900 50px V;transform:scale(${(1 + .08 * Math.sin(t * 9) * (s.type === 'copy' ? 1 : 0) + .2 * Math.sin(Math.PI * done)).toFixed(3)})">${done > 0 ? 'کپی شد ✓' : 'کپی'}</span></div>` +
         `<div style="margin-top:36px;font:900 76px/1.45 V;white-space:normal">${words}</div>` +
@@ -270,7 +286,7 @@ function draw(x, t) {
     }
     case 'ask': {
       const q = x.shown.map(w => `<span style="opacity:${t >= w.t - .05 ? 1 : .15};${w.k ? 'color:var(--y)' : ''}">${w.w}</span>`).join(' ');
-      return photo(s.img, x, t, '', .25) + shade(.5, .6) +
+      return framed(s.img, x, t, .25) +
         `<div class="ab meme" style="left:70px;right:70px;top:230px;text-align:center;font-size:104px;line-height:1.3;white-space:normal">${q}</div>` +
         botBub(s.ai, 70, 1040, ramp(t, x.L.end - .4, x.L.end - .1), 60, t > A + 1 ? t : 0);
     }
