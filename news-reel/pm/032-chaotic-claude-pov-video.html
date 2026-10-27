@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — chaotic chatbot POV (prompt 032)</title>
+<!-- Skill motion-graphy-2026, prompt 032 "Chaotic Claude POV video" (UI), built as its own engine.
+     Look from the prompt: a chaotic but authored brain-rot edit told from the chatbot's own point of view, fast cuts,
+     stacked captions, zooms and hits that land on the cuts and keywords, one running joke (the over-eager approval
+     stamp), a hook in the first half second and a payoff that loops back to the opening phone.
+     Allowed edits: 30 s → the voiced length (40–55 s), Python frames → this page (pure seek(t), page standard),
+     numpy sound → per-cut sfx + music bed (page standard), the chatbot = the story's subject (story.product).
+     Data: story.json beats[{id, text, scene{type, img, …}}]; el/<product>.png real logo; raw/sNN.png photo panels.
+     Scene types: hook, pov, joke, study, num, harm, trust, lab, drop, copy, prompt, ask (+ the end card). -->
+<style>
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --y: #FFE14D; --pink: #FF3D8B; --teal: #10A37F; --red: #FF3B30; --ink: #0D0D0D; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+  #frame { position: absolute; inset: 0; overflow: hidden; font-family: V; font-weight: 900; color: #fff; }
+  #rig { position: absolute; inset: 0; transform-origin: 540px 860px; }
+  #layer, #caps, #flash { position: absolute; inset: 0; }
+  #flash { pointer-events: none; }
+  .ab { position: absolute; }
+  .mid { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; }
+  .meme { paint-order: stroke fill; -webkit-text-stroke: 16px #000; text-shadow: 0 10px 0 rgba(0,0,0,.35); }
+  .bub { position: absolute; padding: 22px 38px 30px; border-radius: 44px; font: 900 62px/1.3 V; white-space: nowrap; box-shadow: 0 18px 40px rgba(0,0,0,.35); }
+</style>
+</head>
+<body>
+<div id="frame"><div id="rig"><div id="layer"></div></div><div id="caps"></div><div id="flash"></div></div>
+<script src="/logo-motion/node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+const P = new URLSearchParams(location.search), HOME = P.get('dir') || '/work/story/';
+const src = f => f.startsWith('/') ? f : HOME + f, el = id => document.getElementById(id);
+const clamp = (v, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, v)), lerp = (a, b, k) => a + (b - a) * k;
+const ramp = (t, a, b) => clamp((t - a) / (b - a));
+const outQ = k => 1 - Math.pow(1 - clamp(k), 4), inOut = gsap.parseEase('power2.inOut'), pop = gsap.parseEase('back.out(2.2)');
+const faNum = s => String(s).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const accent = s => s.replace(/\*([^*]+)\*/g, '<span style="color:var(--y)">$1</span>');
+const BEAT = 60 / 140;                    // the prompt's 140 BPM grid: a small pulse on every beat
+const PROBLEMS = [];
+let D, T, BEATS = [], TOTAL = 50;
+
+// ---------- words: spoken index → time (exact when the aligner counted the same words, else proportional) ----------
+function prep(b) {
+  const L = T.lines[b.id]; if (!L) { PROBLEMS.push('no timing for ' + b.id); return null; }
+  const clean = b.text.replace(/\[[^\]]*\]/g, ' ');
+  const spoken = clean.replace(/\{[^|}]*\|([^}]*)\}/g, '$1').replace(/\*/g, '').trim().split(/\s+/);
+  const n = L.words.length, map = i => spoken.length === n ? i : Math.round(clamp(i / Math.max(1, spoken.length - 1)) * (n - 1));
+  const at = i => (L.words[map(clamp(i, 0, spoken.length - 1))] || [L.start])[0];
+  // shown words (for captions) keep the spoken index of their first spoken word
+  const shown = []; let si = 0, star = false;
+  for (const tok of clean.replace(/\{([^|}]*)\|([^}]*)\}/g, (m, a, c) => a.replace(/\s/g, ' ') + '\u0001' + c.trim().split(/\s+/).length).trim().split(/\s+/)) {
+    let w = tok, span = 1; if (w.includes('\u0001')) { [w, span] = w.split('\u0001'); span = +span; }
+    if (w.startsWith('*')) star = true; const k = star; if (/\*[«»"'.…،؛!؟?:]*$/.test(w)) star = false;
+    shown.push({w: w.replace(/\*/g, ''), k, t: at(si)}); si += span;
+  }
+  return {b, s: b.scene || {}, L, at, shown};
+}
+
+window.ready = (async () => {
+  D = await (await fetch(src('story.json'))).json(); T = await (await fetch(src('timeline.json'))).json();
+  TOTAL = T.total;
+  BEATS = D.beats.map(prep).filter(Boolean);
+  BEATS.forEach((x, i) => { x.i = i; x.a = i ? x.L.start - .08 : 0; x.z = i + 1 < BEATS.length ? BEATS[i + 1].L.start - .08 : T.end_start; });
+  const pics = [...new Set(BEATS.map(x => x.s.img).filter(Boolean))].map(n => src('raw/' + n + '.png')).concat([src('el/' + LOGO())]);
+  await Promise.all(pics.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = u; })));
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'تأیید ChatGPT')));
+  // cuts: every beat, plus a hit on its key moment(s) so no idea holds still
+  const cuts = [];
+  for (const x of BEATS) {
+    const s = x.s, keys = [s.stamp_at, s.big_at, s.n_at, s.meter_at, ...(s.tags || []).map(q => q[1]), ...(s.hits || [])].filter(v => v !== undefined).map(x.at);
+    const pts = [...new Set([x.a, ...keys.filter(h => h > x.a + .9 && h < x.z - .9)].map(v => +v.toFixed(2)))].sort((p, q) => p - q);
+    pts.forEach((p, j) => cuts.push({t0: p, t1: j + 1 < pts.length ? pts[j + 1] : x.z, type: s.type, bg: x.b.id + (j ? '.' + j : ''), sfx: [[p, j ? 'hit' : 'whoosh', j ? .4 : .3]]}));
+  }
+  cuts.push({t0: T.end_start, t1: TOTAL, type: 'end', bg: 'end', sfx: [[T.end_start + .15, 'hit', .5]]});
+  window.SCENES = cuts; window.START = 0; window.DURATION = TOTAL; window.ISSUES = PROBLEMS;
+  for (const c of cuts) if (c.t1 - c.t0 > 3.2) PROBLEMS.push(`idea ${c.bg} holds ${(c.t1 - c.t0).toFixed(1)} s (> 3): add a hit`);
+  seek(0);
+})();
+const LOGO = () => (D.product || 'chatgpt').toLowerCase().replace(/[^a-z0-9]/g, '') + '.png';
+
+// ---------- building blocks ----------
+// projective map of a w×h box onto a 4-point quad (for drawing UI onto the phone screen in the photo)
+function quad(w, hh, q) {
+  const s = [[0, 0], [w, 0], [w, hh], [0, hh]], A = [], v = [];
+  for (let i = 0; i < 4; i++) { const [x, y] = s[i], [X, Y] = q[i];
+    A.push([x, y, 1, 0, 0, 0, -x * X, -y * X]); v.push(X); A.push([0, 0, 0, x, y, 1, -x * Y, -y * Y]); v.push(Y); }
+  for (let c = 0; c < 8; c++) { let p = c; for (let r = c + 1; r < 8; r++) if (Math.abs(A[r][c]) > Math.abs(A[p][c])) p = r;
+    [A[c], A[p]] = [A[p], A[c]]; [v[c], v[p]] = [v[p], v[c]];
+    for (let r = 0; r < 8; r++) if (r !== c) { const f = A[r][c] / A[c][c]; for (let k = c; k < 8; k++) A[r][k] -= f * A[c][k]; v[r] -= f * v[c]; } }
+  const [a, b, c, d, e, f, g, h] = v.map((x, i) => x / A[i][i]);
+  return `matrix3d(${a},${d},0,${g},${b},${e},0,${h},0,0,1,0,${c},${f},0,1)`;
+}
+// full-bleed photo with its own drift; children are drawn in photo space so they stay glued to it
+function photo(img, x, t, inner = '', dim = 0) {
+  const k = inOut(ramp(t, x.a, x.z)), dir = x.i % 2 ? 1 : -1;
+  const sc = lerp(1.16, 1.04, k), tx = dir * lerp(-18, 18, k);
+  return `<div class="ab" style="left:0;top:0;width:1080px;height:1920px;transform:translateX(${tx.toFixed(1)}px) scale(${sc.toFixed(4)});transform-origin:540px 760px">` +
+    `<img src="${src('raw/' + img + '.png')}" style="position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover">` +
+    (dim ? `<div class="ab" style="inset:0;background:rgba(0,0,0,${dim})"></div>` : '') + inner + '</div>';
+}
+const shade = (top = .55, bot = .8) => `<div class="ab" style="inset:0;background:linear-gradient(rgba(0,0,0,${top}),rgba(0,0,0,0) 30%,rgba(0,0,0,0) 55%,rgba(0,0,0,${bot}))"></div>`;
+const logoImg = (size, extra = '') => `<img src="${src('el/' + LOGO())}" style="width:${size}px;height:${size}px;border-radius:${size * .22}px;background:#fff;${extra}">`;
+// the chatbot's own chat UI, rebuilt as vectors (white, its real logo as the avatar)
+function chatTop(size = 40) { return `<div style="display:flex;align-items:center;gap:${size * .4}px;direction:ltr;font:900 ${size}px V;color:#0D0D0D">${logoImg(size * 1.3)}${D.product}</div>`; }
+const userBub = (txt, x, y, k, size = 62) => k <= 0 ? '' : `<div class="bub" style="right:${x}px;top:${y}px;font-size:${size}px;background:#ECECF1;color:#0D0D0D;border-bottom-right-radius:12px;transform:scale(${pop(clamp(k)).toFixed(3)});transform-origin:100% 100%">${txt}</div>`;
+function botBub(txt, x, y, k, size = 64, typing = 0) {
+  if (k <= 0 && typing <= 0) return '';
+  const dots = [0, 1, 2].map(i => `<span style="display:inline-block;width:22px;height:22px;margin:0 7px;border-radius:50%;background:#8E8EA0;transform:translateY(${(-10 * Math.max(0, Math.sin(typing * 14 - i))).toFixed(1)}px)"></span>`).join('');
+  const body = k > 0 ? accent(txt).replace(/var\(--y\)/g, 'var(--teal)') : dots;
+  return `<div class="bub" style="left:${x}px;top:${y}px;font-size:${size}px;background:#fff;color:#0D0D0D;display:flex;align-items:center;gap:22px;border-bottom-left-radius:12px;transform:scale(${pop(clamp(k > 0 ? k : 1)).toFixed(3)});transform-origin:0 100%">${logoImg(size * 1.05)}<span>${body}</span></div>`;
+}
+// the running joke: the over-eager approval stamp (slams in, rotates, shakes the frame)
+function stamp(txt, y, k, col = 'var(--y)', ink = '#0D0D0D', rot = -7) {
+  if (k <= 0) return '';
+  const s = lerp(2.4, 1, outQ(k * 1.6)), rays = Array.from({length: 14}, (_, i) => { const a = i / 14 * Math.PI * 2, r0 = 330, r1 = 330 + 90 * outQ(k * 2) * (1 - .6 * ramp(k, .6, 1));
+    return `<line x1="${540 + Math.cos(a) * r0}" y1="${y + 90 + Math.sin(a) * r0 * .5}" x2="${540 + Math.cos(a) * r1}" y2="${y + 90 + Math.sin(a) * r1 * .5}" stroke="${col}" stroke-width="14" stroke-linecap="round"/>`; }).join('');
+  return `<svg class="ab" width="1080" height="1920" style="left:0;top:0;opacity:${clamp(k * 3)}">${rays}</svg>` +
+    `<div class="mid" style="top:${y}px"><span style="display:inline-block;padding:14px 46px 30px;border:12px solid ${ink};border-radius:30px;background:${col};color:${ink};font-size:104px;transform:rotate(${rot}deg) scale(${s.toFixed(3)});box-shadow:0 22px 0 rgba(0,0,0,.35)">${txt}</span></div>`;
+}
+const chip = (txt, x, y, size, bg, fg, k, rot = 0, ltr = false) => k <= 0 ? '' : `<div class="ab" ${ltr ? 'dir="ltr"' : ''} style="left:${x}px;top:${y}px;padding:${size * .16}px ${size * .42}px ${size * .3}px;border-radius:${size * .28}px;background:${bg};color:${fg};font:900 ${size}px V;white-space:nowrap;transform:rotate(${rot}deg) scale(${pop(clamp(k)).toFixed(3)});box-shadow:0 14px 30px rgba(0,0,0,.3)">${txt}</div>`;
+const memeLine = (txt, y, size, k = 1, rot = 0, col = '#fff') => `<div class="mid meme" style="top:${y}px;font-size:${size}px;color:${col};transform:rotate(${rot}deg) scale(${lerp(1.5, 1, outQ(clamp(k * 2))).toFixed(3)});opacity:${clamp(k * 4)}">${accent(txt)}</div>`;
+// a deterministic burst (hearts / sparks) around a point
+function burst(cx, cy, k, n, col, shape = 'heart') {
+  if (k <= 0 || k >= 1) return '';
+  return `<svg class="ab" width="1080" height="1920" style="left:0;top:0">` + Array.from({length: n}, (_, i) => {
+    const a = i * 2.39996, r = 120 + 520 * outQ(k) * (.6 + .4 * ((i * 37) % 10) / 10), x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r - 200 * k, s = 1.4 * (1 - k * .6);
+    return shape === 'heart' ? `<path transform="translate(${x.toFixed(0)} ${y.toFixed(0)}) scale(${s.toFixed(2)})" d="M0 12 C-26 -8 -18 -30 0 -16 C18 -30 26 -8 0 12 Z" fill="${col}" opacity="${(1 - k).toFixed(2)}"/>` :
+      `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${(14 * s).toFixed(1)}" fill="${col}" opacity="${(1 - k).toFixed(2)}"/>`; }).join('') + '</svg>';
+}
+// a grid of chatbot tiles that pop one by one (the first one is the real product)
+function tiles(n, y, k, cols = 4) {
+  const w = 190, g = 26, rows = Math.ceil(n / cols); let h = '';
+  for (let i = 0; i < n; i++) { const r = Math.floor(i / cols), c = i % cols, inRow = Math.min(cols, n - r * cols), x0 = 540 - (inRow * w + (inRow - 1) * g) / 2;
+    const kk = clamp(k * n * 1.2 - i), hue = ['#FF3D8B', '#4D7CFE', '#FF9F1C', '#9B5DE5', '#00BBF9', '#F15BB5', '#2EC4B6', '#FEE440', '#E76F51', '#06D6A0', '#8338EC'][i % 11];
+    if (kk <= 0) continue;
+    h += `<div class="ab" style="left:${x0 + c * (w + g)}px;top:${y + r * (w + g)}px;width:${w}px;height:${w}px;border-radius:44px;background:${i ? hue : '#fff'};display:flex;align-items:center;justify-content:center;transform:scale(${pop(kk).toFixed(3)}) rotate(${((i % 3) - 1) * 4}deg);box-shadow:0 14px 30px rgba(0,0,0,.35)">` +
+      (i ? `<svg width="110" height="100" viewBox="0 0 110 100"><path d="M10 14 Q10 4 20 4 H90 Q100 4 100 14 V62 Q100 72 90 72 H44 L22 92 V72 H20 Q10 72 10 62 Z" fill="#fff"/><circle cx="35" cy="38" r="8" fill="${hue}"/><circle cx="55" cy="38" r="8" fill="${hue}"/><circle cx="75" cy="38" r="8" fill="${hue}"/></svg>` : logoImg(130)) + '</div>'; }
+  return h;
+}
+
+// ---------- the frame ----------
+function seek(t) {
+  if (!BEATS.length) return;
+  let x = BEATS[0]; for (const q of BEATS) if (t >= q.a) x = q;
+  const endOn = t >= T.end_start;
+  let cut = (window.SCENES || [{t0: 0, t1: 1}])[0]; (window.SCENES || []).forEach(c => { if (t >= c.t0) cut = c; });
+  const ci = (window.SCENES || []).indexOf(cut);
+  // camera: punch-in on every cut and hit, a small pulse on every 140 BPM beat, a slow push; shake after stamps
+  const since = t - cut.t0, kick = (cut.t0 > 0 ? .085 : 0) * Math.exp(-11 * since), pulse = .012 * Math.exp(-14 * ((t % BEAT + BEAT) % BEAT));
+  const push = .03 * ramp(t, cut.t0, cut.t1), sh = shakeAt(x, t), rot = (ci % 2 ? .5 : -.5) * Math.exp(-6 * since);
+  el('rig').style.transform = `translate(${sh[0].toFixed(1)}px,${sh[1].toFixed(1)}px) rotate(${rot.toFixed(2)}deg) scale(${(1 + kick + pulse + push).toFixed(4)})`;
+  const html = endOn ? ending(t - T.end_start, t) : draw(x, t);
+  const lay = el('layer'); if (lay._h !== html) { lay._h = html; lay.innerHTML = html; }
+  const caps = endOn ? '' : captions(x, t); const cp = el('caps'); if (cp._h !== caps) { cp._h = caps; cp.innerHTML = caps; }
+  const fl = el('flash'), f = cut.t0 > 0 && since < .12 ? .32 * (1 - since / .12) : 0;
+  fl.style.background = `rgba(255,255,255,${f.toFixed(3)})`;
+}
+function shakeAt(x, t) {
+  const s = x.s, hits = [s.stamp_at, ...(s.tags || []).map(q => q[1])].filter(v => v !== undefined).map(x.at);
+  if (s.type === 'prompt') hits.push(x.L.end - .25);
+  let m = 0; for (const h of hits) if (t >= h) m = Math.max(m, Math.exp(-9 * (t - h)));
+  return [Math.sin(t * 93) * 16 * m, Math.cos(t * 71) * 12 * m];
+}
+// stacked meme captions: the spoken chunk big, the previous chunk stacked above it, smaller and tilted
+function captions(x, t) {
+  const ty = x.s.type;
+  if (ty === 'hook') return `<div style="position:absolute;inset:0;transform:translateY(${(24 * (1 - outQ(ramp(t, 0, .3)))).toFixed(1)}px)">` + memeLine('ChatGPT همیشه', 1380, 124, 1, -1.5) + `<div class="mid" style="top:1545px"><span class="meme" style="font-size:124px;vertical-align:middle">می‌گه </span><span style="display:inline-block;vertical-align:middle;padding:0 34px 18px;border-radius:30px;background:var(--y);color:#0D0D0D;font-size:124px;transform:rotate(${(-2 + 3 * Math.exp(-8 * Math.max(0, t - .45)) * (t > .45 ? 1 : 0)).toFixed(2)}deg) scale(${(t < .45 ? 1 : 1 + .14 * Math.exp(-9 * (t - .45)) * Math.cos((t - .45) * 18) + .1 * Math.exp(-8 * Math.abs(t - x.at(3))) * (t > x.at(3) - .1 ? 1 : 0)).toFixed(3)})">حق با توئه؟</span></div></div>`;
+  if (ty === 'prompt' || ty === 'ask' || t > x.L.end + .35) return '';
+  const W = x.shown, n = W.length; let j = 0; for (let q = 0; q < n; q++) if (t >= W[q].t - .05) j = q;
+  const per = 3, c0 = Math.floor(j / per) * per, now = W.slice(c0, Math.min(n, c0 + per)), prev = c0 ? W.slice(c0 - per, c0) : [];
+  const line = ws => ws.filter(w => t >= w.t - .05).map(w => w.k ? `<span style="color:var(--y)">${w.w}</span>` : w.w).join(' ');
+  const k = ramp(t, W[c0].t - .05, W[c0].t + .15), y = 1400;
+  return (prev.length ? `<div class="mid meme" style="top:${y - 112}px;font-size:66px;opacity:.75;transform:rotate(-2.5deg)">${prev.map(w => w.k ? `<span style="color:var(--y)">${w.w}</span>` : w.w).join(' ')}</div>` : '') +
+    `<div class="mid meme" style="top:${y}px;font-size:96px;transform:rotate(1.5deg) scale(${lerp(1.25, 1, outQ(k)).toFixed(3)})">${line(now)}</div>`;
+}
+
+function draw(x, t) {
+  const s = x.s, A = x.a, u = t - A, at = x.at;
+  switch (s.type) {
+    case 'hook': {
+      // frame 0: the phone in the photo already shows the chatbot agreeing (chat anchored low, big type); the plain
+      // headline sits in the caption layer; a red «واقعاً؟» slams in at 1.3 s (no number before it is spoken)
+      const W = 480, H = 1000, kb = ramp(t, A + .25, A + .45), k2 = ramp(t, A + .75, A + .95);
+      const ui = `<div class="ab" style="left:0;top:0;width:${W}px;height:${H}px;transform-origin:0 0;transform:${quad(W, H, s.screen)};background:#fff;overflow:hidden">` +
+        `<div style="position:absolute;right:22px;top:150px;padding:18px 30px 26px;border-radius:34px;background:#ECECF1;color:#0D0D0D;font:900 54px/1.3 V;white-space:nowrap">${s.user}</div>` +
+        (kb <= 0 ? `<div style="position:absolute;left:20px;top:360px;display:flex;gap:16px;align-items:center">${logoImg(64)}${[0, 1, 2].map(i => `<span style="display:inline-block;width:26px;height:26px;border-radius:50%;background:#8E8EA0;opacity:${(.4 + .6 * Math.abs(Math.sin(t * 9 - i))).toFixed(2)}"></span>`).join('')}</div>` : '') +
+        (kb > 0 ? `<div style="position:absolute;left:20px;right:20px;top:340px;display:flex;gap:14px;align-items:flex-start;transform:scale(${pop(kb).toFixed(3)});transform-origin:0 0">${logoImg(64)}<div style="font:900 72px/1.2 V;color:#0D0D0D;white-space:nowrap">کاملاً<br><span style="color:var(--teal)">حق با توئه!</span></div></div>` : '') +
+        (k2 > 0 ? `<div style="position:absolute;left:98px;right:20px;top:600px;font:900 72px/1.2 V;color:#0D0D0D;white-space:nowrap;transform:scale(${pop(k2).toFixed(3)});transform-origin:0 0">ایده‌ت<br><span style="color:var(--teal)">بی‌نقصه!</span></div>` : '') +
+        `</div>`;
+      return `<div class="ab" style="inset:0;transform:translateY(-90px)">${photo(s.img, x, t, ui)}</div>` + shade(.45, .95) +
+        `<div class="mid" style="top:70px"><span style="display:inline-flex;align-items:center;gap:22px;padding:14px 36px 18px;border-radius:999px;background:#fff;box-shadow:0 14px 34px rgba(0,0,0,.35)">${chatTop(52)}</span></div>` +
+        chip('واقعاً؟', 660, 1100, 110, 'var(--red)', '#fff', ramp(t, A + 1.3, A + 1.5), 8);
+    }
+    case 'pov': {
+      const k = ramp(t, A, A + .3), ty = ramp(t, A + .3, at(5)) * (t < at(6) ? 1 : 0);
+      return photo(s.img, x, t, '', .35) + chip('POV:', 90, 170, 120, 'var(--y)', '#0D0D0D', ramp(t, A, A + .2), -6, true) +
+        `<div class="ab" style="left:90px;top:400px;width:900px;height:760px;border-radius:48px;background:#fff;box-shadow:0 30px 70px rgba(0,0,0,.5);transform:translateY(${((1 - outQ(k)) * 500).toFixed(0)}px) rotate(${lerp(6, -1.5, outQ(k)).toFixed(2)}deg)">` +
+        `<div style="position:absolute;left:0;right:0;top:44px;display:flex;justify-content:center">${chatTop(56)}</div>` +
+        `<div style="position:absolute;left:44px;right:44px;top:200px;height:2px;background:#E5E5EA"></div>` +
+        userBub('من کی‌ام؟', 44, 260, ramp(t, A + .2, A + .45), 58) +
+        `<div style="position:absolute;left:44px;top:440px;display:flex;align-items:center;gap:26px">${logoImg(84)}` +
+        (t >= at(6) - .05 ? `<span style="font:900 76px V;color:#0D0D0D">من همون <span dir="ltr" style="color:var(--teal)">ChatGPT</span>‌ام!</span>` : [0, 1, 2].map(i => `<span style="display:inline-block;width:28px;height:28px;border-radius:50%;background:#8E8EA0;transform:translateY(${(-12 * Math.max(0, Math.sin(ty * 30 + t * 9 - i))).toFixed(1)}px)"></span>`).join('')) + '</div></div>';
+    }
+    case 'joke': {
+      const ts = at(s.stamp_at), ku = ramp(t, A + .05, A + .3), kt = ramp(t, ts - .02, ts + .25);
+      return photo(s.img, x, t, '', .2) + shade(.35, .6) +
+        userBub(s.user, 60, 300, ku, 60) +
+        botBub(s.ai, 60, 520, kt, 64, t > A + .5 && kt <= 0 ? t : 0) +
+        stamp(s.stamp, 800, ramp(t, ts + .08, ts + .5)) + burst(540, 900, ramp(t, ts + .1, ts + 1.1), 18, 'var(--y)', 'dot');
+    }
+    case 'study': {
+      const tn = at(s.n_at), kc = ramp(t, A, A + .3);
+      return photo(s.img, x, t, '', .3) + shade(.3, .6) +
+        `<div class="mid" style="top:200px"><span dir="ltr" style="display:inline-block;padding:18px 60px 26px;background:#fff;color:#B31B1B;font:700 150px/1 Georgia,'DejaVu Serif',serif;letter-spacing:-2px;border-radius:18px;transform:scale(${lerp(1.8, 1, outQ(kc)).toFixed(3)}) rotate(-2deg);box-shadow:0 20px 50px rgba(0,0,0,.45)">Science</span></div>` +
+        tiles(s.n, 520, ramp(t, tn - .05, tn + .6)) + chip(`${faNum(s.n)} چت‌بات`, 330, 1060, 92, 'var(--pink)', '#fff', ramp(t, tn, tn + .25), 3);
+    }
+    case 'num': {
+      const tb = at(s.big_at), kv = ramp(t, tb - .05, tb + .35), v = Math.round(49 * outQ(kv)), kb = ramp(t, at(5) - .05, at(5) + .5);
+      return photo(s.img, x, t, '', .45) +
+        (kv > 0 ? `<div class="mid meme" style="top:230px;font-size:330px;color:var(--y);transform:scale(${lerp(1.6, 1, outQ(kv)).toFixed(3)})">${faNum(v)}٪</div>` : '') +
+        (kv > 0 ? `<div class="mid meme" style="top:640px;font-size:84px">بیشتر تأیید</div>` : '') +
+        `<div class="ab" style="left:110px;top:860px;width:${(860 * outQ(kb)).toFixed(0)}px;height:120px;border-radius:24px;background:var(--y)"></div><div class="ab" style="right:130px;top:880px;font-size:62px;color:#0D0D0D;opacity:${kb}">چت‌بات‌ها</div>` +
+        `<div class="ab" style="left:110px;top:1020px;width:${(860 / 1.49 * outQ(kb)).toFixed(0)}px;height:120px;border-radius:24px;background:#fff"></div><div class="ab" style="left:${110 + 860 / 1.49 - 250}px;top:1040px;font-size:62px;color:#0D0D0D;opacity:${kb}">آدما</div>`;
+    }
+    case 'harm': {
+      let h = photo(s.img, x, t, '', .3) + shade(.4, .6);
+      s.tags.forEach(([w, i], j) => { const tt = at(i), y = 330 + j * 420;
+        h += chip(w, j ? 560 : 120, y, 130, 'var(--red)', '#fff', ramp(t, tt - .05, tt + .2), j ? 4 : -4) +
+          chip('✓ تأیید', j ? 600 : 160, y + 200, 80, 'var(--teal)', '#fff', ramp(t, tt + .3, tt + .55), j ? -8 : 8); });
+      return h;
+    }
+    case 'trust': {
+      const tm = at(s.meter_at), km = outQ(ramp(t, tm - .05, tm + .6)), ang = lerp(-80, 70, km);
+      return photo(s.img, x, t, '', .25) + shade(.35, .55) +
+        `<svg class="ab" width="1080" height="1920" style="left:0;top:0"><path d="M 190 900 A 350 350 0 0 1 890 900" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="70" stroke-linecap="round"/>` +
+        `<path d="M 190 900 A 350 350 0 0 1 890 900" fill="none" stroke="var(--pink)" stroke-width="70" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - lerp(.08, .95, km)).toFixed(3)}"/>` +
+        `<g transform="translate(540 900) rotate(${ang.toFixed(1)})"><rect x="-14" y="-330" width="28" height="330" rx="14" fill="#fff"/></g><circle cx="540" cy="900" r="46" fill="#fff"/></svg>` +
+        `<div class="mid meme" style="top:330px;font-size:110px">اعتماد</div>` + burst(540, 820, ramp(t, tm + .1, tm + 1.3), 16, 'var(--pink)');
+    }
+    case 'lab': {
+      const tn = at(s.n_at), tnm = at(s.name_at);
+      return photo(s.img, x, t, '', .3) + shade(.3, .6) +
+        (t >= tnm - .1 ? `<div class="mid" style="top:200px"><span dir="ltr" style="display:inline-block;padding:20px 54px 28px;background:#003057;color:#B3A369;font:900 120px V;border-radius:24px;transform:scale(${lerp(1.7, 1, outQ(ramp(t, tnm - .1, tnm + .25))).toFixed(3)}) rotate(2deg);box-shadow:0 20px 50px rgba(0,0,0,.45)">Georgia Tech</span></div>` : '') +
+        tiles(s.n, 520, ramp(t, tn - .05, tn + .5)) + chip(`${faNum(s.n)} مدل`, 380, 1050, 92, 'var(--y)', '#0D0D0D', ramp(t, tn, tn + .25), -3);
+    }
+    case 'drop': {
+      const tb = at(s.big_at), kr = ramp(t, A, A + .3), kd = outQ(ramp(t, tb - .05, tb + .45)), hgt = lerp(700, 182, kd);
+      return photo(s.img, x, t, '', .4) +
+        `<div class="ab" style="left:90px;top:170px;width:900px;height:150px;border-radius:75px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 50px;box-sizing:border-box;transform:scale(${pop(kr).toFixed(3)});box-shadow:0 20px 50px rgba(0,0,0,.4)">` +
+        `<span style="font:900 64px V;color:#0D0D0D">«${s.rule}»</span><span style="width:96px;height:96px;border-radius:50%;background:#0D0D0D;display:flex;align-items:center;justify-content:center"><svg width="44" height="50" viewBox="0 0 44 50"><path d="M22 46 V6 M6 22 L22 6 L38 22" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>` +
+        `<div class="ab" style="left:150px;top:${1130 - hgt}px;width:260px;height:${hgt}px;border-radius:30px 30px 0 0;background:var(--red)"></div>` +
+        `<div class="ab" style="left:150px;width:260px;top:1150px;text-align:center;font-size:56px">تأیید الکی</div>` +
+        (kd > 0 ? `<div class="ab meme" dir="ltr" style="left:440px;top:${lerp(500, 640, kd)}px;font-size:220px;color:var(--y);transform:scale(${lerp(1.5, 1, kd).toFixed(3)})">${s.big}</div>` : '');
+    }
+    case 'copy': case 'prompt': {
+      // the copyable prompt: typed in as it is spoken, then copied
+      const kc = ramp(t, A, A + .35), done = s.type === 'prompt' ? ramp(t, x.L.end - .3, x.L.end) : 0;
+      const words = s.type === 'prompt' ? x.shown.map(w => `<span style="opacity:${t >= w.t - .05 ? 1 : .12}">${w.w.replace(/[«»]/g, '')}</span>`).join(' ') : `<span style="opacity:.3">${((BEATS[x.i + 1] || {}).s || {}).prompt_fa || '…'}</span>`;
+      return photo(s.img, x, t, '', .45) +
+        `<div class="ab" style="left:70px;top:${lerp(1900, 330, outQ(kc)).toFixed(0)}px;width:940px;border-radius:44px;background:#fff;color:#0D0D0D;box-shadow:0 30px 80px rgba(0,0,0,.55);padding:40px 50px 50px;box-sizing:border-box">` +
+        `<div style="display:flex;justify-content:space-between;align-items:center">${chatTop(42)}<span style="padding:12px 30px 18px;border-radius:24px;background:${done > 0 ? 'var(--teal)' : '#0D0D0D'};color:#fff;font:900 50px V;transform:scale(${(1 + .08 * Math.sin(t * 9) * (s.type === 'copy' ? 1 : 0) + .2 * Math.sin(Math.PI * done)).toFixed(3)})">${done > 0 ? 'کپی شد ✓' : 'کپی'}</span></div>` +
+        `<div style="margin-top:36px;font:900 76px/1.45 V;white-space:normal">${words}</div>` +
+        (s.prompt_en ? `<div dir="ltr" style="margin-top:22px;font:600 38px/1.35 V;color:#6E6E80;opacity:${ramp(t, x.shown[3].t, x.shown[3].t + .3)}">${s.prompt_en}</div>` : '') + '</div>' +
+        (s.type === 'copy' ? memeLine('↓ اینو سیو کن', 1080, 90, ramp(t, A + .5, A + .8), -3, 'var(--y)') : '') +
+        (s.stamp ? stamp(s.stamp, 1180, ramp(t, x.L.end - .25, x.L.end + .2), 'var(--teal)', '#fff', 6) : '');
+    }
+    case 'ask': {
+      const q = x.shown.map(w => `<span style="opacity:${t >= w.t - .05 ? 1 : .15};${w.k ? 'color:var(--y)' : ''}">${w.w}</span>`).join(' ');
+      return photo(s.img, x, t, '', .25) + shade(.5, .6) +
+        `<div class="ab meme" style="left:70px;right:70px;top:230px;text-align:center;font-size:104px;line-height:1.3;white-space:normal">${q}</div>` +
+        botBub(s.ai, 70, 1040, ramp(t, x.L.end - .4, x.L.end - .1), 60, t > A + 1 ? t : 0);
+    }
+  }
+  PROBLEMS.push('unknown scene ' + s.type); return '';
+}
+// the payoff loops back to the opening phone: now the chatbot answers honestly
+function ending(u, t) {
+  const h = BEATS[0], s = h.s, W = 480, H = 1000;
+  const ui = `<div class="ab" style="left:0;top:0;width:${W}px;height:${H}px;transform-origin:0 0;transform:${quad(W, H, s.screen)};background:#fff;overflow:hidden">` +
+    `<div style="position:absolute;left:0;right:0;top:70px;display:flex;justify-content:center">${chatTop(34)}</div>` +
+    `<div style="position:absolute;left:22px;right:22px;top:200px;display:flex;gap:16px">${logoImg(56)}<div style="font:900 44px/1.4 V;color:#0D0D0D">رک بگم؟<br><span style="color:var(--red)">۳ دلیل</span> که این نقشه<br>شکست می‌خوره:<br>۱. …</div></div></div>`;
+  return photo(s.img, {a: T.end_start, z: TOTAL, i: 1}, t, ui) + shade(.4, .92) +
+    memeLine(D.end_text || '', 1380, 120, ramp(u, .1, .4)) +
+    `<div class="mid" style="top:1560px;font-size:60px;opacity:${ramp(u, .3, .6)}">${D.end_sub || ''}</div>` +
+    `<div class="mid" dir="ltr" style="top:1660px;font:600 42px V;letter-spacing:6px;color:var(--y);opacity:${ramp(u, .4, .7)}">${(D.handle || '').replace('@', '').toUpperCase()}</div>`;
+}
+window.seek = seek;
+</script>
+</body>
+</html>

@@ -6,7 +6,7 @@
 <!-- Reel cover, YouTube-thumbnail style (user rule 2026-10-23). A scroll-stopping photoreal background made with our
      image model (no text in it), the news subject's REAL logo, and a huge typeset Persian headline (exact spelling,
      never model-drawn). Everything important sits inside the 4:5 grid crop (y 285–1635) and avoids the reel UI.
-     Data: <dir>/cover.json {bg, logo?, logo_label?, kicker?, title ("*word*" = accent box), sub?, sub_px?, twist? (big red pill under the headline: the story's tension), accent?, ink?, dark?,
+     Data: <dir>/cover.json {bg, logo?, logo_label?, kicker?, title ("*word*" = accent box), sub?, sub_px?, twist? (big red pill under the headline: the story's tension), twist_px?, accent?, ink?, dark?,
      pos?: bottom|top|middle (headline position; vary it cover to cover, user rule 2026-10-24), align?: center|right} -->
 <style>
   @font-face { font-family: Vaz; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
@@ -62,7 +62,7 @@ window.ready = (async () => {
   if (C.logo) $('logo').innerHTML = `<img src="${url(C.logo)}">${C.logo_label ? `<span>${esc(C.logo_label)}</span>` : ''}`; else $('logo').remove();
   $('title').innerHTML = esc(C.title).replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>');
   if (C.sub) { $('sub').textContent = C.sub; if (C.sub_px) $('sub').style.fontSize = C.sub_px + 'px'; } else $('sub').remove();
-  if (C.twist) { const w = document.createElement('div'); w.id = 'twist'; w.textContent = C.twist; w.style.cssText = 'position:absolute;left:0;right:0;margin:auto;width:max-content;font:900 96px Vaz;color:#fff;background:#E5322D;padding:8px 44px 24px;border-radius:26px;transform:rotate(-2deg);box-shadow:0 16px 40px rgba(0,0,0,.45);direction:rtl'; $('c').appendChild(w); }
+  if (C.twist) { const w = document.createElement('div'); w.id = 'twist'; w.textContent = C.twist; w.style.cssText = 'position:absolute;left:0;right:0;margin:auto;width:max-content;font:900 ' + (C.twist_px || 96) + 'px Vaz;color:#fff;background:#E5322D;padding:8px 44px 24px;border-radius:26px;transform:rotate(-2deg);box-shadow:0 16px 40px rgba(0,0,0,.45);direction:rtl'; $('c').appendChild(w); }
   await document.fonts.ready; await Promise.all(['600', '900'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش AI')));
   await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('image failed: ' + i.src))));
   // fit: shrink the headline until it is at most 3 lines and stays inside the 4:5 grid crop
