@@ -53,7 +53,7 @@ function prep(b) {
   // shown words (for captions) keep the spoken index of their first spoken word
   const shown = []; let si = 0, star = false;
   for (const tok of clean.replace(/\{([^|}]*)\|([^}]*)\}/g, (m, a, c) => a.replace(/\s/g, ' ') + '\u0001' + c.trim().split(/\s+/).length).trim().split(/\s+/)) {
-    let w = tok, span = 1; if (w.includes('\u0001')) { [w, span] = w.split('\u0001'); span = +span; }
+    let w = tok, span = 1; if (w.includes('\u0001')) { const [w0, rest] = w.split('\u0001'); span = parseInt(rest, 10); w = w0 + rest.replace(/^\d+/, ''); }
     if (w.startsWith('*')) star = true; const k = star; if (/\*[«»"'.…،؛!؟?:]*$/.test(w)) star = false;
     shown.push({w: w.replace(/\*/g, ''), k, t: at(si)}); si += span;
   }
@@ -111,12 +111,37 @@ function ground(t, i) {
     `<svg class="ab" width="1080" height="1920" style="left:0;top:0;opacity:.35"><defs><pattern id="dg${i}" width="54" height="54" patternUnits="userSpaceOnUse" patternTransform="translate(${(t * 24 % 54).toFixed(1)} ${(t * 40 % 54).toFixed(1)})"><circle cx="2" cy="2" r="2.4" fill="#fff"/></pattern></defs><rect width="1080" height="1920" fill="url(#dg${i})"/></svg>`;
 }
 function framed(img, x, t, dim = 0) {
+  // the photo lives inside a rebuilt ChatGPT app window: dark title bar with the real logo, the photo as the chat
+  // pane, a message box with a blinking cursor; the window tilts in in 3D, glows on the beat, a light sweep crosses it
   const k = inOut(ramp(t, x.a, x.z)), e = outQ(ramp(t, x.a - .05, x.a + .35)), side = x.i % 2 ? 1 : -1, g = GLOW[x.i % GLOW.length];
-  const sweep = ((t - x.a) * 900) % 2600 - 700;
-  return ground(t, x.i) + `<div class="ab" style="left:80px;top:240px;width:920px;height:1010px;border-radius:56px;overflow:hidden;transform:perspective(1800px) rotateY(${(side * 8 * (1 - e)).toFixed(2)}deg) rotate(${(side * lerp(3, 1.5, k)).toFixed(2)}deg) scale(${lerp(.84, 1, e).toFixed(3)});box-shadow:0 0 0 7px rgba(255,255,255,.92),0 50px 120px rgba(0,0,0,.65),0 0 160px ${g}aa">` +
-    `<img src="${src('raw/' + img + '.png')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(${lerp(1.16, 1.03, k).toFixed(4)}) translateX(${(side * lerp(-14, 14, k)).toFixed(1)}px)">` +
-    `<div class="ab" style="inset:0;background:rgba(0,0,0,${dim})"></div>` +
-    `<div class="ab" style="top:-200px;bottom:-200px;width:220px;left:${sweep.toFixed(0)}px;transform:rotate(18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent)"></div></div>`;
+  const sweep = ((t - x.a) * 900) % 2600 - 700, beat = Math.exp(-10 * ((t % BEAT + BEAT) % BEAT)), cursor = Math.floor(t * 2.4) % 2;
+  return ground(t, x.i) + `<div class="ab" style="left:40px;top:170px;width:900px;height:1130px;border-radius:44px;overflow:hidden;background:#202123;transform:perspective(1800px) rotateY(${(side * 8 * (1 - e)).toFixed(2)}deg) rotate(${(side * lerp(2.4, 1.2, k)).toFixed(2)}deg) scale(${lerp(.84, 1, e).toFixed(3)});box-shadow:0 0 0 5px rgba(255,255,255,.85),0 50px 120px rgba(0,0,0,.65),0 0 ${(120 + 80 * beat).toFixed(0)}px ${g}${beat > .3 ? 'ff' : 'aa'}">` +
+    `<div class="ab" style="left:0;right:0;top:0;height:92px;display:flex;align-items:center;justify-content:space-between;padding:0 34px;direction:ltr;background:#171717">` +
+      `<span style="display:flex;gap:14px">${['#FF5F57', '#FEBC2E', '#28C840'].map(c => `<i style="width:22px;height:22px;border-radius:50%;background:${c}"></i>`).join('')}</span>` +
+      `<span style="display:flex;align-items:center;gap:14px;font:900 38px V;color:#fff">${logoImg(46)}${D.product}</span><span style="width:96px"></span></div>` +
+    `<div class="ab" style="left:0;right:0;top:92px;bottom:118px;overflow:hidden"><img src="${src('raw/' + img + '.png')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(${lerp(1.16, 1.03, k).toFixed(4)}) translateX(${(side * lerp(-14, 14, k)).toFixed(1)}px)">` +
+      `<div class="ab" style="inset:0;background:rgba(0,0,0,${dim})"></div></div>` +
+    `<div class="ab" style="left:24px;right:24px;bottom:18px;height:84px;border-radius:42px;background:#2F2F2F;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 34px;direction:rtl">` +
+      `<span style="font:600 36px V;color:#9A9AA5">پیام به ${D.product}<span style="color:#fff;opacity:${cursor}">|</span></span><span style="width:60px;height:60px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center"><svg width="28" height="32" viewBox="0 0 28 32"><path d="M14 28 V4 M4 14 L14 4 L24 14" stroke="#000" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>` +
+    `<div class="ab" style="top:-200px;bottom:-200px;width:220px;left:${sweep.toFixed(0)}px;transform:rotate(18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent)"></div></div>`;
+}
+// a ticker of the chatbot's replies under the window: flattering until the fix, honest after it
+function ticker(x, t) {
+  const honest = x.i >= 9 && t >= (x.b.id === 'b10' ? x.at(x.s.big_at) : x.a);
+  const words = honest ? ['رک بگم…', 'ریسک داره', 'دلیلت چیه؟', 'سه ایراد داره', 'مطمئنی؟'] : ['عالیه!', 'حق با توئه', 'نابغه‌ای!', 'بی‌نقصه!', '۱۰۰٪ موافقم'];
+  const col = honest ? 'var(--red)' : 'var(--teal)', row = words.concat(words, words).map(w => `<span style="display:inline-block;margin:0 14px;padding:6px 30px 14px;border-radius:999px;background:${col};color:#fff;font:900 46px V;box-shadow:0 0 30px ${col}">${w}</span>`).join('');
+  return `<div class="ab" style="left:0;right:0;top:1600px;height:90px;overflow:hidden;white-space:nowrap;direction:ltr;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)"><div style="position:absolute;top:8px;left:${(-((t * 160) % 760)).toFixed(0)}px">${row}</div></div>`;
+}
+// the running "yes-meter": how much the chatbot is agreeing, climbing through the flattery, crashing after the fix
+const YES = {b02: .55, b03: .72, b04: .8, b05: .82, b06: .9, b07: .97, b08: 1, b09: .92, b10: .26, b11: .24, b12: .2, b13: .2};
+function yesMeter(x, t) {
+  const prev = BEATS[x.i - 1], v0 = prev ? (YES[prev.b.id] ?? .5) : .5, v1 = YES[x.b.id] ?? v0;
+  const kAt = x.s.big_at !== undefined && x.b.id === 'b10' ? x.at(x.s.big_at) : x.a + .2, v = lerp(v0, v1, outQ(ramp(t, kAt - .05, kAt + .5)));
+  const H = 820, col = v > .6 ? 'var(--teal)' : 'var(--red)';
+  return `<div class="ab" style="right:22px;top:330px;width:64px;height:${H}px;border-radius:32px;background:rgba(255,255,255,.14);border:3px solid rgba(255,255,255,.55);overflow:hidden">` +
+    `<div class="ab" style="left:0;right:0;bottom:0;height:${(H * v).toFixed(0)}px;background:${col};box-shadow:0 0 50px ${col}"></div></div>` +
+    `<div class="ab" style="right:4px;top:${(330 + H * (1 - v) - 30).toFixed(0)}px;padding:4px 12px 12px;border-radius:16px;background:#fff;color:#0D0D0D;font:900 40px V">${faNum(Math.round(v * 100))}٪</div>` +
+    `<div class="ab" style="right:0;top:270px;width:108px;text-align:center;font:900 32px V;color:#fff">تأیید</div>`;
 }
 const shade = (top = .55, bot = .8) => `<div class="ab" style="inset:0;background:linear-gradient(rgba(0,0,0,${top}),rgba(0,0,0,0) 30%,rgba(0,0,0,0) 55%,rgba(0,0,0,${bot}))"></div>`;
 const logoImg = (size, extra = '') => `<img src="${src('el/' + LOGO())}" style="width:${size}px;height:${size}px;border-radius:${size * .22}px;background:#fff;${extra}">`;
@@ -171,7 +196,7 @@ function seek(t) {
   el('rig').style.transform = `translate(${sh[0].toFixed(1)}px,${sh[1].toFixed(1)}px) rotate(${rot.toFixed(2)}deg) scale(${(1 + kick + pulse + push).toFixed(4)})`;
   const html = endOn ? ending(t - T.end_start, t) : draw(x, t);
   const lay = el('layer'); if (lay._h !== html) { lay._h = html; lay.innerHTML = html; }
-  const caps = endOn ? '' : captions(x, t); const cp = el('caps'); if (cp._h !== caps) { cp._h = caps; cp.innerHTML = caps; }
+  const caps = endOn ? '' : captions(x, t) + (x.s.type === 'hook' ? '' : yesMeter(x, t) + ticker(x, t)); const cp = el('caps'); if (cp._h !== caps) { cp._h = caps; cp.innerHTML = caps; }
   const fl = el('flash'), f = cut.t0 > 0 && since < .12 ? .32 * (1 - since / .12) : 0;
   fl.style.background = `rgba(255,255,255,${f.toFixed(3)})`;
 }
@@ -184,12 +209,13 @@ function shakeAt(x, t) {
 // stacked meme captions: the spoken chunk big, the previous chunk stacked above it, smaller and tilted
 function captions(x, t) {
   const ty = x.s.type;
-  if (ty === 'hook') return `<div style="position:absolute;inset:0;transform:translateY(${(24 * (1 - outQ(ramp(t, 0, .3)))).toFixed(1)}px)">` + memeLine('ChatGPT همیشه', 70, 128, 1, -1.5) + `<div class="mid" style="top:236px"><span class="meme" style="font-size:128px;vertical-align:middle">می‌گه </span><span style="display:inline-block;vertical-align:middle;padding:0 34px 18px;border-radius:30px;background:var(--y);color:#0D0D0D;font-size:128px;box-shadow:0 12px 0 rgba(0,0,0,.35);transform:rotate(${(-2 + 3 * Math.exp(-8 * Math.max(0, t - .45)) * (t > .45 ? 1 : 0)).toFixed(2)}deg) scale(${(t < .45 ? 1 : 1 + .14 * Math.exp(-9 * (t - .45)) * Math.cos((t - .45) * 18) + .1 * Math.exp(-8 * Math.abs(t - x.at(3))) * (t > x.at(3) - .1 ? 1 : 0)).toFixed(3)})">حق با توئه؟</span></div></div>`;
+  if (ty === 'hook') return `<div style="position:absolute;inset:0;transform:translateY(${(24 * (1 - outQ(ramp(t, 0, .3)))).toFixed(1)}px)">` + memeLine('ChatGPT همیشه', 90, 120, 1, -1) + `<div class="mid" style="top:246px"><span class="meme" style="font-size:120px;vertical-align:middle">می‌گه </span><span style="display:inline-block;vertical-align:middle;padding:0 34px 18px;border-radius:30px;background:var(--y);color:#0D0D0D;font-size:120px;box-shadow:0 12px 0 rgba(0,0,0,.35);transform:rotate(${(-2 + 3 * Math.exp(-8 * Math.max(0, t - .45)) * (t > .45 ? 1 : 0)).toFixed(2)}deg) scale(${(t < .45 ? 1 : 1 + .14 * Math.exp(-9 * (t - .45)) * Math.cos((t - .45) * 18) + .1 * Math.exp(-8 * Math.abs(t - x.at(3))) * (t > x.at(3) - .1 ? 1 : 0)).toFixed(3)})">حق با توئه؟</span></div></div>`;
   if (ty === 'prompt' || ty === 'ask' || t > x.L.end + .35) return '';
   const W = x.shown, n = W.length; let j = 0; for (let q = 0; q < n; q++) if (t >= W[q].t - .05) j = q;
-  const per = 3, c0 = Math.floor(j / per) * per, now = W.slice(c0, Math.min(n, c0 + per)), prev = c0 ? W.slice(c0 - per, c0) : [];
+  const ch = []; let cur = []; W.forEach((w, q) => { cur.push(q); if (cur.length === 3 || /[،؛.!؟?…:»]$/.test(w.w)) { ch.push(cur); cur = []; } }); if (cur.length) ch.push(cur);
+  const ci = ch.findIndex(c => c.includes(j)), c0 = ch[ci][0], now = ch[ci].map(q => W[q]), prev = ci ? ch[ci - 1].map(q => W[q]) : [];
   const line = ws => ws.filter(w => t >= w.t - .05).map(w => w.k ? `<span style="color:var(--y)">${w.w}</span>` : w.w).join(' ');
-  const k = ramp(t, W[c0].t - .05, W[c0].t + .15), y = 1400;
+  const k = ramp(t, W[c0].t - .05, W[c0].t + .15), y = 1440;
   return (prev.length ? `<div class="mid meme" style="top:${y - 112}px;font-size:66px;opacity:.75;transform:rotate(-2.5deg)">${prev.map(w => w.k ? `<span style="color:var(--y)">${w.w}</span>` : w.w).join(' ')}</div>` : '') +
     `<div class="mid meme" style="top:${y}px;font-size:96px;transform:rotate(1.5deg) scale(${lerp(1.25, 1, outQ(k)).toFixed(3)})">${line(now)}</div>`;
 }
@@ -208,7 +234,7 @@ function draw(x, t) {
         (kb > 0 ? `<div style="position:absolute;left:20px;right:20px;top:340px;display:flex;gap:14px;align-items:flex-start;transform:scale(${pop(kb).toFixed(3)});transform-origin:0 0">${logoImg(64)}<div style="font:900 72px/1.2 V;color:#0D0D0D;white-space:nowrap">معلومه!<br><span style="color:var(--teal)">تو نابغه‌ای!</span></div></div>` : '') +
         (k2 > 0 ? `<div style="position:absolute;left:98px;right:20px;top:600px;font:900 72px/1.2 V;color:#0D0D0D;white-space:nowrap;transform:scale(${pop(k2).toFixed(3)});transform-origin:0 0">ایده‌ت<br><span style="color:var(--teal)">بی‌نقصه!</span></div>` : '') +
         `</div>`;
-      return `<div class="ab" style="inset:0;transform:scale(1.25);transform-origin:540px 0">${photo(s.img, x, t, ui)}</div>` + `<div class="ab" style="inset:0;background:linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.35) 24%,rgba(0,0,0,0) 34%)"></div>` +
+      return `<div class="ab" style="inset:0;transform:scale(${lerp(1.12, 1.32, outQ(ramp(t, 0, 2.6))).toFixed(4)});transform-origin:540px 0">${photo(s.img, x, t, ui)}</div>` + `<div class="ab" style="inset:0;background:linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.35) 24%,rgba(0,0,0,0) 34%)"></div>` +
         chip('واقعاً؟', 40, 1330, 150, 'var(--red)', '#fff', ramp(t, A + 1.0, A + 1.2), -8);
     }
     case 'pov': {
@@ -268,9 +294,12 @@ function draw(x, t) {
       return framed(s.img, x, t, .4) +
         `<div class="ab" style="left:90px;top:170px;width:900px;height:150px;border-radius:75px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 50px;box-sizing:border-box;transform:scale(${pop(kr).toFixed(3)});box-shadow:0 20px 50px rgba(0,0,0,.4)">` +
         `<span style="font:900 64px V;color:#0D0D0D">«${s.rule}»</span><span style="width:96px;height:96px;border-radius:50%;background:#0D0D0D;display:flex;align-items:center;justify-content:center"><svg width="44" height="50" viewBox="0 0 44 50"><path d="M22 46 V6 M6 22 L22 6 L38 22" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>` +
-        `<div class="ab" style="left:150px;top:${1130 - hgt}px;width:260px;height:${hgt}px;border-radius:30px 30px 0 0;background:var(--red)"></div>` +
-        `<div class="ab" style="left:150px;width:260px;top:1150px;text-align:center;font-size:56px">تأیید الکی</div>` +
-        (kd > 0 ? `<div class="ab meme" dir="ltr" style="left:440px;top:${lerp(500, 640, kd)}px;font-size:220px;color:var(--y);transform:scale(${lerp(1.5, 1, kd).toFixed(3)})">${s.big}</div>` : '');
+        `<div class="ab" style="left:110px;top:1130px;width:860px;height:6px;border-radius:3px;background:rgba(255,255,255,.8)"></div>` +
+        `<div class="ab" style="left:150px;top:${1130 - 700 * outQ(kr)}px;width:220px;height:${700 * outQ(kr)}px;border-radius:30px 30px 0 0;background:rgba(255,255,255,.9)"></div>` +
+        `<div class="ab" style="left:120px;width:280px;top:1150px;text-align:center;font-size:48px">بدون دستور</div>` +
+        `<div class="ab" style="left:430px;top:${1130 - hgt * outQ(kr)}px;width:220px;height:${hgt * outQ(kr)}px;border-radius:30px 30px 0 0;background:var(--red);box-shadow:0 0 60px rgba(255,59,48,.7)"></div>` +
+        `<div class="ab" style="left:400px;width:280px;top:1150px;text-align:center;font-size:48px">با دستور</div>` +
+        (kd > 0 ? `<div class="ab meme" dir="ltr" style="left:560px;top:${lerp(420, 560, kd)}px;font-size:170px;color:var(--y);transform:scale(${lerp(1.5, 1, kd).toFixed(3)})">${s.big}</div>` : '');
     }
     case 'copy': case 'prompt': {
       // the copyable prompt: typed in as it is spoken, then copied
@@ -298,9 +327,9 @@ function ending(u, t) {
   const h = BEATS[0], s = h.s, W = 480, H = 1000;
   const ui = `<div class="ab" style="left:0;top:0;width:${W}px;height:${H}px;transform-origin:0 0;transform:${quad(W, H, s.screen)};background:#fff;overflow:hidden">` +
     `<div style="position:absolute;left:0;right:0;top:70px;display:flex;justify-content:center">${chatTop(34)}</div>` +
-    `<div style="position:absolute;left:22px;right:22px;top:200px;display:flex;gap:16px">${logoImg(56)}<div style="font:900 44px/1.4 V;color:#0D0D0D">رک بگم؟<br><span style="color:var(--red)">۳ دلیل</span> که این نقشه<br>شکست می‌خوره:<br>۱. …</div></div></div>`;
+    `<div style="position:absolute;left:22px;right:22px;top:200px;display:flex;gap:16px">${logoImg(56)}<div style="font:900 44px/1.45 V;color:#0D0D0D">رک بگم؟<br><span style="color:var(--red)">۳ دلیل</span> که شکست می‌خوره:${['سرمایه‌ت کمه', 'رقیب زیاده', 'تجربه نداری'].map((r, i) => `<div style="opacity:${ramp(u, .2 + i * .35, .4 + i * .35)};transform:translateX(${(30 * (1 - outQ(ramp(u, .2 + i * .35, .4 + i * .35)))).toFixed(0)}px)">${faNum(i + 1)}. ${r}</div>`).join('')}</div></div></div>`;
   return photo(s.img, {a: T.end_start, z: TOTAL, i: 1}, t, ui) + shade(.4, .92) +
-    memeLine(D.end_text || '', 1380, 120, ramp(u, .1, .4)) +
+    `<div style="position:absolute;inset:0;transform:scale(${(1 + .03 * Math.sin(u * 6)).toFixed(4)});transform-origin:540px 1450px">` + memeLine(D.end_text || '', 1380, 120, ramp(u, .1, .4)) + '</div>' +
     `<div class="mid" style="top:1560px;font-size:60px;opacity:${ramp(u, .3, .6)}">${D.end_sub || ''}</div>` +
     `<div class="mid" dir="ltr" style="top:1660px;font:600 42px V;letter-spacing:6px;color:var(--y);opacity:${ramp(u, .4, .7)}">${(D.handle || '').replace('@', '').toUpperCase()}</div>`;
 }
