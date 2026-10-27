@@ -20,6 +20,7 @@ import pycolmap
 
 RES = 0.05            # metres per plan cell
 EYE_HEIGHT = 1.5      # assumed lens height above the floor when no reference measurement exists
+MIN_JOG = 0.35        # outline steps shorter than this are treated as noise, not as a wall corner
 DOOR_HALF = 0.55      # half the narrowest passage kept inside one room; sweep on the reference (0.5-0.7) settled here
 
 
@@ -333,6 +334,16 @@ def _rectilinear(poly: np.ndarray) -> np.ndarray:
         edges[0] = (eo, (ec * eL + c * L) / (eL + L), eL + L)
     if len(edges) < 4 or len(edges) % 2:
         return poly
+    # drop short jogs: a short edge between two parallel neighbours folds into them (keeps walls straight)
+    while len(edges) > 4:
+        n = len(edges)
+        real = [abs(edges[(i + 1) % n][1] - edges[i - 1][1]) for i in range(n)]   # snapped length of edge i
+        k = min(range(n), key=real.__getitem__)
+        if real[k] * RES >= MIN_JOG:                # outline is in plan pixels here
+            break
+        edges = edges[k - 1:] + edges[:k - 1] if k else edges[-1:] + edges[:-1]   # short edge now at index 1
+        e0, e2 = edges[0], edges[2]
+        edges = [(e0[0], (e0[1] * e0[2] + e2[1] * e2[2]) / (e0[2] + e2[2]), e0[2] + e2[2])] + edges[3:]
     verts = []
     for i in range(len(edges)):
         e, f = edges[i], edges[(i + 1) % len(edges)]

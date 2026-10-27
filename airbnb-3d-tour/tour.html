@@ -79,6 +79,11 @@ h2 { font-family: var(--display); font-weight: 700; font-size: 26px; line-height
 #tourCanvas, #tourCanvas canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
 .stop-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; transition: opacity .7s ease; }
 .stop-photo.instant { transition: none; }
+.srcsw { display: flex; gap: 4px; margin: 6px 0 2px; }
+.srcsw button { font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 99px; border: 1px solid currentColor; background: none; color: inherit; opacity: .7; cursor: pointer; }
+.srcsw button[aria-pressed="true"] { opacity: 1; font-weight: 700; }
+.srcsw button:disabled { opacity: .35; cursor: default; text-decoration: line-through; }
+.stop .ai { position: absolute; bottom: 4px; left: 4px; font-size: 10px; line-height: 1; padding: 3px 5px; border-radius: 3px; background: rgba(0,0,0,.62); color: #fff; }
 .hud { position: absolute; color: var(--hud-fg); font-size: 13.5px; }
 .hud-top { top: 12px; left: 12px; right: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; pointer-events: none; }
 @media (max-width: 640px) { .seg button, .hbtn { padding: 5px 9px; font-size: 12.5px; } }
@@ -241,7 +246,11 @@ aside { display: grid; gap: 18px; min-width: 0; }
       </div>
       <div class="hud caption" id="caption" hidden dir="rtl">
         <div class="t" id="capText"></div>
-        <label class="blend"><span>مدل</span><input type="range" id="blend" min="0" max="100" value="100" aria-label="ترکیب مدل سه‌بعدی و رندر هم‌زاویه"><span>رندر</span></label>
+        <div class="srcsw" id="srcsw" role="group" aria-label="نوع تصویر">
+          <button type="button" id="srcPhoto" aria-pressed="false">عکس واقعی</button>
+          <button type="button" id="srcRender" aria-pressed="true">رندر هوش مصنوعی</button>
+        </div>
+        <label class="blend"><span>مدل</span><input type="range" id="blend" min="0" max="100" value="100" aria-label="ترکیب مدل سه‌بعدی و تصویر هم‌زاویه"><span id="blendEnd">رندر</span></label>
       </div>
       <canvas class="minimap" id="minimap" aria-label="نقشه‌ی کوچک؛ برای رفتن به هر نقطه کلیک کنید"></canvas>
       <div class="hud hint" id="hint"></div>
@@ -392,10 +401,19 @@ window.HOME = (function () {
     { n: 10, room: "main", x: 5.25, y: 1.6, a: 0, h: 1.35, p: 8, cap: "کولر گازی بالای کاناپه و پنجره‌ی کنار تخت" },
     { n: 11, room: "entry", x: 2.55, y: 2.75, a: 180, h: 1.6, p: -5, cap: "راهروی ورودی: در اصلی، آینه‌ی قدی، قفسه‌ی مودم" },
     { n: 12, room: "entry", x: 3.85, y: 2.45, a: 180, h: 1.5, p: -5, cap: "دو درگاه از اتاق اصلی: ورودی سمت چپ، حمام با دوش سمت راست" },
+    // added to cover walls no listing photo shows: AI renders only, no real photo exists from these angles
+    { n: 13, room: "kitchen", x: 2.85, y: 7.5, a: 15, h: 1.55, p: -10, ai: true, refs: [7], cap: "آشپزخانه از گوشه‌ی کنار پنجره" },
+    { n: 14, room: "nook", x: 6.5, y: 8.5, a: -135, h: 1.55, p: -8, ai: true, refs: [8], cap: "ناهارخوری رو به قوس و آشپزخانه" },
+    { n: 15, room: "bath", x: 0.45, y: 0.85, a: 30, h: 1.55, p: -12, ai: true, refs: [12], cap: "حمام از گوشه‌ی دوش" },
+    { n: 16, room: "main", x: 3.1, y: 2.7, a: -135, h: 1.55, p: -8, ai: true, refs: [2, 6], cap: "اتاق اصلی رو به درگاه‌ها" },
+    { n: 17, room: "main", x: 6.6, y: 5.7, a: 120, h: 1.55, p: -8, ai: true, refs: [6, 4], cap: "دیوار تلویزیون و قوس‌ها از کنار کاناپه" },
+    { n: 18, room: "kitchen", x: 4.6, y: 8.0, a: -150, h: 1.55, p: -10, ai: true, refs: [7], cap: "آشپزخانه رو به قوس" },
+    { n: 19, room: "bath", x: 1.3, y: 1.75, a: -150, h: 1.55, p: -12, ai: true, refs: [12], cap: "حمام رو به روشویی" },
   ];
-  const TOUR_ORDER = [11, 12, 2, 4, 6, 5, 1, 9, 3, 10, 8, 7];
+  const TOUR_ORDER = [11, 12, 16, 2, 4, 6, 5, 1, 9, 3, 10, 17, 8, 14, 7, 13, 18, 15, 19];
   const fa = (v) => String(v).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]).replace(".", "٫");
-  const photoSrc = (n) => `photos/p${String(n).padStart(2, "0")}.jpg`;
+  const isAi = (n) => !!(PHOTOS.find((q) => q.n === n) || {}).ai;
+  const photoSrc = (n) => isAi(n) ? `renders/r${String(n).padStart(2, "0")}.jpg` : `photos/p${String(n).padStart(2, "0")}.jpg`;
   const renderSrc = (n) => `renders/r${String(n).padStart(2, "0")}.jpg`;
   const roomName = Object.fromEntries(ROOMS.map((r) => [r.id, r.name]));
   return { ROOMS, WALLS, WALL_RECTS, WINDOWS, OPENINGS, PHOTOS, TOUR_ORDER, fa, photoSrc, renderSrc, roomName };
@@ -405,7 +423,8 @@ window.HOME = (function () {
 <script>
 /* ===== 2D plan, photo grid and lightbox ===== */
 (function () {
-  const { ROOMS, WALL_RECTS, WINDOWS, OPENINGS, PHOTOS, fa, photoSrc, roomName } = window.HOME;
+  const { ROOMS, WALL_RECTS, WINDOWS, OPENINGS, fa, photoSrc, roomName } = window.HOME;
+  const PHOTOS = window.HOME.PHOTOS.filter((p) => !p.ai);      // the plan tab documents the listing's real photos
   const S = 100;
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("plan");
@@ -633,7 +652,7 @@ window.HOME = (function () {
     const p = H.PHOTOS.find((q) => q.n === n);
     const b = document.createElement("button");
     b.type = "button"; b.className = "stop";
-    b.innerHTML = `<div class="img"><img src="${photoSrc(n)}" alt="" loading="lazy"><span class="num">${fa(n)}</span></div><span>${roomName[p.room]}</span>`;
+    b.innerHTML = `<div class="img"><img src="${photoSrc(n)}" alt="" loading="lazy"><span class="num">${fa(n)}</span>${p.ai ? '<span class="ai">رندر AI</span>' : ""}</div><span>${roomName[p.room]}</span>`;
     b.setAttribute("aria-label", `ایستگاه ${fa(n)}: ${p.cap}`);
     b.addEventListener("click", () => { stopAuto(); goStop(n); });
     stopsEl.appendChild(b);
@@ -1269,18 +1288,39 @@ window.HOME = (function () {
     Object.entries(stopBtns).forEach(([k, b]) => b.setAttribute("aria-current", String(+k === n)));
     if (n) {
       const p = H.PHOTOS.find((q) => q.n === n);
-      capText.innerHTML = `<b>${fa(n)}</b>${roomName[p.room]} · ${p.cap}<br><small style="opacity:.75">رندر هوش مصنوعی از زاویه‌ی همین دوربین، بر پایه‌ی عکس ${fa(n)} آگهی</small>`;
+      capText.innerHTML = `<b>${fa(n)}</b>${roomName[p.room]} · ${p.cap}<br><small id="srcNote" style="opacity:.75"></small>`;
+      srcPhoto.disabled = !!p.ai;
+      setSrc(p.ai ? "render" : src);
       caption.hidden = false; hint.style.opacity = 0;
       stopBtns[n].scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduced ? "auto" : "smooth" });
     } else { caption.hidden = true; hint.style.opacity = 1; }
   }
   function showPhoto(n) {
     photoEl.classList.remove("instant");
-    photoEl.src = H.renderSrc(n);
+    const p = H.PHOTOS.find((q) => q.n === n);
+    photoEl.src = p.ai || src === "render" ? H.renderSrc(n) : H.photoSrc(n);
     photoEl.alt = H.PHOTOS.find((q) => q.n === n).cap;
     blend.value = 100;
     requestAnimationFrame(() => (photoEl.style.opacity = 1));
   }
+  // listing stations can show the real photo or its AI render; added stations only have a render
+  let src = "render";
+  const srcPhoto = document.getElementById("srcPhoto"), srcRender = document.getElementById("srcRender"), blendEnd = document.getElementById("blendEnd");
+  function setSrc(v) {
+    const p = H.PHOTOS.find((q) => q.n === curStop);
+    if (!p) return;
+    if (!p.ai) src = v;
+    const r = p.ai || v === "render";
+    srcPhoto.setAttribute("aria-pressed", String(!r)); srcRender.setAttribute("aria-pressed", String(r));
+    blendEnd.textContent = r ? "رندر" : "عکس";
+    const note = document.getElementById("srcNote");
+    if (note) note.textContent = p.ai
+      ? `رندر هوش مصنوعی بر پایه‌ی عکس ${p.refs.map(fa).join(" و ")}؛ از این زاویه عکس واقعی وجود ندارد`
+      : r ? `رندر هوش مصنوعی از زاویه‌ی همین دوربین، بر پایه‌ی عکس ${fa(p.n)} آگهی` : `عکس اصلی آگهی (شماره‌ی ${fa(p.n)})`;
+    if (photoEl.style.opacity !== "0" && photoEl.style.opacity !== "") { photoEl.classList.add("instant"); photoEl.src = r ? H.renderSrc(p.n) : H.photoSrc(p.n); }
+  }
+  srcPhoto.addEventListener("click", () => { stopAuto(); setSrc("photo"); });
+  srcRender.addEventListener("click", () => { stopAuto(); setSrc("render"); });
   function hidePhoto(instant) {
     photoEl.classList.toggle("instant", !!instant);
     photoEl.style.opacity = 0;
@@ -1489,6 +1529,7 @@ window.HOME = (function () {
     },
     hide() { running = false; stopAuto(); },
     markers(v) { markersOn = v; rings.forEach((r) => (r.visible = v)); },
+    go(n) { goStop(n); },
   };
 })();
 </script>

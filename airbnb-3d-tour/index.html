@@ -220,7 +220,7 @@ p { margin: 0; }
       <div class="fact"><span class="k">INPUT</span><b class="fa-num">۱۲</b><small>عکس آگهی، تنها ورودی</small></div>
       <div class="fact"><span class="k">AREA</span><b class="fa-num">≈۵۰</b><small>متر مربع فضای بازسازی‌شده</small></div>
       <div class="fact"><span class="k">VIEWS</span><b class="fa-num">۳</b><small>پلان، سه‌بعدی، قدم زدن</small></div>
-      <div class="fact"><span class="k">STATIONS</span><b class="fa-num">۱۲</b><small>ایستگاه با عکس واقعی روی مدل</small></div>
+      <div class="fact"><span class="k">STATIONS</span><b class="fa-num">۱۹</b><small>ایستگاه: ۱۲ با عکس واقعی، ۷ رندر برای دیوارهای ندیده</small></div>
       <div class="fact"><span class="k">RUNTIME</span><b>مرورگر</b><small>بدون نصب، روی موبایل و دسکتاپ</small></div>
     </div>
   </header>
@@ -334,8 +334,8 @@ p { margin: 0; }
         <div class="compare-cap"><span><b>۱۲</b> · درگاه ورودی و حمام</span><span>ورودی</span></div>
       </div>
     </div>
-    <div class="renders" id="renders" aria-label="۱۲ رندر هم‌زاویه با مدل"></div>
-    <div class="sheet-cap"><span>12 RENDERS · NANO BANANA · SKETCH + PHOTO REFERENCES</span><span>هر رندر از زاویه‌ی همان ایستگاه در مدل</span></div>
+    <div class="renders" id="renders" aria-label="۱۹ رندر هم‌زاویه با مدل"></div>
+    <div class="sheet-cap"><span>19 RENDERS · NANO BANANA · SKETCH + PHOTO REFERENCES</span><span>۱ تا ۱۲ هم‌زاویه با عکس آگهی؛ ۱۳ تا ۱۹ برای دیوارهایی که هیچ عکسی نشان نمی‌داد</span></div>
   </section>
 
   <!-- TWO LANGUAGES -->
@@ -439,9 +439,9 @@ p { margin: 0; }
     sheet.appendChild(f);
   }
   const rg = document.getElementById("renders");
-  [11, 12, 2, 4, 6, 5, 1, 9, 3, 10, 8, 7].forEach((n) => {
+  [11, 12, 16, 2, 4, 6, 5, 1, 9, 3, 10, 17, 8, 14, 7, 13, 18, 15, 19].forEach((n) => {
     const f = document.createElement("figure");
-    f.innerHTML = `<img src="renders/r${String(n).padStart(2, "0")}.jpg" width="400" height="300" loading="lazy" alt="رندر ایستگاه ${fa(n)}"><figcaption>${fa(n)}</figcaption>`;
+    f.innerHTML = `<img src="renders/r${String(n).padStart(2, "0")}.jpg" width="400" height="300" loading="lazy" alt="رندر ایستگاه ${fa(n)}"><figcaption>${fa(n)}${n > 12 ? " · بدون عکس واقعی" : ""}</figcaption>`;
     rg.appendChild(f);
   });
   // before/after sliders
