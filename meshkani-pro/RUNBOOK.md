@@ -654,7 +654,9 @@ narrator talks, nothing attractive in the picture").
    typography, real UI, framed photos on a designed ground, split screens, editorial layouts, 3D. Do not make
    every reel a full-screen photo slideshow. Nothing is cut by the frame edge unless it is a full-bleed
    background, and no text is truncated.
-3. **Rhythm.** A new shot or a clear camera change every 1.5–3 s; no still picture longer than 1.5 s,
+3. **Rhythm and sync.** (User rule 2026-10-27, after REEL-014 failed visual_match on late numbers:) every number, name or
+   result appears on screen within 0.3 s of the word that says it (time it from the voice word timings, never by scene
+   order), and no frame between shots is empty or near-empty. A new shot or a clear camera change every 1.5–3 s; no still picture longer than 1.5 s,
    except a final CTA of at most 2 s. Cut on action. Length 40–55 s (the 60–92 s ranges below are replaced).
 4. **Hook in 2 seconds.** (User rule 2026-10-26, after REEL-013 failed the critic's hook score twice:) from frame 0 a huge,
    readable Persian hook line (≥ 120 px, ≤ 2 short lines, never clipped, inside the safe area) over a bright, large
