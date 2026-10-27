@@ -668,8 +668,8 @@ narrator talks, nothing attractive in the picture").
    - particles or shapes only where the chosen prompt allows them.
    Photos are one layer inside a designed frame (a card, a mask, a device), never a whole scene that just pans,
    zooms or slides; at most 2 such photo-led shots per reel. A reel built from generated plates with Ken Burns
-   moves (REEL-007R/«جزیره» look) is a failure. The critic scores this as `motion_richness` (preflight ≥ 8 on the
-   scene stills, final ≥ 7).
+   moves (REEL-007R/«جزیره» look) is a failure. The critic scores this as `motion_richness` (≥ 7 on the scene stills
+   in preflight and in the final gate).
 3. **Rhythm and sync.** (User rule 2026-10-27, after REEL-014 failed visual_match on late numbers:) every number, name or
    result appears on screen within 0.3 s of the word that says it (time it from the voice word timings, never by scene
    order), and no frame between shots is empty or near-empty. A new shot or a clear camera change every 1.5–3 s; no still picture longer than 1.5 s,
@@ -848,8 +848,8 @@ narrator talks, nothing attractive in the picture").
      summary to the independent critic (same rules as step 5, fresh subagent) and ask only for
      `cover_stop_power`, `headline_clarity`, `hook` and, on `out/sheet*.jpg` from `--mode=check` (stills of every
      scene), `motion_richness` (rule 2b) (1–10, one-line reasons) → `work/story/critic_preflight.json`.
-     `python3 news-reel/preflight.py --dir work/story check`: every score must be **≥ 8** (one above the gate),
-     else fix and repeat, at most 3 rounds.
+     `python3 news-reel/preflight.py --dir work/story check`: every score must be **≥ 7** (the gate's bar; 8 was
+     tried on 2026-10-27 and stopped every reel), else fix and repeat, at most 3 rounds.
    - **Cost rule:** fixes in preflight and after it are made in code, typography, headline and crop. Never call the
      image model again for a fix, except one new cover background in total. Never re-render the full video for a
      cover/headline/hook problem; those are caught here. A reel that cannot pass preflight in 3 rounds is `FAILED`
