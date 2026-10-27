@@ -237,6 +237,7 @@ aside { display: grid; gap: 18px; min-width: 0; }
           <div class="seg" role="group" aria-label="سبک نمایش">
             <button type="button" id="sSketch" aria-pressed="true">اسکچ</button>
             <button type="button" id="sReal" aria-pressed="false">واقعی</button>
+            <button type="button" id="sPhoto" aria-pressed="false" title="سطح‌ها با تصویرهای ۱۸ ایستگاه پوشانده می‌شوند">تصویری</button>
           </div>
         </div>
         <div class="hgroup">
@@ -637,7 +638,7 @@ window.HOME = (function () {
   const hint = document.getElementById("hint");
   const mini = document.getElementById("minimap");
   const btnMode = { plan: document.getElementById("mPlan"), doll: document.getElementById("mDoll"), walk: document.getElementById("mWalk") };
-  const btnStyle = { sketch: document.getElementById("sSketch"), real: document.getElementById("sReal") };
+  const btnStyle = { sketch: document.getElementById("sSketch"), real: document.getElementById("sReal"), photo: document.getElementById("sPhoto") };
   const btnPlay = document.getElementById("btnPlay"), btnFull = document.getElementById("btnFull");
   const stopsEl = document.getElementById("stops");
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1181,15 +1182,124 @@ window.HOME = (function () {
     Object.entries(btnStyle).forEach(([k, b]) => b.setAttribute("aria-pressed", String(k === s)));
     viewer.classList.toggle("sketch", s === "sketch");
     scene.background.set(s === "sketch" ? "#ffffff" : "#cdd5d2");
-    renderer.toneMapping = s === "sketch" ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
+    renderer.toneMapping = s === "real" ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping;
+    meshes.forEach((m) => { if (!m.userData.real) m.userData.real = m.material; });
+    if (s === "photo") preparePhoto();
+    if (hint) hint.textContent = s === "photo" && mode === "walk" ? "روی زمین بزنید تا به نزدیک‌ترین نما بپرید · برای نگاه کردن بکشید · قدم زدن آزاد با کلیدهای جهت" : HINTS[mode];
     meshes.forEach((m) => {
       const u = m.userData;
-      if (!u.real) u.real = m.material;
       if (s === "sketch") { m.material = whiteMat; m.visible = !(u.glass || u.ground); }
+      else if (s === "photo") { m.material = u.photo; m.visible = !u.ground; }
       else { m.material = u.real; m.visible = true; }
     });
     ["ink", "sketch", "light"].forEach((k) => (lines[k].visible = s === "sketch"));
     lines.cap.visible = s === "sketch" && mode !== "walk";
+  }
+
+  /* ---------- image style: the 18 station images projected back onto the model ----------
+     Each station image was made from the sketch at a known pose and lens (62° vertical, 4:3), so it can be projected
+     from that same pose. A depth map per station keeps an image off surfaces hidden from that camera; every
+     surface blends the cameras that see it best (head-on, close, away from the frame edge). Surfaces no
+     station sees keep the model's plain colour. */
+  const PJ = { cols: 6, tw: 640, th: 480, dw: 512, dh: 384 };
+  let photoReady = false;
+  function preparePhoto() {
+    if (photoReady) return;
+    photoReady = true;
+    const st = H.PHOTOS, n = st.length, rows = Math.ceil(n / PJ.cols);
+    // projector cameras, exactly as the station views were captured
+    const cams = st.map((p) => {
+      const c = new THREE.PerspectiveCamera(62, 4 / 3, .05, 20);
+      c.position.set(p.x, p.h, p.y); c.quaternion.copy(quatFor(yawFromPlan(p.a), p.p * Math.PI / 180));
+      c.updateMatrixWorld(true); c.updateProjectionMatrix();
+      return c;
+    });
+    const vp = cams.map((c) => new THREE.Matrix4().multiplyMatrices(c.projectionMatrix, c.matrixWorldInverse));
+    // image atlas
+    const cv = document.createElement("canvas"); cv.width = PJ.cols * PJ.tw; cv.height = rows * PJ.th;
+    const g = cv.getContext("2d"); g.fillStyle = "#808080"; g.fillRect(0, 0, cv.width, cv.height);
+    const img = new THREE.CanvasTexture(cv); img.encoding = THREE.sRGBEncoding; img.generateMipmaps = false; img.minFilter = THREE.LinearFilter;
+    st.forEach((p, i) => {
+      const im = new Image();
+      im.onload = () => { g.drawImage(im, (i % PJ.cols) * PJ.tw, Math.floor(i / PJ.cols) * PJ.th, PJ.tw, PJ.th); img.needsUpdate = true; };
+      im.src = H.renderSrc(p.n);
+    });
+    // depth atlas, rendered once
+    const rt = new THREE.WebGLRenderTarget(PJ.cols * PJ.dw, rows * PJ.dh);
+    const depthMat = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, side: THREE.DoubleSide });
+    const hidden = [];
+    scene.traverse((o) => { if ((o.isLine || o.isLineSegments || o.isSprite || o.isPoints || o.userData.keep || o.userData.glass || o.userData.ground || o.type === "LineSegments2") && o.visible) { hidden.push(o); o.visible = false; } });
+    const clip0 = clipPlane.constant, cc = renderer.getClearColor(new THREE.Color()), ca = renderer.getClearAlpha(), bg = scene.background;
+    clipPlane.constant = 1000; scene.background = null; scene.overrideMaterial = depthMat;
+    renderer.setClearColor(0xffffff, 1); renderer.setRenderTarget(rt); renderer.clear();
+    rt.scissorTest = true;
+    cams.forEach((c, i) => {
+      const x = (i % PJ.cols) * PJ.dw, y = Math.floor(i / PJ.cols) * PJ.dh;
+      rt.viewport.set(x, y, PJ.dw, PJ.dh); rt.scissor.set(x, y, PJ.dw, PJ.dh);
+      renderer.setRenderTarget(rt); renderer.render(scene, c);
+    });
+    rt.scissorTest = false; renderer.setRenderTarget(null);
+    scene.overrideMaterial = null; scene.background = bg; clipPlane.constant = clip0; renderer.setClearColor(cc, ca);
+    hidden.forEach((o) => (o.visible = true));
+
+    const uniforms = {
+      pjImg: { value: img }, pjDep: { value: rt.texture },
+      pjVP: { value: vp }, pjPos: { value: cams.map((c) => c.position.clone()) },
+      pjGrid: { value: new THREE.Vector2(PJ.cols, rows) },
+    };
+    const cache = {};
+    const photoMat = (base) => {
+      // unseen surfaces: the model's own colour; textured white surfaces (walls, ceiling) get the walls' warm cream
+      let col = base && base.color ? base.color.getHexString() : "e9e1d3";
+      if (base && base.map && col === "ffffff") col = "e9e1d3";
+      if (cache[col]) return cache[col];
+      const m = new THREE.MeshBasicMaterial({ color: "#" + col, side: THREE.DoubleSide, toneMapped: false });
+      m.onBeforeCompile = (sh) => {
+        Object.assign(sh.uniforms, uniforms);
+        sh.vertexShader = sh.vertexShader
+          .replace("#include <common>", "#include <common>\nvarying vec3 vPW; varying vec3 vPN;")
+          .replace("#include <project_vertex>", "#include <project_vertex>\nvPW = (modelMatrix * vec4(transformed, 1.0)).xyz; vPN = normalize(mat3(modelMatrix) * normal);");
+        sh.fragmentShader = sh.fragmentShader
+          .replace("#include <common>", `#include <common>
+#include <packing>
+#define PN ${n}
+uniform sampler2D pjImg; uniform sampler2D pjDep; uniform mat4 pjVP[PN]; uniform vec3 pjPos[PN]; uniform vec2 pjGrid;
+varying vec3 vPW; varying vec3 vPN;
+vec3 pjColor(vec3 base) {
+  vec3 acc = vec3(0.0); float ws = 0.0, cover = 0.0;
+  for (int i = 0; i < PN; i++) {
+    vec4 c = pjVP[i] * vec4(vPW, 1.0);
+    if (c.w <= 0.0) continue;
+    vec3 nd = c.xyz / c.w;
+    float e = max(abs(nd.x), abs(nd.y));
+    if (e >= 1.0) continue;
+    vec3 tc = pjPos[i] - vPW; float d = length(tc);
+    float facing = abs(dot(normalize(vPN), tc / d));
+    if (facing < 0.08) continue;
+    vec2 uv = nd.xy * 0.5 + 0.5;
+    float col = mod(float(i), pjGrid.x), row = floor(float(i) / pjGrid.x);
+    float stored = unpackRGBAToDepth(texture2D(pjDep, (vec2(col, row) + uv) / pjGrid));
+    float zMap = -perspectiveDepthToViewZ(stored, 0.05, 20.0);
+    float zHere = -perspectiveDepthToViewZ(nd.z * 0.5 + 0.5, 0.05, 20.0);
+    if (zHere > zMap + 0.04 + 0.012 * d) continue;           // something nearer hides this point from camera i
+    float edge = smoothstep(1.0, 0.8, e);
+    cover = max(cover, edge * smoothstep(0.08, 0.25, facing));
+    float w = facing * facing * edge / (d * d + 0.25);
+    w = w * w * w;                                          // the best view dominates, seams stay soft
+    vec4 px = texture2D(pjImg, vec2((col + uv.x) / pjGrid.x, 1.0 - (row + 1.0 - uv.y) / pjGrid.y));
+    acc += px.rgb * w; ws += w;                              // sRGB texture: the GPU decodes to linear on sampling
+  }
+  return ws > 1e-9 ? mix(base, acc / ws, cover) : base;   // fade to the plain colour at the edge of what was seen
+}`)
+          .replace("vec4 diffuseColor = vec4( diffuse, opacity );", "vec4 diffuseColor = vec4( pjColor(diffuse), opacity );");
+      };
+      cache[col] = m;
+      return m;
+    };
+    meshes.forEach((m) => {
+      const r = m.userData.real;
+      m.userData.photo = Array.isArray(r) ? r.map(photoMat) : photoMat(r);
+    });
   }
 
   /* ---------- hotspots ---------- */
@@ -1248,7 +1358,7 @@ window.HOME = (function () {
     mode = m;
     Object.entries(btnMode).forEach(([k, b]) => b.setAttribute("aria-pressed", String(k === m)));
     sprites.forEach((s) => s.scale.setScalar(m === "walk" ? .2 : m === "plan" ? .36 : .42));
-    hint.textContent = HINTS[m];
+    hint.textContent = style === "photo" && m === "walk" ? "روی زمین بزنید تا به نزدیک‌ترین نما بپرید · برای نگاه کردن بکشید · قدم زدن آزاد با کلیدهای جهت" : HINTS[m];
     if (lines.cap) lines.cap.visible = style === "sketch" && m !== "walk";
     controls.enabled = false;
     if (m === "walk") return;
@@ -1366,7 +1476,22 @@ window.HOME = (function () {
     if (s) return { stop: s.object.userData.stop };
     const f = raycaster.intersectObjects(meshes, false).find((h) => h.object.visible && !h.object.userData.ground && h.point.y <= clipPlane.constant + .01);
     if (f && f.object.userData.floor) return { floor: f.point };
+    if (f && style === "photo") return { floor: f.point, any: true };   // image style: any surface is a place to jump toward
     return null;
+  }
+  // image style moves station to station: at rest the view is the exact station image, the projected
+  // model only fills the motion in between. Pick the station nearest the click that faces roughly our way.
+  function teleportTarget(x, z) {
+    const d = camera.getWorldDirection(new THREE.Vector3());
+    let best = null, bs = Infinity;
+    H.PHOTOS.forEach((q) => {
+      if (q.n === curStop || Math.hypot(q.x - camera.position.x, q.y - camera.position.z) < .35) return;
+      const dist = Math.hypot(q.x - x, q.y - z), a = q.a * Math.PI / 180;
+      const turn = 1 - (Math.cos(a) * d.x + Math.sin(a) * d.z) / Math.max(1e-6, Math.hypot(d.x, d.z));
+      const sc = dist + 0.7 * turn;
+      if (sc < bs) { bs = sc; best = q.n; }
+    });
+    return best;
   }
   function userActed() { stopAuto(); if (curStop && mode === "walk") { hidePhoto(); setCurrent(null); } }
   function overDirYaw() { const d = camera.getWorldDirection(new THREE.Vector3()); return Math.abs(d.x) + Math.abs(d.z) < .05 ? 0 : Math.atan2(-d.x, -d.z); }
@@ -1402,6 +1527,7 @@ window.HOME = (function () {
       const p = pick(e);
       if (!p) return;
       if (p.stop) { goStop(p.stop); return; }
+      if (style === "photo") { const t = teleportTarget(p.floor.x, p.floor.z); stopAuto(); if (t) goStop(t); return; }   // jump between exact views
       if (hits(p.floor.x, p.floor.z, RADIUS * .6).length) return;
       userActed();
       if (mode !== "walk") enterWalk(p.floor.x, p.floor.z, overDirYaw(), -0.08, EYE);
@@ -1424,6 +1550,7 @@ window.HOME = (function () {
     btnMode.plan.addEventListener("click", () => { stopAuto(); if (mode !== "plan") setMode("plan"); });
     btnStyle.sketch.addEventListener("click", () => setStyle("sketch"));
     btnStyle.real.addEventListener("click", () => setStyle("real"));
+    btnStyle.photo.addEventListener("click", () => setStyle("photo"));
     if (viewer.requestFullscreen) {
       btnFull.addEventListener("click", () => {
         if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
@@ -1529,6 +1656,7 @@ window.HOME = (function () {
     hide() { running = false; stopAuto(); },
     markers(v) { markersOn = v; rings.forEach((r) => (r.visible = v)); },
     go(n) { goStop(n); },
+    walkTo(x, y, a, h = EYE, p = -5) { hidePhoto(true); setCurrent(null); enterWalk(x, y, yawFromPlan(a), p * Math.PI / 180, h, 600); },
   };
 })();
 </script>
