@@ -1,4 +1,7 @@
-"""Which wall faces of the sketch model do the 12 listing photos see, and which extra camera poses fill the gaps."""
+"""Wall coverage of the listing photos on the plan, and extra camera poses (open framing only) that fill the gaps.
+
+  python tools/wall_coverage.py tour.html plan.json
+"""
 import json, math, re, sys
 import numpy as np
 
@@ -64,13 +67,16 @@ def visible(cx, cy, a_deg):
 seen = np.zeros(len(S), bool)
 for p in PHOTOS:
     seen |= visible(p["x"], p["y"], p["a"])
+KEEP = []   # stations already accepted, as (x, y, a)
+for x, y, a in KEEP:
+    seen |= visible(x, y, a)
 def report(tag):
     out = {}
     for r in ROOMS:
         m = np.array([x == r["id"] for x in SR])
         out[r["id"]] = round(float(seen[m].mean()), 2)
     print(tag, "coverage", round(float(seen.mean()), 3), out)
-report("12 photos:")
+report("12 photos + 4 kept:")
 before = seen.copy()
 
 # candidate poses
@@ -95,21 +101,20 @@ def ray_depth(cx, cy, a_deg):
 rd = {r["id"]: math.hypot(r["w"], r["h"]) for r in ROOMS}
 def framed(c):
     # look across the room, not at a wall a metre away: the centre ray and both frame edges need depth
-    need = min(2.0, .75 * rd[c[0]])
-    return (ray_depth(c[1], c[2], c[3]) >= need and ray_depth(c[1], c[2], c[3] - 25) >= .6 * need
-            and ray_depth(c[1], c[2], c[3] + 25) >= .6 * need)
+    need = min(2.8, .8 * rd[c[0]])
+    return all(ray_depth(c[1], c[2], c[3] + o) >= need * k for o, k in ((0, 1), (-20, .8), (20, .8), (-35, .5), (35, .5)))
 cands = [c for c in cands if framed(c)]
 print("candidates", len(cands))
 vis = {}
 new = []
 target = .95
-while seen.mean() < target and len(new) < 14:
+while seen.mean() < target and len(new) < 8:
     best, bg = None, 0
     for c in cands:
         if c not in vis: vis[c] = visible(c[1], c[2], c[3])
         g = int((vis[c] & ~seen).sum())
         if g > bg: best, bg = c, g
-    if not best or bg < 6: break       # less than 60 cm of new wall
+    if not best or bg < 8: break       # less than 80 cm of new wall
     seen |= vis[best]; new.append(dict(room=best[0], x=best[1], y=best[2], a=best[3], gain_m=round(bg * .1, 1)))
     print("add", new[-1], "->", round(float(seen.mean()), 3))
 report("with new:")
