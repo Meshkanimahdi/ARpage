@@ -7,7 +7,8 @@ only after a full render (≈ 25 min) and new images. This step judges those thr
 
   node news-reel/reel_render.mjs --dir=work/story --page=<engine> --mode=stills --t=0,0.5,1,1.9
   python3 news-reel/preflight.py --dir work/story sheet      # → work/story/preflight.jpg for the critic
-  (independent critic writes work/story/critic_preflight.json {"scores":{cover_stop_power, headline_clarity, hook}, "notes":{…}})
+  (also --mode=check for out/sheet*.jpg; the independent critic writes work/story/critic_preflight.json
+   {"scores":{cover_stop_power, headline_clarity, hook, motion_richness}, "notes":{…}})
   python3 news-reel/preflight.py --dir work/story check      # exit 0 = pass (every score ≥ 8), 3 = fix and repeat
 
 The bar is 8, one above the final gate's 7, so the full render does not fail on these three scores later.
@@ -15,7 +16,7 @@ The bar is 8, one above the final gate's 7, so the full render does not fail on 
 import argparse, json, subprocess, sys
 from pathlib import Path
 
-NEED = ('cover_stop_power', 'headline_clarity', 'hook')
+NEED = ('cover_stop_power', 'headline_clarity', 'hook', 'motion_richness')  # richness: RUNBOOK §4.0 rule 2b, judged on out/sheet*.jpg
 BAR = 8
 TS = ('0.00', '0.50', '1.00', '1.90')
 
