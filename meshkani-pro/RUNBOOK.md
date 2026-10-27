@@ -654,6 +654,22 @@ narrator talks, nothing attractive in the picture").
    typography, real UI, framed photos on a designed ground, split screens, editorial layouts, 3D. Do not make
    every reel a full-screen photo slideshow. Nothing is cut by the frame edge unless it is a full-bleed
    background, and no text is truncated.
+2b. **Professional motion graphics, never a photo slideshow (user rule 2026-10-27, blocking).** Mahdi, watching
+   REEL-014 being built: «داره خیلی مسخره اینکارو میکنه، فقط بازی با تصویر و اسلاید کردنشون داره میشه مثل ریلز
+   جزیره، من میخوام یه موشن گرافی حرفه ای داشته باشیم با کلی المان و عدد و رقم و نمودار و درخشش و… گفتم نمونه
+   والمارت بهترین بوده». The Walmart reel (089) is the **quality bar**, not a template to copy. Every scene is a built
+   motion-graphics composition, drawn in code, with at least 4 animated layers from this list:
+   - numbers that count up (money, %, users, dates) and stat cards;
+   - charts that draw on (bar, line, area, donut, progress ring) with axis labels and a highlighted point;
+   - real UI rebuilt as vectors (cards, chat bubbles, dashboards, app screens) with a cursor or taps;
+   - light and depth: glow, light sweeps over glass cards, soft shadows, parallax layers, a camera move in
+     depth;
+   - real logos on chips, icons, kinetic type, arrows, connectors and highlights;
+   - particles or shapes only where the chosen prompt allows them.
+   Photos are one layer inside a designed frame (a card, a mask, a device), never a whole scene that just pans,
+   zooms or slides; at most 2 such photo-led shots per reel. A reel built from generated plates with Ken Burns
+   moves (REEL-007R/«جزیره» look) is a failure. The critic scores this as `motion_richness` (preflight ≥ 8 on the
+   scene stills, final ≥ 7).
 3. **Rhythm and sync.** (User rule 2026-10-27, after REEL-014 failed visual_match on late numbers:) every number, name or
    result appears on screen within 0.3 s of the word that says it (time it from the voice word timings, never by scene
    order), and no frame between shots is empty or near-empty. A new shot or a clear camera change every 1.5–3 s; no still picture longer than 1.5 s,
@@ -702,19 +718,20 @@ narrator talks, nothing attractive in the picture").
    or whose look does not fit the story. Each one gets its own engine built from its own prompt text:
    | # | prompt | category | why it is dynamic / when to use it |
    |---|---|---|---|
-   | 1 | `032-chaotic-claude-pov-video` | EDIT | 140 BPM, fast cuts, stacked captions, zooms and hits on the beat, one running joke; native 1080x1920. Viral/funny news |
-   | 2 | `095-gravitydex-anime-hype-edit` | ANIME/UI | 15 s hype edit on the beat, real UI and brand. Product launches |
-   | 3 | `074-engraving-style-claude-ad` | EDIT | fast ad, bold light mode, elements painted over real photos. Brand or company news |
-   | 4 | `191-speech-built-as-architecture` | TYPE | every spoken line rebuilds the frame's architecture; made for a voiced script. Opinion/insight news |
-   | 5 | `219-uk-dubstep-track-with-ascii-visuals` | MUSIC | bold two-colour geometry hit by the bass; drive the hits from the voice beats. Tech/AI breakthroughs |
-   | 6 | `155-photo-print-app-launch-film` | UI | one continuous take, a black shape floods the frame into the next scene, springs, bars. Apps and consumer products |
-   | 7 | `020-beat-synced-bouncing-3d-ball` | 3D | three.js, Blender quality, beat-synced fall through scenes, humour. A journey/"from A to B" story |
-   | 8 | `079-fiery-samurai-kata` | ANIME | one figure, a strike per bar, weight and follow-through, fiery display. A person/founder/hero story |
-   | 9 | `160-pixel-art-llm-history` | PIXEL | strict-grid pixel art, escalating gag. History/"how we got here" news |
-   | 10 | `086-food-craving-launch-film` | UI | one continuous take, photo result cards. Food, beauty, lifestyle, women's topics |
-   | 11 | `225-what-happens-in-one-second` | TOPIC | everything that happens in one second, shapes/type morph into each other. Big numbers/scale news |
-   | 12 | `120-morphing-ui-states-loop` | UI | one shape never cut, morphing through states. A product with several features |
-   | reserve | `112-lightspark-social-promo-video`, `163-porco-rosso-sunset-dogfight` (3D cinematic), `050-collision-driven-music-machine`, the `001` showreel family | | when the 12 above are blocked |
+   | 1 | `181-sahi-trading-terminal-reveal` | MUSIC/UI | data-rich: real-looking charts, windows, zooms across scales. Money, markets, company numbers |
+   | 2 | `155-photo-print-app-launch-film` | UI | Apple-keynote continuous take: springs, bars drawing, black shape floods into the next scene |
+   | 3 | `207-taxtello-bookkeeping-app-film` | UI | premium Apple-level product film with dashboards and numbers. Business/finance tools |
+   | 4 | `112-lightspark-social-promo-video` | UI | punchy social promo of real capabilities with UI and stats |
+   | 5 | `117-matra-caption-app-promo` | UI | white space, one idea per shot, the device as the hero; glass cards and glow |
+   | 6 | `120-morphing-ui-states-loop` | UI | one shape morphing through UI states with a blur; feature lists |
+   | 7 | `225-what-happens-in-one-second` | TOPIC | scale and big numbers, type and shapes morphing |
+   | 8 | `095-gravitydex-anime-hype-edit` | UI/ANIME | fast cuts on the beat, impact frames, big type, real UI |
+   | 9 | `219-uk-dubstep-track-with-ascii-visuals` | MUSIC | bold two-colour geometry and numbers hit on the beat |
+   | 10 | `228-white-ball-ui-motion-loop` | TOPIC/UI | UI motion on a near-black dot grid: slider, notifications, typing |
+   | 11 | `032-chaotic-claude-pov-video` | EDIT | 140 BPM chaotic POV with stacked captions; only for funny/viral stories, still with UI and numbers |
+   | 12 | `089-frame-by-frame-launch-video` (Walmart) | UI | the quality bar; allowed again once 10 other reels have run, never copied into another prompt's engine |
+   Story/character prompts (074, 191, 020, 079, 160, 086, 184, 211…) are used only when the story itself is a
+   character story, and they must still meet rule 2b.
    Already used (blocked until 10 other reels): 089, 168, 211 (019), 001 (105), 149, 178, 074 (REEL-014).
    The 40–55 s, hook, storyboard and gate rules above stay; a 15–30 s prompt is stretched by
    giving each voiced beat its own section in that prompt's look, not by repeating sections.
@@ -829,7 +846,8 @@ narrator talks, nothing attractive in the picture").
      `node news-reel/reel_render.mjs --dir=work/story --page=<engine> --mode=stills --t=0,0.5,1,1.9`, then
      `python3 news-reel/preflight.py --dir work/story sheet`. Give `preflight.jpg`, the headline and a 2-line
      summary to the independent critic (same rules as step 5, fresh subagent) and ask only for
-     `cover_stop_power`, `headline_clarity` and `hook` (1–10, one-line reasons) → `work/story/critic_preflight.json`.
+     `cover_stop_power`, `headline_clarity`, `hook` and, on `out/sheet*.jpg` from `--mode=check` (stills of every
+     scene), `motion_richness` (rule 2b) (1–10, one-line reasons) → `work/story/critic_preflight.json`.
      `python3 news-reel/preflight.py --dir work/story check`: every score must be **≥ 8** (one above the gate),
      else fix and repeat, at most 3 rounds.
    - **Cost rule:** fixes in preflight and after it are made in code, typography, headline and crop. Never call the
@@ -907,7 +925,8 @@ narrator talks, nothing attractive in the picture").
    `cover_stop_power` (would a Persian scroller stop for this thumbnail in Explore?), `headline_clarity`
    (understood at once by someone who has not seen the news; big and readable at thumbnail size; **≤ 4 when such a person cannot say in one plain sentence what it means**, e.g. metaphors like «دستور آرایشگاه» or «اردک‌ها» for robots, user rule 2026-10-26),
    `hook` (first 2 s), `visual_match` (each second shows what is said), `style_distinct` (clearly a different
-   look from the previous 3 reels). Save it as `work/story/critic.json` `{"scores":{…},"notes":{…}}`.
+   look from the previous 3 reels), `motion_richness` (professional motion graphics with numbers, charts, UI, glow
+   and layered elements, not photos sliding or zooming; rule 2b). Save it as `work/story/critic.json` `{"scores":{…},"notes":{…}}`.
 6. **Gate (user rule 2026-10-25, blocking):** `story.json` must carry `content_id`, `motion_prompt`
    (catalog id), `engine` (the page you rendered with), `motion_category` and `layout`. Download
    `_automation/motion_history.json` (`config.json → google.motion_history_id`) and run
