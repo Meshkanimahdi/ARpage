@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+# run outputs and datasets stay local
+runs/
+data/
+viewer/data

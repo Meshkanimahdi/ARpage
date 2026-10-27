@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>بازسازی واقعی ملک</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f2ee;--ink:#1d1d1b;--mute:#6b6862;--card:rgba(255,255,255,.92);--line:#dedad2;--acc:#b5532e;--ok:#2f7d4f;--warn:#a06a00}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171716;--ink:#ecebe7;--mute:#a19e97;--card:rgba(30,30,28,.92);--line:#3a3935;--acc:#e07a4f;--ok:#5cbf83;--warn:#e0a83a}}
+:root[data-theme="dark"]{--bg:#171716;--ink:#ecebe7;--mute:#a19e97;--card:rgba(30,30,28,.92);--line:#3a3935;--acc:#e07a4f;--ok:#5cbf83;--warn:#e0a83a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:Vazirmatn,system-ui,sans-serif;overflow:hidden}
+#stage{position:fixed;inset:0}
+#stage canvas{position:absolute;display:block}
+#photo{position:absolute;pointer-events:none;object-fit:fill;opacity:0;transition:opacity .15s}
+.bar{position:fixed;top:12px;right:12px;left:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;z-index:5;pointer-events:none}
+.bar>*{pointer-events:auto}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;backdrop-filter:blur(8px)}
+.seg button,.chip{font:inherit;font-size:13px;border:0;background:none;color:var(--ink);padding:7px 12px;border-radius:9px;cursor:pointer;white-space:nowrap}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.chip{background:var(--card);border:1px solid var(--line);backdrop-filter:blur(8px)}
+.chip.on{border-color:var(--acc);color:var(--acc)}
+.title{font-weight:800;font-size:15px;margin-left:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.title small{display:block;font-weight:400;color:var(--mute);font-size:11px}
+#panel{position:fixed;bottom:12px;right:12px;width:min(340px,calc(100vw - 24px));background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:12.5px;z-index:5;backdrop-filter:blur(8px);max-height:48vh;overflow:auto}
+#panel h3{margin:0 0 6px;font-size:13px}
+#panel table{width:100%;border-collapse:collapse}
+#panel td{padding:3px 0;border-bottom:1px dashed var(--line)}
+#panel td:last-child{text-align:left;font-variant-numeric:tabular-nums;direction:ltr}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;border:1px solid currentColor}
+.ok{color:var(--ok)}.warn{color:var(--warn)}
+#panel .x{float:left;cursor:pointer;color:var(--mute)}
+#stbar{position:fixed;bottom:12px;left:12px;display:none;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 12px;z-index:6;font-size:12.5px;backdrop-filter:blur(8px);max-width:calc(100vw - 24px);flex-wrap:wrap}
+#stbar input{width:140px;accent-color:var(--acc)}
+#labels{position:fixed;inset:0;pointer-events:none;z-index:4}
+.lab{position:absolute;transform:translate(50%,-50%);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:2px 8px;font-size:12px;white-space:nowrap}
+.lab small{color:var(--mute)}
+#hint{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:12px;color:var(--mute);z-index:5;display:none}
+#walkpad{position:fixed;left:16px;bottom:80px;display:none;grid-template-columns:repeat(3,44px);gap:6px;z-index:6}
+#walkpad button{height:44px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:18px}
+#err{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:24px;text-align:center;line-height:2}
+@media (max-width:640px){.title{display:none}#panel{max-height:34vh}}
+</style>
+</head>
+<body>
+<div id="stage"><img id="photo" alt=""></div>
+<div id="labels"></div>
+<div class="bar">
+  <div class="seg" id="modes">
+    <button data-m="orbit" class="on">نمای کلی</button>
+    <button data-m="plan">پلان</button>
+    <button data-m="walk">قدم زدن</button>
+  </div>
+  <button class="chip" id="tPts">ابر نقاط</button>
+  <button class="chip on" id="tLab">نام اتاق‌ها</button>
+  <button class="chip on" id="tSt">ایستگاه‌ها</button>
+  <button class="chip" id="tGap">نشان‌دادن نادیده‌ها</button>
+  <div class="title">بازسازی از تصاویر واقعی<small id="sub">—</small></div>
+</div>
+<div id="panel"></div>
+<div id="stbar">
+  <b id="stname">ایستگاه</b>
+  <span>سه‌بعدی</span><input id="mix" type="range" min="0" max="100" value="100"><span>عکس واقعی</span>
+  <button class="chip" id="stPrev">قبلی</button><button class="chip" id="stNext">بعدی</button>
+  <button class="chip" id="stExit">خروج</button>
+</div>
+<div id="hint"></div>
+<div id="walkpad"><span></span><button data-k="f">▲</button><span></span><button data-k="l">◀</button><button data-k="b">▼</button><button data-k="r">▶</button></div>
+<div id="err"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(async function () {
+const DATA = (new URLSearchParams(location.search).get('data') || 'data/').replace(/\/?$/, '/');
+const $ = id => document.getElementById(id);
+const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+
+let scene;
+try {
+  scene = await (await fetch(DATA + 'scene.json')).json();
+} catch (e) {
+  $('err').style.display = 'flex';
+  $('err').innerHTML = 'داده پیدا نشد: <code dir="ltr">' + DATA + 'scene.json</code><br>' +
+    (location.protocol === 'file:' ? 'این صفحه را با یک سرور محلی باز کنید (مثلاً <code dir="ltr">python -m http.server</code>).' : 'مسیر داده را با <code dir="ltr">?data=</code> بدهید.');
+  return;
+}
+
+// plan (x, y, z-up) -> three (x, z, -y)
+const P = (x, y, z = 0) => new THREE.Vector3(x, z, -y);
+const H = scene.ceiling.height;
+const mn = scene.bounds.min, mx = scene.bounds.max;
+const ctr = P((mn[0] + mx[0]) / 2, (mn[1] + mx[1]) / 2);
+const span = Math.hypot(mx[0] - mn[0], mx[1] - mn[1]);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+$('stage').prepend(renderer.domElement);
+const world = new THREE.Scene();
+const cam = new THREE.PerspectiveCamera(50, 1, 0.05, 200);
+const orbit = new THREE.OrbitControls(cam, renderer.domElement);
+orbit.target.copy(ctr); orbit.enableDamping = true;
+
+// Real pixels only. Texels no frame saw were baked as neutral grey (154); "show gaps" stripes them.
+const gapU = { value: 0 };
+const loader = new THREE.TextureLoader();
+function surfMat(url, cut, isFloor) {
+  const t = loader.load(DATA + url);
+  t.anisotropy = 4;
+  return new THREE.ShaderMaterial({
+    uniforms: { map: { value: t }, gaps: gapU, cut: { value: cut || 0 }, cutH: { value: 99 }, floor: { value: isFloor ? 1 : 0 } },
+    side: THREE.DoubleSide,
+    vertexShader: 'varying vec2 vUv; varying vec3 vW; void main(){ vUv=uv; vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w; }',
+    fragmentShader: `uniform sampler2D map; uniform float gaps; uniform float cut; uniform float cutH; uniform float floor; varying vec2 vUv; varying vec3 vW;
+      void main(){
+        if (cut > .5 && vW.y > cutH) discard;
+        vec4 c = texture2D(map, vUv);
+        if (floor > .5 && min(c.r, min(c.g, c.b)) > .96) discard;   // outside the reconstructed rooms
+        bool grey = abs(c.r-.604)<.03 && abs(c.g-.604)<.03 && abs(c.b-.604)<.03;
+        if (gaps > .5 && grey) { float s = step(.5, fract((gl_FragCoord.x+gl_FragCoord.y)/14.)); c.rgb = mix(vec3(.93,.45,.3), vec3(1.), s*.6); }
+        gl_FragColor = vec4(c.rgb, 1.);
+      }`
+  });
+}
+
+// floor: one mosaic over the plan bounds (saved with the top row = max y)
+const floorImg = await new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = DATA + scene.appearance.floor_texture; });
+const fw = floorImg.width * scene.appearance.floor_res, fh = floorImg.height * scene.appearance.floor_res;
+{
+  const g = new THREE.BufferGeometry();
+  const a = P(mn[0], mn[1]), b = P(mn[0] + fw, mn[1]), c = P(mn[0] + fw, mn[1] + fh), d = P(mn[0], mn[1] + fh);
+  g.setAttribute('position', new THREE.Float32BufferAttribute([...a.toArray(), ...b.toArray(), ...c.toArray(), ...d.toArray()], 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, 1, 0, 1], 2));
+  g.setIndex([0, 1, 2, 0, 2, 3]);
+  world.add(new THREE.Mesh(g, surfMat(scene.appearance.floor_texture, 0, true)));
+}
+
+// walls: one textured quad per segment (image row 0 = top, column 0 = end a)
+const wallMats = [];
+for (const w of scene.walls) {
+  const g = new THREE.BufferGeometry();
+  const a0 = P(w.a[0], w.a[1], 0), b0 = P(w.b[0], w.b[1], 0), b1 = P(w.b[0], w.b[1], w.height), a1 = P(w.a[0], w.a[1], w.height);
+  g.setAttribute('position', new THREE.Float32BufferAttribute([...a0.toArray(), ...b0.toArray(), ...b1.toArray(), ...a1.toArray()], 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, 1, 0, 1], 2));
+  g.setIndex([0, 1, 2, 0, 2, 3]);
+  const m = surfMat(w.texture, 1);
+  wallMats.push(m);
+  world.add(new THREE.Mesh(g, m));
+}
+
+// point cloud (x, y, z, r, g, b as float32)
+const raw = new Float32Array(await (await fetch(DATA + 'points.f32')).arrayBuffer());
+const n = raw.length / 6, pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
+for (let i = 0; i < n; i++) {
+  pos[i * 3] = raw[i * 6]; pos[i * 3 + 1] = raw[i * 6 + 2]; pos[i * 3 + 2] = -raw[i * 6 + 1];
+  col[i * 3] = raw[i * 6 + 3]; col[i * 3 + 1] = raw[i * 6 + 4]; col[i * 3 + 2] = raw[i * 6 + 5];
+}
+const pg = new THREE.BufferGeometry();
+pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+pg.setAttribute('color', new THREE.BufferAttribute(col, 3));
+const cloud = new THREE.Points(pg, new THREE.PointsMaterial({ size: 0.025, vertexColors: true }));
+cloud.visible = false; world.add(cloud);
+
+// stations: cameras whose original photo ships with the viewer
+const stations = scene.cameras.filter(c => c.station);
+const stGroup = new THREE.Group(); world.add(stGroup);
+const stGeo = new THREE.SphereGeometry(0.09, 16, 12);
+const stMat = new THREE.MeshBasicMaterial({ color: 0xb5532e });
+stations.forEach((c, i) => {
+  const m = new THREE.Mesh(stGeo, stMat); m.position.copy(P(c.pos[0], c.pos[1], c.height)); m.userData.i = i; stGroup.add(m);
+  const dir = camDir(c), tip = m.position.clone().addScaledVector(dir, 0.35);
+  stGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([m.position, tip]), new THREE.LineBasicMaterial({ color: 0xb5532e })));
+});
+function camDir(c) {
+  const y = c.yaw * Math.PI / 180, p = c.pitch * Math.PI / 180;
+  return new THREE.Vector3(Math.cos(y) * Math.cos(p), Math.sin(p), -Math.sin(y) * Math.cos(p));
+}
+
+// room labels at polygon centroids
+const roomName = { 'living room': 'نشیمن', bedroom: 'خواب', kitchen: 'آشپزخانه', dining: 'ناهارخوری', bathroom: 'حمام', hallway: 'راهرو', office: 'دفتر کار', storage: 'انباری', other: 'سایر' };
+const labs = scene.rooms.map(r => {
+  const p = r.polygon; let cx = 0, cy = 0; p.forEach(q => { cx += q[0]; cy += q[1]; });
+  const el = document.createElement('div'); el.className = 'lab';
+  const s = r.semantic && r.semantic.label;
+  el.innerHTML = (s ? roomName[s] || s : 'فضای ' + fa(r.id.slice(1))) + ' <small>' + fa(r.area_m2.toFixed(1)) + ' م²' + (s ? ' · اطمینان ' + fa(Math.round(r.semantic.confidence * 100)) + '٪' : '') + '</small>';
+  $('labels').appendChild(el);
+  return { el, v: P(cx / p.length, cy / p.length, 1.2) };
+});
+
+// wall segments for walk collision
+const segs = scene.walls.map(w => [w.a, w.b]);
+function blocked(x, y, r = 0.22) {
+  for (const [a, b] of segs) {
+    const dx = b[0] - a[0], dy = b[1] - a[1], L = dx * dx + dy * dy;
+    const t = Math.max(0, Math.min(1, ((x - a[0]) * dx + (y - a[1]) * dy) / L));
+    if (Math.hypot(x - a[0] - t * dx, y - a[1] - t * dy) < r) return true;
+  }
+  return false;
+}
+
+// ---------- modes ----------
+let mode = 'orbit', walk = { x: 0, y: 0, yaw: 0, pitch: 0 }, stIdx = -1;
+const keys = {};
+function setMode(m) {
+  mode = m; stIdx = -1;
+  document.querySelectorAll('#modes button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+  $('stbar').style.display = 'none'; $('photo').style.opacity = 0; $('panel').style.visibility = ''; $('walkpad').style.display = m === 'walk' ? 'grid' : 'none';
+  orbit.enabled = m !== 'walk';
+  stGroup.visible = m !== 'walk' && $('tSt').classList.contains('on');
+  wallMats.forEach(w => w.uniforms.cutH.value = m === 'walk' ? 99 : (m === 'plan' ? 0.9 : H * 0.62));
+  cam.fov = 50;
+  if (m === 'orbit') { cam.position.copy(ctr).add(new THREE.Vector3(span * .45, span * .55, span * .45)); orbit.target.copy(ctr); }
+  if (m === 'plan') { cam.position.copy(ctr).add(new THREE.Vector3(0, span * 1.05, 0.001)); orbit.target.copy(ctr); }
+  if (m === 'walk') {
+    const c = stations[0] || scene.cameras[0];
+    walk = { x: c.pos[0], y: c.pos[1], yaw: c.yaw * Math.PI / 180, pitch: 0 };
+  }
+  hint(m === 'walk' ? 'کلیدهای جهت یا W/A/S/D برای حرکت، کشیدن برای چرخیدن · دیوارها مانع عبورند' : m === 'plan' ? 'نمای بالا · روی ایستگاه‌ها بزنید' : 'روی هر ایستگاه بزنید تا از همان زاویه با عکس واقعی مقایسه کنید');
+  layout();
+}
+function openStation(i) {
+  stIdx = (i + stations.length) % stations.length; mode = 'station';
+  const c = stations[stIdx];
+  orbit.enabled = false; stGroup.visible = false;
+  wallMats.forEach(w => w.uniforms.cutH.value = 99);
+  cam.position.copy(P(c.pos[0], c.pos[1], c.height));
+  cam.fov = c.fov_y; cam.lookAt(cam.position.clone().add(camDir(c)));
+  $('photo').src = DATA + 'photos/' + c.name;
+  $('stbar').style.display = 'flex'; $('walkpad').style.display = 'none'; $('panel').style.visibility = 'hidden';
+  $('stname').textContent = 'ایستگاه ' + fa(stIdx + 1) + ' از ' + fa(stations.length);
+  setMix(); hint('لغزنده را جابه‌جا کنید: هم‌خوانی مدل با عکس واقعی همین نقطه'); layout();
+}
+function setMix() { $('photo').style.opacity = mode === 'station' ? $('mix').value / 100 : 0; }
+
+function layout() {
+  const W = innerWidth, Hh = innerHeight;
+  let w = W, h = Hh, l = 0, t = 0;
+  if (mode === 'station') {   // match the captured frame's aspect so the photo overlays exactly
+    const a = stations[stIdx].aspect;
+    if (W / Hh > a) { w = Hh * a; l = (W - w) / 2; } else { h = W / a; t = (Hh - h) / 2; }
+  }
+  renderer.setSize(w, h);
+  for (const el of [renderer.domElement, $('photo')]) Object.assign(el.style, { left: l + 'px', top: t + 'px', width: w + 'px', height: h + 'px' });
+  cam.aspect = w / h; cam.updateProjectionMatrix();
+}
+addEventListener('resize', layout);
+function hint(s) { $('hint').textContent = s; $('hint').style.display = 'block'; clearTimeout(hint.t); hint.t = setTimeout(() => $('hint').style.display = 'none', 6000); }
+
+document.querySelectorAll('#modes button').forEach(b => b.onclick = () => setMode(b.dataset.m));
+const toggle = (id, f) => $(id).onclick = () => { const on = !$(id).classList.contains('on'); $(id).classList.toggle('on', on); f(on); };
+toggle('tPts', on => cloud.visible = on);
+toggle('tLab', on => $('labels').style.display = on ? '' : 'none');
+toggle('tSt', on => stGroup.visible = on);
+toggle('tGap', on => gapU.value = on ? 1 : 0);
+$('mix').oninput = setMix;
+$('stPrev').onclick = () => openStation(stIdx - 1);
+$('stNext').onclick = () => openStation(stIdx + 1);
+$('stExit').onclick = () => setMode('orbit');
+
+// picking stations
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let down = null;
+renderer.domElement.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY, walk.yaw, walk.pitch]; renderer.domElement.setPointerCapture(e.pointerId); });
+renderer.domElement.addEventListener('pointermove', e => {
+  if (!down || mode !== 'walk') return;
+  walk.yaw = down[2] + (e.clientX - down[0]) * 0.005;
+  walk.pitch = Math.max(-1.2, Math.min(1.2, down[3] + (e.clientY - down[1]) * 0.004));
+});
+renderer.domElement.addEventListener('pointerup', e => {
+  const moved = down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5; down = null;
+  if (moved || mode === 'walk' || mode === 'station' || !stGroup.visible) return;
+  const r = renderer.domElement.getBoundingClientRect();
+  ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ndc, cam);
+  const hit = ray.intersectObjects(stGroup.children.filter(o => o.isMesh))[0];
+  if (hit) openStation(hit.object.userData.i);
+});
+addEventListener('keydown', e => { keys[e.key.toLowerCase()] = 1; if (e.key === 'Escape' && mode === 'station') setMode('orbit'); });
+addEventListener('keyup', e => keys[e.key.toLowerCase()] = 0);
+document.querySelectorAll('#walkpad button').forEach(b => {
+  b.onpointerdown = () => keys['pad' + b.dataset.k] = 1;
+  b.onpointerup = b.onpointerleave = () => keys['pad' + b.dataset.k] = 0;
+});
+
+// ---------- panel ----------
+const ap = scene.appearance, M = scene.metrics || {};
+const pct = v => v == null ? '—' : fa(Math.round(v * 100)) + '٪';
+$('sub').textContent = fa(scene.rooms.length) + ' فضا · ' + fa(scene.stats.free_area_m2.toFixed(0)) + ' متر مربع کف دیده‌شده · ' + fa(scene.cameras.length) + ' دوربین';
+$('panel').innerHTML = `<span class="x" onclick="this.parentNode.style.display='none'">✕</span><h3>شناسنامه‌ی این بازسازی</h3><table>
+<tr><td>پیکسل ساخته‌شده با هوش مصنوعی</td><td><span class="tag ok">${fa(ap.generated_pixels)}</span></td></tr>
+<tr><td>پوشش کف از عکس واقعی</td><td>${pct(ap.floor_coverage)}</td></tr>
+<tr><td>پوشش دیوارها از عکس واقعی</td><td>${pct(ap.wall_coverage)}</td></tr>
+<tr><td>فریم‌های به‌کاررفته در بافت</td><td>${fa(ap.frames_used)} / ${fa(ap.frames_available)}</td></tr>
+${M.registration_rate != null ? `<tr><td>فریم‌های جای‌گرفته در مدل</td><td>${pct(M.registration_rate)}</td></tr>` : ''}
+${M.plan_iou != null ? `<tr><td>هم‌پوشانی پلان با مرجع (IoU)</td><td>${pct(M.plan_iou)}</td></tr>` : ''}
+${M.ate_median_m != null ? `<tr><td>خطای میانه‌ی جای دوربین</td><td>${fa((M.ate_median_m * 100).toFixed(1))} سانتی‌متر</td></tr>` : ''}
+<tr><td>مقیاس</td><td><span class="tag warn">${scene.scale.confidence === 'measured' ? 'اندازه‌گیری‌شده' : 'تخمینی'}</span></td></tr>
+<tr><td>ارتفاع سقف</td><td>${fa(H.toFixed(2))} متر</td></tr></table>
+<p style="color:var(--mute);margin:8px 0 0;line-height:1.8">رنگ هر نقطه‌ی کف و دیوار مستقیم از نزدیک‌ترین عکس واقعی برداشته شده. جاهایی که هیچ دوربینی ندیده خاکستری مانده‌اند و با «نشان‌دادن نادیده‌ها» راه‌راه می‌شوند. مقیاس از فرض ارتفاع ۱٫۵ متری دوربین آمده؛ برای عدد قطعی یک اندازه‌ی مرجع لازم است.</p>`;
+
+// ---------- loop ----------
+const clock = new THREE.Clock();
+function frame() {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  if (mode === 'walk') {
+    const f = (keys.w || keys.arrowup || keys.padf ? 1 : 0) - (keys.s || keys.arrowdown || keys.padb ? 1 : 0);
+    const s = (keys.d || keys.padr ? 1 : 0) - (keys.a || keys.padl ? 1 : 0);
+    const turn = (keys.arrowleft ? 1 : 0) - (keys.arrowright ? 1 : 0);
+    walk.yaw += turn * 1.6 * dt;
+    const v = 1.4 * dt, cy = Math.cos(walk.yaw), sy = Math.sin(walk.yaw);
+    const dx = (cy * f + sy * s) * v, dy = (sy * f - cy * s) * v;
+    if (!blocked(walk.x + dx, walk.y)) walk.x += dx;
+    if (!blocked(walk.x, walk.y + dy)) walk.y += dy;
+    cam.position.copy(P(walk.x, walk.y, 1.55));
+    cam.lookAt(cam.position.clone().add(new THREE.Vector3(Math.cos(walk.yaw) * Math.cos(walk.pitch), Math.sin(walk.pitch), -Math.sin(walk.yaw) * Math.cos(walk.pitch))));
+  } else if (mode !== 'station') orbit.update();
+  renderer.render(world, cam);
+  const W = renderer.domElement.clientWidth, Hh = renderer.domElement.clientHeight, show = mode === 'orbit' || mode === 'plan';
+  for (const l of labs) {
+    const p = l.v.clone().project(cam);
+    l.el.style.display = show && p.z < 1 ? '' : 'none';
+    l.el.style.right = (W - (p.x + 1) / 2 * W) + 'px'; l.el.style.top = ((1 - p.y) / 2 * Hh) + 'px';
+  }
+  requestAnimationFrame(frame);
+}
+window.viewer = { setMode, openStation, stations, scene };
+setMode('orbit');
+frame();
+})();
+</script>
+</body>
+</html>

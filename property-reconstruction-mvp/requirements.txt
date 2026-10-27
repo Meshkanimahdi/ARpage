@@ -1,0 +1,5 @@
+numpy>=2.0
+opencv-python-headless>=4.9
+pillow>=10
+pycolmap>=4.0
+# also needs the ffmpeg binary on PATH for video input
