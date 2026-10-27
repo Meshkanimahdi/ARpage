@@ -21,3 +21,16 @@ file `creative.request` which request you followed. Requests for past slots are 
   reused for the hook). No flat stickers / sunbursts / checkerboard shapes, no sprite-sheet collage.
 - **Voice: female**, warm and energetic (STORY_SPEC §5 table), v4 tags.
 - Everything else as usual: word-level sync, 60–90 s, reel + Story share at 09:00.
+
+## 2026-10-27 15:00 reel — AI sycophancy (Mahdi, relayed by the setup chat 2026-10-27 06:03)
+- Mahdi: «https://www.instagram.com/reel/DeXdCJ_KaRb/ واسه ریلز ساعت ۱۵ اینو پوشش بده» (asked 2026-10-26 ~12:25 for the
+  15:00 reel; missed because of worker restarts, so it applies to **2026-10-27 15:00**).
+- Topic: ChatGPT / AI chatbots over-validating and flattering users (sycophancy). The reference reel (@radin_trade,
+  «بیش از حد شما را تایید می‌کند», ~208k plays) split its comments: "it praised my impossible plan for two weeks" vs
+  "set it to strict / ask it to be harsh". That debate is the hook. Do not copy its footage or script.
+- Anchor on a real, sourced item in the last 7 days (30-day fallback): a study, news or a model/settings change about
+  sycophancy. Only allowed claims.
+- Hook in frame 0: a real ChatGPT screen / the real logo and name + a plain ≥ 120 px line, e.g.
+  «ChatGPT داره بهت دروغ می‌گه که خوشت بیاد؟» or a call-out «اگه با ChatGPT تصمیم کاری می‌گیری، اینو ببین».
+- Payoff: one copyable prompt that makes it critical (e.g. "be brutally honest, list 3 reasons this fails").
+- Motion prompt: next in the §4.0 rule 9 rotation (032 chaotic POV fits). All gates apply.
