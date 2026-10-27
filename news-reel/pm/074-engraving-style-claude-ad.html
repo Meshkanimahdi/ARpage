@@ -44,7 +44,7 @@ const IMG = n => U('raw/' + n + '.png');
 // a photo card: (x, y, w, h), k = entrance 0..1 (grows from 70 % with a clip reveal), z = zoom inside, o = origin
 function card(n, x, y, w, h, k, z = 1, o = '50% 50%', rot = 0) {
   h = Math.max(h, 1880 - y);
-  const e = ex(k), s = mix(.72, 1, e), clip = 100 - e * 100;
+  const e = ex(k), s = mix(.88, 1, e), clip = (1 - e) * 45;
   return `<div class="card" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${rot}deg) scale(${s.toFixed(3)});clip-path:inset(${(clip / 2).toFixed(1)}% 0 ${(clip / 2).toFixed(1)}% 0 round 28px)"><img src="${IMG(n)}" style="transform:scale(${z.toFixed(3)});transform-origin:${o}"></div>`;
 }
 // big type that morphs in: each line slides up from a mask; accent words in *stars* get the orange block
@@ -124,11 +124,11 @@ function scene(b, t, u) {
   switch (s.type) {
     case 'hook': {
       // frame 0: the big photo, the real mark, and the plain promise; the number counts up on the keyword
-      const n = (16.3 * io(pr(t, A, (kt[0] || A + 1) + .5))).toFixed(1);
-      r += card(s.img, 40, 470, 1000, 950, 1, mix(1.25, 1.05, io(pr(t, A, b.b))), '50% 30%');
-      r += big(['سازندهٔ *Claude*', 'توی ۶ ماه فروخت:'], 90, 118, 1);
-      r += `<div class="t" dir="ltr" style="top:1080px;font-size:200px;color:#fff;text-shadow:0 10px 40px rgba(0,0,0,.5)">$${n}B</div>`;
-      r += mark('claude.png', 900, 600, 190, pr(t, A, A + .5), t * 40);
+      const n = mix(1.2, 16.3, io(pr(t, A, (kt[0] || A + 1) + .5))).toFixed(1);
+      r += `<div class="card" style="left:0;top:0;width:1080px;height:1920px;border-radius:0"><img src="${IMG(s.img)}" style="transform:scale(${mix(1.3, 1.08, io(pr(t, A, b.b))).toFixed(3)});transform-origin:50% 35%"></div><div style="position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,0) 35%,rgba(0,0,0,0) 55%,rgba(0,0,0,.55))"></div>`;
+      r += big(['سازندهٔ *Claude*', 'توی ۶ ماه فروخت:'], 110, 120, 1, '#fff');
+      r += `<div class="t" dir="ltr" style="top:700px;font-size:290px;color:#fff;letter-spacing:-6px;text-shadow:0 14px 0 var(--acc),0 30px 60px rgba(0,0,0,.6)">$${n}B</div>`;
+      r += mark('claude.png', 540, 1150, 220, b.i === 0 ? 1 : pr(t, A, A + .5), t * 40);
       r += svg(stroke('M 230 1320 C 420 1360, 700 1290, 870 1330', pr(t, (kt[0] || A + 1), (kt[0] || A + 1) + .5), 'var(--acc)', 18));
       return r;
     }
@@ -162,8 +162,8 @@ function scene(b, t, u) {
     case 'split': {
       r += card(s.img, 60, 300, 960, 1100, k0, z).replace('<img', '<img style="filter:brightness(.5) grayscale(.4)"');
       const k = K(0, .9), w72 = 860 * 72.4 / 80.7;
-      r += svg(`<rect x="110" y="760" width="${(w72 * ex(Math.max(k, .001))).toFixed(1)}" height="200" rx="18" fill="#9A9A9A"/><rect x="${(110 + w72 * ex(k) + 8 * ex(k)).toFixed(1)}" y="760" width="${(860 - w72) * ex(k) - 8}" height="200" rx="18" fill="var(--red)"/>` + (k < .02 ? `<rect x="110" y="760" width="860" height="200" rx="18" fill="var(--red)"/>` : ''));
-      r += `<div style="position:absolute;left:110px;width:${w72}px;top:990px;text-align:center;font:900 70px V;color:#fff;opacity:${k}">${fa('72.4')}<br><span style="font-size:48px">هزینهٔ حسابداری</span></div><div dir="ltr" style="position:absolute;left:${110 + w72}px;width:${860 - w72}px;top:990px;text-align:center;font:900 60px V;color:var(--red);opacity:${k}">8.3</div>`;
+      r += svg(`<rect x="110" y="760" width="${(w72 * ex(Math.max(k, .001))).toFixed(1)}" height="200" rx="18" fill="#fff"/><rect x="${(110 + w72 * ex(k) + 8 * ex(k)).toFixed(1)}" y="760" width="${(860 - w72) * ex(k) - 8}" height="200" rx="18" fill="var(--red)"/>` + (k < .02 ? `<rect x="110" y="760" width="860" height="200" rx="18" fill="var(--red)"/>` : ''));
+      r += `<div style="position:absolute;left:110px;width:${w72}px;top:780px;text-align:center;font:900 90px V;color:var(--ink);opacity:${k}">${fa('72.4')}<br><span style="font-size:48px;color:#fff;position:relative;top:110px">هزینهٔ حسابداری</span></div><div dir="ltr" style="position:absolute;left:${110 + w72}px;width:${860 - w72}px;top:990px;text-align:center;font:900 60px V;color:var(--red);opacity:${k}">8.3</div>`;
       const tx = s.extra_hits ? b.wt(s.extra_hits[0]) : 99; if (t >= tx - .05) r += chip(250, 1240, 'نه پولی که خرج شده', '#fff', 'var(--ink)', 66, pr(t, tx - .05, tx + .3));
       return r + big(['از ۸۰ میلیارد ضرر…'], 150, 110, pr(t, A, A + .45));
     }
