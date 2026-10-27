@@ -29,7 +29,7 @@ publish twice, never publish late, never publish unverified content.
 ## 0. Ground rules (both phases)
 
 - **Motion graphics (user rule 2026-10-23):** every reel's motion style comes from the skill
-  **motion-graphy-2026** (`.claude/skills/motion-graphy-2026/SKILL.md`, 230 tested prompts). Read
+  **motion-graphy-2026** (`.claude/skills/motion-graphy-2026/SKILL.md`, 85 distinct tested prompts). Read
   it by path at the start of every REEL_PREPARE (a session started before the skill existed does not
   load it by itself). Pick the prompt that fits the news. Never change a prompt's structure; change only
   timing, size/aspect ratio, duration and the topic slots (SKILL.md, "What you may change").
@@ -692,28 +692,29 @@ narrator talks, nothing attractive in the picture").
 9. **Dynamic rotation list (user rule 2026-10-26).** Mahdi: «سبک والمارت نمیخوام باز بعدی ها دقیقا همون
    پرامپت رو کپی کنه… بهترینهاشن که پویا هستند رو انتخاب کن برای ریلز ها» ("I don't want the next reels to copy
    the Walmart prompt; pick the best dynamic ones"). Walmart (089) was only an example of good energy, not a
-   template: never rebuild 089 or copy its glass look. The 230 catalog prompts are only 78 different prompts
-   (many are the same text under another name: 019 = 211 = 184, 105 = the 001 showreel; see
-   `news-reel/pm/families.json`), and the gate blocks a prompt whose **family** was used in the last 10 reels.
+   template: never rebuild 089 or copy its glass look. The skill catalog was deduplicated on 2026-10-27 (Mahdi):
+   230 entries were only 85 different prompts, and the 145 copies were removed (`references/duplicates.json`
+   maps an old id to the kept one, e.g. 019 → 211, 105 → 001). The gate treats a removed id as its kept prompt
+   (`news-reel/pm/families.json`), so a prompt used in the last 10 reels cannot come back under another name.
    Choose each reel's prompt from this list, in order, skipping one whose family or category is blocked,
    or whose look does not fit the story. Each one gets its own engine built from its own prompt text:
    | # | prompt | category | why it is dynamic / when to use it |
    |---|---|---|---|
    | 1 | `032-chaotic-claude-pov-video` | EDIT | 140 BPM, fast cuts, stacked captions, zooms and hits on the beat, one running joke; native 1080x1920. Viral/funny news |
-   | 2 | `095-gravitydex-anime-hype-edit` (family 064: 142, 175, 199…) | ANIME/UI | 15 s hype edit on the beat, real UI and brand. Product launches |
+   | 2 | `095-gravitydex-anime-hype-edit` | ANIME/UI | 15 s hype edit on the beat, real UI and brand. Product launches |
    | 3 | `074-engraving-style-claude-ad` | EDIT | fast ad, bold light mode, elements painted over real photos. Brand or company news |
    | 4 | `191-speech-built-as-architecture` | TYPE | every spoken line rebuilds the frame's architecture; made for a voiced script. Opinion/insight news |
    | 5 | `219-uk-dubstep-track-with-ascii-visuals` | MUSIC | bold two-colour geometry hit by the bass; drive the hits from the voice beats. Tech/AI breakthroughs |
    | 6 | `155-photo-print-app-launch-film` | UI | one continuous take, a black shape floods the frame into the next scene, springs, bars. Apps and consumer products |
-   | 7 | `020-beat-synced-bouncing-3d-ball` (family 016: 212) | 3D | three.js, Blender quality, beat-synced fall through scenes, humour. A journey/"from A to B" story |
+   | 7 | `020-beat-synced-bouncing-3d-ball` | 3D | three.js, Blender quality, beat-synced fall through scenes, humour. A journey/"from A to B" story |
    | 8 | `079-fiery-samurai-kata` | ANIME | one figure, a strike per bar, weight and follow-through, fiery display. A person/founder/hero story |
    | 9 | `160-pixel-art-llm-history` | PIXEL | strict-grid pixel art, escalating gag. History/"how we got here" news |
    | 10 | `086-food-craving-launch-film` | UI | one continuous take, photo result cards. Food, beauty, lifestyle, women's topics |
-   | 11 | `225-what-happens-in-one-second` (family: 226) | TOPIC | everything that happens in one second, shapes/type morph into each other. Big numbers/scale news |
-   | 12 | `120-morphing-ui-states-loop` (family: 185, 186) | UI | one shape never cut, morphing through states. A product with several features |
+   | 11 | `225-what-happens-in-one-second` | TOPIC | everything that happens in one second, shapes/type morph into each other. Big numbers/scale news |
+   | 12 | `120-morphing-ui-states-loop` | UI | one shape never cut, morphing through states. A product with several features |
    | reserve | `112-lightspark-social-promo-video`, `163-porco-rosso-sunset-dogfight` (3D cinematic), `050-collision-driven-music-machine`, the `001` showreel family | | when the 12 above are blocked |
-   Already used (blocked until 10 other reels): 089, 168, 211 family (013, 019, 184), 105 (001 family), 149, 178
-   (147 family). The 40–55 s, hook, storyboard and gate rules above stay; a 15–30 s prompt is stretched by
+   Already used (blocked until 10 other reels): 089, 168, 211 (019), 001 (105), 149, 178, 074 (REEL-014).
+   The 40–55 s, hook, storyboard and gate rules above stay; a 15–30 s prompt is stretched by
    giving each voiced beat its own section in that prompt's look, not by repeating sections.
 
 ### 4.1 Preconditions
@@ -805,6 +806,34 @@ narrator talks, nothing attractive in the picture").
    exit 4 → respell/rephrase the flagged beats). 40–55 s (§4.0).
 
 ### 4.4 Render and QC
+0. **Pass the critic before rendering (user rule 2026-10-27, blocking).** Mahdi: «چرا هی میره تو گیت رد میشه…
+   پرامپتش رو سفت و سفت‌تر کن که رد نشه، چون هر دفعه باید بره ری‌جنریت کنه و کلی هزینه داره». REEL-011 to 014
+   failed the critic on cover, headline or hook only after a full render and new images. So the cover and the first
+   2 s are built to this spec and judged on stills **before** the video render:
+   - **Headline (cover and first spoken line, same words):** 4–7 plain Persian words with a verb; names the real
+     subject (brand or person in Latin, or a plain noun); one number or stake when the facts have one; no metaphor,
+     pun, nickname or riddle; a newcomer can repeat it in one sentence. Write 12 candidates (HEADLINES.md), then
+     test the top 3 by asking yourself "what is this about?" and drop any that need the news to understand.
+   - **Cover:** a real photo of the main subject (a person's face, the product, or the place), big (≥ 50 % of the
+     frame), bright, high contrast, warm or saturated colour; the headline at 120–150 px in the calm area; the real
+     logo chip only for the main subject; no illustration, no UI screenshot as the whole cover, nothing dark or
+     muddy.
+   - **Hook (0–2 s):** frame 0 is a real photo or video of the same subject, full-bleed and bright, already moving
+     (push-in, whip or slam); the headline line is on screen from frame 0, ≥ 120 px, inside the safe area and never
+     clipped, for at least 1.5 s; one big number or result card may slam in by 1.2 s with ≥ 64 px text. Banned in
+     0–2 s: an illustrated or drawn opening, a tight dark crop, small buttons or UI text, an empty or transition
+     frame, a logo alone, a slow fade.
+   - **Check on stills:** render `cover.jpg` (§4.4 step 3b) and
+     `node news-reel/reel_render.mjs --dir=work/story --page=<engine> --mode=stills --t=0,0.5,1,1.9`, then
+     `python3 news-reel/preflight.py --dir work/story sheet`. Give `preflight.jpg`, the headline and a 2-line
+     summary to the independent critic (same rules as step 5, fresh subagent) and ask only for
+     `cover_stop_power`, `headline_clarity` and `hook` (1–10, one-line reasons) → `work/story/critic_preflight.json`.
+     `python3 news-reel/preflight.py --dir work/story check`: every score must be **≥ 8** (one above the gate),
+     else fix and repeat, at most 3 rounds.
+   - **Cost rule:** fixes in preflight and after it are made in code, typography, headline and crop. Never call the
+     image model again for a fix, except one new cover background in total. Never re-render the full video for a
+     cover/headline/hook problem; those are caught here. A reel that cannot pass preflight in 3 rounds is `FAILED`
+     before any video render.
 1. `node news-reel/reel_render.mjs --dir=work/story --page=<pm/<id>.html | glass.html | fallback engine> --mode=check`
    (the prompt chosen in §4.3 step 0; §4.0 rules apply). Also render the stills the prompt's own `<start>`/`<build>` asks for,
    and review them yourself; Read every
@@ -842,7 +871,7 @@ narrator talks, nothing attractive in the picture").
      on-topic person or product, warm rich colour, beauty-campaign light), with a big plain headline and the real
      logo. Even when the reel is riso, paper, clay, kinetic type or UI, the cover is not drawn in that style.
      One `gen_image.py --kind story` background (≈ $0.05).
-   - **Big headline (user rule 2026-10-25):** the headline is rendered at 112–150 px and has at most 9 words
+   - **Big headline (user rule 2026-10-25):** the headline is rendered at 120–150 px (raised 2026-10-27) and has at most 9 words
      (4–7 read best); `cover_render.mjs` exits 5 when it cannot fit, so shorten it. It writes
      `cover_report.json` (font, words, position, md5) which the gate checks.
    - Render with `node news-reel/cover_render.mjs --dir=work/story`, which writes `cover.jpg` and the 4:5
@@ -882,10 +911,10 @@ narrator talks, nothing attractive in the picture").
    `_automation/motion_history.json` (`config.json → google.motion_history_id`) and run
    `python3 news-reel/reel_gate.py --dir work/story --history motion_history.json`. It re-checks attention
    (reel_qa), that `cover.jpg` is the rendered designed cover (md5 vs `cover_report.json`, never a video
-   frame), headline ≥ 112 px and ≤ 9 words, cover position ≠ previous reel, prompt and engine not in the last
+   frame), headline ≥ 120 px and ≤ 9 words, cover position ≠ previous reel, prompt and engine not in the last
    10 reels, engine not a renamed copy of a recent engine (> 60 % same code), category ≠ previous reel, and
-   critic scores all ≥ 7. Exit 3 → fix (new headline/cover, real new engine, re-render) and re-run the critic
-   and the gate; at most 2 rounds. Still failing → status `FAILED` with the gate reasons: a weak reel is
+   critic scores all ≥ 7, and a passing `preflight.json` (step 0). Exit 3 → fix in code/typography only (no new
+   images, step 0 cost rule) and re-run the critic and the gate; at most 1 re-render. Still failing → status `FAILED` with the gate reasons: a weak reel is
    skipped, never published. Save `gate.json` to the package and `gate.history_entry` to the slot file.
 
 ### 4.5 Storage, caption, sheet

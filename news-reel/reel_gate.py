@@ -11,7 +11,7 @@ engine, so it looked like the reels before it. This script checks the real files
 
 Checks (any failure = exit 3, reasons in <dir>/gate.json):
   1. attention: reel_qa.py passes (empty screen, holds, rhythm, hook, 40–55 s);
-  2. cover is the designed one: cover_report.json exists, has no issues, font ≥ 112 px, ≤ 9 words, and the
+  2. cover is the designed one: cover_report.json exists, has no issues, font ≥ 120 px, ≤ 9 words, and the
      cover file's md5 equals the report's md5; the cover is not a frame of the reel;
   3. cover position differs from the previous reel's (history);
   4. motion variety: story.json `motion_prompt` (catalog id) and `engine` (news-reel/pm/<file>.html) are set;
@@ -73,7 +73,7 @@ def main():
     else:
         rep = json.loads(rep_p.read_text()); info['cover'] = {k: rep.get(k) for k in ('font_px', 'words', 'pos', 'title')}
         if rep.get('issues'): fails.append('cover issues: ' + '; '.join(rep['issues']))
-        if (rep.get("font_px") or 0) < 110: fails.append(f"cover headline too small ({rep.get('font_px')} px < 110)")
+        if (rep.get("font_px") or 0) < 120: fails.append(f"cover headline too small ({rep.get('font_px')} px < 120)")
         if (rep.get('words') or 99) > 9: fails.append(f"cover headline too long ({rep.get('words')} words > 9)")
         if not cover.exists(): fails.append('cover file missing')
         elif md5(cover) != rep.get('md5'): fails.append('cover file is not the rendered designed cover (md5 mismatch): a frame or an old file')
@@ -123,6 +123,11 @@ def main():
     recent = [h.get('field', '') for h in hist[-4:]] + list(story.get('recent_fields', []))
     if not fld: fails.append('story.json must name field (topic family, e.g. beauty, robotics, health, money)')
     elif fld in recent: fails.append(f'field {fld} repeats a recent reel/post ({recent})')
+
+    # 4c. preflight (user rule 2026-10-27): cover, headline and hook were judged on stills before the full render
+    pf = d / 'preflight.json'
+    if not pf.exists() or not json.loads(pf.read_text()).get('pass'):
+        fails.append('no passing preflight.json: judge the cover and the first 2 s on stills before rendering (preflight.py)')
 
     # 5. independent critic
     cp = d / 'critic.json'

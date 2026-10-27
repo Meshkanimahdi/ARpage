@@ -1,6 +1,6 @@
 ---
 name: motion-graphy-2026
-description: "Catalog of 230 tested, approved motion-graphics prompts from Prompt Motion: product/UI films, explainers, kinetic type, 3D, showreels, editorial, music-driven, hand-drawn, story, pixel and stop-motion. Each has a title, use, mood, audience, trend fit and the full verbatim prompt. Use it BEFORE designing any reel, story animation, promo or motion graphic, especially for meshkani.pro. Pick the style that fits the news, keep the prompt's structure exactly, and change only timing, size/aspect ratio, duration and the topic-specific slots. Triggers: reel, Reels, motion graphics, موشن گرافیک, ریلز, animation, promo video, explainer video, product sting, showreel, kinetic typography."
+description: "Catalog of 85 distinct, tested, approved motion-graphics prompts from Prompt Motion: product/UI films, explainers, kinetic type, 3D, showreels, editorial, music-driven, hand-drawn, story, pixel and stop-motion. Each has a title, use, mood, audience, trend fit and the full verbatim prompt. Use it BEFORE designing any reel, story animation, promo or motion graphic, especially for meshkani.pro. Pick the style that fits the news, keep the prompt's structure exactly, and change only timing, size/aspect ratio, duration and the topic-specific slots. Triggers: reel, Reels, motion graphics, موشن گرافیک, ریلز, animation, promo video, explainer video, product sting, showreel, kinetic typography."
 ---
 
 # motion-graphy-2026: tested motion-graphics prompts
@@ -10,7 +10,7 @@ its content, the best motion-graphics style from this catalog. The prompts were 
 samples were made with them. **Never change the core structure of a prompt.**
 
 ## Files
-- `references/index.md`: all 230 prompts grouped by visual category, one line each (id, title, brief, mood,
+- `references/index.md`: all 85 prompts grouped by visual category, one line each (id, title, brief, mood,
   trend fit, whether it has an `<inputs>` block). Read this first.
 - `references/prompts/<id>.md`: one prompt per file with its notes (use, style, mood, audience, gender target,
   trend fit, creator, source link) and the **verbatim** prompt.
@@ -126,8 +126,9 @@ If a prompt cannot hold the story without breaking its structure, pick another p
 
 ## Rotation
 - Never use the same prompt twice within 14 days (check `catalog.json` against the slot files and the sheet).
-- **Prompt families (2026-10-26):** the 230 prompts are only 78 different texts; renamed twins are one family
-  (`news-reel/pm/families.json`, e.g. 019 = 211 = 184). A twin of a recently used prompt counts as the same prompt.
+- **Deduplicated (2026-10-27, Mahdi):** the catalog had 230 entries but only 85 different prompts; the 145 copies
+  (same text, only the brand/product/duration changed) were removed. `references/duplicates.json` maps a removed id
+  to the kept one, and `news-reel/pm/families.json` makes the gate treat them as the same prompt.
 - **meshkani.pro reels pick from the dynamic rotation list** in `meshkani-pro/RUNBOOK.md` §4.0 rule 9 (032, 095,
   074, 191, 219, 155, 020, 079, 160, 086, 225, 120). Walmart/089 was an example of energy, never a template to copy.
 - Never use the same category in two reels in a row. Across a week, use at least 4 categories.
