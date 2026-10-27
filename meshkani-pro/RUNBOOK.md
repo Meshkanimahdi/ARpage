@@ -154,6 +154,12 @@ except one log row `DUPLICATE_RUN_STOPPED`.
 
 ## 1. PREPARE phase (main 10:30 / 16:30, retry 11:05 / 17:05 Tehran)
 
+**Post cadence (user rule 2026-10-27): one carousel every other day, at 12:00 only.** Mahdi: «فعلا تو برنامه پست
+اسلایدی بشه روز در میون یه دونه». The 18:00 PREPARE/PUBLISH tasks are disabled. A day is a post day when the
+number of days since 2026-10-27 (Tehran date) is even (2026-10-29, 10-31, 11-02, …); on any other day the 12:00
+PREPARE, retry and PUBLISH write one log row "off day (carousel every other day)" and stop. The DAY_SUMMARY row
+(§2.6) is written by the 21:00 REEL_PUBLISH instead.
+
 Goal: by publish time, a slot JSON with status `READY`, six QA-passed JPEGs in
 Drive and `Ready` rows in the sheet. Keep going only while
 `tehran.py check-deadline <slot_key>` exits 0; if the window closes, set
