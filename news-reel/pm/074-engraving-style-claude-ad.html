@@ -119,7 +119,7 @@ function caption(b, t, endOn) {
 }
 
 function scene(b, t, u) {
-  const s = b.sc, A = b.a, k0 = b.i === 0 ? 1 : pr(t, A, A + .45), kt = b.kt, K = (i, d = .45) => kt[i] === undefined ? 0 : pr(t, kt[i] - .05, kt[i] - .05 + d), z = mix(1.12, 1.0, io(pr(t, A, b.b)));
+  const s = b.sc, A = b.a, k0 = b.i === 0 ? 1 : pr(t, A - .3, A + .25), kt = b.kt, K = (i, d = .45) => kt[i] === undefined ? 0 : pr(t, Math.min(kt[i], A + .6) - .05, Math.min(kt[i], A + .6) - .05 + d), z = mix(1.12, 1.0, io(pr(t, A, b.b)));
   let r = '';
   switch (s.type) {
     case 'hook': {
@@ -135,7 +135,7 @@ function scene(b, t, u) {
     case 'ticker': {
       r += card(s.img, 60, 620, 960, 780, k0, z, '50% 50%');
       r += big(['داره میره بورس'], 150, 120, pr(t, A, A + .5));
-      if (t >= kt[1] - .1) { const k = pr(t, kt[1] - .1, kt[1] + .35); r += `<div class="t" dir="ltr" style="top:860px;font-size:${(300 * back(k)).toFixed(0)}px;color:#fff;letter-spacing:10px;text-shadow:0 12px 40px rgba(0,0,0,.45)">ANT</div>` + chip(380, 1220, 'Nasdaq', 'var(--acc)', '#fff', 64, k, true); }
+      { const k = pr(t, A + .3, A + .7); r += `<div class="t" dir="ltr" style="top:860px;font-size:${(300 * back(k)).toFixed(0)}px;color:#fff;letter-spacing:10px;text-shadow:0 12px 40px rgba(0,0,0,.45)">ANT</div>` + chip(380, 1220, 'Nasdaq', 'var(--acc)', '#fff', 64, k, true); }
       return r + mark('anthropic.png', 160, 470, 150, pr(t, A + .1, A + .5));
     }
     case 'doc': {
