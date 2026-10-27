@@ -55,7 +55,7 @@ publish twice, never publish late, never publish unverified content.
 - If anything is uncertain (identity, source, text accuracy, publish outcome),
   stop that slot, record why, and do not guess.
 - Instagram account must read back as username `meshkani.pro`, id
-  `17841471767180096`. The Composio alias `instagram_beath-billow` alone is not
+  `17841471767180096`. The Composio account id `instagram_beath-billow` (alias `meshkani.pro`; always pass one) alone is not
   proof of identity.
 - Text and research are done by you (Claude) in the session. Images are made only
   with OpenRouter (`OPENROUTER_API_KEY`), model from `config.json`.
