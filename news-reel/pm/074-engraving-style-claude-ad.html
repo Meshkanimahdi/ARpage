@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — fast editorial brand ad (prompt 074)</title>
+<!-- Skill motion-graphy-2026, prompt 074 "Engraving-style Claude ad" (EDIT), built as its own engine.
+     Look from the prompt: a fast-paced ad, bold light mode, clean and perfect (no beige "artsy" look, no eyebrow
+     labels), elements painted on top of real images, images small / bigger / several at once, morphing text,
+     clean animations of the brand's own mark, zooms, every morph exact, ending on the real logo.
+     Page standards: 1080x1920, Persian narration (eleven_v4) with a word-by-word caption, music bed.
+     Data: story.json beats[{id, text, scene{type, img}}], brand, product, end_text, end_sub; el/<logos>.png,
+     raw/<sNN>.png photo panels. Pure seek(t): every style is computed from t, no CSS animations or timers. -->
+<style>
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --bg: #FAFAF7; --ink: #121212; --acc: #D97757; --red: #E5322D; --green: #1F9D55; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
+  #root { position: absolute; inset: 0; overflow: hidden; background: var(--bg); font-family: V; font-weight: 900; color: var(--ink); }
+  #cam { position: absolute; inset: 0; transform-origin: 540px 900px; }
+  #stage { position: absolute; inset: 0; }
+  .t { position: absolute; left: 0; right: 0; text-align: center; line-height: 1.08; white-space: nowrap; }
+  .card { position: absolute; overflow: hidden; border-radius: 28px; background: #ddd; box-shadow: 0 18px 50px rgba(0,0,0,.18); }
+  .card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #sub { position: absolute; left: 60px; right: 60px; top: 1470px; height: 140px; display: flex; align-items: center; justify-content: center; }
+  #sub .pill { padding: 10px 34px 18px; border-radius: 20px; font: 900 58px/1.3 V; white-space: nowrap; background: var(--ink); color: #fff; }
+  #sub .w { display: inline-block; margin: 0 .13em; }
+</style>
+</head>
+<body>
+<div id="root"><div id="cam"><div id="stage"></div></div><div id="sub"></div></div>
+<script src="/logo-motion/node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const U = s => s.startsWith('/') ? s : DIR + s, $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), mix = (a, b, k) => a + (b - a) * k, pr = (t, a, b) => cl((t - a) / (b - a));
+const ex = k => 1 - Math.pow(2, -10 * cl(k)), io = gsap.parseEase('power3.inOut'), back = gsap.parseEase('back.out(1.4)');
+const fa = s => String(s).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]).replace(/\./g, '٫');
+const ISSUES = [];
+let S, TL, B = [], END = 50;
+const IMG = n => U('raw/' + n + '.png');
+
+// a photo card: (x, y, w, h), k = entrance 0..1 (grows from 70 % with a clip reveal), z = zoom inside, o = origin
+function card(n, x, y, w, h, k, z = 1, o = '50% 50%', rot = 0) {
+  h = Math.max(h, 1880 - y);
+  const e = ex(k), s = mix(.72, 1, e), clip = 100 - e * 100;
+  return `<div class="card" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${rot}deg) scale(${s.toFixed(3)});clip-path:inset(${(clip / 2).toFixed(1)}% 0 ${(clip / 2).toFixed(1)}% 0 round 28px)"><img src="${IMG(n)}" style="transform:scale(${z.toFixed(3)});transform-origin:${o}"></div>`;
+}
+// big type that morphs in: each line slides up from a mask; accent words in *stars* get the orange block
+function big(lines, y, size, k, col = 'var(--ink)', ltr = false) {
+  return lines.map((ln, i) => { const kk = ex(cl(k * 1.4 - i * .25)), html = ln.replace(/\*([^*]+)\*/g, '<span style="background:var(--acc);color:#fff;padding:0 .14em .04em;border-radius:.12em">$1</span>');
+    return `<div class="t" ${ltr ? 'dir="ltr"' : ''} style="top:${y + i * size * 1.12}px;height:${size * 1.15}px;overflow:hidden;font-size:${size}px;color:${col}"><div style="transform:translateY(${((1 - kk) * 110).toFixed(1)}%)">${html}</div></div>`; }).join('');
+}
+// painted marks (stroke draws on)
+const svg = inner => `<svg width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;left:0;top:0;overflow:visible">${inner}</svg>`;
+const stroke = (d, k, col = 'var(--acc)', w = 14) => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(k)).toFixed(3)}"/>`;
+const ring = (cx, cy, rx, ry, k, col) => stroke(`M ${cx + rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx + rx - 1} ${cy - 8}`, k, col, 12);
+const arrow = (x1, y1, x2, y2, k, col = 'var(--acc)') => stroke(`M ${x1} ${y1} Q ${(x1 + x2) / 2 + 60} ${(y1 + y2) / 2 - 80} ${x2} ${y2}`, k, col, 12) + (k > .7 ? `<path d="M ${x2 - 30} ${y2 - 10} L ${x2} ${y2} L ${x2 - 6} ${y2 - 32}" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round"/>` : '');
+// the brand's own mark, animated: spins in, breathes, never redrawn
+function mark(file, x, y, size, k, spin = 0) {
+  const e = back(cl(k));
+  return `<img src="${U('el/' + file)}" style="position:absolute;left:${x - size / 2}px;top:${y - size / 2}px;width:${size}px;height:${size}px;transform:rotate(${((1 - e) * -120 + spin).toFixed(1)}deg) scale(${e.toFixed(3)});opacity:${cl(k * 3).toFixed(2)}">`;
+}
+const chip = (x, y, html, bg, col, size, k, ltr) => `<div ${ltr ? 'dir="ltr"' : ''} style="position:absolute;left:${x}px;top:${y}px;padding:${size * .18}px ${size * .45}px ${size * .28}px;border-radius:${size * .3}px;background:${bg};color:${col};font:900 ${size}px V;white-space:nowrap;transform:scale(${back(cl(k)).toFixed(3)});opacity:${cl(k * 3)}">${html}</div>`;
+
+window.ready = (async () => {
+  S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json();
+  END = TL.total;
+  const shown = t => t.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/);
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) { ISSUES.push('no timing for ' + bt.id); continue; }
+    const raw = shown(bt.text); let on = false;
+    const words = raw.map(w => { if (w.startsWith('*')) on = true; const k = on || /\*/.test(w); if (/\*[.…،؛!؟?]*$/.test(w)) on = false; return {w: w.replace(/\*/g, ''), k}; });
+    const wt = j => { const i = Math.round(cl(j / Math.max(1, words.length - 1)) * (L.words.length - 1)); return (L.words[i] || [L.start])[0]; };
+    const kis = words.map((w, i) => w.k && (i === 0 || !words[i - 1].k) ? i : -1).filter(i => i >= 0);
+    B.push({bt, sc: bt.scene || {}, L, words, wt, kt: kis.map(wt)});
+  }
+  B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
+  const imgs = [...new Set(S.beats.map(b => (b.scene || {}).img).filter(Boolean))].map(IMG).concat(['claude.png', 'anthropic.png', 'openai.png'].map(f => U('el/' + f)));
+  await Promise.all(imgs.map(src => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = src; })));
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'میلیارد Claude')));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  const SC = [];
+  for (const b of B) {
+    const pts = [b.a, ...b.kt.filter(h => h > b.a + .9 && h < b.b - .9)];
+    (b.sc.extra_hits || []).forEach(j => { const h = b.wt(j); if (h > b.a + .9 && h < b.b - .9) pts.push(h); });
+    const ps = [...new Set(pts.map(x => +x.toFixed(2)))].sort((p, q) => p - q);
+    ps.forEach((p, i) => SC.push({t0: p, t1: i + 1 < ps.length ? ps[i + 1] : b.b, type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: i ? [[p, 'hit', .35]] : [[p, 'whoosh', .3]]}));
+  }
+  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .2, 'hit', .5]]});
+  window.SCENES = SC;
+  for (const s of SC) if (s.t1 - s.t0 > 3.2) ISSUES.push(`idea ${s.bg} holds ${(s.t1 - s.t0).toFixed(1)} s (> 3): add a hit`);
+  seek(0);
+})();
+
+function seek(t) {
+  if (!B.length) return;
+  let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
+  const endOn = t >= TL.end_start, b = B[bi];
+  let sc = (window.SCENES || [])[0] || {t0: 0, t1: 1}; (window.SCENES || []).forEach(s => { if (t >= s.t0) sc = s; });
+  // camera: a zoom on every idea (punch in, then a slow push), never still
+  const kick = Math.exp(-8 * (t - sc.t0)) * .06, push = .035 * io(pr(t, sc.t0, sc.t1));
+  $('cam').style.transform = `scale(${(1 + push + kick).toFixed(4)})`;
+  const h = endOn ? endCard(t - TL.end_start) : scene(b, t, t - b.a);
+  const st = $('stage'); if (st._h !== h) { st._h = h; st.innerHTML = h; }
+  caption(b, t, endOn);
+}
+
+function caption(b, t, endOn) {
+  const sub = $('sub');
+  if (endOn || t > b.L.end + .3) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
+  const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + c0;
+  if (sub._k !== key) { sub._k = key; const lat = w => /^[A-Za-z0-9.\-]+[،,.!?؟…؛]*$/.test(w.w); const gs = [];
+    ch.forEach((w, q) => { const g = gs[gs.length - 1]; if (g && lat(w) && g.l) { g.w += ' ' + w.w; g.k = g.k || w.k; } else gs.push({w: w.w, k: w.k, i: q, l: lat(w)}); });
+    sub.innerHTML = `<span class="pill">${gs.map(g => `<span class="w" data-i="${g.i}" ${g.l ? 'dir="ltr"' : ''} style="${g.k ? 'color:#F2A07B' : ''}">${g.w}</span>`).join(' ')}</span>`; }
+  sub.querySelectorAll('.w').forEach(el => { const tw = b.wt(c0 + +el.dataset.i); el.style.opacity = .3 + .7 * ex(pr(t, tw - .05, tw + .2)); });
+}
+
+function scene(b, t, u) {
+  const s = b.sc, A = b.a, k0 = b.i === 0 ? 1 : pr(t, A, A + .45), kt = b.kt, K = (i, d = .45) => kt[i] === undefined ? 0 : pr(t, kt[i] - .05, kt[i] - .05 + d), z = mix(1.12, 1.0, io(pr(t, A, b.b)));
+  let r = '';
+  switch (s.type) {
+    case 'hook': {
+      // frame 0: the big photo, the real mark, and the plain promise; the number counts up on the keyword
+      const n = (16.3 * io(pr(t, A, (kt[0] || A + 1) + .5))).toFixed(1);
+      r += card(s.img, 40, 470, 1000, 950, 1, mix(1.25, 1.05, io(pr(t, A, b.b))), '50% 30%');
+      r += big(['سازندهٔ *Claude*', 'توی ۶ ماه فروخت:'], 90, 118, 1);
+      r += `<div class="t" dir="ltr" style="top:1080px;font-size:200px;color:#fff;text-shadow:0 10px 40px rgba(0,0,0,.5)">$${n}B</div>`;
+      r += mark('claude.png', 900, 600, 190, pr(t, A, A + .5), t * 40);
+      r += svg(stroke('M 230 1320 C 420 1360, 700 1290, 870 1330', pr(t, (kt[0] || A + 1), (kt[0] || A + 1) + .5), 'var(--acc)', 18));
+      return r;
+    }
+    case 'ticker': {
+      r += card(s.img, 60, 620, 960, 780, k0, z, '50% 50%');
+      r += big(['داره میره بورس'], 150, 120, pr(t, A, A + .5));
+      if (t >= kt[1] - .1) { const k = pr(t, kt[1] - .1, kt[1] + .35); r += `<div class="t" dir="ltr" style="top:860px;font-size:${(300 * back(k)).toFixed(0)}px;color:#fff;letter-spacing:10px;text-shadow:0 12px 40px rgba(0,0,0,.45)">ANT</div>` + chip(380, 1220, 'Nasdaq', 'var(--acc)', '#fff', 64, k, true); }
+      return r + mark('anthropic.png', 160, 470, 150, pr(t, A + .1, A + .5));
+    }
+    case 'doc': {
+      r += card(s.img, 120, 380, 840, 1000, k0, mix(1, 1.35, io(pr(t, A, b.b))), '60% 60%', -2);
+      const k = K(0); r += big(['پرونده به', '*کمیسیون بورس*'], 120, 110, pr(t, A, A + .5));
+      r += svg(ring(560, 900, 260, 200, k, 'var(--red)'));
+      if (k > 0) r += `<div class="t" dir="ltr" style="top:830px;font-size:150px;color:var(--red);transform:rotate(-12deg) scale(${back(k).toFixed(3)})">S-1</div>`;
+      return r;
+    }
+    case 'growth': {
+      r += card(s.img, 60, 300, 960, 1100, k0, z).replace('<img', '<img style="filter:brightness(.55)"');
+      const k = pr(t, A + .2, A + 1.2), kk = K(0, .8);
+      r += svg(`<rect x="230" y="${1300 - 60 * ex(k)}" width="220" height="${60 * ex(k)}" rx="16" fill="#fff"/><rect x="630" y="${1300 - 820 * ex(kk)}" width="220" height="${820 * ex(kk)}" rx="16" fill="var(--acc)"/>`);
+      r += `<div style="position:absolute;left:230px;width:220px;top:${1240 - 60 * ex(k) - 70}px;text-align:center;font:900 64px V;color:#fff">${fa('1.2')}</div><div style="position:absolute;left:630px;width:220px;top:${1300 - 820 * ex(kk) - 90}px;text-align:center;font:900 76px V;color:#fff">${fa('16.3')}</div>`;
+      r += `<div style="position:absolute;left:230px;width:220px;top:1320px;text-align:center;font:900 46px V;color:#fff">پارسال</div><div style="position:absolute;left:630px;width:220px;top:1320px;text-align:center;font:900 46px V;color:#fff">امسال</div>`;
+      return r + big(['حدود *۱۵ برابر*'], 110, 130, pr(t, kt[0] - .1, kt[0] + .4) || pr(t, A, A + .5)) + `<div class="t" style="top:270px;font-size:46px;font-weight:600;color:var(--ink)">درآمد ۶ ماههٔ اول (میلیارد دلار)</div>`;
+    }
+    case 'loss': {
+      r += card(s.img, 40, 420, 1000, 1000, k0, z, '50% 40%');
+      r += big(['یه عدد ترسناک:'], 140, 110, pr(t, A, A + .4));
+      const k = K(0); if (k > 0) r += `<div class="t" dir="ltr" style="top:760px;font-size:${(196 * back(k)).toFixed(0)}px;color:#fff;text-shadow:0 10px 0 var(--red), 0 20px 50px rgba(0,0,0,.5)">−$80.7B</div>` + chip(390, 1050, 'ضرر', 'var(--red)', '#fff', 80, k);
+      return r;
+    }
+    case 'split': {
+      r += card(s.img, 60, 300, 960, 1100, k0, z).replace('<img', '<img style="filter:brightness(.5) grayscale(.4)"');
+      const k = K(0, .9), w72 = 860 * 72.4 / 80.7;
+      r += svg(`<rect x="110" y="760" width="${(w72 * ex(Math.max(k, .001))).toFixed(1)}" height="200" rx="18" fill="#9A9A9A"/><rect x="${(110 + w72 * ex(k) + 8 * ex(k)).toFixed(1)}" y="760" width="${(860 - w72) * ex(k) - 8}" height="200" rx="18" fill="var(--red)"/>` + (k < .02 ? `<rect x="110" y="760" width="860" height="200" rx="18" fill="var(--red)"/>` : ''));
+      r += `<div style="position:absolute;left:110px;width:${w72}px;top:990px;text-align:center;font:900 70px V;color:#fff;opacity:${k}">${fa('72.4')}<br><span style="font-size:48px">هزینهٔ حسابداری</span></div><div dir="ltr" style="position:absolute;left:${110 + w72}px;width:${860 - w72}px;top:990px;text-align:center;font:900 60px V;color:var(--red);opacity:${k}">8.3</div>`;
+      const tx = s.extra_hits ? b.wt(s.extra_hits[0]) : 99; if (t >= tx - .05) r += chip(250, 1240, 'نه پولی که خرج شده', '#fff', 'var(--ink)', 66, pr(t, tx - .05, tx + .3));
+      return r + big(['از ۸۰ میلیارد ضرر…'], 150, 110, pr(t, A, A + .45));
+    }
+    case 'cash': {
+      r += card(s.img, 40, 400, 1000, 1040, k0, mix(1.3, 1.05, io(pr(t, A, b.b))), '50% 50%');
+      const k = K(0); r += big(['برای اولین بار:'], 140, 110, pr(t, A, A + .4));
+      if (k > 0) r += `<div class="t" dir="ltr" style="top:780px;font-size:${(190 * back(k)).toFixed(0)}px;color:#fff;text-shadow:0 10px 0 var(--green),0 20px 50px rgba(0,0,0,.5)">+$3.9B</div>` + chip(300, 1060, 'پول نقد از کارش', 'var(--green)', '#fff', 72, k);
+      return r;
+    }
+    case 'ratio': {
+      r += card(s.img, 40, 380, 1000, 1060, k0, z, '50% 50%');
+      const k1 = pr(t, A + .2, A + .6), k2 = K(0);
+      r += chip(640, 600, '$1', '#fff', 'var(--ink)', 130, k1, true) + `<div style="position:absolute;left:670px;top:790px;font:900 50px V;color:#fff;opacity:${k1}">کامپیوتر</div>`;
+      r += svg(arrow(620, 680, 420, 900, k2, '#fff'));
+      r += chip(140, 900, '$2.08', 'var(--acc)', '#fff', 150, k2, true) + `<div style="position:absolute;left:190px;top:1110px;font:900 50px V;color:#fff;opacity:${k2}">درآمد</div>`;
+      return r + big(['هر دلار خرج…'], 140, 110, pr(t, A, A + .4));
+    }
+    case 'noads': {
+      r += card(s.img, 40, 380, 1000, 1060, k0, z, '50% 50%');
+      const k = K(0);
+      r += `<div style="position:absolute;left:250px;top:620px;width:580px;height:330px;border-radius:24px;background:#FFE14D;box-shadow:0 14px 40px rgba(0,0,0,.3);transform:rotate(-4deg) scale(${back(pr(t, A + .2, A + .6)).toFixed(3)});display:flex;align-items:center;justify-content:center;font:900 150px V;color:var(--ink)" dir="ltr">AD</div>`;
+      r += svg(stroke('M 230 980 L 850 600', k, 'var(--red)', 30) + stroke('M 230 600 L 850 980', pr(t, kt[0] + .1, kt[0] + .5), 'var(--red)', 30));
+      return r + big(['هیچ *تبلیغی*', 'نمی‌فروشه'], 110, 115, pr(t, A, A + .5));
+    }
+    case 'value': {
+      r += card(s.img, 40, 420, 1000, 1000, k0, z, '50% 40%');
+      const k = K(0); r += big(['هدفِ ارزشش:'], 150, 110, pr(t, A, A + .4));
+      if (k > 0) r += `<div class="t" dir="ltr" style="top:760px;font-size:${(170 * back(k)).toFixed(0)}px;color:#fff;text-shadow:0 10px 0 var(--acc),0 20px 50px rgba(0,0,0,.5)">$1.5–2T</div>` + chip(300, 1020, 'به گفتهٔ رسانه‌ها', '#fff', 'var(--ink)', 64, k);
+      return r;
+    }
+    case 'race': {
+      r += card(s.img, 40, 420, 1000, 600, k0, z, '50% 50%');
+      const k = K(0), p1 = ex(pr(t, A + .2, A + 1.6)), p2 = ex(pr(t, A + .2, A + 1.6)) * .72;
+      r += svg(`<line x1="120" y1="1170" x2="960" y2="1170" stroke="#ddd" stroke-width="10"/><line x1="120" y1="1330" x2="960" y2="1330" stroke="#ddd" stroke-width="10"/><line x1="960" y1="1100" x2="960" y2="1400" stroke="var(--ink)" stroke-width="8" stroke-dasharray="20 14"/>`);
+      r += mark('anthropic.png', 120 + 780 * p1, 1170, 120, 1) + mark('openai.png', 120 + 780 * p2, 1330, 120, 1);
+      r += chip(100, 1060, 'Anthropic', 'var(--acc)', '#fff', 48, pr(t, A + .3, A + .7), true) + chip(100, 1400, 'OpenAI', 'var(--ink)', '#fff', 48, k, true);
+      return r + big(['زودتر از *رقیبش*'], 150, 120, pr(t, A, A + .5));
+    }
+    case 'ask': {
+      r += card(s.img, 40, 380, 1000, 1060, k0, z, '50% 40%');
+      const k = K(0); r += big(['حباب؟'], 140, 150, pr(t, A, A + .45));
+      if (k > 0) r += `<div class="t" style="top:820px;font-size:${(200 * back(k)).toFixed(0)}px;color:#fff;text-shadow:0 10px 0 var(--acc),0 20px 50px rgba(0,0,0,.5)">آینده؟</div>`;
+      return r + mark('claude.png', 920, 520, 150, pr(t, A + .2, A + .6), t * 50);
+    }
+  }
+  ISSUES.push('unknown scene ' + s.type); return '';
+}
+
+function endCard(u) {
+  // ends on the real mark: a spin-in, the name, the question
+  const q = (S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--acc)">$1</span>');
+  return mark('claude.png', 540, 640, 300 * mix(1.2, 1, ex(pr(u, 0, .6))), pr(u, 0, .4), u * 60) +
+    `<div class="t" dir="ltr" style="top:860px;font-size:110px;opacity:${pr(u, .2, .5)}">${S.product}</div>` +
+    `<div class="t" dir="ltr" style="top:1000px;font-size:44px;font-weight:600;letter-spacing:6px;opacity:${pr(u, .3, .6)}">BY ${S.brand.toUpperCase()}</div>` +
+    `<div class="t" style="top:1110px;font-size:96px;opacity:${pr(u, .45, .8)}">${q}</div>` +
+    `<div class="t" style="top:1250px;font-size:56px;font-weight:600;opacity:${pr(u, .6, .9)}">${S.end_sub || ''}</div>` +
+    `<div class="t" dir="ltr" style="top:1350px;font-size:40px;font-weight:600;letter-spacing:4px;color:var(--acc);opacity:${pr(u, .7, 1)}">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;
+}
+window.seek = seek;
+</script>
+</body>
+</html>
