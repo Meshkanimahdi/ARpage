@@ -1,6 +1,9 @@
 """Run the reconstruction pipeline on one capture.
 
-  python run.py --out OUT [--photos DIR] [--video FILE] [--focal-factor 0.45] [--stages pre,sfm,layout,texture,semantic]
+  python run.py --out OUT [--photos DIR] [--video FILE] [--focal-factor 0.45] [--mapper incremental|global]
+                [--stages pre,sfm,map,layout,texture,semantic]
+
+"map" re-runs only the mapping on the existing match database (e.g. to compare mappers without re-matching).
 
 Each stage writes its result into OUT and is skipped when its output already exists (use --force to redo),
 so fixing a later stage never re-runs the expensive ones.
@@ -25,6 +28,7 @@ def main():
     ap.add_argument("--photos")
     ap.add_argument("--video")
     ap.add_argument("--focal-factor", type=float, default=None)
+    ap.add_argument("--mapper", default="incremental", choices=["global", "incremental"])
     ap.add_argument("--stages", default="pre,sfm,layout,texture")
     ap.add_argument("--force", action="store_true")
     a = ap.parse_args()
@@ -52,7 +56,16 @@ def main():
 
     sfm_path = os.path.join(a.out, "sfm.json")
     if "sfm" in stages and (a.force or not os.path.exists(sfm_path)):
-        res = geometry.reconstruct(frames_dir, os.path.join(a.out, "colmap"), video, photos, a.focal_factor)
+        res = geometry.reconstruct(frames_dir, os.path.join(a.out, "colmap"), video, photos, a.focal_factor,
+                                   mapper=a.mapper)
+        json.dump(res, open(sfm_path, "w"), indent=1)
+    elif "map" in stages:
+        old = json.load(open(sfm_path))
+        res = geometry.map_database(os.path.join(a.out, "colmap", "database.db"), frames_dir,
+                                    os.path.join(a.out, "colmap"), video + photos, a.mapper)
+        res["pairs"] = old.get("pairs")
+        res["seconds"] = {k: v for k, v in old["seconds"].items() if k in ("features", "matching")} | res["seconds"]
+        res["seconds"]["total"] = round(sum(v for k, v in res["seconds"].items() if k != "total"), 1)
         json.dump(res, open(sfm_path, "w"), indent=1)
     sfm = json.load(open(sfm_path)) if os.path.exists(sfm_path) else None
 
@@ -67,7 +80,7 @@ def main():
         semantic.build(a.out, frames_dir)
 
     print(json.dumps({"log": log, "frames": rep["counts"], "video": rep["video"],
-                      "sfm": {k: v for k, v in (sfm or {}).items() if k in ("ok", "inputs", "registered", "models", "points3D", "mean_reprojection_error", "seconds")}},
+                      "sfm": {k: v for k, v in (sfm or {}).items() if k in ("ok", "mapper", "inputs", "registered", "models", "points3D", "mean_reprojection_error", "seconds")}},
                      indent=1, ensure_ascii=False))
 
 

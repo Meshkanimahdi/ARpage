@@ -4,6 +4,11 @@ Matching strategy follows the capture:
   photos only      -> exhaustive (every photo against every photo)
   video only       -> sequential (each keyframe against its next N neighbours)
   video + photos   -> sequential for the video, plus every photo against everything
+
+Mapping is incremental by default. Global mapping (GLOMAP) is available as an experiment: on the test
+walk-through it registered 99% of frames in one model, but most camera positions were wrong (median error
+about 6 m against the reference), while incremental kept 71% of frames with a 1.8 cm median error.
+Registration counts alone are not trusted; see evaluate.py.
 """
 from __future__ import annotations
 
@@ -31,8 +36,9 @@ def _write_pairs(path: str, video: list[str], photos: list[str], overlap: int) -
 
 
 def reconstruct(frames_dir: str, work_dir: str, video: list[str], photos: list[str],
-                focal_factor: float | None = None, overlap: int = 10, max_features: int = 4096) -> dict:
-    """Run feature extraction, matching and incremental mapping. Returns stats + the largest model."""
+                focal_factor: float | None = None, overlap: int = 10, max_features: int = 4096,
+                mapper: str = "incremental") -> dict:
+    """Run feature extraction, matching and mapping. Returns stats + the largest model."""
     t0 = time.time()
     if os.path.exists(work_dir):
         shutil.rmtree(work_dir)
@@ -79,16 +85,35 @@ def reconstruct(frames_dir: str, work_dir: str, video: list[str], photos: list[s
         pycolmap.match_image_pairs(db, matching_options=match, pairing_options=imp)
     t_match = time.time()
 
-    opts = pycolmap.IncrementalPipelineOptions()
-    opts.num_threads = os.cpu_count() or 4
-    opts.ba_refine_focal_length = True
-    opts.ba_refine_extra_params = True
-    models = pycolmap.incremental_mapping(db, frames_dir, os.path.join(work_dir, "sparse"), options=opts)
+    res = map_database(db, frames_dir, work_dir, names, mapper)
+    res["pairs"] = n_pairs
+    res["seconds"] = {"features": round(t_feat - t0, 1), "matching": round(t_match - t_feat, 1), **res["seconds"]}
+    res["seconds"]["total"] = round(sum(res["seconds"].values()), 1)
+    return res
+
+
+def map_database(db: str, frames_dir: str, work_dir: str, names: list[str], mapper: str = "incremental") -> dict:
+    """Poses + points from an already matched database; keeps the largest model in work_dir/model."""
+    t0 = time.time()
+    out = os.path.join(work_dir, "sparse")
+    if os.path.exists(out):
+        shutil.rmtree(out)
+    os.makedirs(out)
+    models = {}
+    if mapper == "global":
+        models = pycolmap.global_mapping(db, frames_dir, out)
+    if not models:
+        mapper = "incremental"
+        opts = pycolmap.IncrementalPipelineOptions()
+        opts.num_threads = os.cpu_count() or 4
+        opts.ba_refine_focal_length = True
+        opts.ba_refine_extra_params = True
+        models = pycolmap.incremental_mapping(db, frames_dir, out, options=opts)
     t_map = time.time()
 
     if not models:
-        return {"ok": False, "inputs": len(names), "registered": 0, "models": 0,
-                "seconds": {"features": t_feat - t0, "matching": t_match - t_feat, "mapping": t_map - t_match}}
+        return {"ok": False, "inputs": len(names), "registered": 0, "models": 0, "mapper": mapper,
+                "seconds": {"mapping": round(t_map - t0, 1)}}
     best_id = max(models, key=lambda k: models[k].num_reg_images())
     rec = models[best_id]
     best_dir = os.path.join(work_dir, "model")
@@ -96,6 +121,7 @@ def reconstruct(frames_dir: str, work_dir: str, video: list[str], photos: list[s
     rec.write(best_dir)
     return {
         "ok": True,
+        "mapper": mapper,
         "inputs": len(names),
         "registered": rec.num_reg_images(),
         "registered_names": sorted(img.name for img in rec.images.values() if img.has_pose),
@@ -103,9 +129,7 @@ def reconstruct(frames_dir: str, work_dir: str, video: list[str], photos: list[s
         "other_models_images": sorted(m.num_reg_images() for k, m in models.items() if k != best_id),
         "points3D": rec.num_points3D(),
         "mean_reprojection_error": rec.compute_mean_reprojection_error(),
-        "pairs": n_pairs,
         "cameras": {cid: str(c) for cid, c in rec.cameras.items()},
-        "seconds": {"features": round(t_feat - t0, 1), "matching": round(t_match - t_feat, 1),
-                    "mapping": round(t_map - t_match, 1), "total": round(t_map - t0, 1)},
+        "seconds": {"mapping": round(t_map - t0, 1)},
         "model_dir": best_dir,
     }
