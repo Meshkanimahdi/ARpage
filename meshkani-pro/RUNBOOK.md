@@ -12,9 +12,9 @@ Daily schedule (Tehran, user rule 2026-10-24):
 |---|---|---|
 | **06:00** | ANALYTICS: the daily review that starts the day (§6) | — |
 | **09:00** | reel + its story | 06:30, 07:30 (the same morning, after ANALYTICS; never the night before) |
-| **12:00** | post + 3 stories | 10:30, 11:05 |
+| **12:00** | post + 3 stories, **every other day** (§1 cadence, 2026-10-27) | 10:30, 11:05 |
 | **15:00** | reel + its story | 12:45, 13:45 |
-| **18:00** | post + 3 stories | 16:30, 17:05 |
+| ~~18:00~~ | disabled 2026-10-27 (carousels every other day) | — |
 | **21:00** | reel + its story | 18:45, 19:45 |
 
 Publish runs start at :57 the hour before. Each reel (one trending AI story, news-reel/STORY_SPEC.md) is
@@ -159,6 +159,28 @@ except one log row `DUPLICATE_RUN_STOPPED`.
 number of days since 2026-10-27 (Tehran date) is even (2026-10-29, 10-31, 11-02, …); on any other day the 12:00
 PREPARE, retry and PUBLISH write one log row "off day (carousel every other day)" and stop. The DAY_SUMMARY row
 (§2.6) is written by the 21:00 REEL_PUBLISH instead.
+
+**Carousel format (user rule 2026-10-27, overrides §1.3–§1.5 where they differ).** Mahdi approved all five
+fixes from the carousel analysis (26 carousels: median reach 38, about 3 % of followers; 1 save and 4 shares in
+total; reels median 1,429): «پیشنهادات همش خوب بود، همه رو اعمال».
+1. **Saveable, not news.** A carousel is a utility the viewer keeps: "5 prompts for …", a checklist, before/after,
+   "if you are a [job], these 4 tools …", "never tell ChatGPT these 5 things", a step-by-step how-to, a
+   comparison table. A real, sourced fact or recent news item may anchor it (one slide, with source), but the
+   carousel is the practical value. Breaking news goes to the reels.
+2. **Topics from the reel winners' family:** jobs, money, everyday life, a named group of people («اگه آشپزی…»,
+   «آرایشگرها…», HEADLINES.md angle G). No corporate/B2B deal news (banks, defence, pharma partnerships, utilities)
+   unless it changes the viewer's own job or money.
+3. **Slide roles:** slide 1 is a big hook cover in the reel-cover style (one plain line, ≥ 4–7 words, a real face,
+   product or object, strong contrast; the headline system and clear-before-clever apply); slide 2 delivers a
+   useful item at once (no context or date slide); slides 3–8 one item each, readable without the caption;
+   the last slide asks for the save or the send: «ذخیره کن تا یادت نره» / «برای یه [شغل/دوست] بفرست». The
+   caption's first line is the same hook, never a news-wire opening («X روز ۲۱ اکتبر اعلام کرد…»).
+4. **Push it to followers right after posting:** story 1 is the carousel's slide 1 with «پست جدید رو ببین 👆
+   ورق بزن» and the first useful item as a teaser; stories 2–3 tease two more items. (The Graph API cannot add
+   poll or link stickers, so the teaser has to make people open the post.)
+5. **Review after two weeks (2026-11-10):** the ANALYTICS phase compares carousels from 2026-10-29 on with the
+   old median (38 reach). If they do not reach ≥ 150 reach and several saves each, recommend cutting carousels
+   to one a week in `insights.json`.
 
 Goal: by publish time, a slot JSON with status `READY`, six QA-passed JPEGs in
 Drive and `Ready` rows in the sheet. Keep going only while
