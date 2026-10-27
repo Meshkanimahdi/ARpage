@@ -67,11 +67,11 @@ window.ready = (async () => {
   // fit: shrink the headline until it is at most 3 lines and stays inside the 4:5 grid crop
   // fit: shrink the headline until it is at most 3 lines and stays inside the 4:5 grid crop (y 285–1635)
   const T = $('title'), out = () => { const r = T.getBoundingClientRect(); return POS === 'bottom' ? r.top < 470 : (r.top < 320 || r.bottom > 1600); };
-  // big enough to read in the Explore grid (user rule 2026-10-25): start at 150 px, never below 112 px
+  // big enough to read in the Explore grid (user rule 2026-10-25): start at 150 px, never below 120 px (raised 2026-10-27)
   let fs = 150; T.style.fontSize = fs + 'px';
-  while (fs > 112 && (T.offsetHeight > fs * 1.12 * 3 + 4 || out())) { fs -= 4; T.style.fontSize = fs + 'px'; }
+  while (fs > 120 && (T.offsetHeight > fs * 1.12 * 3 + 4 || out())) { fs -= 2; T.style.fontSize = fs + 'px'; }
   const nWords = C.title.replace(/[*|]/g, ' ').trim().split(/\s+/).filter(w => w.length > 0).length;
-  if (T.offsetHeight > fs * 1.12 * 3 + 4 || out()) ISSUES.push(`headline does not fit at ${fs}px (min 112): shorten it (4–7 words read best)`);
+  if (T.offsetHeight > fs * 1.12 * 3 + 4 || out()) ISSUES.push(`headline does not fit at ${fs}px (min 120): shorten it (4–7 words read best)`);
   if (nWords > 9) ISSUES.push(`headline has ${nWords} words (max 9; 4–7 is best)`);
   window.REPORT = {font_px: fs, pos: POS, words: nWords, lines: Math.round(T.offsetHeight / (fs * 1.12)), title: C.title, kicker: C.kicker || '', logo: C.logo || ''};
   
