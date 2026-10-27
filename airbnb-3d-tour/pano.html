@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تور ۳۶۰ آپارتمان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap">
+<style>
+/* Layout: one full-bleed panorama; quiet glass chrome in the corners (place, map, controls) so the room stays the subject */
+:root {
+  --hud: rgba(14, 18, 17, 0.62);
+  --hud-strong: rgba(14, 18, 17, 0.82);
+  --hud-fg: #eef2f0;
+  --hud-muted: rgba(238, 242, 240, 0.68);
+  --hud-line: rgba(238, 242, 240, 0.16);
+  --accent: #5b86f0;
+  --ai: #f0b75b;
+  --body: "Vazirmatn", Tahoma, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; background: #0e1211; color: var(--hud-fg); font-family: var(--body); overflow: hidden; }
+#stage { position: fixed; inset: 0; touch-action: none; cursor: grab; }
+#stage.drag { cursor: grabbing; }
+#stage canvas { display: block; width: 100%; height: 100%; }
+.glass { background: var(--hud); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--hud-line); border-radius: 12px; }
+.top { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); left: calc(12px + env(safe-area-inset-left, 0px)); display: flex; gap: 8px; align-items: flex-start; pointer-events: none; }
+.top > * { pointer-events: auto; }
+.place { padding: 10px 14px; max-width: min(460px, 100%); min-width: 0; }
+.place .k { font-size: 11px; color: var(--hud-muted); letter-spacing: .02em; }
+.place h1 { margin: 2px 0 0; font-size: 16px; font-weight: 700; text-wrap: balance; }
+.place p { margin: 4px 0 0; font-size: 13px; color: var(--hud-muted); line-height: 1.7; }
+.badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 11.5px; color: var(--ai); }
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ai); }
+.tools { margin-inline-start: auto; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.btn { font: inherit; font-size: 13px; color: var(--hud-fg); padding: 8px 12px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.btn[aria-pressed="true"] { background: var(--accent); border-color: transparent; }
+.btn:focus-visible, #map:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bottom { position: fixed; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); left: calc(12px + env(safe-area-inset-left, 0px)); display: flex; gap: 8px; align-items: flex-end; pointer-events: none; }
+.bottom > * { pointer-events: auto; }
+#map { width: 180px; height: 210px; padding: 6px; cursor: pointer; }
+.nav { display: flex; gap: 6px; align-items: center; padding: 6px; margin-inline-start: auto; }
+.nav .btn { padding: 8px 14px; }
+.nav .count { font-size: 12px; color: var(--hud-muted); padding: 0 6px; font-variant-numeric: tabular-nums; }
+#hint { position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); padding: 7px 14px; font-size: 12.5px; color: var(--hud-muted); white-space: nowrap; transition: opacity .6s; pointer-events: none; }
+#load { position: fixed; inset: 0; display: grid; place-items: center; font-size: 14px; color: var(--hud-muted); pointer-events: none; transition: opacity .5s; }
+@media (max-width: 640px) {
+  #map { width: 120px; height: 140px; }
+  .place p { display: none; }
+  .tools .lbl { display: none; }
+  #hint { white-space: normal; width: calc(100% - 32px); text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) { #hint, #load { transition: none; } }
+</style>
+</head>
+<body>
+<div id="stage" aria-label="نمای ۳۶۰ درجه؛ برای نگاه کردن بکشید و برای رفتن روی دایره‌های کف بزنید"></div>
+<div id="load">در حال بارگذاری نما…</div>
+
+<div class="top">
+  <div class="place glass" aria-live="polite">
+    <div class="k" id="pk">ایستگاه</div>
+    <h1 id="pt">—</h1>
+    <p id="pc"></p>
+    <div class="badge" id="pb">نمای ساخته‌شده از رندرهای هوش مصنوعی و مدل؛ عکس ۳۶۰ واقعی نیست</div>
+  </div>
+  <div class="tools">
+    <button class="btn glass" id="bRot" type="button" aria-pressed="false">⟳ <span class="lbl">چرخش خودکار</span></button>
+    <button class="btn glass" id="bFull" type="button">⤢ <span class="lbl">تمام‌صفحه</span></button>
+    <a class="btn glass" href="tour.html">◧ <span class="lbl">مدل سه‌بعدی</span></a>
+  </div>
+</div>
+
+<div class="bottom">
+  <canvas id="map" class="glass" tabindex="0" aria-label="نقشه؛ روی هر نقطه بزنید تا به آن ایستگاه بروید"></canvas>
+  <div class="nav glass">
+    <button class="btn" id="bPrev" type="button" aria-label="ایستگاه قبلی">→</button>
+    <span class="count" id="cnt">۱ / ۱۵</span>
+    <button class="btn" id="bNext" type="button" aria-label="ایستگاه بعدی">←</button>
+  </div>
+</div>
+<div id="hint" class="glass">برای نگاه کردن به هر طرف بکشید · روی دایره‌های کف بزنید تا جلو بروید</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="home.js"></script>
+<script>
+(function () {
+  const H = window.HOME, fa = H.fa, $ = (id) => document.getElementById(id);
+  // stations 2, 4 and 10 were shot from on top of the bed: no place to stand in a walk-through
+  const SKIP = [2, 4, 10];
+  const NODES = H.PHOTOS.filter((q) => !SKIP.includes(q.n)), ORDER = H.TOUR_ORDER.filter((n) => !SKIP.includes(n));
+  const byN = Object.fromEntries(NODES.map((q) => [q.n, q]));
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const panoSrc = (n) => `panos/pano${String(n).padStart(2, "0")}.jpg`;
+  const yawFromPlan = (aDeg) => { const a = aDeg * Math.PI / 180; return Math.atan2(-Math.cos(a), -Math.sin(a)); };
+
+  if (!window.THREE) { $("load").textContent = "کتابخانه‌ی سه‌بعدی بارگذاری نشد. اتصال اینترنت را بررسی کنید و صفحه را دوباره باز کنید."; return; }
+  if (location.protocol === "file:") { $("load").textContent = "این صفحه را با یک سرور محلی باز کنید (python3 -m http.server)."; return; }
+
+  /* ---------- reachable neighbours: close enough and no wall in between ---------- */
+  const rects = H.WALL_RECTS.map((r) => ({ x0: r.x0 + .02, y0: r.y0 + .02, x1: r.x1 - .02, y1: r.y1 - .02 }));
+  function blocked(ax, ay, bx, by) {
+    return rects.some(({ x0, y0, x1, y1 }) => {
+      let t0 = 0, t1 = 1; const dx = bx - ax, dy = by - ay;
+      for (const [p, q] of [[-dx, ax - x0], [dx, x1 - ax], [-dy, ay - y0], [dy, y1 - ay]]) {
+        if (p === 0) { if (q < 0) return false; continue; }
+        const t = q / p; if (p < 0) t0 = Math.max(t0, t); else t1 = Math.min(t1, t);
+      }
+      return t0 < t1;
+    });
+  }
+  const neighbours = {};
+  NODES.forEach((a) => {
+    neighbours[a.n] = NODES.filter((b) => b !== a && Math.hypot(a.x - b.x, a.y - b.y) > .45 && Math.hypot(a.x - b.x, a.y - b.y) < 4.2 && !blocked(a.x, a.y, b.x, b.y)).map((b) => b.n);
+  });
+
+  /* ---------- renderer and panorama spheres ---------- */
+  const stage = $("stage");
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  stage.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, 1, .05, 100);
+  camera.rotation.order = "YXZ";
+
+  const loader = new THREE.TextureLoader(), texCache = {};
+  function tex(n) {
+    if (!texCache[n]) texCache[n] = new Promise((res) => loader.load(panoSrc(n), (t) => {
+      t.encoding = THREE.sRGBEncoding; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter;
+      t.anisotropy = renderer.capabilities.getMaxAnisotropy(); res(t);
+    }, undefined, () => res(null)));
+    return texCache[n];
+  }
+  // a sphere around the station; while moving, the sphere of the next station fades in around its own centre,
+  // which gives the forward-motion stretch of street-level tours
+  const R = 5;
+  function panoMesh() {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(R, 64, 32), new THREE.ShaderMaterial({
+      uniforms: { map: { value: null }, center: { value: new THREE.Vector3() }, opacity: { value: 1 } },
+      vertexShader: "varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position, 1.); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }",
+      fragmentShader: `uniform sampler2D map; uniform vec3 center; uniform float opacity; varying vec3 vW;
+        void main(){ vec3 d = normalize(vW - center);
+          vec2 uv = vec2(atan(d.x, -d.z) / 6.2831853 + .5, asin(clamp(d.y, -1., 1.)) / 3.1415927 + .5);
+          gl_FragColor = vec4(texture2D(map, uv).rgb, opacity);
+          #include <encodings_fragment>
+        }`,
+      side: THREE.BackSide, transparent: true, depthTest: false, depthWrite: false,
+    }));
+    m.frustumCulled = false;
+    scene.add(m);
+    return m;
+  }
+  const spheres = [panoMesh(), panoMesh()];
+  let front = 0;
+  function place(sphere, q, t) {
+    sphere.position.set(q.x, q.h, q.y);
+    sphere.material.uniforms.center.value.copy(sphere.position);
+    sphere.material.uniforms.map.value = t;
+  }
+
+  /* ---------- floor hotspots ---------- */
+  const accent = new THREE.Color("#5b86f0");
+  const spots = new THREE.Group(); scene.add(spots);
+  function spotMesh() {
+    const g = new THREE.Group();
+    const disc = new THREE.Mesh(new THREE.CircleGeometry(.24, 48), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .22, depthTest: false }));
+    const ring = new THREE.Mesh(new THREE.RingGeometry(.2, .245, 48), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .95, depthTest: false }));
+    [disc, ring].forEach((m) => { m.rotation.x = -Math.PI / 2; m.renderOrder = 10; g.add(m); });
+    g.userData.ring = ring; g.userData.disc = disc;
+    return g;
+  }
+  const cursor = spotMesh(); cursor.userData.ring.material.opacity = .6; cursor.userData.disc.material.opacity = .12; cursor.visible = false; scene.add(cursor);
+  function buildSpots(n) {
+    spots.clear();
+    neighbours[n].forEach((m) => {
+      const q = byN[m], s = spotMesh();
+      s.position.set(q.x, .02, q.y); s.userData.n = m;
+      spots.add(s);
+    });
+  }
+
+  /* ---------- view state ---------- */
+  let cur = null, yaw = 0, pitch = -.05, fov = 75, moving = null, auto = false, lastAct = performance.now();
+  const ease = (k) => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+
+  async function go(n, opts = {}) {
+    if (moving || n === cur) return;
+    const q = byN[n], from = cur ? byN[cur] : null;
+    const t = await tex(n);
+    if (!t) { $("load").textContent = "تصویر این نما پیدا نشد."; $("load").style.opacity = 1; return; }
+    $("load").style.opacity = 0;
+    neighbours[n].forEach(tex);                                     // preload where the visitor can go next
+    const back = spheres[1 - front];
+    place(back, q, t);
+    if (!from || opts.instant || reduced) {
+      spheres[front].visible = false; back.visible = true; back.material.uniforms.opacity.value = 1; front = 1 - front;
+      camera.position.set(q.x, q.h, q.y);
+      if (opts.yaw !== undefined) yaw = opts.yaw;
+      arrive(n); return;
+    }
+    // keep the heading, unless the jump is from the map or the buttons: then face the station's own view
+    const y0 = yaw, y1 = opts.face ? nearestAngle(y0, yawFromPlan(q.a)) : y0;
+    back.visible = true; back.material.uniforms.opacity.value = 0;
+    spots.visible = false; cursor.visible = false;
+    const p0 = camera.position.clone(), p1 = new THREE.Vector3(q.x, q.h, q.y);
+    const dist = p0.distanceTo(p1), dur = Math.min(1500, 650 + dist * 230), f0 = fov;
+    moving = { t0: performance.now(), step(k) {
+      const e = ease(k);
+      camera.position.lerpVectors(p0, p1, e);
+      yaw = y0 + (y1 - y0) * e;
+      fov = f0 - Math.sin(Math.PI * k) * 10;                       // a slight lean-in while moving
+      back.material.uniforms.opacity.value = Math.min(1, Math.max(0, (k - .15) / .6));
+      spheres[front].material.uniforms.opacity.value = 1 - Math.max(0, (k - .55) / .45);
+    }, done() {
+      fov = f0; spheres[front].visible = false; spheres[front].material.uniforms.opacity.value = 1; front = 1 - front;
+      back.material.uniforms.opacity.value = 1; arrive(n);
+    }, dur };
+  }
+  function nearestAngle(a, b) { while (b - a > Math.PI) b -= 2 * Math.PI; while (b - a < -Math.PI) b += 2 * Math.PI; return b; }
+  function arrive(n) {
+    cur = n; moving = null; spots.visible = true;
+    buildSpots(n);
+    const q = byN[n];
+    $("pk").textContent = `ایستگاه ${fa(n)} · ${H.roomName[q.room]}`;
+    $("pt").textContent = q.cap;
+    $("pc").textContent = q.ai
+      ? `این نقطه در آگهی عکسی نداشت؛ نما بر پایه‌ی عکس ${q.refs.map(fa).join(" و ")} آگهی و مدل ساخته شده.`
+      : `جای دوربین عکس ${fa(n)} آگهی؛ نمای کامل ۳۶۰ بر پایه‌ی عکس‌های آگهی و مدل ساخته شده.`;
+    $("cnt").textContent = `${fa(ORDER.indexOf(n) + 1)} / ${fa(ORDER.length)}`;
+    if (location.hash !== "#s" + n) history.replaceState(null, "", "#s" + n);
+    drawMap();
+  }
+
+  /* ---------- input: drag to look, wheel/pinch to zoom, click to move ---------- */
+  const ptrs = new Map(); let drag = null, pinch0 = 0;
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  function act() { lastAct = performance.now(); if (auto) setAuto(false); }
+  stage.addEventListener("pointerdown", (e) => {
+    stage.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (ptrs.size === 1) drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false, vy: 0, vp: 0 };
+    if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch0 = Math.hypot(a.x - b.x, a.y - b.y); drag = null; }
+    act();
+  });
+  stage.addEventListener("pointermove", (e) => {
+    if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (ptrs.size === 2) {
+      const [a, b] = [...ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (pinch0) { fov = THREE.MathUtils.clamp(fov * pinch0 / d, 35, 100); pinch0 = d; }
+      return;
+    }
+    if (drag) {
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y, k = fov / 75 * .0042;
+      if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 5) { drag.moved = true; stage.classList.add("drag"); }
+      if (drag.moved && !moving) { yaw += dx * k; pitch = THREE.MathUtils.clamp(pitch + dy * k, -1.45, 1.45); drag.vy = dx * k; drag.vp = dy * k; }
+      drag.x = e.clientX; drag.y = e.clientY;
+      cursor.visible = false;
+      return;
+    }
+    hover(e);
+  });
+  function endPtr(e) {
+    ptrs.delete(e.pointerId); stage.classList.remove("drag");
+    if (ptrs.size < 2) pinch0 = 0;
+    if (drag && !drag.moved && e.type === "pointerup") click(e);
+    if (drag && drag.moved) inertia = { vy: drag.vy, vp: drag.vp };
+    drag = null;
+  }
+  let inertia = null;
+  stage.addEventListener("pointerup", endPtr);
+  stage.addEventListener("pointercancel", endPtr);
+  stage.addEventListener("pointerleave", () => (cursor.visible = false));
+  stage.addEventListener("wheel", (e) => { e.preventDefault(); fov = THREE.MathUtils.clamp(fov + e.deltaY * .04, 35, 100); act(); }, { passive: false });
+
+  function rayFrom(e) {
+    const r = renderer.domElement.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+  }
+  function target(e) {
+    rayFrom(e);
+    const hit = ray.intersectObjects(spots.children, true)[0];
+    if (hit) { let o = hit.object; while (o && o.userData.n === undefined) o = o.parent; if (o) return { n: o.userData.n, at: o.position }; }
+    const p = ray.ray.intersectPlane(floorPlane, new THREE.Vector3());
+    if (!p || !cur) return null;
+    // a click on the floor goes to the reachable station closest to that spot
+    let best = null, bd = 1.6;
+    neighbours[cur].forEach((m) => { const q = byN[m], d = Math.hypot(q.x - p.x, q.y - p.z); if (d < bd) { bd = d; best = m; } });
+    return best ? { n: best, at: new THREE.Vector3(byN[best].x, .02, byN[best].y), floor: p } : null;
+  }
+  function hover(e) {
+    if (e.pointerType !== "mouse" || moving) return;
+    const t = target(e);
+    spots.children.forEach((s) => { const on = t && s.userData.n === t.n; s.scale.setScalar(on ? 1.25 : 1); s.userData.ring.material.color.set(on ? accent : 0xffffff); });
+    stage.style.cursor = t ? "pointer" : "";
+    if (t && t.floor) { cursor.visible = true; cursor.position.set(t.floor.x, .02, t.floor.z); } else cursor.visible = false;
+  }
+  function click(e) { const t = target(e); if (t) go(t.n); }
+
+  addEventListener("keydown", (e) => {
+    if (e.target.closest && e.target.closest("button, a")) return;
+    const step = .08;
+    if (e.key === "ArrowLeft") { yaw += step; act(); }
+    else if (e.key === "ArrowRight") { yaw -= step; act(); }
+    else if (e.key === "ArrowUp" || e.key === "w") { forward(); act(); }
+    else if (e.key === "ArrowDown") { pitch = Math.max(-1.45, pitch - step); act(); }
+  });
+  // forward: the reachable station most in front of the view
+  function forward() {
+    if (!cur) return;
+    const d = camera.getWorldDirection(new THREE.Vector3()), q0 = byN[cur];
+    let best = null, bs = .55;
+    neighbours[cur].forEach((m) => {
+      const q = byN[m], v = new THREE.Vector2(q.x - q0.x, q.y - q0.y), L = v.length();
+      const c = (v.x * d.x + v.y * d.z) / (L * Math.hypot(d.x, d.z));
+      if (c - L * .04 > bs) { bs = c - L * .04; best = m; }
+    });
+    if (best) go(best);
+  }
+
+  /* ---------- map ---------- */
+  const map = $("map"), mctx = map.getContext("2d");
+  let mapT = null;
+  function drawMap() {
+    const dpr = Math.min(devicePixelRatio || 1, 2), W = map.clientWidth, Hh = map.clientHeight;
+    map.width = W * dpr; map.height = Hh * dpr;
+    const xs = H.WALL_RECTS.flatMap((r) => [r.x0, r.x1]), ys = H.WALL_RECTS.flatMap((r) => [r.y0, r.y1]);
+    const mnx = Math.min(...xs), mxx = Math.max(...xs), mny = Math.min(...ys), mxy = Math.max(...ys), pad = 10;
+    const s = Math.min((W - 2 * pad) / (mxx - mnx), (Hh - 2 * pad) / (mxy - mny));
+    const ox = (W - s * (mxx - mnx)) / 2 - mnx * s, oy = (Hh - s * (mxy - mny)) / 2 - mny * s;
+    mapT = { s, ox, oy };
+    const X = (x) => ox + x * s, Y = (y) => oy + y * s;
+    mctx.setTransform(dpr, 0, 0, dpr, 0, 0); mctx.clearRect(0, 0, W, Hh);
+    mctx.fillStyle = "rgba(238,242,240,.06)";
+    H.ROOMS.forEach((r) => mctx.fillRect(X(r.x), Y(r.y), r.w * s, r.h * s));
+    mctx.fillStyle = "rgba(238,242,240,.85)";
+    H.WALL_RECTS.forEach((r) => mctx.fillRect(X(r.x0), Y(r.y0), (r.x1 - r.x0) * s, (r.y1 - r.y0) * s));
+    if (cur) {
+      const q = byN[cur], d = camera.getWorldDirection(new THREE.Vector3()), a = Math.atan2(d.z, d.x), half = THREE.MathUtils.degToRad(camera.fov * camera.aspect / 2);
+      const g = mctx.createRadialGradient(X(q.x), Y(q.y), 0, X(q.x), Y(q.y), 34);
+      g.addColorStop(0, "rgba(91,134,240,.75)"); g.addColorStop(1, "rgba(91,134,240,0)");
+      mctx.fillStyle = g; mctx.beginPath(); mctx.moveTo(X(q.x), Y(q.y)); mctx.arc(X(q.x), Y(q.y), 34, a - Math.min(half, 1.2), a + Math.min(half, 1.2)); mctx.closePath(); mctx.fill();
+    }
+    NODES.forEach((q) => {
+      const on = q.n === cur, near = cur && neighbours[cur].includes(q.n);
+      mctx.beginPath(); mctx.arc(X(q.x), Y(q.y), on ? 5 : 3.4, 0, Math.PI * 2);
+      mctx.fillStyle = on ? "#5b86f0" : q.ai ? "#f0b75b" : near ? "#ffffff" : "rgba(238,242,240,.55)";
+      mctx.fill();
+      if (on) { mctx.lineWidth = 2; mctx.strokeStyle = "#ffffff"; mctx.stroke(); }
+    });
+  }
+  map.addEventListener("click", (e) => {
+    if (!mapT) return;
+    const r = map.getBoundingClientRect(), x = (e.clientX - r.left - mapT.ox) / mapT.s, y = (e.clientY - r.top - mapT.oy) / mapT.s;
+    let best = null, bd = 1.2;
+    NODES.forEach((q) => { const d = Math.hypot(q.x - x, q.y - y); if (d < bd) { bd = d; best = q.n; } });
+    if (best) { act(); go(best, { face: true }); }
+  });
+
+  /* ---------- buttons ---------- */
+  const step = (k) => { act(); go(ORDER[(ORDER.indexOf(cur) + k + ORDER.length) % ORDER.length], { face: true }); };
+  $("bNext").addEventListener("click", () => step(1));
+  $("bPrev").addEventListener("click", () => step(-1));
+  function setAuto(v) { auto = v; $("bRot").setAttribute("aria-pressed", String(v)); }
+  $("bRot").addEventListener("click", () => setAuto(!auto));
+  $("bFull").addEventListener("click", () => {
+    const el = document.documentElement;
+    if (!document.fullscreenElement) (el.requestFullscreen ? el.requestFullscreen() : Promise.reject()).catch(() => {});
+    else document.exitFullscreen().catch(() => {});
+  });
+
+  /* ---------- loop ---------- */
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); drawMap();
+  }
+  addEventListener("resize", resize);
+  let last = performance.now(), mapTick = 0;
+  function frame(now) {
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    if (moving) { const k = Math.min(1, (now - moving.t0) / moving.dur); moving.step(k); if (k >= 1) moving.done(); }
+    else {
+      if (inertia) { yaw += inertia.vy; pitch = THREE.MathUtils.clamp(pitch + inertia.vp, -1.45, 1.45); inertia.vy *= .9; inertia.vp *= .9; if (Math.abs(inertia.vy) + Math.abs(inertia.vp) < 1e-4) inertia = null; }
+      if (!auto && !reduced && now - lastAct > 9000) setAuto(true);
+      if (auto) yaw += dt * .09;
+    }
+    camera.rotation.set(pitch, yaw, 0);
+    camera.fov = fov; camera.updateProjectionMatrix();
+    renderer.render(scene, camera);
+    if (now - mapTick > 120) { mapTick = now; drawMap(); }
+    requestAnimationFrame(frame);
+  }
+  setTimeout(() => ($("hint").style.opacity = 0), 7000);
+
+  const start = +((location.hash.match(/^#s(\d+)$/) || [])[1]) || ORDER[0];
+  const q0 = byN[start] || byN[ORDER[0]];
+  resize();
+  go(q0.n, { instant: true, yaw: yawFromPlan(q0.a) }).then(() => requestAnimationFrame(frame));
+  addEventListener("hashchange", () => { const m = location.hash.match(/^#s(\d+)$/); if (m && byN[+m[1]] && +m[1] !== cur) go(+m[1], { face: true }); });
+  window.PANO = { go, look(y, p) { yaw = y; pitch = p; } };
+})();
+</script>
+</body>
+</html>
