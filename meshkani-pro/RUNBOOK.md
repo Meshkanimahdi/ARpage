@@ -77,6 +77,10 @@ publish twice, never publish late, never publish unverified content.
 4. Run the whole of `meshkani-pro/workbench/drive_bridge.py` in one
    `COMPOSIO_REMOTE_WORKBENCH` call (it prints `drive_bridge ready`). Workbench
    state persists between calls, so later cells can call its helpers.
+   **The workbench sandbox is shared with the responder session (2026-10-27: its `rows` overwrote ours and 6
+   comment-log rows landed in Stories).** Never pass data between cells in a plain global (`rows`, `data`,
+   `values`, `res`…): build the payload and send it in the same cell, or use names prefixed `pub_<RUN_ID-hex>_`.
+   Read back every sheet write.
 5. `RUN_ID` = `<phase>-<UTC yyyymmddHHMMSS>-<4 random hex>`.
 6. Slot: `python3 meshkani-pro/scripts/tehran.py slot <phase>`. If it returns no
    slot, write one log row (§3) "no slot window open" and stop.
