@@ -865,6 +865,12 @@ narrator talks, nothing attractive in the picture").
      subject (brand or person in Latin, or a plain noun); one number or stake when the facts have one; no metaphor,
      pun, nickname or riddle; a newcomer can repeat it in one sentence. Write 12 candidates (HEADLINES.md), then
      test the top 3 by asking yourself "what is this about?" and drop any that need the news to understand.
+   - **Headline test first, text only (2026-10-28, after REEL-016 failed on clarity 6 with everything else
+     7–8):** before any image, voice or engine work, give the independent critic only the top 3 headline
+     candidates and a one-line story summary, and ask for `headline_clarity` (1–10) and the one-sentence
+     paraphrase a newcomer would give. Keep only a headline scoring ≥ 8 whose paraphrase matches the story (who
+     did what, to whom). None reaches 8 → rewrite and test again (it costs nothing), or pick another story.
+     The voice's first line uses that exact headline.
    - **Cover:** a real photo of the main subject (a person's face, the product, or the place), big (≥ 50 % of the
      frame), bright, high contrast, warm or saturated colour; the headline at 120–150 px in the calm area; the real
      logo chip only for the main subject; no illustration, no UI screenshot as the whole cover, nothing dark or
