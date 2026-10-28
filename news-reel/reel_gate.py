@@ -124,6 +124,11 @@ def main():
     if not fld: fails.append('story.json must name field (topic family, e.g. beauty, robotics, health, money)')
     elif fld in recent: fails.append(f'field {fld} repeats a recent reel/post ({recent})')
 
+    # 4b2. concept gate (user rule 2026-10-28): the concept was approved before any production
+    cg = d / 'concept_gate.json'
+    if not cg.exists() or not json.loads(cg.read_text()).get('pass'):
+        fails.append('no passing concept_gate.json: approve headline, hook, cover and motion plan before production (concept_gate.py)')
+
     # 4c. preflight (user rule 2026-10-27): cover, headline and hook were judged on stills before the full render
     pf = d / 'preflight.json'
     if not pf.exists() or not json.loads(pf.read_text()).get('pass'):

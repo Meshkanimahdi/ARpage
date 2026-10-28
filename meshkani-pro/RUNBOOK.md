@@ -312,6 +312,18 @@ Mahdi: one storyboard image, cut into slides, gives better quality, lower cost a
 - **Publish (§2.3):** one carousel with 9 children (video children with music, image children as fallback).
 
 ### 1.4 Content (Persian)
+**Concept gate first (user rule 2026-10-28, blocking).** Before any image call, write `work/concept.json`
+(story, 3 headlines + chosen, `format`, the slide list from hook to the save/send ask, cover subject) and run
+`python3 news-reel/concept_gate.py --dir work --kind post lint`, the independent critic, then `… check`.
+   The critic is a fresh subagent (Agent tool, no shared context) that gets only `concept.json` and the previous
+   3 covers' headlines; it answers JSON `{"scores": {…}, "paraphrase": "<what a newcomer thinks the headline
+   means, one sentence>", "notes": {…}}` → `critic_concept.json`. Scores 1–10: `headline_clarity` (≥ 8; ≤ 4 when
+   the paraphrase does not match who did what to whom), `story_appeal` (would a Persian scroller who is not into
+   tech care? jobs, money, everyday life win), `hook_plan` (is frame 0 a real, bright, big subject with the
+   headline on screen and moving?), `cover_plan` (real face/product, big plain headline, clear at thumbnail size),
+   and `save_value` (would someone save or send it?). Bars: clarity 8, the rest 7. Fix and repeat (text
+   only, it costs nothing), at most 4 rounds; still failing → choose another story or angle.
+
 Content ID: the next `POST-NNN` after the highest id in the sheet **and** in any
 slot file. Stories are `POST-NNN-STORY-1..3`.
 
@@ -807,6 +819,24 @@ narrator talks, nothing attractive in the picture").
    (only if confirmed) or paraphrase, allowed claims, field, selection reason.
 
 ### 4.3 Script, voice, elements
+-1. **Concept gate, before anything is produced (user rule 2026-10-28, blocking).** Mahdi: «یه کاری کن قبل از
+   تولید همه چیز کنترل کیفیت بشه مخصوصا هوک کاور و تیترش». Before any image, voice, engine or render, write
+   `work/story/concept.json` (format in `news-reel/concept_gate.py`): the story, 3 headlines and the chosen one,
+   the first spoken line, the hook plan (frame 0, motion, on-screen line), the cover plan (real subject, position,
+   kicker, sub, logo) and the motion plan (prompt + at least 6 scenes with ≥ 4 animated layers each). Run
+   `python3 news-reel/concept_gate.py --dir work/story --kind reel --history motion_history.json lint` (exit 3 →
+   fix: word count, AI words, cover position, prompt family, thin scenes, field cooldown), then the critic, then
+   `concept_gate.py … check` (exit 0 = go). The production must then follow the approved concept; the preflight
+   (§4.4 step 0) and the gate check the built version.
+   The critic is a fresh subagent (Agent tool, no shared context) that gets only `concept.json` and the previous
+   3 covers' headlines; it answers JSON `{"scores": {…}, "paraphrase": "<what a newcomer thinks the headline
+   means, one sentence>", "notes": {…}}` → `critic_concept.json`. Scores 1–10: `headline_clarity` (≥ 8; ≤ 4 when
+   the paraphrase does not match who did what to whom), `story_appeal` (would a Persian scroller who is not into
+   tech care? jobs, money, everyday life win), `hook_plan` (is frame 0 a real, bright, big subject with the
+   headline on screen and moving?), `cover_plan` (real face/product, big plain headline, clear at thumbnail size),
+   and for reels `motion_plan` (every scene ≥ 4 animated layers: numbers, charts, UI, glow; not photos sliding)
+   or for posts `save_value` (would someone save or send it?). Bars: clarity 8, the rest 7. Fix and repeat (text
+   only, it costs nothing), at most 4 rounds; still failing → choose another story or angle.
 0. **Motion style first (mandatory).** Follow the workflow in `.claude/skills/motion-graphy-2026/SKILL.md`:
    - read `references/index.md` and shortlist 3 prompts for this story;
    - choose one, using the category table, `insights.json → leaders.motion_category` and the skill's
