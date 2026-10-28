@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — keynote UI film (prompt 155)</title>
+<!-- Skill motion-graphy-2026, prompt 155 "Photo print app launch film" (UI), built as its own engine.
+     Look from the prompt: an Apple-keynote launch film, 2D, one continuous take: nothing fades or cuts — shapes change
+     instead. Text rises out of a mask line, icons pop from zero on a closed-form spring, bars draw across, a black
+     shape floods the frame and contracts into the next scene, an iris of six blades snaps open onto a photo, a cursor
+     drives every change with real clicks, and the camera zooms screen-studio style onto each moment. Warm off-white
+     canvas, black UI. Banned (kept): crossfades, blur-ins, 3D flips, particles, glows, holds longer than 1 s.
+     Allowed edits: square → 1080x1920, 54 beats → the voiced length at 120 BPM, the photo-print app → the story's
+     subject (story.product), downloaded SFX → per-cut sfx + music bed (page standard), the opening → the real photo
+     hook (RUNBOOK §4.0 rule 4).
+     Data: story.json beats[{id, text, scene{type, img}}]; el/<product>.png, el/<brand>.png real logos; raw/sNN.png.
+     Scene types: hook, peek, intro, menu, pin, folder, search, plans, warn, support, crypto, ask (+ end). -->
+<style>
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --paper: #F3EFE7; --ink: #0E0E0E; --mute: #8A867E; --line: #DDD7CC; --gpt: #10A37F; --red: #E5322D; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--paper); }
+  #root { position: absolute; inset: 0; overflow: hidden; font-family: V; font-weight: 900; color: var(--ink); }
+  #cam, #stage, #over, #caps { position: absolute; inset: 0; }
+  #cam { transform-origin: 0 0; }
+  .a { position: absolute; }
+  .row { display: flex; align-items: center; }
+  .mask { overflow: hidden; display: inline-block; vertical-align: bottom; }
+</style>
+</head>
+<body>
+<div id="root"><div id="cam"><div id="stage"></div></div><div id="over"></div><div id="caps"></div></div>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const url = f => f.startsWith('/') ? f : DIR + f, byId = id => document.getElementById(id);
+const cl = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v)), mix = (a, b, k) => a + (b - a) * k;
+const lin = (t, a, b) => cl((t - a) / (b - a));
+// closed-form spring step response (prompt build 2): 0 → 1 with a small overshoot, a pure function of time
+const spr = (t, t0, w = 16, z = .55) => { const u = t - t0; if (u <= 0) return 0; const wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * u) * (Math.cos(wd * u) + z * w / wd * Math.sin(wd * u)); };
+const eo = k => 1 - Math.pow(1 - cl(k), 3), eio = k => (k = cl(k), k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+const fa = s => String(s).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const BPM = 120, BT = 60 / BPM;
+const ISS = [];
+let S, TL, B = [], DUR = 50;
+
+function parse(b) {
+  const L = TL.lines[b.id]; if (!L) { ISS.push('no timing ' + b.id); return null; }
+  const raw = b.text.replace(/\[[^\]]*\]/g, ' ');
+  const spoken = raw.replace(/\{[^|}]*\|([^}]*)\}/g, '$1').replace(/\*/g, '').trim().split(/\s+/);
+  const n = L.words.length, idx = i => spoken.length === n ? i : Math.round(cl(i / Math.max(1, spoken.length - 1)) * (n - 1));
+  const tw = i => (L.words[idx(cl(i, 0, spoken.length - 1))] || [L.start])[0];
+  const W = []; let si = 0, hot = false;
+  for (const tok of raw.replace(/\{([^|}]*)\|([^}]*)\}/g, (m, a, c) => a.replace(/\s/g, '\u0002') + '\u0001' + c.trim().split(/\s+/).length).trim().split(/\s+/)) {
+    let w = tok, sp = 1; if (w.includes('\u0001')) { const [p, r] = w.split('\u0001'); sp = parseInt(r, 10) || 1; w = p + r.replace(/^\d+/, ''); }
+    if (w.startsWith('*')) hot = true; const h = hot; if (/\*[«»"'.…،؛!؟?:]*$/.test(w)) hot = false;
+    W.push({w: w.replace(/\*/g, '').replace(/\u0002/g, ' '), h, t: tw(si)}); si += sp;
+  }
+  const at = (sub, k = 0) => { const m = W.filter(x => x.w.includes(sub)); if (!m.length) { ISS.push(`${b.id}: no word "${sub}"`); return L.start; } return m[Math.min(k, m.length - 1)].t; };
+  return {b, s: b.scene || {}, L, W, at};
+}
+
+window.ready = (async () => {
+  S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json();
+  DUR = TL.total; B = S.beats.map(parse).filter(Boolean);
+  B.forEach((x, i) => { x.i = i; x.a = i ? x.L.start - .1 : 0; x.z = i + 1 < B.length ? B[i + 1].L.start - .1 : TL.end_start; });
+  const imgs = [...new Set(B.map(x => x.s.img).filter(Boolean))].map(n => url('raw/' + n + '.png')).concat([url('el/' + LOGO()), url('el/' + BRANDLOGO())]);
+  await Promise.all(imgs.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = u; })));
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'قفل ChatGPT')));
+  B.forEach(x => { x.keys = (HITS[x.s.type] || (() => []))(x).filter(v => v > x.a + .6 && v < x.z - .6).sort((p, q) => p - q); });
+  const sc = [];
+  for (const x of B) { const pts = [x.a, ...x.keys];
+    pts.forEach((p, j) => sc.push({t0: +p.toFixed(2), t1: +(j + 1 < pts.length ? pts[j + 1] : x.z).toFixed(2), type: x.s.type, bg: x.b.id + (j ? '.' + j : ''), sfx: [[p, j ? 'hit' : 'whoosh', j ? .35 : .3]]})); }
+  sc.push({t0: TL.end_start, t1: DUR, type: 'end', bg: 'end', sfx: [[TL.end_start + .1, 'hit', .45]]});
+  window.SCENES = sc; window.START = 0; window.DURATION = DUR; window.ISSUES = ISS;
+  for (const c of sc) if (c.t1 - c.t0 > 3.2) ISS.push(`shot ${c.bg} holds ${(c.t1 - c.t0).toFixed(1)} s: add a hit`);
+  seek(0);
+})();
+const LOGO = () => (S.product || 'chatgpt').toLowerCase().replace(/[^a-z0-9]/g, '') + '.png';
+const BRANDLOGO = () => (S.brand || 'openai').toLowerCase().replace(/[^a-z0-9]/g, '') + '.png';
+
+// key moments inside a beat: each one is a screen-studio zoom (a new framing) so no idea holds still
+const HITS = {
+  hook: x => [x.at('قفل'), x.at('رمز')], peek: x => [x.at('جلوی')], intro: x => [x.at('اکتبر'), x.at('هشدار')], menu: x => [x.at('Lock')],
+  pin: x => [x.at('Face')], folder: x => [x.at('Locked')], search: x => [x.at('جستجو')], plans: x => [x.at('Pro'), x.at('آروم')],
+  warn: x => [x.at('یادت'), x.at('ریستش'), x.at('پاک')], support: x => [x.at('نمی‌تونه')], crypto: x => [x.at('رمزنگاری')], ask: x => []
+};
+// camera keys [time, scale, focusX, focusY]
+const CAM = {
+  hook: x => [[0, 1, 540, 960], [x.at('رمز'), 1.06, 540, 900]],
+  peek: x => [[x.a, 1, 540, 960], [x.at('جلوی'), 1.12, 540, 1080]],
+  intro: x => [[x.a, 1.2, 540, 900], [x.at('اکتبر'), 1, 540, 960], [x.at('هشدار'), 1.12, 540, 1150]],
+  menu: x => [[x.a, 1, 540, 960], [x.a + 1.0, 1.18, 700, 640], [x.at('Lock'), 1.22, 640, 860]],
+  pin: x => [[x.a, 1, 540, 960], [x.at('Face'), 1.12, 600, 860]],
+  folder: x => [[x.a, 1.1, 540, 900], [x.at('Locked'), 1.2, 540, 980]],
+  search: x => [[x.a, 1.15, 540, 620], [x.at('جستجو'), 1, 540, 960]],
+  plans: x => [[x.a, 1, 540, 960], [x.at('Pro'), 1.1, 540, 900], [x.at('آروم'), 1.15, 540, 1200]],
+  warn: x => [[x.a, 1, 540, 960], [x.at('یادت'), 1.14, 540, 820], [x.at('ریستش'), 1.04, 540, 900], [x.at('پاک'), 1.1, 540, 1080]],
+  support: x => [[x.a, 1.1, 540, 900], [x.at('نمی‌تونه'), 1.18, 540, 1000]],
+  crypto: x => [[x.a, 1, 540, 960], [x.at('رمزنگاری'), 1.14, 540, 900]],
+  ask: x => [[x.a, 1, 540, 960]]
+};
+function camAt(x, t) {
+  const k = (CAM[x.s.type] || (() => [[0, 1, 540, 960]]))(x);
+  let i = 0; for (let j = 0; j < k.length; j++) if (t >= k[j][0]) i = j;
+  const p = k[Math.max(0, i - 1)], q = k[i], m = i ? eio(lin(t, q[0], q[0] + .45)) : 1;
+  return {s: mix(p[1], q[1], m) * (1 + .02 * lin(t, x.a, x.z)), x: mix(p[2], q[2], m), y: mix(p[3], q[3], m)};
+}
+
+function seek(t) {
+  if (!B.length) return;
+  NOW = t;
+  let x = B[0]; for (const q of B) if (t >= q.a) x = q;
+  const end = t >= TL.end_start, c = end ? {s: 1, x: 540, y: 960} : camAt(x, t);
+  byId('cam').style.transform = `translate(540px,960px) scale(${c.s.toFixed(4)}) translate(${(-c.x).toFixed(1)}px,${(-c.y).toFixed(1)}px)`;
+  const h = end ? endCard(t - TL.end_start) : scene(x, t);
+  const st = byId('stage'); if (st._h !== h) { st._h = h; st.innerHTML = h; }
+  const o = flood(t); const ov = byId('over'); if (ov._h !== o) { ov._h = o; ov.innerHTML = o; }
+  const cp = end ? '' : caption(x, t); const ca = byId('caps'); if (ca._h !== cp) { ca._h = cp; ca.innerHTML = cp; }
+}
+// the black shape: at every beat change it floods out from a dot (0.25 s) and contracts away into the next scene (0.3 s)
+function flood(t) {
+  for (let i = 1; i <= B.length; i++) {
+    const T0 = i < B.length ? B[i].a : TL.end_start;
+    if (t > T0 - .17 && t < T0 + .3) {
+      const r = t < T0 ? 2300 * eio(lin(t, T0 - .17, T0)) : 2300 * (1 - eio(lin(t, T0, T0 + .3)));
+      const cx = i % 2 ? 760 : 320, cy = i % 3 ? 1100 : 760;
+      return `<div class="a" style="left:${(cx - r).toFixed(0)}px;top:${(cy - r).toFixed(0)}px;width:${(2 * r).toFixed(0)}px;height:${(2 * r).toFixed(0)}px;border-radius:50%;background:var(--ink)"></div>`;
+    }
+  }
+  return '';
+}
+
+// ---------- parts ----------
+const logo = (f, s, bg = '#fff') => `<span style="display:inline-flex;align-items:center;justify-content:center;width:${s}px;height:${s}px;border-radius:${s * .26}px;background:${bg};vertical-align:middle;box-shadow:0 6px 18px rgba(0,0,0,.12)"><img src="${url('el/' + f)}" style="width:${s * .72}px;height:${s * .72}px;object-fit:contain"></span>`;
+// text rising out of a mask line
+const rise = (html, k, sz, col = 'var(--ink)') => `<span class="mask" style="font-size:${sz}px;line-height:1.25;color:${col}"><span style="display:inline-block;transform:translateY(${((1 - eo(k)) * 110).toFixed(1)}%)">${html}</span></span>`;
+const pop = (t, t0) => cl(spr(t, t0, 18, .5), 0, 1.25);
+function chip(html, x0, y0, sz, bg, fg, t, t0, dir = 'rtl') {
+  const k = pop(t, t0); if (k <= 0) return '';
+  return `<div class="a" style="left:${x0}px;top:${y0}px;padding:${sz * .16}px ${sz * .42}px ${sz * .26}px;border-radius:${sz}px;background:${bg};color:${fg};font:900 ${sz}px/1.15 V;white-space:nowrap;direction:${dir};transform:scale(${k.toFixed(3)});transform-origin:50% 50%">${html}</div>`;
+}
+function cursor(x0, y0, press) {
+  return `<svg class="a" style="left:${x0}px;top:${y0}px;overflow:visible;transform:scale(${(1 - .18 * press).toFixed(3)});transform-origin:0 0" width="60" height="80"><path d="M0 0 L0 58 L15 45 L26 72 L37 67 L26 41 L46 41 Z" fill="#0E0E0E" stroke="#fff" stroke-width="5" stroke-linejoin="round"/></svg>` +
+    (press > 0 ? `<div class="a" style="left:${x0 - 34}px;top:${y0 - 34}px;width:68px;height:68px;border-radius:50%;border:5px solid rgba(14,14,14,${(.5 * press).toFixed(2)});transform:scale(${(1 + (1 - press)).toFixed(2)})"></div>` : '');
+}
+// cursor path: list of [time, x, y, click?]; eased moves between points, a press dip on clicks
+function cur(t, path) {
+  let i = 0; for (let j = 0; j < path.length; j++) if (t >= path[j][0]) i = j;
+  const p = path[i], q = path[Math.min(i + 1, path.length - 1)], m = q === p ? 0 : eio(lin(t, p[0] + .1, q[0]));
+  let press = 0; for (const c of path) if (c[3]) press = Math.max(press, Math.exp(-((t - c[0]) ** 2) / .006));
+  return cursor(mix(p[1], q[1], m), mix(p[2], q[2], m), press);
+}
+// six-blade iris over a photo (prompt build 5): open fraction k
+function iris(img, x0, y0, d, k, t, a) {
+  const R = d / 2, ap = R * mix(.0, 1.05, eo(k)), blades = [];
+  for (let i = 0; i < 6; i++) { const th = i * Math.PI / 3 + (1 - k) * .9, ph = th + Math.PI / 3;
+    const p1 = [R + ap * Math.cos(th), R + ap * Math.sin(th)], p2 = [R + ap * Math.cos(ph), R + ap * Math.sin(ph)];
+    const far = 3 * R, q1 = [R + far * Math.cos(th + .3), R + far * Math.sin(th + .3)], q2 = [R + far * Math.cos(ph + .3), R + far * Math.sin(ph + .3)];
+    blades.push(`<polygon points="${[p1, p2, q2, q1].map(p => p.map(v => v.toFixed(1)).join(',')).join(' ')}" fill="#0E0E0E" stroke="#2A2A2A" stroke-width="3"/>`); }
+  const sc = mix(1.15, 1.02, lin(t, a, a + 4));
+  return `<div class="a" style="left:${x0}px;top:${y0}px;width:${d}px;height:${d}px;border-radius:50%;overflow:hidden">` +
+    `<img src="${url('raw/' + img + '.png')}" style="position:absolute;left:0;top:${-d * .35}px;width:${d}px;height:${d * 1.78}px;object-fit:cover;transform:scale(${sc.toFixed(3)})">` +
+    `<svg class="a" style="left:0;top:0" width="${d}" height="${d}">${blades.join('')}</svg></div>`;
+}
+// rebuilt ChatGPT phone screen (black UI on white): header, bubbles; children drawn inside
+function phone(x0, y0, w, h, inner, k = 1, tilt = 0) {
+  return `<div class="a" style="left:${x0}px;top:${y0}px;width:${w}px;height:${h}px;border-radius:${w * .12}px;background:#0E0E0E;padding:14px;box-sizing:border-box;transform:translateY(${((1 - eo(k)) * 260).toFixed(1)}px) rotate(${tilt}deg);box-shadow:0 30px 60px rgba(0,0,0,.18)">` +
+    `<div style="position:relative;width:100%;height:100%;border-radius:${w * .1}px;background:#fff;overflow:hidden">${inner}</div></div>`;
+}
+const head = (w, title = 'ChatGPT', dots = false) => `<div class="row" style="height:110px;padding:0 30px;gap:16px;direction:ltr;border-bottom:2px solid #EEE">${logo(LOGO(), 60)}<span style="font:900 42px V">${title}</span>${dots ? '<span style="margin-left:auto;font:900 46px V;letter-spacing:4px">···</span>' : ''}</div>`;
+const bub = (x0, y0, w, h, dark) => `<div class="a" style="left:${x0}px;top:${y0}px;width:${w}px;height:${h}px;border-radius:${h / 2}px;background:${dark ? '#0E0E0E' : '#ECECF1'}"></div>`;
+function padlock(cx, cy, s, k, col = '#0E0E0E') {
+  if (k <= 0) return ''; const sh = 1 - cl((k - .6) / .4) * 0;
+  return `<svg class="a" style="left:${cx - 70 * s}px;top:${cy - 90 * s}px;overflow:visible;transform:scale(${k.toFixed(3)});transform-origin:${70 * s}px ${90 * s}px" width="${140 * s}" height="${180 * s}" viewBox="0 0 140 180">` +
+    `<path d="M30 80 V55 a40 40 0 0 1 80 0 V80" fill="none" stroke="${col}" stroke-width="18"/><rect x="10" y="78" width="120" height="96" rx="20" fill="${col}"/>` +
+    `<circle cx="70" cy="118" r="13" fill="#fff"/><rect x="64" y="122" width="12" height="28" rx="5" fill="#fff"/></svg>`;
+}
+function faceRing(cx, cy, r, k, ok) {
+  const L = 2 * Math.PI * r;
+  return `<svg class="a" style="left:${cx - r - 10}px;top:${cy - r - 10}px;overflow:visible" width="${2 * r + 20}" height="${2 * r + 20}"><circle cx="${r + 10}" cy="${r + 10}" r="${r}" fill="none" stroke="${ok ? 'var(--gpt)' : '#0E0E0E'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="${(L * (1 - eo(k))).toFixed(1)}" transform="rotate(-90 ${r + 10} ${r + 10})"/></svg>`;
+}
+const check = (cx, cy, s, k) => k <= 0 ? '' : `<div class="a" style="left:${cx - s / 2}px;top:${cy - s / 2}px;width:${s}px;height:${s}px;border-radius:50%;background:var(--gpt);color:#fff;display:flex;align-items:center;justify-content:center;font-size:${s * .6}px;transform:scale(${k.toFixed(3)})">✓</div>`;
+let NOW = 0;
+const FR = [[60, 140, 300, 70, .6], [720, 200, 260, 70, 1], [820, 1420, 220, 64, .8], [40, 1480, 280, 70, 1.2], [880, 980, 170, 60, .5], [30, 860, 160, 60, .9]];
+const grid = () => `<div class="a" style="inset:0;background-image:radial-gradient(#D9D3C6 2.5px,transparent 2.5px);background-size:54px 54px;background-position:${(-NOW * 12).toFixed(1)}px ${(-NOW * 8).toFixed(1)}px"></div>` +
+  `<img class="a" src="${url('el/' + LOGO())}" style="left:20px;top:440px;width:1040px;height:1040px;opacity:.045;transform:rotate(${(NOW * 6).toFixed(1)}deg)">` +
+  FR.map(([x0, y0, w, h, sp], i) => `<div class="a" style="left:${x0}px;top:${(y0 - (NOW * 22 * sp) % 260).toFixed(1)}px;width:${w}px;height:${h}px;border-radius:${h / 2}px;background:${i % 3 ? '#fff' : '#0E0E0E'};opacity:${i % 3 ? .75 : .1};box-shadow:0 10px 24px rgba(0,0,0,.06)"></div>`).join('');
+
+// ---------- captions: the spoken words, ≤ 4 per chunk, black pill (UI type), accent words in ChatGPT green ----------
+function caption(x, t) {
+  if (x.s.type === 'hook' && t < x.at('قفل') - .05) return hookTitle(x, t);
+  if (t > x.L.end + .3) return '';
+  const W = x.W; let j = 0; for (let q = 0; q < W.length; q++) if (t >= W[q].t - .05) j = q;
+  const ch = []; let c = []; W.forEach((w, q) => { c.push(q); if (c.length === 4 || /[،؛.!؟?…:»]$/.test(w.w)) { ch.push(c); c = []; } }); if (c.length) ch.push(c);
+  const now = ch.find(g => g.includes(j)), k = lin(t, W[now[0]].t - .05, W[now[0]].t + .2);
+  const line = now.filter(q => t >= W[q].t - .05).map(q => W[q].h ? `<span style="color:#5EE3B8">${W[q].w}</span>` : W[q].w).join(' ');
+  return `<div class="a" style="left:0;right:0;top:1570px;text-align:center"><span style="display:inline-block;padding:12px 42px 24px;border-radius:60px;background:#0E0E0E;color:#fff;font-size:76px;line-height:1.25;white-space:nowrap;transform:translateY(${((1 - eo(k)) * 26).toFixed(1)}px)">${line}</span></div>`;
+}
+function hookTitle(x, t) {
+  // the cover's own headline, static from frame 0 (no mask rise here, so no half-drawn glyphs)
+  return `<div class="a" style="left:0;right:0;top:1190px;text-align:center;color:#fff;font-size:124px;line-height:1.25;text-shadow:0 6px 0 rgba(0,0,0,.45),0 0 26px rgba(0,0,0,.55)">` +
+    `<div>حالا می‌شه</div><div>چت‌های <span dir="ltr">ChatGPT</span></div>` +
+    `<div style="margin-top:6px"><span style="display:inline-block;padding:0 40px 18px;border-radius:28px;background:#fff;color:#0E0E0E;text-shadow:none;transform:scale(${(1 + .12 * Math.exp(-7 * Math.max(0, t - .3)) * (t > .3 ? 1 : 0)).toFixed(3)})">رو قفل کرد</span></div></div>`;
+}
+// hook, second half: the phone screen now fills the frame as a rebuilt locked-chat UI on the paper ground
+function bigLock(x, t) {
+  const A = x.at('قفل') - .05, kr = lin(t, A + .1, A + .9), kd = Math.min(4, Math.floor(cl((t - x.at('رمز') + .1) / (BT / 2), 0, 4)));
+  return grid() + phone(150, 260, 780, 1080, head(752) + bub(330, 170, 380, 80, true) + bub(30, 280, 520, 80) + bub(240, 390, 470, 80, true) +
+    `<div class="a" style="inset:110px 0 0 0;background:rgba(255,255,255,.92)"></div>` + padlock(376, 560, 2.1, pop(t, A)) + faceRing(376, 560, 240, kr, kr >= 1) +
+    (kr >= 1 ? check(540, 720, 96, pop(t, A + .95)) : '') +
+    (t > x.at('رمز') - .1 ? `<div class="a row" style="left:0;right:0;top:800px;justify-content:center;gap:40px;direction:ltr">${[0, 1, 2, 3].map(i => `<span style="width:56px;height:56px;border-radius:50%;border:8px solid #0E0E0E;background:${i < kd ? '#0E0E0E' : 'transparent'}"></span>`).join('')}</div>` : '') +
+    `<div class="a" style="left:0;right:0;top:900px;text-align:center;font:900 64px V">Locked chat</div>`, 1, 0) +
+    chip('<span dir="ltr">Face ID</span>', 680, 140, 64, '#0E0E0E', '#fff', t, x.at('Face') - .05, 'ltr');
+}
+function scene(x, t) {
+  const s = x.s, A = x.a, at = x.at;
+  switch (s.type) {
+    case 'hook': {
+      // frame 0 = the cover photo (relative peeking over the shoulder at the phone), already pushing in toward the phone;
+      // the phone screen shows ChatGPT, the padlock pops on it at 0.3 s, a Face ID ring closes, 👀 tags the peeker at 0.6 s
+      if (t >= at('قفل') - .05) return bigLock(x, t);
+      // slam zoom: from the cover framing into the phone (fills the frame by 1.0 s); the lock is already on screen at frame 0
+      const zoom = mix(1.06, 1.25, eo(lin(t, 0, .35))) * mix(1, 2.6, eio(lin(t, .35, 1.0))), kl = 1, kr = lin(t, .1, .8);
+      const sx = 1080 / 1152, Q = [[366, 266], [578, 278], [574, 722], [372, 712]].map(p => [p[0] * sx, p[1] * sx]);
+      const w = Q[1][0] - Q[0][0], h = Q[3][1] - Q[0][1];
+      const scr = `<div class="a" style="left:${Q[0][0].toFixed(0)}px;top:${Q[0][1].toFixed(0)}px;width:${w.toFixed(0)}px;height:${h.toFixed(0)}px;border-radius:26px;background:#fff;overflow:hidden;transform:rotate(1.6deg);transform-origin:0 0">` +
+        `<div class="row" style="height:64px;padding:0 16px;gap:10px;direction:ltr;border-bottom:2px solid #EEE">${logo(LOGO(), 40)}<span style="font:900 26px V">ChatGPT</span></div>` +
+        bub(70, 90, 120, 34) + bub(16, 140, 150, 34) + bub(50, 190, 140, 34) +
+        `<div class="a" style="inset:64px 0 0 0;background:rgba(255,255,255,${(.85 * cl(kl)).toFixed(2)})"></div>` +
+        padlock(w / 2, h / 2 + 30, .9, kl) + faceRing(w / 2, h / 2 + 30, 108, kr, kr >= 1) + (kr >= 1 ? check(w / 2 + 70, h / 2 + 110, 54, pop(t, 1.3)) : '') + '</div>';
+      return `<div class="a" style="inset:0;transform:scale(${zoom.toFixed(4)});transform-origin:440px 520px"><img src="${url('raw/s00.png')}" style="position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover">${scr}` +
+        chip('👀', 140, 300, 90, '#fff', '#0E0E0E', t, .05, 'ltr') + '</div>' +
+        `<div class="a" style="inset:0;background:linear-gradient(rgba(0,0,0,0) 52%,rgba(0,0,0,.6) 64%,rgba(0,0,0,.85))"></div>` +
+        chip(`${logo(LOGO(), 64)} <span dir="ltr" style="vertical-align:middle">ChatGPT</span>`, 680, 760, 60, '#fff', '#0E0E0E', t, .45, 'ltr');
+    }
+    case 'peek': {
+      const ki = lin(t, A, A + .6), kf = lin(t, at('جلوی') - .05, at('جلوی') + .5);
+      const list = phone(560, 700, 440, 820, head(412) +
+        ['برنامهٔ سورپرایز تولد', 'سؤال پزشکی', 'متن پیام به رئیس', 'لیست خرید'].map((q, i) => `<div class="row" style="height:116px;padding:0 28px;border-bottom:2px solid #F0F0F0;font:600 34px V;opacity:${lin(t, A + .3 + i * BT / 2, A + .5 + i * BT / 2).toFixed(2)}">${q}</div>`).join('') +
+        `<div class="a" style="left:0;right:0;top:110px;height:${(470 * eo(kf)).toFixed(0)}px;background:#0E0E0E"></div>`, lin(t, A + .2, A + .7), 3);
+      return grid() + iris(s.img, 60, 300, 560, ki, t, A) + list +
+        chip('👀 جلوی چشمش', 110, 920, 66, '#0E0E0E', '#fff', t, at('جلوی')) +
+        cur(t, [[A, 900, 1500], [at('چت‌هات') + .1, 780, 980, 1], [x.z, 780, 980]]);
+    }
+    case 'intro': {
+      const kd = lin(t, A, A + .5), w = mix(40, 760, eo(lin(t, A + .3, A + .8))), h = mix(40, 200, eo(lin(t, A + .3, A + .8)));
+      return grid() + `<div class="a" style="left:${540 - w / 2}px;top:${760 - h / 2}px;width:${w}px;height:${h}px;border-radius:${h / 2}px;background:#0E0E0E;transform:scale(${mix(.2, 1, eo(kd)).toFixed(3)})"></div>` +
+        `<div class="a row" style="left:0;right:0;top:${760 - 70}px;height:140px;justify-content:center;gap:26px;direction:ltr;color:#fff">${lin(t, A + .6, A + .9) > 0 ? logo(BRANDLOGO(), 96) : ''}${rise('OpenAI', lin(t, A + .7, A + 1.0), 96, '#fff')}</div>` +
+        chip(`📅 ${fa(20)} اکتبر ${fa(2026)}`, 250, 960, 72, '#fff', '#0E0E0E', t, at('اکتبر') - .05) +
+        chip('⚠️ آخرش: یه هشدار', 260, 1180, 72, 'var(--red)', '#fff', t, at('هشدار') - .05);
+    }
+    case 'menu': {
+      const kp = lin(t, A, A + .5), km = pop(t, A + 1.1), kl = lin(t, at('Lock') - .05, at('Lock') + .25), klock = pop(t, at('Lock') + .35);
+      const items = ['Share', 'Rename', 'Archive', 'Lock chat', 'Delete'];
+      const menu = km > 0 ? `<div class="a" style="right:40px;top:120px;width:420px;border-radius:30px;background:#fff;box-shadow:0 20px 50px rgba(0,0,0,.2);overflow:hidden;transform:scale(${km.toFixed(3)});transform-origin:90% 0;direction:ltr">` +
+        items.map((it, i) => `<div class="row" style="height:96px;padding:0 34px;gap:18px;font:900 38px V;color:${it === 'Delete' ? 'var(--red)' : '#0E0E0E'};background:${it === 'Lock chat' && kl > 0 ? `rgba(16,163,127,${(.18 * kl).toFixed(2)})` : 'transparent'}">${it === 'Lock chat' ? '🔒 ' : ''}${it}</div>`).join('') + '</div>' : '';
+      const scr = head(712, 'ChatGPT', true) + bub(330, 170, 350, 76, true) + bub(30, 280, 520, 76) + bub(30, 380, 440, 76) + bub(260, 500, 420, 76, true) + menu +
+        (klock > 0 ? `<div class="a" style="inset:110px 0 0 0;background:rgba(255,255,255,.88)"></div>` + padlock(356, 620, 1.4, klock) : '');
+      return grid() + phone(170, 360, 740, 1160, scr, kp) +
+        cur(t, [[A, 540, 1500], [A + 1.0, 820, 450, 1], [at('Lock') - .3, 700, 760], [at('Lock'), 700, 760, 1], [x.z, 700, 760]]);
+    }
+    case 'pin': {
+      const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'], beat = BT / 2;
+      const filled = Math.min(4, Math.floor(cl((t - A - .4) / beat, 0, 4)));
+      const kf = lin(t, at('Face') - .1, at('Face') + .8);
+      const pad = `<div class="a" style="left:120px;top:520px;width:500px">` +
+        `<div class="row" style="justify-content:center;gap:34px;height:90px;direction:ltr">${[0, 1, 2, 3].map(i => `<span style="width:40px;height:40px;border-radius:50%;border:6px solid #0E0E0E;background:${i < filled ? '#0E0E0E' : 'transparent'};transform:scale(${i === filled - 1 ? (1 + .3 * Math.exp(-12 * ((t - A - .4) % beat))).toFixed(3) : 1})"></span>`).join('')}</div>` +
+        `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:30px;direction:ltr">${keys.map((k, i) => `<div style="height:120px;border-radius:60px;background:${k ? '#fff' : 'transparent'};display:flex;align-items:center;justify-content:center;font:900 52px V;transform:scale(${pop(t, A + .1 + i * .05).toFixed(3)})">${k}</div>`).join('')}</div></div>`;
+      const face = `<div class="a" style="left:640px;top:600px;width:340px;height:340px;border-radius:50%;overflow:hidden;transform:scale(${pop(t, at('Face') - .2).toFixed(3)})"><img src="${url('raw/' + s.img + '.png')}" style="width:340px;height:604px;object-fit:cover;margin-top:-90px"></div>` +
+        (kf > 0 ? faceRing(810, 770, 190, kf, kf >= 1) : '') + check(940, 920, 90, pop(t, at('Face') + .9));
+      const kc = lin(t, A + .3, A + 1.8), combos = Math.round(10000 * eo(kc));
+      const stat = `<div class="a" style="left:120px;top:300px;font:900 40px V;color:var(--mute)">ترکیب‌های ممکن</div><div class="a" style="left:120px;top:350px;font:900 110px V;direction:ltr">${fa(combos.toLocaleString('en-US'))}</div>`;
+      return grid() + stat + pad + face + chip(`<span dir="ltr">Face ID</span>`, 680, 1060, 64, '#0E0E0E', '#fff', t, at('Face')) +
+        chip(`رمز ${fa(4)} رقمی`, 190, 1220, 64, '#fff', '#0E0E0E', t, at('رمز') - .05);
+    }
+    case 'folder': {
+      const kfly = eio(lin(t, A + .5, at('Locked'))), kc = pop(t, at('Locked') + .1);
+      const side = `<div class="a" style="left:80px;top:420px;width:520px;height:900px;border-radius:40px;background:#fff;box-shadow:0 24px 60px rgba(0,0,0,.12);padding:36px;box-sizing:border-box;direction:ltr">` +
+        `<div style="font:900 36px V;color:var(--mute)">Projects</div>` +
+        ['Work', 'Trip plan'].map(n => `<div class="row" style="height:96px;gap:18px;font:600 38px V">📁 ${n}</div>`).join('') +
+        `<div class="row" style="height:110px;gap:18px;font:900 42px V;border-radius:24px;padding:0 18px;background:${kc > 0 ? 'rgba(16,163,127,.14)' : 'transparent'}">🔒 Locked chats <span style="margin-left:auto;padding:4px 20px 10px;border-radius:30px;background:#0E0E0E;color:#fff;font-size:34px;transform:scale(${(1 + .3 * Math.exp(-8 * Math.max(0, t - at('Locked')))).toFixed(3)})">${t > at('Locked') ? 1 : 0}</span></div></div>`;
+      const cx = mix(700, 300, kfly), cy = mix(560, 860, kfly), cs = mix(1, .25, kfly);
+      const card = kfly < 1 ? `<div class="a" style="left:${cx}px;top:${cy}px;width:320px;height:220px;border-radius:30px;background:#0E0E0E;color:#fff;padding:28px;box-sizing:border-box;transform:scale(${cs.toFixed(3)});transform-origin:0 0;font:900 34px/1.4 V">برنامهٔ سورپرایز تولد 🎁</div>` : '';
+      return grid() + side + card + chip('داخل Projects', 560, 1260, 62, '#0E0E0E', '#fff', t, at('Projects') - .05, 'rtl');
+    }
+    case 'search': {
+      const q = 'سورپرایز', kt = lin(t, A + .3, A + 1.3), kr = lin(t, at('جستجو') - .05, at('جستجو') + .4);
+      const res = ['برنامهٔ سورپرایز تولد', 'ایدهٔ کادو سورپرایز'];
+      const box = `<div class="a" style="left:100px;top:420px;width:880px;height:130px;border-radius:65px;background:#fff;box-shadow:0 16px 40px rgba(0,0,0,.1);display:flex;align-items:center;padding:0 46px;box-sizing:border-box;gap:20px;font:600 46px V">🔍 ${q.slice(0, Math.round(q.length * kt))}<span style="opacity:${(t * 2 % 1 < .5) ? 1 : 0}">|</span></div>`;
+      const list = res.map((r, i) => `<div class="a" style="left:100px;top:${600 + i * 150}px;width:880px;height:${(130 * (1 - eo(kr))).toFixed(0)}px;overflow:hidden;border-radius:36px;background:#fff;display:flex;align-items:center;padding:0 46px;box-sizing:border-box;font:600 40px V;opacity:${lin(t, A + 1.0 + i * .2, A + 1.2 + i * .2).toFixed(2)}">${r}</div>`).join('');
+      const none = kr > .5 ? `<div class="a" style="left:0;right:0;top:640px;text-align:center">${rise('نتیجه‌ای پیدا نشد', lin(t, at('جستجو') + .2, at('جستجو') + .5), 72)}</div>` : '';
+      const hist = `<div class="a" style="left:100px;top:900px;width:880px;padding:30px 40px;border-radius:36px;background:#fff;box-sizing:border-box">` +
+        ['سؤال درسی', 'دستور پخت', 'برنامهٔ سفر'].map(h => `<div style="height:84px;font:600 38px V;border-bottom:2px solid #F0F0F0">${h}</div>`).join('') + `<div style="margin-top:20px;font:900 34px V;color:var(--mute)">تاریخچه — بدون چت قفل‌شده</div></div>`;
+      return grid() + box + list + none + hist + chip('غیب شد ✓', 380, 1320, 66, 'var(--gpt)', '#fff', t, at('غیب') - .05);
+    }
+    case 'plans': {
+      const plans = ['Free', 'Go', 'Plus', 'Pro', 'Business', 'Enterprise', 'Edu'];
+      const chips = plans.map((p, i) => { const k = pop(t, A + .2 + i * BT / 2); if (k <= 0) return '';
+        const col = i % 2, row = Math.floor(i / 2); return `<div class="a" style="left:${120 + col * 440}px;top:${420 + row * 170}px;width:400px;height:130px;border-radius:65px;background:${p === 'Free' ? 'var(--gpt)' : '#0E0E0E'};color:#fff;display:flex;align-items:center;justify-content:center;font:900 54px V;transform:scale(${k.toFixed(3)})">${p}</div>`; }).join('');
+      const kb = lin(t, at('آروم') - .05, x.z);
+      const bar = `<div class="a" style="left:120px;top:1150px;width:840px;height:44px;border-radius:22px;background:var(--line)"><div style="width:${(100 * (.15 + .5 * eo(kb))).toFixed(1)}%;height:100%;border-radius:22px;background:#0E0E0E"></div></div>` +
+        `<div class="a" style="left:120px;top:1220px;font:900 46px V">آروم‌آروم برای همه فعال می‌شه</div>`;
+      return grid() + chips + (kb > 0 ? bar : '') + `<div class="a row" style="left:120px;top:250px;gap:20px"><span style="font:900 150px V">${fa(Math.min(7, Math.floor(cl((t - A - .2) / (BT / 2) + 1, 0, 7))))}</span><span style="font:900 54px V;color:var(--mute)">پلن، همه‌شون</span></div>`;
+    }
+    case 'warn': {
+      const kc = pop(t, A + .1), kr = lin(t, at('یادت') - .1, at('یادت') + .3), kt = eio(lin(t, at('پاک') - .1, at('پاک') + .7));
+      const card = `<div class="a" style="left:110px;top:330px;width:860px;padding:44px;border-radius:44px;background:var(--red);color:#fff;box-sizing:border-box;transform:scale(${kc.toFixed(3)})"><div style="font:900 70px V">⚠️ هشدار</div><div style="font:600 44px/1.5 V;margin-top:12px">رمزو فراموش کنی و ریست کنی…</div></div>`;
+      const btn = `<div class="a" style="left:300px;top:700px;width:480px;height:130px;border-radius:65px;background:#0E0E0E;color:#fff;display:flex;align-items:center;justify-content:center;font:900 48px V;transform:scale(${(1 - .08 * Math.exp(-((t - at('یادت') - .2) ** 2) / .01)).toFixed(3)})">Reset PIN</div>`;
+      const chats = [0, 1, 2].map(i => { const k = eio(lin(t, at('پاک') - .1 + i * .15, at('پاک') + .5 + i * .15));
+        return `<div class="a" style="left:${mix(140 + i * 270, 470, k)}px;top:${mix(920, 1240, k)}px;width:240px;height:150px;border-radius:26px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;font-size:60px;transform:scale(${mix(1, .2, k).toFixed(3)});opacity:${(1 - lin(k, .85, 1)).toFixed(2)}">🔒</div>`; }).join('');
+      const bin = `<div class="a" style="left:430px;top:1200px;width:220px;height:240px;text-align:center;transform:scale(${pop(t, at('پاک') - .2).toFixed(3)})"><svg width="200" height="230" viewBox="0 0 200 230"><rect x="20" y="30" width="160" height="22" rx="10" fill="#E5322D"/><rect x="75" y="8" width="50" height="26" rx="8" fill="#E5322D"/><path d="M35 62 H165 L152 222 H48 Z" fill="#E5322D"/><path d="M78 90 V195 M100 90 V195 M122 90 V195" stroke="#fff" stroke-width="10" stroke-linecap="round"/></svg></div>`;
+      const left = 3 - Math.min(3, Math.floor(cl((t - at('پاک') + .1) / .3, 0, 3)));
+      return grid() + card + btn + chats + bin + `<div class="a" style="left:150px;top:1240px;font:900 120px V;color:var(--red);direction:ltr">${fa(left)}</div><div class="a" style="left:130px;top:1390px;font:900 40px V;color:var(--mute)">چت قفل</div>` + (kr > 0 ? cur(t, [[at('یادت') - .5, 900, 1000], [at('یادت') + .2, 560, 780, 1], [x.z, 560, 780]]) : '') +
+        chip('برای همیشه', 650, 1420, 64, 'var(--red)', '#fff', t, at('همیشه') - .05);
+    }
+    case 'support': {
+      const kc = pop(t, A + .1), ks = lin(t, at('نمی‌تونه') - .05, at('نمی‌تونه') + .3);
+      const card = `<div class="a" style="left:110px;top:400px;width:860px;height:720px;border-radius:44px;background:#fff;box-shadow:0 24px 60px rgba(0,0,0,.12);padding:50px;box-sizing:border-box;transform:scale(${kc.toFixed(3)})">` +
+        `<div class="row" style="gap:20px;direction:ltr">${logo(BRANDLOGO(), 80)}<span style="font:900 46px V">OpenAI Support</span></div>` +
+        `<div style="margin-top:44px;font:600 44px/1.6 V">«لطفاً چت‌های قفلمو برگردونید»</div>` +
+        `<div style="margin-top:30px;height:24px;width:${(80 * eo(lin(t, A + .5, A + 1.5))).toFixed(0)}%;border-radius:12px;background:#ECECF1"></div>` +
+        `<div style="margin-top:20px;height:24px;width:${(60 * eo(lin(t, A + .7, A + 1.7))).toFixed(0)}%;border-radius:12px;background:#ECECF1"></div></div>`;
+      const stamp = ks > 0 ? `<div class="a" style="left:230px;top:880px;padding:16px 46px 28px;border:10px solid var(--red);border-radius:24px;color:var(--red);font:900 72px V;background:rgba(255,255,255,.92);transform:rotate(-8deg) scale(${mix(1.8, 1, eo(ks)).toFixed(3)})">قابل برگشت نیست</div>` : '';
+      return grid() + card + stamp;
+    }
+    case 'crypto': {
+      const k1 = pop(t, A + .1), k2 = pop(t, A + .4), kx = lin(t, at('رمزنگاری') - .05, at('رمزنگاری') + .35);
+      const box = (x0, ic, title, k, strike) => `<div class="a" style="left:${x0}px;top:420px;width:420px;height:520px;border-radius:44px;background:${strike ? '#fff' : '#0E0E0E'};color:${strike ? '#0E0E0E' : '#fff'};box-shadow:0 20px 50px rgba(0,0,0,.12);text-align:center;transform:scale(${k.toFixed(3)})">` +
+        `<div style="font-size:180px;line-height:1.6;height:260px">${ic}</div><div style="font:900 50px/1.3 V;padding:0 30px;position:relative">${title}${strike ? `<span class="a" style="left:20px;top:46%;height:10px;width:${(380 * eo(kx)).toFixed(0)}px;background:var(--red)"></span>` : ''}</div></div>`;
+      const list = ['مدت نگهداری چت: همون', 'تنظیم آموزش مدل: همون'].map((q, i) => `<div class="a row" style="left:140px;top:${1020 + i * 120}px;gap:20px;font:900 46px V;opacity:${lin(t, at('رمزنگاری') + .3 + i * .3, at('رمزنگاری') + .5 + i * .3).toFixed(2)}"><span style="color:var(--mute)">=</span> ${q}</div>`).join('');
+      return grid() + box(560, '<svg width="140" height="180" viewBox="0 0 140 180" style="vertical-align:middle;margin-top:40px"><path d="M30 80 V55 a40 40 0 0 1 80 0 V80" fill="none" stroke="#fff" stroke-width="18"/><rect x="10" y="78" width="120" height="96" rx="20" fill="#fff"/></svg>', 'قفل', k1, false) + box(100, '<svg width="150" height="170" viewBox="0 0 150 170" style="vertical-align:middle;margin-top:40px"><path d="M75 8 L140 32 V80 C140 125 110 152 75 164 C40 152 10 125 10 80 V32 Z" fill="#0E0E0E"/><path d="M45 84 L67 106 L108 62" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></svg>', 'رمزنگاری سرتاسری', k2, true) +
+        `<div class="a" style="left:500px;top:620px;font:900 90px V;transform:scale(${pop(t, A + .6).toFixed(3)})">≠</div>` + list;
+    }
+    case 'ask': {
+      const k = lin(t, A, A + .6);
+      return grid() + `<div class="a" style="left:240px;top:360px;width:600px;height:1000px;border-radius:70px;overflow:hidden;background:#0E0E0E;padding:14px;box-sizing:border-box;transform:scale(${mix(.6, 1, eo(k)).toFixed(3)})">` +
+        `<img src="${url('raw/' + s.img + '.png')}" style="width:100%;height:100%;object-fit:cover;border-radius:58px"></div>` +
+        padlock(540, 790, 1.5, pop(t, A + .4)) + chip('کدوم چتتو؟', 300, 1180, 90, '#0E0E0E', '#fff', t, A + .6);
+    }
+  }
+  return grid();
+}
+// end card: last frame = first frame idea — the black pill with the logo, then the question rises
+function endCard(u) {
+  const w = mix(60, 820, eo(lin(u, 0, .5)));
+  return grid() + `<div class="a" style="left:${540 - w / 2}px;top:620px;width:${w}px;height:220px;border-radius:110px;background:#0E0E0E"></div>` +
+    `<div class="a row" style="left:0;right:0;top:640px;height:180px;justify-content:center;gap:24px;direction:ltr;color:#fff">${u > .4 ? logo(LOGO(), 110) : ''}${rise('ChatGPT', lin(u, .45, .8), 90, '#fff')}</div>` +
+    `<div class="a" style="left:0;right:0;top:960px;text-align:center">${rise((S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--gpt)">$1</span>'), lin(u, .6, .95), 110)}</div>` +
+    `<div class="a" style="left:0;right:0;top:1140px;text-align:center;font:600 60px V;color:var(--mute);opacity:${lin(u, .9, 1.2).toFixed(2)}">${S.end_sub || ''} · ${S.handle || ''}</div>`;
+}
+window.seek = seek;
+</script>
+</body>
+</html>
