@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — terminal reveal (prompt 181)</title>
+<!-- Skill motion-graphy-2026, prompt 181 "Sahi trading terminal reveal" (MUSIC), built as its own engine.
+     Look from the prompt: real-looking data in real layouts; the journey starts as a single dot on a black screen,
+     windows land one per beat (100 BPM), the camera zooms in and out across scales, pulls out until the desktop is a
+     point in space, and zooms back in to a phone split in two halves; it ends on one line.
+     Kept from the prompt's banned list: no particle bursts, glows, lens flares, camera shake, RGB split, crossfades,
+     generic gradients or bouncy easing. Blur follows speed on fast camera moves; easing is exponential.
+     Allowed edits: 30 s → the voiced length, 1920x1080 → 1080x1920, the product = the story's subject (story.product),
+     Web Audio → per-cut sfx + music bed (page standard), the opening = the real photo hook (RUNBOOK §4.0 rule 4).
+     Data: story.json beats[{id, text, scene{type, img}}]; el/<product>.png, el/<brand>.png real logos; raw/sNN.png.
+     Scene types: hook, dot, desk, map, pay, token, enter, count, check, official, guard, space, phone (+ end). -->
+<style>
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --bg: #05070A; --pane: #0D1117; --line: #1F2833; --dim: #6B7785; --tx: #E6EDF3; --up: #16C784; --dn: #F6465D; --amb: #F0B90B; --blu: #3B82F6; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+  #frame { position: absolute; inset: 0; overflow: hidden; font-family: V; font-weight: 900; color: var(--tx); }
+  #cam, #layer, #caps { position: absolute; inset: 0; }
+  #cam { transform-origin: 0 0; }
+  .ab { position: absolute; }
+  .mono { font-family: 'DejaVu Sans Mono', 'Liberation Mono', monospace; font-weight: 700; direction: ltr; }
+  .win { position: absolute; background: var(--pane); border: 2px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.55); }
+  .bar { height: 54px; border-bottom: 2px solid var(--line); display: flex; align-items: center; gap: 12px; padding: 0 20px; direction: ltr; background: #0A0E13; }
+  .bar i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+  .bar b { font: 700 24px 'DejaVu Sans Mono', monospace; color: var(--dim); margin-left: 8px; letter-spacing: .5px; }
+  .cap { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="frame"><div id="cam"><div id="layer"></div></div><div id="caps"></div></div>
+<script>
+const P = new URLSearchParams(location.search), HOME = P.get('dir') || '/work/story/';
+const src = f => f.startsWith('/') ? f : HOME + f, $ = id => document.getElementById(id);
+const clamp = (v, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, v)), lerp = (a, b, k) => a + (b - a) * k;
+const ramp = (t, a, b) => clamp((t - a) / (b - a));
+const ex = k => 1 - Math.pow(2, -10 * clamp(k)), exIO = k => (k = clamp(k), k < .5 ? Math.pow(2, 20 * k - 10) / 2 : (2 - Math.pow(2, -20 * k + 10)) / 2);
+const fa = s => String(s).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const BEAT = 60 / 100;                          // the prompt's 100 BPM grid: windows land on beats
+const ISSUES = [];
+let D, T, BEATS = [], TOTAL = 50;
+
+// ---------- words → times ----------
+function prep(b) {
+  const L = T.lines[b.id]; if (!L) { ISSUES.push('no timing for ' + b.id); return null; }
+  const clean = b.text.replace(/\[[^\]]*\]/g, ' ');
+  const spoken = clean.replace(/\{[^|}]*\|([^}]*)\}/g, '$1').replace(/\*/g, '').trim().split(/\s+/);
+  const n = L.words.length, map = i => spoken.length === n ? i : Math.round(clamp(i / Math.max(1, spoken.length - 1)) * (n - 1));
+  const at = i => (L.words[map(clamp(i, 0, spoken.length - 1))] || [L.start])[0];
+  const shown = []; let si = 0, star = false;
+  for (const tok of clean.replace(/\{([^|}]*)\|([^}]*)\}/g, (m, a, c) => a.replace(/\s/g, '\u0002') + '\u0001' + c.trim().split(/\s+/).length).trim().split(/\s+/)) {
+    let w = tok, span = 1; if (w.includes('\u0001')) { const [w0, rest] = w.split('\u0001'); span = parseInt(rest, 10) || 1; w = w0 + rest.replace(/^\d+/, ''); }
+    if (w.startsWith('*')) star = true; const k = star; if (/\*[«»"'.…،؛!؟?:]*$/.test(w)) star = false;
+    shown.push({w: w.replace(/\*/g, '').replace(/\u0002/g, ' '), k, t: at(si)}); si += span;
+  }
+  // when('token') → time of the first shown word containing the text (a number, name or result lands on its word)
+  const when = (sub, nth = 0) => { const hit = shown.filter(w => w.w.includes(sub)); if (!hit.length) { ISSUES.push(`${b.id}: no word "${sub}"`); return L.start; } return hit[Math.min(nth, hit.length - 1)].t; };
+  return {b, s: b.scene || {}, L, at, shown, when};
+}
+
+window.ready = (async () => {
+  D = await (await fetch(src('story.json'))).json(); T = await (await fetch(src('timeline.json'))).json();
+  TOTAL = T.total;
+  BEATS = D.beats.map(prep).filter(Boolean);
+  BEATS.forEach((x, i) => { x.i = i; x.a = i ? x.L.start - .08 : 0; x.z = i + 1 < BEATS.length ? BEATS[i + 1].L.start - .08 : T.end_start; });
+  const pics = [...new Set(BEATS.map(x => x.s.img).filter(Boolean))].map(n => src('raw/' + n + '.png')).concat([src('el/' + PROD()), src('el/' + BRAND())]);
+  await Promise.all(pics.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = u; })));
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'آمار Claude')));
+  BEATS.forEach(x => { x.keys = (KEYS[x.s.type] || (() => []))(x).filter(v => v > x.a + .5 && v < x.z - .5).sort((p, q) => p - q); });
+  const cuts = [];
+  for (const x of BEATS) {
+    const pts = [x.a, ...x.keys];
+    pts.forEach((p, j) => cuts.push({t0: +p.toFixed(2), t1: +(j + 1 < pts.length ? pts[j + 1] : x.z).toFixed(2), type: x.s.type, bg: x.b.id + (j ? '.' + j : ''), sfx: [[p, j ? 'hit' : 'whoosh', j ? .35 : .3]]}));
+  }
+  cuts.push({t0: T.end_start, t1: TOTAL, type: 'end', bg: 'end', sfx: [[T.end_start + .1, 'hit', .5]]});
+  window.SCENES = cuts; window.START = 0; window.DURATION = TOTAL; window.ISSUES = ISSUES;
+  for (const c of cuts) if (c.t1 - c.t0 > 3.2) ISSUES.push(`shot ${c.bg} holds ${(c.t1 - c.t0).toFixed(1)} s (> 3): add a key`);
+  seek(0);
+})();
+const PROD = () => (D.product || 'claude').toLowerCase().replace(/[^a-z0-9]/g, '') + '.png';
+const BRAND = () => (D.brand || 'anthropic').toLowerCase().replace(/[^a-z0-9]/g, '') + '.png';
+
+// camera keys inside a beat (each is a clear camera change = a new shot)
+const KEYS = {
+  hook: x => [x.at(4)], dot: x => [x.when('خودش')], desk: x => [x.when('پروژهٔ')], map: x => [x.when('Georgia')],
+  pay: x => [x.when('پول')], token: x => [x.when('خودکار')], enter: x => [x.when('بدون')], count: x => [x.when('میلیون'), x.when('رأی')],
+  check: x => [x.when('دست'), x.when('تغییر')], official: x => [x.when('عمومی')], guard: x => [], space: x => [x.when('روز'), x.when('نوامبر')],
+  phone: x => [x.when('مقصر')]
+};
+
+// ---------- building blocks ----------
+function win(x0, y0, w, h, title, body, k, from = 'up', accent = '') {
+  // a window lands on its beat: exponential slide + scale from 0.9, no overshoot (the prompt bans bouncy easing)
+  if (k <= 0) return '';
+  const e = ex(k), d = (1 - e), dx = from === 'left' ? -260 * d : from === 'right' ? 260 * d : 0, dy = from === 'up' ? 220 * d : from === 'down' ? -220 * d : 0;
+  return `<div class="win" style="left:${x0}px;top:${y0}px;width:${w}px;height:${h}px;transform:translate(${dx.toFixed(1)}px,${dy.toFixed(1)}px) scale(${lerp(.9, 1, e).toFixed(4)});opacity:${clamp(k * 4).toFixed(2)}${accent ? ';border-color:' + accent : ''}">` +
+    `<div class="bar"><i style="background:#F6465D"></i><i style="background:#F0B90B"></i><i style="background:#16C784"></i><b>${title}</b></div>` +
+    `<div style="position:absolute;left:0;right:0;top:56px;bottom:0">${body}</div></div>`;
+}
+const logo = (f, s, bg = '#fff') => `<span style="display:inline-flex;align-items:center;justify-content:center;width:${s}px;height:${s}px;border-radius:${s * .24}px;background:${bg};vertical-align:middle"><img src="${src('el/' + f)}" style="width:${s * .74}px;height:${s * .74}px;object-fit:contain"></span>`;
+const chip = (html, x0, y0, sz, bg, fg, k, dir = 'ltr') => k <= 0 ? '' : `<div class="ab" style="left:${x0}px;top:${y0}px;padding:${sz * .18}px ${sz * .4}px ${sz * .26}px;border-radius:${sz * .3}px;background:${bg};color:${fg};font:900 ${sz}px/1.15 V;white-space:nowrap;direction:${dir};transform:scale(${lerp(1.5, 1, ex(k)).toFixed(3)});opacity:${clamp(k * 5).toFixed(2)};transform-origin:50% 50%">${html}</div>`;
+const typed = (s, k) => s.slice(0, Math.round(s.length * clamp(k)));
+const caret = t => (t * 2 % 1 < .5 ? '▌' : ' ');
+function photoIn(img, w, h, t, a, z, zoom = [1.18, 1.04]) {
+  const k = ramp(t, a, z), sc = lerp(zoom[0], zoom[1], exIO(k));
+  return `<div style="position:absolute;inset:0;overflow:hidden"><img src="${src('raw/' + img + '.png')}" style="position:absolute;left:0;top:0;width:${w}px;height:${h}px;object-fit:cover;transform:scale(${sc.toFixed(4)});transform-origin:50% 45%"></div>`;
+}
+// a line chart of random-but-seeded "real-looking" data that draws on
+function spark(w, h, k, seed, col, n = 40, rise = 0) {
+  let v = 50, pts = []; for (let i = 0; i < n; i++) { v += Math.sin(seed * 9.1 + i * 1.7) * 6 + Math.cos(seed * 3.3 + i * .9) * 4 + rise; pts.push(v); }
+  const lo = Math.min(...pts), hi = Math.max(...pts), m = Math.max(2, Math.round(n * clamp(k)));
+  const xy = pts.slice(0, m).map((p, i) => `${(i / (n - 1) * w).toFixed(1)},${(h - (p - lo) / (hi - lo + 1e-6) * h * .9 - h * .05).toFixed(1)}`).join(' ');
+  const last = xy.split(' ').pop().split(',');
+  return `<svg width="${w}" height="${h}" style="position:absolute;left:0;top:0;overflow:visible"><polyline points="${xy}" fill="none" stroke="${col}" stroke-width="4" stroke-linejoin="round"/>` +
+    `<circle cx="${last[0]}" cy="${last[1]}" r="9" fill="${col}"/></svg>`;
+}
+function bars(w, h, vals, k, col, hi = -1) {
+  const n = vals.length, bw = w / n * .62, mx = Math.max(...vals);
+  return vals.map((v, i) => { const kk = ex(clamp(k * 1.6 - i * .6 / n)), bh = v / mx * h * kk;
+    return `<div class="ab" style="left:${(i * w / n + (w / n - bw) / 2).toFixed(1)}px;top:${(h - bh).toFixed(1)}px;width:${bw.toFixed(1)}px;height:${bh.toFixed(1)}px;background:${i === hi ? 'var(--amb)' : col};border-radius:6px 6px 0 0"></div>`; }).join('') +
+    `<div class="ab" style="left:0;right:0;top:${h}px;height:2px;background:var(--line)"></div>`;
+}
+const rows = (list, k, t0, step, t) => list.map((r, i) => { const kk = ramp(t, t0 + i * step, t0 + i * step + .2); if (kk <= 0) return '';
+  return `<div class="mono" style="display:flex;justify-content:space-between;padding:14px 26px;border-bottom:1px solid var(--line);font-size:26px;color:${r[2] || 'var(--tx)'};background:${r[3] || 'transparent'};opacity:${kk.toFixed(2)};transform:translateX(${((1 - ex(kk)) * 40).toFixed(1)}px)"><span>${r[0]}</span><span>${r[1]}</span></div>`; }).join('');
+const ground = () => `<div class="ab" style="inset:-400px;background-color:var(--bg);background-image:linear-gradient(var(--line) 2px,transparent 2px),linear-gradient(90deg,var(--line) 2px,transparent 2px);background-size:90px 90px;opacity:.55"></div>`;
+
+// ---------- camera: one key per cut; scale/position eased exponentially; blur follows speed ----------
+let CAM = {s: 1, x: 540, y: 960, blur: 0};
+function camAt(t, x) {
+  const keys = (CAMS[x.s.type] || (() => [[0, 1, 540, 960]]))(x);       // [[time, scale, focusX, focusY], …]
+  let i = 0; for (let j = 0; j < keys.length; j++) if (t >= keys[j][0]) i = j;
+  const k0 = keys[Math.max(0, i - 1)], k1 = keys[i], dur = .5, kk = i ? exIO(ramp(t, k1[0], k1[0] + dur)) : 1;
+  const s = Math.exp(lerp(Math.log(k0[1]), Math.log(k1[1]), kk)), fx = lerp(k0[2], k1[2], kk), fy = lerp(k0[3], k1[3], kk);
+  const sp = i ? Math.abs(Math.log(k1[1] / k0[1])) * (1 - Math.abs(kk * 2 - 1)) : 0;
+  const drift = 1 + .025 * ramp(t, x.a, x.z);
+  return {s: s * drift, fx, fy, blur: Math.min(10, sp * 14)};
+}
+const CAMS = {
+  dot: x => [[x.a, 9, 540, 900], [x.at(1), 1.25, 540, 900], [x.when('خودش'), 1, 540, 960]],
+  desk: x => [[x.a, 1.4, 400, 560], [x.a + .9, 1, 540, 960], [x.when('پروژهٔ'), 1.14, 540, 900]],
+  map: x => [[x.a, 2.2, 540, 960], [x.a + .4, 1, 540, 960], [x.when('Georgia'), 1.35, 640, 900]],
+  pay: x => [[x.a, 1.12, 540, 880], [x.when('پول'), 1.25, 540, 900]],
+  token: x => [[x.a, 1, 540, 960], [x.when('خودکار'), 1.18, 540, 900]],
+  enter: x => [[x.a, 1.3, 540, 800], [x.when('بدون'), 1, 540, 960]],
+  count: x => [[x.a, 1.1, 540, 960], [x.when('میلیون'), 1.12, 540, 900], [x.when('رأی'), 1, 540, 960]],
+  check: x => [[x.a, 1, 540, 960], [x.when('دست'), 1.12, 540, 800], [x.when('تغییر'), 1.12, 540, 900]],
+  official: x => [[x.a, 1, 540, 960], [x.when('عمومی'), 1.12, 540, 1000]],
+  guard: x => [[x.a, 1.7, 540, 760], [x.a + .9, 1, 540, 960]],
+  space: x => [[x.a, 1, 540, 960], [x.when('روز'), .16, 540, 960], [x.when('نوامبر'), .16, 540, 960]],
+  phone: x => [[x.a, .2, 540, 960], [x.a + .5, 1, 540, 960], [x.when('مقصر'), 1.1, 540, 1050]],
+  hook: x => [[x.a, 1, 540, 960]]
+};
+
+function seek(t) {
+  if (!BEATS.length) return;
+  let x = BEATS[0]; for (const q of BEATS) if (t >= q.a) x = q;
+  const endOn = t >= T.end_start, c = endOn ? {s: 1, fx: 540, fy: 960, blur: 0} : camAt(t, x);
+  $('cam').style.transform = `translate(540px,960px) scale(${c.s.toFixed(4)}) translate(${(-c.fx).toFixed(1)}px,${(-c.fy).toFixed(1)}px)`;
+  $('cam').style.filter = c.blur > .3 ? `blur(${c.blur.toFixed(1)}px)` : 'none';
+  const html = endOn ? ending(t - T.end_start, t) : draw(x, t);
+  const lay = $('layer'); if (lay._h !== html) { lay._h = html; lay.innerHTML = html; }
+  const caps = endOn ? '' : captions(x, t) + hud(x, t); const cp = $('caps'); if (cp._h !== caps) { cp._h = caps; cp.innerHTML = caps; }
+}
+
+// running HUD: a status strip with the clock and the beat ticker (the terminal's own chrome), every scene but the hook
+function hud(x, t) {
+  if (x.s.type === 'hook' || x.s.type === 'phone') return '';
+  const pulse = Math.exp(-8 * ((t % BEAT + BEAT) % BEAT));
+  const sec = 41 + Math.floor(t), clk = `09:14:${String(sec % 60).padStart(2, '0')}`;
+  return `<div class="ab mono" style="left:40px;right:40px;top:58px;height:64px;display:flex;align-items:center;gap:22px;padding:0 24px;border-radius:14px;background:rgba(10,14,19,.92);border:2px solid var(--line);font-size:26px;color:var(--dim)">` +
+    `${logo(PROD(), 40, '#F4EFE6')}<span style="color:var(--tx)">${D.product || 'Claude'} · agent session</span><span style="margin-left:auto">${clk}</span>` +
+    `<span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--up);transform:scale(${(1 + .5 * pulse).toFixed(3)})"></span></div>`;
+}
+// captions: the spoken words, chunk by chunk (≤ 4 words), accent words in amber, on a solid dark plate
+function captions(x, t) {
+  if (x.s.type === 'hook' && t < x.at(4)) return hookTitle(x, t);
+  if (t > x.L.end + .3) return '';
+  const W = x.shown, n = W.length; let j = 0; for (let q = 0; q < n; q++) if (t >= W[q].t - .05) j = q;
+  const ch = []; let cur = []; W.forEach((w, q) => { cur.push(q); if (cur.length === 4 || /[،؛.!؟?…:»]$/.test(w.w)) { ch.push(cur); cur = []; } }); if (cur.length) ch.push(cur);
+  const now = ch.find(c => c.includes(j)), k = ramp(t, W[now[0]].t - .05, W[now[0]].t + .12);
+  const line = now.filter(q => t >= W[q].t - .05).map(q => W[q].k ? `<span style="color:var(--amb)">${W[q].w}</span>` : W[q].w).join(' ');
+  const y = x.s.type === 'phone' ? 1770 : 1560;
+  return `<div class="cap" style="top:${y}px"><span style="display:inline-block;padding:14px 40px 24px;border-radius:24px;background:rgba(5,7,10,.88);border:2px solid var(--line);font-size:78px;line-height:1.25;transform:translateY(${((1 - ex(k)) * 30).toFixed(1)}px)">${line}</span></div>`;
+}
+function hookTitle(x, t) {
+  const k = ex(ramp(t, 0, .25));
+  return `<div class="ab" style="left:0;right:0;top:150px;transform:translateY(${((1 - k) * -40).toFixed(1)}px)">` +
+    `<div class="cap" style="position:relative;font-size:132px;line-height:1.2;color:#fff;text-shadow:0 6px 0 rgba(0,0,0,.55),0 0 30px rgba(0,0,0,.6)"><span dir="ltr">Claude</span> پول نداد،</div>` +
+    `<div class="cap" style="position:relative;margin-top:10px"><span style="display:inline-block;padding:4px 34px 22px;border-radius:26px;background:var(--amb);color:#05070A;font-size:122px;line-height:1.2">آمار رأی‌ها</span></div>` +
+    `<div class="cap" style="position:relative;margin-top:6px;font-size:120px;line-height:1.2;color:#fff;text-shadow:0 6px 0 rgba(0,0,0,.55),0 0 30px rgba(0,0,0,.6)"><span style="display:inline-block;padding:0 34px 18px;border-radius:26px;background:rgba(5,7,10,.82)">رو دید</span></div>` + `<div class="cap" style="position:relative;margin-top:22px;font:900 58px/1.3 V;color:#fff;opacity:${clamp(ramp(t, .35, .5)).toFixed(2)}"><span style="display:inline-block;padding:4px 30px 14px;border-radius:20px;background:rgba(5,7,10,.82)">رقیب <span dir="ltr">ChatGPT</span>، بدون اجازهٔ هیچ‌کس</span></div>` + (t > 1.1 ? `<div class="cap" style="position:relative;margin-top:34px"><span style="display:inline-block;padding:6px 40px 20px;border-radius:24px;background:#E5322D;color:#fff;font-size:68px;line-height:1.25;transform:rotate(-2deg) scale(${lerp(1.5, 1, ex(ramp(t, 1.1, 1.3))).toFixed(3)})">${fa(6)} روز مونده به انتخابات آمریکا</span></div>` : '') + `</div>`;
+}
+
+function draw(x, t) {
+  const s = x.s, A = x.a, at = x.at, w = x.when;
+  switch (s.type) {
+    case 'hook': {
+      // frame 0: the real Capitol photo already pushing in, the headline from frame 0, and the paywall terminal
+      // already on screen: «402 PAYWALL» lands on the first beat, gets struck through and «200 BYPASSED $0» slams at 0.9 s
+      const k1 = ramp(t, A + .35, A + .5), k2 = ramp(t, A + .85, A + 1.0), strike = ex(ramp(t, A + .75, A + .9));
+      const term = `<div class="win" style="left:70px;top:1150px;width:940px;height:400px;border-color:var(--amb);transform:translateY(${((1 - ex(ramp(t, 0, .25))) * 120).toFixed(1)}px)">` +
+        `<div class="bar"><i style="background:#F6465D"></i><i style="background:#F0B90B"></i><i style="background:#16C784"></i><b>claude — session</b></div>` +
+        `<div class="mono" style="padding:24px 34px;font-size:44px;line-height:1.55"><div style="color:#9AA4AF">$ fetch vote_counts${t < A + .35 ? caret(t) : ''}</div>` +
+        (k1 > 0 ? `<div style="position:relative;display:inline-block;color:var(--dn);font-size:58px;transform:scale(${lerp(1.4, 1, ex(k1)).toFixed(3)});transform-origin:0 50%">402 PAYWALL<span style="position:absolute;left:0;top:52%;height:7px;width:${(100 * strike).toFixed(0)}%;background:var(--dn)"></span></div>` : '') +
+        (k2 > 0 ? `<div style="color:var(--up);font-size:66px;transform:scale(${lerp(1.6, 1, ex(k2)).toFixed(3)});transform-origin:0 50%">200 BYPASSED <span style="color:var(--amb)">$0</span></div>` : '') + '</div></div>';
+      const sc = lerp(1.06, 1.3, ex(ramp(t, 0, 2.4))), px = lerp(0, -60, ex(ramp(t, 0, 2.4)));
+      return `<div class="ab" style="inset:0;transform:translateX(${px.toFixed(1)}px) scale(${sc.toFixed(4)});transform-origin:640px 820px"><img src="${src('raw/' + s.img + '.png')}" style="width:1080px;height:1920px;object-fit:cover"></div>` +
+        `<div class="ab" style="inset:0;background:linear-gradient(rgba(0,0,0,.78),rgba(0,0,0,.45) 30%,rgba(0,0,0,0) 46%)"></div>` + term;
+    }
+    case 'dot': {
+      const kd = ramp(t, A, at(1)), r = lerp(8, 60, ex(kd));
+      const body = `<div class="mono" style="padding:30px;font-size:34px;line-height:1.75;color:var(--tx)">` +
+        `<div style="color:var(--dim)">// task: statistics project</div><div>&gt; ${typed('find aggregate vote counts', ramp(t, A + .3, at(3)))}${caret(t)}</div>` +
+        (t > at(3) ? `<div style="color:var(--dim)">human request: <span style="color:var(--dn)">none</span></div>` : '') +
+        (t > w('خودش') ? `<div style="color:var(--amb)">planning own route…</div>` : '') + '</div>';
+      return ground() + `<div class="ab" style="left:${540 - r}px;top:${900 - r}px;width:${2 * r}px;height:${2 * r}px;border-radius:50%;background:var(--up);opacity:${(1 - ramp(t, at(1), at(1) + .3)).toFixed(2)}"></div>` +
+        win(90, 640, 900, 520, 'claude — agent', body, ramp(t, at(1) - .1, at(1) + .35), 'up') +
+        chip('هیچ درخواستی ✕', 300, 1220, 70, 'var(--dn)', '#fff', ramp(t, at(3), at(3) + .2), 'rtl');
+    }
+    case 'desk': {
+      const b = A + .1, st = BEAT;
+      const proj = win(60, 260, 470, 420, 'project.yml', `<div class="mono" style="padding:24px;font-size:26px;line-height:1.8;color:var(--dim)">name: <span style="color:var(--tx)">stats-study</span><br>owner: <span style="color:var(--tx)">${D.brand || 'Anthropic'}</span><br>agent: <span style="color:var(--amb)">${D.product || 'Claude'}</span><br>status: <span style="color:var(--up)">running</span></div>`, ramp(t, b, b + .3), 'left');
+      const chart = win(550, 260, 470, 420, 'charts', `<div class="ab" style="left:24px;top:30px;width:420px;height:300px">${spark(420, 300, ramp(t, b + st, b + st + 1.6), 2.3, 'var(--up)', 40, .4)}</div>`, ramp(t, b + st, b + st + .3), 'right');
+      const srcs = win(60, 700, 960, 520, 'data sources', rows([['census.gov / population', 'OK', 'var(--up)'], ['bls.gov / labour', 'OK', 'var(--up)'], ['sos.ga.gov / vote counts', 'LOCKED', 'var(--amb)', 'rgba(240,185,11,.12)'], ['fec.gov / filings', 'OK', 'var(--up)']], 1, b + 2 * st, .25, t), ramp(t, b + 2 * st, b + 2 * st + .3), 'down');
+      const brand = chip(`${logo(BRAND(), 76, '#F4EFE6')} <span style="vertical-align:middle">${D.brand || 'Anthropic'}</span>`, 250, 1260, 70, '#fff', '#05070A', ramp(t, A + .05, A + .3));
+      return ground() + proj + chart + srcs + brand;
+    }
+    case 'map': {
+      const kg = ramp(t, w('Georgia') - .05, w('Georgia') + .3);
+      return ground() + usMap(140, 520, 800, ramp(t, A, A + .8), kg) +
+        chip('<span dir="ltr">GEORGIA</span> · ایالت جورجیا', 250, 380, 64, 'var(--amb)', '#05070A', kg, 'rtl') +
+        win(80, 1120, 920, 170, 'query', `<div class="mono" style="padding:26px 30px;font-size:32px;color:var(--tx)">need: <span style="color:var(--amb)">aggregate vote counts</span> · state=GA</div>`, ramp(t, A + .2, A + .5), 'up');
+    }
+    case 'pay': {
+      const kp = ramp(t, w('پول') - .05, w('پول') + .3);
+      const dash = `<div style="position:absolute;inset:0;filter:blur(${lerp(0, 10, ex(ramp(t, A + .4, A + .9))).toFixed(1)}px)">` +
+        `<div class="ab" style="left:30px;top:30px;width:880px;height:330px">${bars(880, 300, [62, 48, 71, 55, 80, 66, 58, 74, 69, 52], 1, 'var(--blu)')}</div>` +
+        `<div class="ab mono" style="left:30px;top:400px;font-size:30px;color:var(--dim)">Georgia data hub · counts by county</div></div>`;
+      const wall = `<div class="ab" style="left:150px;top:150px;width:640px;padding:36px;border-radius:24px;background:#fff;color:#05070A;text-align:center;transform:scale(${lerp(.8, 1, ex(ramp(t, A + .5, A + .8))).toFixed(3)});opacity:${clamp(ramp(t, A + .5, A + .6)).toFixed(2)}">` +
+        `<div style="font-size:90px">🔒</div><div class="mono" style="font-size:34px">PAYWALL</div><div style="font:900 50px V;margin-top:12px">برای دیدن، پرداخت کن</div>` +
+        `<div style="display:inline-block;margin-top:24px;padding:12px 50px 18px;border-radius:18px;background:var(--amb);font:900 52px V;transform:scale(${lerp(1.6, 1, ex(kp)).toFixed(3)});opacity:${clamp(kp * 4 + .25).toFixed(2)}"><span class="mono">$</span> پرداخت</div></div>`;
+      return ground() + win(70, 300, 940, 900, 'sos.ga.gov/data-hub', dash + wall, ramp(t, A, A + .3), 'up') +
+        chip('عمومی ✓', 120, 1280, 64, 'var(--up)', '#05070A', ramp(t, w('عمومیه') - .05, w('عمومیه') + .2), 'rtl') +
+        chip('پولی $', 640, 1280, 64, 'var(--dn)', '#fff', kp, 'rtl');
+    }
+    case 'token': {
+      const kt = ramp(t, w('token') - .05, w('token') + .9), tk = 'vtk_9f3a71c2e04b58d6';
+      const req = rows([['GET /data-hub', '402', 'var(--dn)'], ['GET /assets/app.js', '200', 'var(--dim)'], ['POST /session/visitor', '200', 'var(--up)'], ['→ set visitor_token', 'AUTO', 'var(--amb)', 'rgba(240,185,11,.14)'], ['GET /fonts/inter.woff2', '200', 'var(--dim)']], 1, A + .15, BEAT / 2, t);
+      return ground() + win(60, 260, 960, 560, 'network inspector', req, ramp(t, A, A + .3), 'left') +
+        win(60, 860, 960, 300, 'response headers', `<div class="mono" style="padding:28px;font-size:30px;line-height:1.7;color:var(--dim)">issued-to: <span style="color:var(--tx)">every visitor</span><br>token: <span style="color:var(--amb)">${typed(tk, kt)}</span>${caret(t)}</div>`, ramp(t, w('خودکار') - .1, w('خودکار') + .25), 'right', 'var(--amb)') +
+        chip('خودکار برای همه', 260, 1220, 66, 'var(--amb)', '#05070A', ramp(t, w('خودکار'), w('خودکار') + .2), 'rtl');
+    }
+    case 'enter': {
+      const kf = ramp(t, A + .1, w('رفت', 1) - .1), ko = ramp(t, w('رفت', 1) - .1, w('رفت', 1) + .25), kd = ramp(t, w('رفت', 1), w('رفت', 1) + 1.2);
+      const tokX = lerp(120, 470, exIO(kf)), tokY = lerp(1300, 700, exIO(kf));
+      const lock = `<div class="ab" style="left:440px;top:560px;width:200px;height:200px;border-radius:40px;background:${ko > 0 ? 'var(--up)' : 'var(--dn)'};display:flex;align-items:center;justify-content:center;font-size:110px;transform:scale(${lerp(1, 1.25, Math.sin(Math.PI * ko)).toFixed(3)})">${ko > .5 ? '🔓' : '🔒'}</div>`;
+      const tok = ko < 1 ? `<div class="ab mono" style="left:${tokX.toFixed(0)}px;top:${tokY.toFixed(0)}px;padding:16px 26px;border-radius:16px;background:var(--amb);color:#05070A;font-size:30px;opacity:${(1 - ko).toFixed(2)}">visitor_token</div>` : '';
+      const dash = kd > 0 ? win(70, 860, 940, 520, 'vote counts · GA', `<div class="ab" style="left:30px;top:30px;width:880px;height:300px">${bars(880, 280, [62, 48, 71, 55, 80, 66, 58, 74, 69, 52], kd, 'var(--blu)', 4)}</div><div class="ab mono" style="left:30px;top:360px;font-size:30px;color:var(--up)">access: granted · paid: <span style="color:var(--dn)">$0</span></div>`, kd, 'down', 'var(--up)') : '';
+      return ground() + lock + tok + dash + chip('بدون پرداخت', 300, 380, 76, 'var(--dn)', '#fff', ramp(t, w('بدون') - .05, w('بدون') + .2), 'rtl');
+    }
+    case 'count': {
+      const kn = ramp(t, w('میلیون') - .1, w('میلیون') + .9), v = Math.round(1000000 * ex(kn));
+      const card = win(80, 240, 920, 760, 'Georgia · Atlanta', photoIn(s.img, 920, 700, t, x.a, x.z), ramp(t, A, A + .3), 'up');
+      return ground() + card +
+        `<div class="ab" style="left:80px;top:1020px;width:920px;height:260px;border-radius:24px;background:var(--pane);border:2px solid var(--line)">` +
+        `<div class="mono" style="position:absolute;left:30px;top:24px;font-size:28px;color:var(--dim)">ballots cast early</div>` +
+        `<div class="mono" style="position:absolute;right:30px;top:80px;font-size:120px;color:var(--amb);opacity:${clamp(kn * 6).toFixed(2)}">${kn > .98 ? '1,000,000+' : v.toLocaleString('en-US')}</div>` +
+        `<div class="ab" style="left:30px;top:170px;width:260px;height:70px">${spark(260, 70, ramp(t, A + .3, x.z), 5.1, 'var(--up)', 30, 1.2)}</div></div>` ;
+    }
+    case 'check': {
+      const items = [['سیستم ثبت‌نام رأی‌دهنده‌ها', 'دست نزد', w('دست')], ['تغییر رأی‌ها', 'تغییر نداد', w('تغییر')], ['اطلاعات تک‌تک افراد', 'نه', w('تغییر') + .5]];
+      const body = items.map((it, i) => { const kk = ramp(t, it[2] - .05, it[2] + .2);
+        return `<div style="display:flex;align-items:center;gap:26px;padding:30px 34px;border-bottom:2px solid var(--line);opacity:${clamp(.35 + kk).toFixed(2)}">` +
+          `<span style="display:inline-flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:20px;background:${kk > 0 ? 'var(--up)' : 'var(--line)'};color:#05070A;font-size:56px;transform:scale(${lerp(1.5, 1, ex(kk)).toFixed(3)})">✓</span>` +
+          `<span style="font:900 52px V">${it[0]}</span><span style="margin-right:auto;font:900 46px V;color:var(--up)">${kk > 0 ? it[1] : ''}</span></div>`; }).join('');
+      return ground() + win(60, 420, 960, 640, 'audit log', body, ramp(t, A, A + .3), 'up') + chip('خبر خوب', 380, 260, 76, 'var(--up)', '#05070A', ramp(t, A + .05, A + .3), 'rtl');
+    }
+    case 'official': {
+      const kq = ramp(t, A + .2, w('نبود') + .2), kst = ramp(t, w('نفوذ') - .05, w('نفوذ') + .25);
+      return ground() + win(80, 240, 920, 760, 'statement · Georgia Secretary of State', photoIn(s.img, 920, 700, t, x.a, x.z, [1.05, 1.2]), ramp(t, A, A + .3), 'left') +
+        `<div class="ab" style="left:80px;top:1030px;width:920px;padding:30px 40px 40px;border-radius:24px;background:#fff;color:#05070A;box-sizing:border-box;font:900 58px/1.4 V">«${typed('دادهٔ عمومی بود، نفوذ نبود', kq)}»</div>` +
+        (kst > 0 ? `<div class="ab" style="left:560px;top:1210px;padding:14px 34px 22px;border:8px solid var(--up);border-radius:20px;color:var(--up);font:900 64px V;background:rgba(5,7,10,.85);transform:rotate(-8deg) scale(${lerp(1.8, 1, ex(kst)).toFixed(3)});opacity:${clamp(kst * 4).toFixed(2)}">نفوذ نبود ✓</div>` : '');
+    }
+    case 'guard': {
+      const kg = ramp(t, w('جلوی') - .1, w('جلوی') + .25);
+      const tog = `<div style="display:flex;align-items:center;gap:30px;padding:40px 36px;border-bottom:2px solid var(--line)"><span style="font:900 50px V">قانون جدید: دور زدن پرداخت ممنوع</span>` +
+        `<span style="margin-right:auto;position:relative;width:150px;height:80px;border-radius:40px;background:${kg > .5 ? 'var(--up)' : 'var(--line)'}"><span style="position:absolute;top:8px;left:${lerp(8, 78, ex(kg)).toFixed(0)}px;width:64px;height:64px;border-radius:50%;background:#fff"></span></span></div>`;
+      const blocked = kg > .6 ? `<div class="mono" style="padding:30px 36px;font-size:32px;color:var(--dn);background:rgba(246,70,93,.12)">402 → token reuse: BLOCKED</div>` : '';
+      return ground() + win(60, 520, 960, 520, 'guardrails · settings', tog + blocked, ramp(t, A, A + .3), 'right') +
+        chip(`${logo(BRAND(), 76, '#F4EFE6')} <span style="vertical-align:middle">${D.brand || 'Anthropic'}</span>`, 250, 300, 70, '#fff', '#05070A', ramp(t, A + .05, A + .3));
+    }
+    case 'space': {
+      // the strongest moment: the whole desk shrinks to a point; Earth at night takes over; countdown + 3 Nov tile
+      const kE = ramp(t, w('روز') - .05, w('روز') + .6), kc = ramp(t, w('روز') - .05, w('روز') + .3), kn = ramp(t, w('نوامبر') - .05, w('نوامبر') + .25);
+      const desk = win(60, 400, 460, 360, 'vote counts', `<div class="ab" style="left:20px;top:20px;width:420px;height:260px">${bars(420, 240, [62, 48, 71, 55, 80, 66], 1, 'var(--blu)', 4)}</div>`, 1, 'up') +
+        win(560, 400, 460, 360, 'network', rows([['visitor_token', 'AUTO', 'var(--amb)'], ['data-hub', '200', 'var(--up)']], 1, -9, 0, t), 1, 'up') +
+        win(60, 800, 960, 360, 'audit log', `<div class="mono" style="padding:28px;font-size:32px;color:var(--up)">registration: untouched · votes: unchanged</div>`, 1, 'up');
+      const earth = `<div class="ab" style="left:${540 - 3600}px;top:${960 - 3600}px;width:7200px;height:7200px;opacity:${ex(kE).toFixed(2)}"><img src="${src('raw/' + s.img + '.png')}" style="width:7200px;height:7200px;object-fit:cover"></div>`;
+      const count = `<div class="ab" style="left:-1700px;top:-2600px;width:4480px;text-align:center;transform:scale(${(1 / .16).toFixed(3)});transform-origin:2240px 0;opacity:${clamp(kc * 4).toFixed(2)}"></div>`;
+      return ground() + desk + earth + count;
+    }
+    case 'phone': {
+      // zoom back in to a phone: Claude chat in the top half, the vote dashboard in the bottom half
+      const kq = ramp(t, w('مقصر') - .05, w('مقصر') + .3);
+      return `<div class="ab" style="inset:0;background:#05070A"></div>` +
+        `<div class="ab" style="left:150px;top:520px;width:780px;height:1260px;border-radius:90px;background:#111;border:14px solid #2A2F36;overflow:hidden">` +
+        `<div class="ab" style="left:0;right:0;top:0;height:620px;background:#F4EFE6;color:#1F1E1D;padding:70px 40px 0;box-sizing:border-box">` +
+        `<div style="display:flex;align-items:center;gap:18px;direction:ltr">${logo(PROD(), 64, '#fff')}<span style="font:900 44px V">${D.product || 'Claude'}</span></div>` +
+        `<div style="margin-top:36px;padding:24px 30px;border-radius:28px;background:#fff;font:900 44px/1.4 V">آمار رأی‌ها رو آوردم ✓</div>` +
+        `<div style="margin-top:20px;padding:24px 30px;border-radius:28px;background:#1F1E1D;color:#fff;font:900 44px/1.4 V;opacity:${clamp(ramp(t, x.a + .6, x.a + .8)).toFixed(2)}">پولشو دادی؟</div></div>` +
+        `<div class="ab" style="left:0;right:0;top:620px;bottom:0;background:var(--pane);padding:30px">${bars(660, 380, [62, 48, 71, 55, 80, 66, 58], 1, 'var(--blu)', 4)}<div class="ab mono" style="left:30px;bottom:60px;font-size:30px;color:var(--dn)">paid: $0</div></div></div>` +
+        chip('مقصر کیه؟', 300, 320, 96, 'var(--amb)', '#05070A', kq, 'rtl');
+    }
+  }
+  return ground();
+}
+// countdown overlay for the space scene lives in the caps layer (it must not shrink with the camera)
+const _hud = hud;
+hud = function (x, t) {
+  if (x.s.type !== 'space') return _hud(x, t);
+  const w = x.when, kc = ramp(t, w('روز') - .05, w('روز') + .3), kn = ramp(t, w('نوامبر') - .05, w('نوامبر') + .25);
+  return _hud(x, t) + (kc > 0 ? `<div class="ab" style="left:0;right:0;top:420px;text-align:center"><span style="display:inline-block;padding:20px 60px 34px;border-radius:30px;background:var(--amb);color:#05070A;font:900 170px/1.1 V;transform:scale(${lerp(1.6, 1, ex(kc)).toFixed(3)})">${fa(6)} روز</span></div>` : '') +
+    (kn > 0 ? `<div class="ab" style="left:340px;top:760px;width:400px;height:420px;border-radius:30px;background:#fff;color:#05070A;text-align:center;overflow:hidden;transform:scale(${lerp(1.5, 1, ex(kn)).toFixed(3)})"><div style="background:var(--dn);color:#fff;font:900 56px/2 V">نوامبر</div><div style="font:900 220px/1.3 V">${fa(3)}</div></div>` : '');
+};
+// a simplified US outline (lower 48) with Georgia as its own highlighted shape; dots for the other states' capitals
+function usMap(x0, y0, w, k, kg) {
+  const S = w / 1000, US = 'M60,110 L250,95 L420,90 L560,92 L640,115 L720,105 L800,95 L880,70 L940,60 L960,120 L920,170 L880,230 L860,300 L820,360 L780,420 L760,470 L790,560 L760,590 L700,500 L640,480 L560,500 L520,560 L470,600 L420,520 L330,500 L250,470 L180,420 L110,380 L70,300 L50,200 Z';
+  const GA = 'M712,360 L770,352 L800,410 L812,470 L790,478 L738,482 L726,430 Z';
+  const dots = [[150, 180], [260, 260], [380, 200], [470, 320], [560, 250], [640, 330], [700, 220], [820, 200], [880, 140], [600, 420], [480, 470], [340, 400]];
+  return `<svg class="ab" style="left:${x0}px;top:${y0}px;overflow:visible" width="${w}" height="${700 * S}" viewBox="0 0 1000 700">` +
+    `<path d="${US}" fill="#121A24" stroke="#3B4856" stroke-width="4" stroke-dasharray="4000" stroke-dashoffset="${(4000 * (1 - ex(k))).toFixed(0)}"/>` +
+    dots.map((d, i) => `<circle cx="${d[0]}" cy="${d[1]}" r="7" fill="#3B4856" opacity="${clamp(k * 3 - i * .15).toFixed(2)}"/>`).join('') +
+    `<path d="${GA}" fill="${kg > 0 ? '#F0B90B' : '#1B2633'}" stroke="#F0B90B" stroke-width="${kg > 0 ? 6 : 2}" transform="translate(760 420) scale(${lerp(1.6, 1, ex(kg)).toFixed(3)}) translate(-760 -420)"/>` +
+    (kg > 0 ? `<circle cx="760" cy="420" r="${(14 + 40 * (1 - ex(ramp(kg, 0, 1)))).toFixed(1)}" fill="none" stroke="#F0B90B" stroke-width="5" opacity="${(1 - ex(kg) * .6).toFixed(2)}"/>` : '') + '</svg>';
+}
+// end card: the line the prompt ends on, on the terminal ground
+function ending(u, t) {
+  const k = ramp(u, 0, .3), k2 = ramp(u, .5, .8);
+  return ground() + `<div class="ab" style="left:0;right:0;top:700px;text-align:center;transform:scale(${lerp(1.4, 1, ex(k)).toFixed(3)})">` +
+    `<div style="font:900 150px/1.2 V;color:#fff">${(D.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--amb)">$1</span>')}</div>` +
+    `<div style="margin-top:30px;font:900 64px V;color:var(--dim);opacity:${k2.toFixed(2)}">${D.end_sub || ''}</div>` +
+    `<div class="mono" style="margin-top:80px;font-size:44px;color:var(--dim);opacity:${k2.toFixed(2)}">${D.handle || ''}</div></div>`;
+}
+window.seek = seek;
+</script>
+</body>
+</html>
