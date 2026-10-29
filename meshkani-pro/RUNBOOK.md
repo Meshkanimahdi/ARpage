@@ -317,11 +317,11 @@ Mahdi: one storyboard image, cut into slides, gives better quality, lower cost a
 `python3 news-reel/concept_gate.py --dir work --kind post lint`, the independent critic, then `… check`.
    The critic is a fresh subagent (Agent tool, no shared context) that gets only `concept.json` and the previous
    3 covers' headlines; it answers JSON `{"scores": {…}, "paraphrase": "<what a newcomer thinks the headline
-   means, one sentence>", "notes": {…}}` → `critic_concept.json`. Scores 1–10: `headline_clarity` (≥ 8; ≤ 4 when
+   means, one sentence>", "notes": {…}}` → `critic_concept.json`. Scores 1–10: `headline_clarity` (≥ 7, user rule 2026-10-29; ≤ 4 when
    the paraphrase does not match who did what to whom), `story_appeal` (would a Persian scroller who is not into
    tech care? jobs, money, everyday life win), `hook_plan` (is frame 0 a real, bright, big subject with the
    headline on screen and moving?), `cover_plan` (real face/product, big plain headline, clear at thumbnail size),
-   and `save_value` (would someone save or send it?). Bars: clarity 8, the rest 7. Fix and repeat (text
+   and `save_value` (would someone save or send it?). Bars: all 7 (clarity lowered from 8 to 7 by Mahdi on 2026-10-29: «حد نصاب وضوح رو ۷ کن»; 18 rounds on 2026-10-29 stuck at 7 while critics asked for wordings that do not fit 7 words). Fix and repeat (text
    only, it costs nothing), at most 4 rounds; still failing → choose another story or angle.
 
 Content ID: the next `POST-NNN` after the highest id in the sheet **and** in any
@@ -830,12 +830,12 @@ narrator talks, nothing attractive in the picture").
    (§4.4 step 0) and the gate check the built version.
    The critic is a fresh subagent (Agent tool, no shared context) that gets only `concept.json` and the previous
    3 covers' headlines; it answers JSON `{"scores": {…}, "paraphrase": "<what a newcomer thinks the headline
-   means, one sentence>", "notes": {…}}` → `critic_concept.json`. Scores 1–10: `headline_clarity` (≥ 8; ≤ 4 when
+   means, one sentence>", "notes": {…}}` → `critic_concept.json`. Scores 1–10: `headline_clarity` (≥ 7, user rule 2026-10-29; ≤ 4 when
    the paraphrase does not match who did what to whom), `story_appeal` (would a Persian scroller who is not into
    tech care? jobs, money, everyday life win), `hook_plan` (is frame 0 a real, bright, big subject with the
    headline on screen and moving?), `cover_plan` (real face/product, big plain headline, clear at thumbnail size),
    and for reels `motion_plan` (every scene ≥ 4 animated layers: numbers, charts, UI, glow; not photos sliding)
-   or for posts `save_value` (would someone save or send it?). Bars: clarity 8, the rest 7. Fix and repeat (text
+   or for posts `save_value` (would someone save or send it?). Bars: all 7 (clarity lowered from 8 to 7 by Mahdi on 2026-10-29: «حد نصاب وضوح رو ۷ کن»; 18 rounds on 2026-10-29 stuck at 7 while critics asked for wordings that do not fit 7 words). Fix and repeat (text
    only, it costs nothing), at most 4 rounds; still failing → choose another story or angle.
 0. **Motion style first (mandatory).** Follow the workflow in `.claude/skills/motion-graphy-2026/SKILL.md`:
    - read `references/index.md` and shortlist 3 prompts for this story;
@@ -900,8 +900,8 @@ narrator talks, nothing attractive in the picture").
    - **Headline test first, text only (2026-10-28, after REEL-016 failed on clarity 6 with everything else
      7–8):** before any image, voice or engine work, give the independent critic only the top 3 headline
      candidates and a one-line story summary, and ask for `headline_clarity` (1–10) and the one-sentence
-     paraphrase a newcomer would give. Keep only a headline scoring ≥ 8 whose paraphrase matches the story (who
-     did what, to whom). None reaches 8 → rewrite and test again (it costs nothing), or pick another story.
+     paraphrase a newcomer would give. Keep only a headline scoring ≥ 7 whose paraphrase matches the story (who
+     did what, to whom). None reaches 7 → rewrite and test again (it costs nothing), or pick another story.
      The voice's first line uses that exact headline.
    - **Cover:** a real photo of the main subject (a person's face, the product, or the place), big (≥ 50 % of the
      frame), bright, high contrast, warm or saturated colour; the headline at 120–150 px in the calm area; the real
