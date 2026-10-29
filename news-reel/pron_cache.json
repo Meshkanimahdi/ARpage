@@ -1,1 +1,79 @@
-{}
+{
+ "serious": {
+  "mode": "A",
+  "spoken": "serious",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-10-29"
+ },
+ "AI Microsoft": {
+  "mode": "C",
+  "spoken": "اِی‌آی مایکْروسافت",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-10-29"
+ },
+ "curious": {
+  "mode": "A",
+  "spoken": "curious",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-10-29"
+ },
+ "matter-of-fact": {
+  "mode": "A",
+  "spoken": "matter-of-fact",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-10-29"
+ },
+ "Science": {
+  "mode": "A",
+  "spoken": "Science",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-10-29"
+ },
+ "Microsoft": {
+  "mode": "C",
+  "spoken": "مایکْروسافت",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-10-29"
+ },
+ "emphatic": {
+  "mode": "A",
+  "spoken": "emphatic",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-10-29"
+ },
+ "thoughtful": {
+  "mode": "A",
+  "spoken": "thoughtful",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-10-29"
+ },
+ "Boston": {
+  "mode": "A",
+  "spoken": "Boston",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-10-29"
+ },
+ "warm": {
+  "mode": "A",
+  "spoken": "warm",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-10-29"
+ },
+ "AI": {
+  "mode": "C",
+  "spoken": "اِی‌آی",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-10-29"
+ }
+}

@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — oscilloscope studio film (prompt 147)</title>
+<!-- Skill motion-graphy-2026, prompt 147 "Oscilloscope-style studio motion graphic" (MUSIC), built as its own engine.
+     Look from the prompt: green phosphor lines on black, traces that glow and decay, everything drawn as oscilloscope
+     traces; ONE through-line object (here: the heartbeat / data trace) that changes role in every scene and becomes the
+     logo chip on the end card; UI rebuilt as vector layers driven by a cursor; the camera never sits still (push 1.0 →
+     1.04 per scene, each scene starts at the zoom the last ended on); springs with a small overshoot; nothing appears
+     from nothing (it grows, unfolds or is revealed by a mask); something changes on every beat (120 BPM).
+     Banned (kept): particle bursts, lens flares, camera shake, RGB split, crossfades, generic gradients, bouncy easing.
+     Allowed edits: 1920x1080 → 1080x1920, 20 s → the voiced length, the studio → the story's subject, the soundtrack →
+     page-standard music bed + motion-matched SFX cues, the opening → the real photo hook (RUNBOOK §4.0 rule 4).
+     Data: story.json beats[{id, text, scene{type, img}}]; raw/sNN.png photos; el/logo_<brand>.svg real logo.
+     Scene types: hook, stake, paper, cases, steps, bars, bars2, er, sim, team, next, ask (+ end). -->
+<style>
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --bk: #04100A; --ph: #3DFF8E; --dim: #0E3A22; --ink: #EAF7EF; --mute: #7FA892; --red: #FF5A4E; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--bk); }
+  #root { position: absolute; inset: 0; overflow: hidden; font-family: V; font-weight: 900; color: var(--ink); }
+  #cam, #stage, #caps { position: absolute; inset: 0; }
+  #cam { transform-origin: 0 0; }
+  .a { position: absolute; }
+  .row { display: flex; align-items: center; }
+  .mask { overflow: hidden; display: inline-block; vertical-align: bottom; }
+</style>
+</head>
+<body>
+<div id="root"><div id="cam"><div id="stage"></div></div><div id="caps"></div></div>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const url = f => f.startsWith('/') ? f : DIR + f, byId = id => document.getElementById(id);
+const cl = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v)), mix = (a, b, k) => a + (b - a) * k;
+const lin = (t, a, b) => cl((t - a) / (b - a));
+const spr = (t, t0, w = 16, z = .6) => { const u = t - t0; if (u <= 0) return 0; const wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * u) * (Math.cos(wd * u) + z * w / wd * Math.sin(wd * u)); };
+const eo = k => 1 - Math.pow(1 - cl(k), 3), eio = k => (k = cl(k), k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+const fa = s => String(s).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const BPM = 120, BT = 60 / BPM;
+const ISS = [];
+let S, TL, B = [], DUR = 50, NOW = 0;
+
+function parse(b) {
+  const L = TL.lines[b.id]; if (!L) { ISS.push('no timing ' + b.id); return null; }
+  const raw = b.text.replace(/\[[^\]]*\]/g, ' ');
+  const spoken = raw.replace(/\{[^|}]*\|([^}]*)\}/g, '$1').replace(/\*/g, '').trim().split(/\s+/);
+  const n = L.words.length, idx = i => spoken.length === n ? i : Math.round(cl(i / Math.max(1, spoken.length - 1)) * (n - 1));
+  const tw = i => (L.words[idx(cl(i, 0, spoken.length - 1))] || [L.start])[0];
+  const W = []; let si = 0, hot = false;
+  for (const tok of raw.replace(/\{([^|}]*)\|([^}]*)\}/g, (m, a, c) => a.replace(/\s/g, '\u0002') + '\u0001' + c.trim().split(/\s+/).length).trim().split(/\s+/)) {
+    let w = tok, sp = 1; if (w.includes('\u0001')) { const [p, r] = w.split('\u0001'); sp = parseInt(r, 10) || 1; w = p + r.replace(/^\d+/, ''); }
+    if (w.startsWith('*')) hot = true; const h = hot; if (/\*[«»"'.…،؛!؟?:]*$/.test(w)) hot = false;
+    W.push({w: w.replace(/\*/g, '').replace(/\u0002/g, ' '), h, t: tw(si)}); si += sp;
+  }
+  const at = (sub, k = 0) => { const m = W.filter(x => x.w.includes(sub)); if (!m.length) { ISS.push(`${b.id}: no word "${sub}"`); return L.start; } return m[Math.min(k, m.length - 1)].t; };
+  return {b, s: b.scene || {}, L, W, at};
+}
+
+// key moments (camera re-frames) and the sound that matches each motion (never a whoosh per cut)
+const HITS = {
+  hook: x => [x.at('سخت'), x.at('۸۳'), x.at('عمومی')], stake: x => [x.at('اینو')], paper: x => [x.at('Science'), x.at('اکتبر')], cases: x => [x.at('سخت')],
+  steps: x => [x.at('آزمایش')], bars: x => [x.at('۸۳')], bars2: x => [x.at('۳۶'), x.at('۲۲')], er: x => [x.at('۸۰'), x.at('۴۷')],
+  sim: x => [x.at('شبیه‌سازی'), x.at('قدیمی'), x.at('واقعی')], team: x => [x.at('تیم')], next: x => [x.at('واقعی'), x.at('Boston')], ask: x => [x.at('نظر')]
+};
+const SFX = {
+  hook: x => [[.05, 'hit', .5], [.35, 'sweep_soft', .3], [1.2, 'pop', .35]],
+  stake: x => [[x.a + .05, 'sweep_soft', .25], [x.at('اینو'), 'notify', .3]],
+  paper: x => [[x.a + .1, 'typing', .25], [x.at('اکتبر'), 'pop', .3]],
+  cases: x => [[x.a + .2, 'counter_tick', .25], [x.at('سخت'), 'tap', .35]],
+  steps: x => [[x.a + .1, 'typing', .25], [x.at('آزمایش'), 'click', .35]],
+  bars: x => [[x.a + .1, 'counter_tick', .3], [x.at('۸۳') + .3, 'glass_ping', .35]],
+  bars2: x => [[x.at('۳۶'), 'counter_tick', .25], [x.at('۲۲'), 'tap', .3]],
+  er: x => [[x.a + .1, 'notify', .25], [x.at('۸۰'), 'counter_tick', .25]],
+  sim: x => [[x.a + .1, 'sweep_soft', .25], [x.at('شبیه‌سازی'), 'hit', .4]],
+  team: x => [[x.a + .1, 'pop', .3], [x.at('تیم'), 'pop', .3]],
+  next: x => [[x.a + .1, 'sweep_soft', .25], [x.at('واقعی'), 'shimmer', .3]],
+  ask: x => [[x.a + .1, 'tap', .3], [x.at('نظر'), 'click', .35]]
+};
+
+window.ready = (async () => {
+  S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json();
+  DUR = TL.total; B = S.beats.map(parse).filter(Boolean);
+  B.forEach((x, i) => { x.a = i ? x.L.start - .1 : 0; x.z = i + 1 < B.length ? B[i + 1].L.start - .1 : TL.end_start; });
+  const imgs = ['s01', 's02', 's03', 's04', 's05', 's06', 's08', 's09', 's12'].map(n => url('raw/' + n + '.png')).concat([url('el/' + LOGO())]);
+  await Promise.all(imgs.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = u; })));
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'تشخیص Microsoft')));
+  B.forEach(x => { x.keys = (HITS[x.s.type] || (() => []))(x).filter(v => v > x.a + .6 && v < x.z - .6).sort((p, q) => p - q); });
+  const sc = [];
+  for (const x of B) { const pts = [x.a, ...x.keys]; const cues = (SFX[x.s.type] || (() => []))(x).filter(c => c[0] >= x.a - .05 && c[0] < x.z);
+    pts.forEach((p, j) => { const t1 = j + 1 < pts.length ? pts[j + 1] : x.z;
+      sc.push({t0: +p.toFixed(2), t1: +t1.toFixed(2), type: x.s.type, bg: x.b.id + (j ? '.' + j : ''), sfx: cues.filter(c => c[0] >= p - .05 && c[0] < t1).map(c => [+c[0].toFixed(2), c[1], c[2]])}); }); }
+  sc.push({t0: TL.end_start, t1: DUR, type: 'end', bg: 'end', sfx: [[TL.end_start + .1, 'shimmer', .35]]});
+  window.SCENES = sc; window.START = 0; window.DURATION = DUR; window.ISSUES = ISS;
+  for (const c of sc) if (c.t1 - c.t0 > 3.2) ISS.push(`shot ${c.bg} holds ${(c.t1 - c.t0).toFixed(1)} s: add a hit`);
+  seek(0);
+})();
+const LOGO = () => 'logo_' + (S.brand || 'microsoft').toLowerCase().replace(/[^a-z0-9]/g, '') + '.svg';
+
+// camera: push 1.0 → 1.04 across each beat, plus a re-frame at each key moment; each beat starts where the last ended
+function camAt(x, t) {
+  const pts = [x.a, ...x.keys], j = pts.filter(p => t >= p).length - 1, base = 1 + .04 * lin(t, x.a, x.z);
+  const fy = [960, 900, 1020, 940][(B.indexOf(x) + j) % 4], m = eio(lin(t, pts[j], pts[j] + .45));
+  const sPrev = j ? 1.06 : 1.0, sNow = j ? 1.0 : 1.06;
+  return {s: base * mix(sPrev, sNow, j ? m : 1) * (j % 2 ? 1.05 : 1), x: 540, y: j ? mix(960, fy, m) : 960};
+}
+function seek(t) {
+  if (!B.length) return;
+  NOW = t;
+  let x = B[0]; for (const q of B) if (t >= q.a) x = q;
+  const end = t >= TL.end_start, c = end ? {s: 1, x: 540, y: 960} : camAt(x, t);
+  byId('cam').style.transform = `translate(540px,960px) scale(${c.s.toFixed(4)}) translate(${(-c.x).toFixed(1)}px,${(-c.y).toFixed(1)}px)`;
+  const h = end ? endCard(t - TL.end_start) : scene(x, t);
+  const st = byId('stage'); if (st._h !== h) { st._h = h; st.innerHTML = h; }
+  const cp = end ? '' : caption(x, t); const ca = byId('caps'); if (ca._h !== cp) { ca._h = cp; ca.innerHTML = cp; }
+}
+
+// ---------- parts ----------
+const pop = (t, t0) => cl(spr(t, t0, 18, .6), 0, 1.15);
+// graticule: the oscilloscope screen grid that fills every frame, drifting slowly (parallax layer)
+const grat = () => `<div class="a" style="inset:-60px;background-image:linear-gradient(var(--dim) 2px,transparent 2px),linear-gradient(90deg,var(--dim) 2px,transparent 2px);background-size:120px 120px;background-position:${(-NOW * 10 % 120).toFixed(1)}px ${(-NOW * 6 % 120).toFixed(1)}px;opacity:.9"></div>` +
+  `<div class="a" style="inset:0;background-image:radial-gradient(#1C5A38 2px,transparent 2px);background-size:24px 24px;opacity:.35"></div>`;
+// the through-line trace: a heartbeat line drawn left→right up to fraction k, with a bright head and a decaying tail
+function ecg(x0, y0, w, h, k, col = 'var(--ph)', sw = 8, beats = 3) {
+  const P = []; const n = 120;
+  for (let i = 0; i <= n; i++) { const u = i / n, ph = (u * beats) % 1;
+    let y = 0; if (ph > .42 && ph < .46) y = -.25; else if (ph >= .46 && ph < .5) y = 1; else if (ph >= .5 && ph < .54) y = -.55; else if (ph > .62 && ph < .72) y = .18 * Math.sin((ph - .62) / .1 * Math.PI);
+    P.push([x0 + u * w, y0 - y * h]); }
+  const m = Math.max(1, Math.round(n * cl(k))), pts = P.slice(0, m + 1).map(p => p.map(v => v.toFixed(1)).join(',')).join(' '), hd = P[m];
+  return `<svg class="a" style="left:0;top:0;overflow:visible" width="1080" height="1920"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linejoin="round" stroke-linecap="round" style="filter:drop-shadow(0 0 10px ${col})"/>` +
+    (k < 1 ? `<circle cx="${hd[0].toFixed(1)}" cy="${hd[1].toFixed(1)}" r="${sw * 1.6}" fill="#fff" style="filter:drop-shadow(0 0 16px ${col})"/>` : '') + '</svg>';
+}
+const rise = (html, k, sz, col = 'var(--ink)') => `<span class="mask" style="font-size:${sz}px;line-height:1.3;color:${col}"><span style="display:inline-block;transform:translateY(${((1 - eo(k)) * 110).toFixed(1)}%)">${html}</span></span>`;
+function chip(html, x0, y0, sz, bg, fg, t, t0, dir = 'rtl') {
+  const k = pop(t, t0); if (k <= 0) return '';
+  return `<div class="a" style="left:${x0}px;top:${y0}px;padding:${sz * .14}px ${sz * .4}px ${sz * .24}px;border-radius:${sz * .3}px;background:${bg};color:${fg};font:900 ${sz}px/1.15 V;white-space:nowrap;direction:${dir};transform:scale(${k.toFixed(3)});transform-origin:50% 50%">${html}</div>`;
+}
+const logo = s => `<span style="display:inline-flex;align-items:center;justify-content:center;width:${s}px;height:${s}px;border-radius:${s * .2}px;background:#fff;vertical-align:middle"><img src="${url('el/' + LOGO())}" style="width:${s * .72}px;height:${s * .72}px"></span>`;
+const msChip = (x0, y0, s, t, t0) => chip(`${logo(s)} <span dir="ltr" style="vertical-align:middle">Microsoft</span>`, x0, y0, s * .7, '#fff', '#111', t, t0, 'ltr');
+// photo inside a scope-screen frame (one layer of the composition, never the whole scene)
+function scope(img, x0, y0, w, h, k, t, a, pos = '50% 40%') {
+  const sc = mix(1.12, 1.02, lin(t, a, a + 4)), rh = h * eo(k);
+  return `<div class="a" style="left:${x0}px;top:${(y0 + (h - rh) / 2).toFixed(0)}px;width:${w}px;height:${rh.toFixed(0)}px;border-radius:28px;overflow:hidden;border:5px solid var(--ph);box-shadow:0 0 30px rgba(61,255,142,.35)">` +
+    `<img src="${url('raw/' + img + '.png')}" style="position:absolute;left:0;top:${((rh - h) / 2).toFixed(0)}px;width:${w}px;height:${h}px;object-fit:cover;object-position:${pos};transform:scale(${sc.toFixed(3)})"></div>`;
+}
+function count(v, k, dec = 0) { return fa((v * eo(k)).toFixed(dec)); }
+function bar(x0, y0, w, hMax, v, k, col, label, sub) {
+  const h = hMax * v / 100 * eo(k);
+  return `<div class="a" style="left:${x0}px;top:${y0 + hMax - h}px;width:${w}px;height:${h.toFixed(0)}px;border-radius:18px 18px 4px 4px;background:${col};box-shadow:0 0 26px ${col === 'var(--ph)' ? 'rgba(61,255,142,.5)' : 'rgba(255,255,255,.15)'}"></div>` +
+    `<div class="a" style="left:${x0 - 40}px;width:${w + 80}px;top:${(y0 + hMax - h - 150).toFixed(0)}px;text-align:center;font:900 120px V;color:${col}">${count(v, k)}٪</div>` +
+    `<div class="a" style="left:${x0 - 60}px;width:${w + 120}px;top:${y0 + hMax + 24}px;text-align:center;font:900 46px/1.25 V">${label}</div>` +
+    (sub ? `<div class="a" style="left:${x0 - 60}px;width:${w + 120}px;top:${y0 + hMax + 90}px;text-align:center;font:600 34px V;color:var(--mute)">${sub}</div>` : '');
+}
+function cursor(x0, y0, press) {
+  return `<svg class="a" style="left:${x0}px;top:${y0}px;overflow:visible;transform:scale(${(1 - .18 * press).toFixed(3)});transform-origin:0 0" width="60" height="80"><path d="M0 0 L0 58 L15 45 L26 72 L37 67 L26 41 L46 41 Z" fill="var(--ph)" stroke="#04100A" stroke-width="5" stroke-linejoin="round"/></svg>`;
+}
+function cur(t, path) {
+  let i = 0; for (let j = 0; j < path.length; j++) if (t >= path[j][0]) i = j;
+  const p = path[i], q = path[Math.min(i + 1, path.length - 1)], m = q === p ? 0 : eio(lin(t, p[0] + .1, q[0]));
+  let press = 0; for (const c of path) if (c[3]) press = Math.max(press, Math.exp(-((t - c[0]) ** 2) / .006));
+  return cursor(mix(p[1], q[1], m), mix(p[2], q[2], m), press);
+}
+// ✓/✗ grid filling per case (data layer): n cells, share ok
+function tally(x0, y0, cols, rows, ok, k, cell = 56) {
+  let h = ''; const n = cols * rows, shown = Math.floor(n * eo(k)), good = Math.round(n * ok / 100);
+  for (let i = 0; i < shown; i++) { const c = i % cols, r = Math.floor(i / cols), g = i < good;
+    h += `<div class="a" style="left:${x0 + c * (cell + 10)}px;top:${y0 + r * (cell + 10)}px;width:${cell}px;height:${cell}px;border-radius:12px;background:${g ? 'rgba(61,255,142,.18)' : 'rgba(255,90,78,.16)'};border:3px solid ${g ? 'var(--ph)' : 'var(--red)'};color:${g ? 'var(--ph)' : 'var(--red)'};font:900 ${cell * .6}px/${cell - 6}px V;text-align:center">${g ? '✓' : '✗'}</div>`; }
+  return h;
+}
+
+// ---------- captions: the spoken words, ≤ 4 per chunk, phosphor pill ----------
+function caption(x, t) {
+  if (x.s.type === 'hook') return '';
+  if (t > x.L.end + .3) return '';
+  const W = x.W; let j = 0; for (let q = 0; q < W.length; q++) if (t >= W[q].t - .05) j = q;
+  const ch = []; let c = []; W.forEach((w, q) => { c.push(q); if (c.length === 4 || /[،؛.!؟?…:»]$/.test(w.w)) { ch.push(c); c = []; } }); if (c.length) ch.push(c);
+  const now = ch.find(g => g.includes(j)), k = lin(t, W[now[0]].t - .05, W[now[0]].t + .2);
+  const line = now.filter(q => t >= W[q].t - .05).map(q => W[q].h ? `<span style="color:var(--ph)">${W[q].w}</span>` : W[q].w).join(' ');
+  return `<div class="a" style="left:0;right:0;top:1590px;text-align:center"><span style="display:inline-block;padding:12px 42px 24px;border-radius:24px;background:rgba(2,10,6,.92);border:3px solid var(--ph);color:#fff;font-size:72px;line-height:1.25;white-space:nowrap;transform:translateY(${((1 - eo(k)) * 26).toFixed(1)}px)">${line}</span></div>`;
+}
+
+function scene(x, t) {
+  const s = x.s, A = x.a, at = x.at;
+  switch (s.type) {
+    case 'hook': {
+      // frame 0: the bright stethoscope + tablet photo, full-bleed and pushing in; headline from frame 0; the two score
+      // cards are final from frame 0 (83 big green with the real Microsoft chip, 36 white); the trace runs off the tablet
+      const z = mix(1.02, 1.12, eo(lin(t, 0, 2.5)));
+      const k = lin(t, .3, 1.6), kt = pop(t, 1.2);
+      return `<div class="a" style="inset:0;transform:scale(${z.toFixed(4)});transform-origin:300px 1150px"><img src="${url('raw/s01.png')}" style="position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover"></div>` +
+        `<div class="a" style="left:0;right:0;top:0;height:700px;background:linear-gradient(rgba(255,255,255,.92),rgba(255,255,255,.85) 75%,rgba(255,255,255,0))"></div>` +
+        `<div class="a" style="left:40px;right:40px;top:90px;text-align:center;color:#0B1A12;font-size:122px;line-height:1.24"><div>تشخیص‌های سخت:</div><div>AI <span style="display:inline-block;padding:0 26px 14px;border-radius:24px;background:#0B1A12;color:var(--ph)">${fa(83)}٪</span></div><div>دکتر عمومی ${fa(36)}٪</div></div>` +
+        ecg(0, 1290, 1080, 120, k, '#19D46E', 10) +
+        `<div class="a" style="left:560px;top:1380px;width:440px;height:300px;border-radius:36px;background:#04100A;border:6px solid var(--ph);box-shadow:0 0 40px rgba(61,255,142,.5);text-align:center"><div style="font:900 170px/1.15 V;color:var(--ph)">${fa(83)}٪</div><div style="font:900 44px V;direction:ltr">AI · Microsoft</div></div>` +
+        `<div class="a" style="left:80px;top:1440px;width:380px;height:240px;border-radius:32px;background:#fff;color:#0B1A12;text-align:center;box-shadow:0 18px 40px rgba(0,0,0,.25)"><div style="font:900 130px/1.2 V">${fa(36)}٪</div><div style="font:900 40px V">دکتر عمومی</div></div>` +
+        msChip(700, 1290, 70, t, .2) +
+        (kt > 0 ? chip('دفعهٔ بعد که رفتی دکتر…', 250, 1730, 52, '#0B1A12', '#fff', t, 1.2) : '');
+    }
+    case 'stake': {
+      const k = lin(t, A, A + .5), kk = pop(t, at('اینو'));
+      return grat() + scope('s02', 90, 260, 900, 980, k, t, A, '60% 30%') + ecg(60, 1360, 960, 90, lin(t, A + .2, A + 1.4)) +
+        chip('نظر دوم', 380, 1180, 80, 'var(--ph)', '#04100A', t, at('اینو')) +
+        `<div class="a" style="left:110px;top:1430px;font:900 46px V;color:var(--mute);opacity:${kk > 0 ? 1 : 0}">۸۳٪ ← AI · ۳۶٪ ← دکتر عمومی</div>`;
+    }
+    case 'paper': {
+      const kc = lin(t, A, A + .6), lines = 6, kl = lin(t, A + .3, A + 1.6);
+      const card = `<div class="a" style="left:140px;top:${(320 + (1 - eo(kc)) * 300).toFixed(0)}px;width:800px;height:980px;border-radius:30px;background:#F4F7F5;color:#0B1A12;padding:60px;box-sizing:border-box;box-shadow:0 0 0 6px var(--ph),0 0 50px rgba(61,255,142,.35)">` +
+        `<div style="font:900 130px/1 V;direction:ltr;text-align:left;font-family:Georgia,serif">Science</div><div style="height:6px;background:#0B1A12;margin:24px 0 36px"></div>` +
+        Array.from({length: lines}, (_, i) => `<div style="height:26px;margin:22px 0;border-radius:13px;background:#C9D6CF;width:${(cl((kl * lines - i)) * (i % 3 === 2 ? 60 : 92)).toFixed(0)}%"></div>`).join('') +
+        `<div style="margin-top:40px;font:900 56px/1.35 V">تشخیص با AI روی پرونده‌های سخت پزشکی</div></div>`;
+      return grat() + card + ecg(0, 1460, 1080, 80, lin(t, A, A + 1.2)) + chip(`📅 ${fa(22)} اکتبر ${fa(2026)}`, 300, 1360, 66, 'var(--ph)', '#04100A', t, at('اکتبر') - .05) +
+        chip('مقالهٔ داوری‌شده', 600, 230, 48, '#04100A', 'var(--ph)', t, A + .5);
+    }
+    case 'cases': {
+      const k = lin(t, A, A + .5), n = Math.round(300 * eo(lin(t, A + .2, at('سخت') + .6))), kd = lin(t, at('سخت') - .1, at('سخت') + .8);
+      const stack = [0, 1, 2, 3, 4].map(i => { const kk = pop(t, A + .15 + i * BT / 2); return kk <= 0 ? '' : `<div class="a" style="left:${120 + i * 26}px;top:${560 - i * 40}px;width:480px;height:600px;border-radius:24px;background:#0A2416;border:4px solid var(--ph);transform:scale(${kk.toFixed(3)}) rotate(${(i - 2) * 2}deg);box-shadow:0 0 18px rgba(61,255,142,.25);padding:40px;box-sizing:border-box"><div style="font:900 40px V;color:var(--ph)">پرونده #${fa(i + 1)}</div><div style="height:16px;border-radius:8px;background:var(--dim);margin:30px 0 18px;width:80%"></div><div style="height:16px;border-radius:8px;background:var(--dim);width:60%"></div></div>`; }).join('');
+      return grat() + scope('s08', 640, 300, 360, 520, k, t, A) + stack +
+        `<div class="a" style="left:650px;top:900px;font:900 110px V;color:var(--ph)">#${fa(Math.max(1, Math.round(n / 60)))}</div><div class="a" style="left:650px;top:1040px;width:360px;font:900 40px/1.35 V">پرونده‌های واقعیِ منتشرشده</div>` +
+        `<div class="a" style="left:120px;top:1290px;width:840px;height:44px;border-radius:22px;background:var(--dim)"><div style="width:${(100 * eo(kd)).toFixed(1)}%;height:100%;border-radius:22px;background:linear-gradient(90deg,var(--ph),#FFD23F,var(--red))"></div></div>` +
+        `<div class="a" style="left:120px;top:1360px;font:900 46px V;color:var(--mute)">سختی: <span style="color:var(--red)">${kd > .6 ? 'خیلی سخت' : ''}</span></div>` +
+        chip('<span dir="ltr">NEJM</span>', 760, 220, 54, '#fff', '#111', t, A + .4, 'ltr');
+    }
+    case 'steps': {
+      const log = [['❓', 'تب از کی شروع شد؟'], ['💬', '۵ روزه'], ['🧪', 'آزمایش خون'], ['📊', 'نتیجه: ...'], ['🩻', 'سی‌تی‌اسکن']];
+      const shown = Math.min(log.length, Math.floor(cl((t - A - .2) / (BT * .9), 0, log.length)));
+      const rows = log.slice(0, shown).map(([ic, tx], i) => `<div class="row" style="height:100px;gap:22px;padding:0 30px;margin-bottom:16px;border-radius:22px;background:${i % 2 ? '#0A2416' : '#0E301D'};border:3px solid ${i === shown - 1 ? 'var(--ph)' : 'var(--dim)'};font:900 46px V;transform:scale(${pop(t, A + .2 + i * BT * .9).toFixed(3)})"><span>${ic}</span>${fa(tx)}</div>`).join('');
+      const conf = 15 + 70 * shown / log.length;
+      return grat() + `<div class="a" style="left:90px;top:300px;width:620px">${rows}</div>` + scope('s09', 740, 300, 260, 560, lin(t, A, A + .5), t, A) +
+        `<div class="a" style="left:90px;top:1000px;font:900 40px V;color:var(--mute)">تعداد درخواست</div><div class="a" style="left:90px;top:1050px;font:900 130px V;color:var(--ph)">${fa(shown)}</div>` +
+        `<div class="a" style="left:430px;top:1060px;width:560px"><div style="font:900 40px V;color:var(--mute)">اطمینان تشخیص</div><div style="margin-top:20px;height:40px;border-radius:20px;background:var(--dim)"><div style="width:${conf.toFixed(0)}%;height:100%;border-radius:20px;background:var(--ph)"></div></div></div>` +
+        ecg(0, 1380, 1080, 70, lin(t, A, x.z), 'var(--ph)', 6, 5) + cur(t, [[A, 900, 1500], [A + 1.2, 600, 560, 1], [at('آزمایش'), 400, 680, 1], [x.z, 400, 680]]);
+    }
+    case 'bars': {
+      const k = lin(t, A + .1, at('۸۳') + .3);
+      return grat() + ecg(0, 1340, 1080, 0, 1, 'var(--dim)', 4, 1) + bar(560, 400, 260, 900, 83, k, 'var(--ph)', 'AI <span dir="ltr">Microsoft</span>', 'پرونده‌های سخت') +
+        `<div class="a" style="left:180px;top:${(1300 - 900 * .36 * 0).toFixed(0)}px;width:260px;height:0"></div>` + msChip(130, 380, 80, t, A + .3) +
+        `<div class="a" style="left:120px;top:1330px;width:840px;height:4px;background:var(--mute)"></div>` +
+        `<div class="a" style="left:120px;top:${(1300 - 900 * .83 * eo(k)).toFixed(0)}px;width:840px;height:3px;background:repeating-linear-gradient(90deg,var(--ph) 0 18px,transparent 18px 34px);opacity:.7"></div>`;
+    }
+    case 'bars2': {
+      const k1 = lin(t, A, at('۳۶') + .2), k2 = lin(t, at('۲۲') - .1, at('۲۲') + .5);
+      return grat() + bar(700, 400, 220, 900, 83, 1, 'var(--ph)', 'AI', '') + bar(410, 400, 220, 900, 36, k1, '#fff', 'دکتر عمومی', 'با کتاب و اینترنت') +
+        (k2 > 0 ? bar(120, 400, 220, 900, 22, k2, '#9FB5A9', 'دکتر عمومی', 'بدون منابع') : '') +
+        `<div class="a" style="left:120px;top:1330px;width:840px;height:4px;background:var(--mute)"></div>` +
+        chip(`+${fa(47)} واحد`, 640, 300, 56, 'var(--ph)', '#04100A', t, at('۳۶') + .4);
+    }
+    case 'er': {
+      const k = lin(t, A, A + .5), hr = 72 + Math.round(8 * Math.sin(t * 3)), k1 = lin(t, at('۸۰') - .1, at('۸۰') + .6), k2 = lin(t, at('۴۷') - .1, at('۴۷') + .6);
+      const mon = `<div class="a" style="left:90px;top:260px;width:900px;height:520px;border-radius:30px;background:#020805;border:6px solid var(--ph);overflow:hidden">` +
+        `<div class="a" style="left:30px;top:20px;font:900 40px V;color:var(--mute)">اورژانس · مانیتور</div>` +
+        `<div class="a" style="right:40px;top:30px;font:900 90px V;color:var(--ph);direction:ltr">♥ ${fa(hr)}</div>` +
+        `<div class="a" style="right:40px;top:150px;font:900 60px V;color:#FFD23F;direction:ltr">BP ${fa(118)}/${fa(76)}</div></div>` +
+        ecg(110, 620, 860, 110, (t * .6) % 1, 'var(--ph)', 7, 4);
+      return grat() + mon + scope('s03', 90, 820, 400, 520, k, t, A) +
+        bar(780, 880, 160, 380, 80, k1, 'var(--ph)', 'AI', '') + bar(560, 880, 160, 380, 47, k2, '#fff', 'دکتر', '') +
+        chip('پرونده‌های اورژانس', 520, 1400, 52, '#fff', '#111', t, at('اورژانس'));
+    }
+    case 'sim': {
+      const kf = lin(t, A, A + 1), ks = lin(t, at('شبیه‌سازی') - .05, at('شبیه‌سازی') + .25), kp = pop(t, at('واقعی'));
+      const flat = `<svg class="a" style="left:0;top:0;overflow:visible" width="1080" height="1920"><polyline points="60,560 300,560 340,${(560 - 140 * (1 - kf)).toFixed(0)} 380,${(560 + 90 * (1 - kf)).toFixed(0)} 420,560 1020,560" fill="none" stroke="#FFD23F" stroke-width="9" style="filter:drop-shadow(0 0 10px #FFD23F)"/></svg>`;
+      const files = [0, 1, 2].map(i => `<div class="a" style="left:${140 + i * 40}px;top:${760 + i * 26}px;width:460px;height:340px;border-radius:22px;background:#0A2416;border:4px solid var(--mute);transform:scale(${pop(t, A + .3 + i * .15).toFixed(3)});padding:30px;box-sizing:border-box;font:900 40px V;color:var(--mute)">پروندهٔ قدیمی</div>`).join('');
+      const pat = kp > 0 ? `<div class="a" style="left:680px;top:760px;width:280px;height:380px;border-radius:30px;border:6px dashed var(--red);transform:scale(${kp.toFixed(3)});text-align:center;font-size:170px;line-height:300px">🧍</div><div class="a" style="left:640px;top:1160px;width:360px;text-align:center;font:900 46px V;color:var(--red)">بیمار واقعی ✗</div>` : '';
+      return grat() + flat + files + pat +
+        (ks > 0 ? `<div class="a" style="left:180px;top:300px;padding:14px 44px 26px;border:10px solid #FFD23F;border-radius:22px;color:#FFD23F;font:900 100px V;transform:rotate(-6deg) scale(${mix(1.8, 1, eo(ks)).toFixed(3)})">شبیه‌سازی</div>` : '') +
+        `<div class="a" style="left:120px;top:1300px;font:900 50px V">✓ پرونده‌های منتشرشده<br><span style="color:var(--mute)">✓ جواب‌ها از قبل معلوم</span></div>`;
+    }
+    case 'team': {
+      const k = lin(t, A, A + .5), kt = lin(t, at('تیم') - .1, at('تیم') + .5);
+      return grat() + scope('s04', 90, 300, 440, 640, k, t, A) + scope('s06', 560, 300, 430, 640, kt, t, at('تیم'), '40% 30%') +
+        `<div class="a" style="left:90px;top:980px;width:440px;text-align:center">${rise('عمومی، تنها', lin(t, at('عمومی') - .05, at('عمومی') + .3), 60)}</div>` +
+        (kt > 0 ? `<div class="a" style="left:560px;top:980px;width:430px;text-align:center">${rise('تیم متخصص؟', lin(t, at('تیم'), at('تیم') + .3), 60, 'var(--ph)')}</div>` : '') +
+        tally(120, 1130, 10, 2, 36, lin(t, A + .3, at('تیم'))) + (kt > 0 ? `<div class="a" style="left:740px;top:1130px;font:900 120px V;color:var(--ph)">؟</div>` : '') +
+        `<div class="a" style="left:120px;top:1290px;font:900 40px V;color:var(--mute)">${fa(36)}٪ از دکتر عمومیِ تنها؛ تیم متخصص آزمایش نشد</div>`;
+    }
+    case 'next': {
+      const k = lin(t, A, A + .5), kr = lin(t, A + .2, at('Boston') + .4), kb = pop(t, at('Boston'));
+      const route = `<svg class="a" style="left:0;top:0;overflow:visible" width="1080" height="1920"><path d="M120 1300 C 300 1300, 300 1050, 520 1050 S 820 820, 900 760" fill="none" stroke="var(--ph)" stroke-width="9" stroke-dasharray="1400" stroke-dashoffset="${(1400 * (1 - eo(kr))).toFixed(0)}" style="filter:drop-shadow(0 0 10px #3DFF8E)"/></svg>`;
+      return grat() + scope('s05', 90, 260, 900, 520, k, t, A) + route +
+        (kb > 0 ? `<div class="a" style="left:820px;top:640px;width:150px;height:150px;border-radius:50%;background:var(--ph);color:#04100A;text-align:center;font-size:90px;line-height:150px;transform:scale(${kb.toFixed(3)})">🛏</div>` : '') +
+        `<div class="a" style="left:120px;top:880px;width:480px">${tally(0, 0, 6, 3, 83, 1, 50)}</div><div class="a" style="left:120px;top:1080px;font:900 40px V;color:var(--mute)">پرونده‌های قدیمی ✓</div>` +
+        `<div class="a" style="left:120px;top:1150px">${rise('بیمار واقعی: به‌زودی', lin(t, at('واقعی') - .05, at('واقعی') + .3), 66, 'var(--ph)')}</div>` +
+        chip('<span dir="ltr">Beth Israel Deaconess · Boston</span>', 230, 1360, 48, '#fff', '#111', t, at('Boston'), 'ltr');
+    }
+    case 'ask': {
+      const k = lin(t, A, A + .5), kc = pop(t, at('نظر'));
+      const app = `<div class="a" style="left:220px;top:${(300 + (1 - eo(k)) * 300).toFixed(0)}px;width:640px;height:1060px;border-radius:70px;background:#020805;border:8px solid var(--ph);padding:40px;box-sizing:border-box;box-shadow:0 0 50px rgba(61,255,142,.4)">` +
+        `<div style="font:900 50px V;color:var(--ph);text-align:center">نظر دوم</div>` +
+        `<div style="margin-top:40px;padding:30px;border-radius:30px;background:#fff;color:#111;font:900 42px/1.4 V">🩺 دکتر: …</div>` +
+        `<div style="margin-top:24px;padding:30px;border-radius:30px;background:#0E301D;border:3px solid var(--ph);font:900 42px/1.4 V">🤖 AI: …</div>` +
+        `<div class="row" style="margin-top:40px;gap:20px;justify-content:center"><span style="padding:16px 40px 26px;border-radius:40px;background:var(--ph);color:#04100A;font:900 50px V;transform:scale(${(kc > 0 ? kc : 0).toFixed(3)});display:inline-block">آره</span><span style="padding:16px 40px 26px;border-radius:40px;background:#fff;color:#111;font:900 50px V;transform:scale(${(kc > 0 ? pop(t, at('نظر') + .15) : 0).toFixed(3)});display:inline-block">نه</span></div>` +
+        `<div style="margin-top:44px;font:900 36px V;color:var(--mute);text-align:center">AI ${fa(83)}٪ · دکتر عمومی ${fa(36)}٪ · اورژانس ${fa(80)}/${fa(47)}</div></div>`;
+      return grat() + app + ecg(0, 1460, 1080, 80, lin(t, A, x.z), 'var(--ph)', 6, 3) + cur(t, [[A, 900, 1500], [at('نظر'), 470, 900, 1], [x.z, 470, 900]]);
+    }
+  }
+  return grat();
+}
+// end card: the trace draws the Microsoft chip, then the question rises
+function endCard(u) {
+  return grat() + ecg(0, 760, 1080, 140, lin(u, 0, .8)) +
+    `<div class="a" style="left:0;right:0;top:860px;text-align:center;opacity:${lin(u, .5, .8).toFixed(2)}">${logo(130)}</div>` +
+    `<div class="a" style="left:0;right:0;top:1060px;text-align:center">${rise((S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--ph)">$1</span>'), lin(u, .6, .95), 80)}</div>` +
+    `<div class="a" style="left:0;right:0;top:1300px;text-align:center;font:600 56px V;color:var(--mute);opacity:${lin(u, .9, 1.2).toFixed(2)}">${S.end_sub || ''} · ${S.handle || ''}</div>`;
+}
+window.seek = seek;
+</script>
+</body>
+</html>
