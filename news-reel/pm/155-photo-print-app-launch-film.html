@@ -73,6 +73,7 @@ window.ready = (async () => {
   for (const x of B) { const pts = [x.a, ...x.keys];
     pts.forEach((p, j) => sc.push({t0: +p.toFixed(2), t1: +(j + 1 < pts.length ? pts[j + 1] : x.z).toFixed(2), type: x.s.type, bg: x.b.id + (j ? '.' + j : ''), sfx: [[p, j ? 'hit' : 'whoosh', j ? .35 : .3]]})); }
   sc.push({t0: TL.end_start, t1: DUR, type: 'end', bg: 'end', sfx: [[TL.end_start + .1, 'hit', .45]]});
+  if (sc.length && sc[0].type === 'hook') sc[0].sfx.push([.7, 'hit', .55]);
   window.SCENES = sc; window.START = 0; window.DURATION = DUR; window.ISSUES = ISS;
   for (const c of sc) if (c.t1 - c.t0 > 3.2) ISS.push(`shot ${c.bg} holds ${(c.t1 - c.t0).toFixed(1)} s: add a hit`);
   seek(0);
@@ -221,17 +222,20 @@ function scene(x, t) {
       // frame 0 = the cover photo (relative peeking over the shoulder at the phone), already pushing in toward the phone;
       // the phone screen shows ChatGPT, the padlock pops on it at 0.3 s, a Face ID ring closes, 👀 tags the peeker at 0.6 s
       if (t >= at('قفل') - .05) return bigLock(x, t);
-      // slam zoom: from the cover framing into the phone (fills the frame by 1.0 s); the lock is already on screen at frame 0
-      const zoom = mix(1.06, 1.25, eo(lin(t, 0, .35))) * mix(1, 2.6, eio(lin(t, .35, 1.0))), kl = 1, kr = lin(t, .1, .8);
+      // 0.15 s: the peeker asks «چی تایپ می‌کنی؟»; 0.7 s: a padlock SLAMS onto the open chat (frame jolts on impact);
+      // 1.1 s: her bubble flips to «قفله؟!»; then a push into the phone until the lock state takes over
+      const kslam = lin(t, .7, .9), locked = t >= .7, kr = lin(t, .9, 1.6);
+      const jolt = t > .88 && t < 1.15 ? Math.sin((t - .88) * 90) * 14 * (1 - lin(t, .88, 1.15)) : 0;
+      const zoom = mix(1.04, 1.16, eo(lin(t, 0, .7))) * mix(1, 1.45, eio(lin(t, 1.2, 1.9)));
       const sx = 1080 / 1152, Q = [[366, 266], [578, 278], [574, 722], [372, 712]].map(p => [p[0] * sx, p[1] * sx]);
       const w = Q[1][0] - Q[0][0], h = Q[3][1] - Q[0][1];
       const scr = `<div class="a" style="left:${Q[0][0].toFixed(0)}px;top:${Q[0][1].toFixed(0)}px;width:${w.toFixed(0)}px;height:${h.toFixed(0)}px;border-radius:26px;background:#fff;overflow:hidden;transform:rotate(1.6deg);transform-origin:0 0">` +
         `<div class="row" style="height:64px;padding:0 16px;gap:10px;direction:ltr;border-bottom:2px solid #EEE">${logo(LOGO(), 40)}<span style="font:900 26px V">ChatGPT</span></div>` +
-        bub(70, 90, 120, 34) + bub(16, 140, 150, 34) + bub(50, 190, 140, 34) +
-        `<div class="a" style="inset:64px 0 0 0;background:rgba(255,255,255,${(.85 * cl(kl)).toFixed(2)})"></div>` +
-        padlock(w / 2, h / 2 + 30, .9, kl) + faceRing(w / 2, h / 2 + 30, 108, kr, kr >= 1) + (kr >= 1 ? check(w / 2 + 70, h / 2 + 110, 54, pop(t, 1.3)) : '') + '</div>';
-      return `<div class="a" style="inset:0;transform:scale(${zoom.toFixed(4)});transform-origin:440px 520px"><img src="${url('raw/s00.png')}" style="position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover">${scr}` +
-        chip('👀', 140, 300, 90, '#fff', '#0E0E0E', t, .05, 'ltr') + '</div>' +
+        `<div class="a" style="left:14px;right:14px;top:84px;font:600 22px/1.45 V;color:#0E0E0E">برنامهٔ سورپرایز تولد مامان: کیک، کادو…</div>` + bub(16, 170, 150, 34) + bub(60, 220, 130, 34, true) +
+        (locked ? `<div class="a" style="inset:64px 0 0 0;background:#fff"></div>` + padlock(w / 2, h / 2 + 20, mix(2.6, .9, eo(kslam)), 1) + faceRing(w / 2, h / 2 + 20, 108, kr, kr >= 1) + (kr >= 1 ? check(w / 2 + 70, h / 2 + 100, 54, pop(t, 1.6)) : '') : '') + '</div>';
+      const bubble = (txt, t0, col) => { const k = pop(t, t0); return k <= 0 ? '' : `<div class="a" style="left:90px;top:760px;padding:18px 36px 28px;border-radius:8px 44px 44px 44px;background:${col};color:${col === '#fff' ? '#0E0E0E' : '#fff'};font:900 62px/1.2 V;white-space:nowrap;box-shadow:0 18px 40px rgba(0,0,0,.3);transform:scale(${k.toFixed(3)});transform-origin:0 0">${txt}</div>`; };
+      return `<div class="a" style="inset:0;transform:translate(${jolt.toFixed(1)}px,${(jolt * .6).toFixed(1)}px) scale(${zoom.toFixed(4)});transform-origin:360px 560px"><img src="${url('raw/s00.png')}" style="position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover">${scr}` +
+        (t < 1.1 ? bubble('چی تایپ می‌کنی؟ 👀', .15, '#fff') : bubble('قفله؟! 😳', 1.1, '#E5322D')) + '</div>' +
         `<div class="a" style="inset:0;background:linear-gradient(rgba(0,0,0,0) 52%,rgba(0,0,0,.6) 64%,rgba(0,0,0,.85))"></div>` +
         chip(`${logo(LOGO(), 64)} <span dir="ltr" style="vertical-align:middle">ChatGPT</span>`, 680, 760, 60, '#fff', '#0E0E0E', t, .45, 'ltr');
     }
