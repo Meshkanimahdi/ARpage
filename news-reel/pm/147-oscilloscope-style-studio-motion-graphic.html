@@ -121,8 +121,10 @@ function seek(t) {
 // ---------- parts ----------
 const pop = (t, t0) => cl(spr(t, t0, 18, .6), 0, 1.15);
 // graticule: the oscilloscope screen grid that fills every frame, drifting slowly (parallax layer)
-const grat = () => `<div class="a" style="inset:-60px;background-image:linear-gradient(var(--dim) 2px,transparent 2px),linear-gradient(90deg,var(--dim) 2px,transparent 2px);background-size:120px 120px;background-position:${(-NOW * 10 % 120).toFixed(1)}px ${(-NOW * 6 % 120).toFixed(1)}px;opacity:.9"></div>` +
-  `<div class="a" style="inset:0;background-image:radial-gradient(#1C5A38 2px,transparent 2px);background-size:24px 24px;opacity:.35"></div>`;
+const grat = () => `<div class="a" style="inset:0;background:#0A2818"></div>` +
+  `<div class="a" style="inset:-60px;background-image:linear-gradient(#1E6A42 3px,transparent 3px),linear-gradient(90deg,#1E6A42 3px,transparent 3px);background-size:90px 90px;background-position:${(-NOW * 10 % 90).toFixed(1)}px ${(-NOW * 6 % 90).toFixed(1)}px"></div>` +
+  `<div class="a" style="inset:0;background-image:radial-gradient(#2E8A58 2.5px,transparent 2.5px);background-size:30px 30px;opacity:.55"></div>` +
+  `<div class="a" style="left:0;right:0;top:${((NOW * 260) % 2200 - 200).toFixed(0)}px;height:160px;background:rgba(61,255,142,.10);border-top:3px solid rgba(61,255,142,.35)"></div>`;
 // the through-line trace: a heartbeat line drawn left→right up to fraction k, with a bright head and a decaying tail
 function ecg(x0, y0, w, h, k, col = 'var(--ph)', sw = 8, beats = 3) {
   const P = []; const n = 120;
@@ -142,7 +144,7 @@ const logo = s => `<span style="display:inline-flex;align-items:center;justify-c
 const msChip = (x0, y0, s, t, t0) => chip(`${logo(s)} <span dir="ltr" style="vertical-align:middle">Microsoft</span>`, x0, y0, s * .7, '#fff', '#111', t, t0, 'ltr');
 // photo inside a scope-screen frame (one layer of the composition, never the whole scene)
 function scope(img, x0, y0, w, h, k, t, a, pos = '50% 40%') {
-  const sc = mix(1.12, 1.02, lin(t, a, a + 4)), rh = h * eo(k);
+  const sc = mix(1.12, 1.02, lin(t, a, a + 4)), rh = h * mix(.55, 1, eo(k));
   return `<div class="a" style="left:${x0}px;top:${(y0 + (h - rh) / 2).toFixed(0)}px;width:${w}px;height:${rh.toFixed(0)}px;border-radius:28px;overflow:hidden;border:5px solid var(--ph);box-shadow:0 0 30px rgba(61,255,142,.35)">` +
     `<img src="${url('raw/' + img + '.png')}" style="position:absolute;left:0;top:${((rh - h) / 2).toFixed(0)}px;width:${w}px;height:${h}px;object-fit:cover;object-position:${pos};transform:scale(${sc.toFixed(3)})"></div>`;
 }
@@ -189,6 +191,11 @@ function scene(x, t) {
       // frame 0: the bright stethoscope + tablet photo, full-bleed and pushing in; headline from frame 0;
       // 0–0.6 s the doctor card counts 0→36, at 0.7 s the AI card SLAMS in and counts to 83 (bigger, glowing); the trace
       // runs off the tablet; the viewer's stake line «دفعهٔ بعد که رفتی دکتر…» lands at 0.5 s, big, under the headline
+      if (t > at('۸۳') + .2) { const kb = lin(t, at('۸۳') + .2, at('۸۳') + .9), kd2 = lin(t, at('عمومی') - .1, at('عمومی') + .5);
+        return grat() + `<div class="a" style="left:40px;right:40px;top:120px;text-align:center;font-size:110px;line-height:1.2">تشخیص‌های سخت</div>` +
+          bar(600, 420, 300, 900, 83, kb, 'var(--ph)', 'AI <span dir="ltr">Microsoft</span>', '') + bar(180, 420, 300, 900, 36, kd2, '#fff', 'دکتر عمومی', '') +
+          `<div class="a" style="left:120px;top:1330px;width:840px;height:4px;background:var(--mute)"></div>` + msChip(380, 1500, 70, t, at('۸۳') + .4) +
+          ecg(0, 1680, 1080, 70, lin(t, at('۸۳'), x.z), 'var(--ph)', 6, 4); }
       const z = mix(1.0, 1.16, eo(lin(t, 0, 2.2)));
       const k = lin(t, .1, 1.4), kd = lin(t, 0, .6), ka = pop(t, .7), kn = lin(t, .7, 1.3);
       const jolt = t > .7 && t < .95 ? Math.sin((t - .7) * 80) * 12 * (1 - lin(t, .7, .95)) : 0;
