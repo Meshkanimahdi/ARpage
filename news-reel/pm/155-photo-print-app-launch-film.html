@@ -124,8 +124,8 @@ function seek(t) {
 function flood(t) {
   for (let i = 1; i <= B.length; i++) {
     const T0 = i < B.length ? B[i].a : TL.end_start;
-    if (t > T0 - .17 && t < T0 + .3) {
-      const r = t < T0 ? 2300 * eio(lin(t, T0 - .17, T0)) : 2300 * (1 - eio(lin(t, T0, T0 + .3)));
+    if (t > T0 - .1 && t < T0 + .16) {
+      const r = t < T0 ? 2300 * eio(lin(t, T0 - .1, T0)) : 2300 * (1 - eio(lin(t, T0, T0 + .16)));
       const cx = i % 2 ? 760 : 320, cy = i % 3 ? 1100 : 760;
       return `<div class="a" style="left:${(cx - r).toFixed(0)}px;top:${(cy - r).toFixed(0)}px;width:${(2 * r).toFixed(0)}px;height:${(2 * r).toFixed(0)}px;border-radius:50%;background:var(--ink)"></div>`;
     }
