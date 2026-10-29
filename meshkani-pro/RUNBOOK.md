@@ -46,8 +46,8 @@ publish twice, never publish late, never publish unverified content.
   writes a `MODEL_MISMATCH` row (`model=<actual>`) in the Automation Log so the session gets moved.
 - Time zone is `Asia/Tehran` everywhere. Get times only from
   `python3 meshkani-pro/scripts/tehran.py`.
-- Slots: `12:00` and `18:00` (posts), `09:00`, `15:00` and `21:00` (reels). Slot key format `YYYY-MM-DD|HH:MM`.
-- Per slot at most 1 post + 3 stories; per Tehran day at most 2 posts + 6 post stories + 3 reels + 3 reel stories (cap 9 stories).
+- Slots: `12:00` (post, every other day; `18:00` disabled 2026-10-27), `09:00`, `15:00` and `21:00` (reels). Slot key format `YYYY-MM-DD|HH:MM`.
+- Per slot at most 1 post + 3 stories; per Tehran day at most 1 post (every other day) + 3 post stories + 3 reels + 3 reel stories.
 - Publish window: from the slot time until slot time + 30 minutes. After that the
   slot is `SKIPPED_LATE`. A missed slot is never caught up later.
 - Never print, log or write to the sheet: API keys, Drive upload-session URLs,
@@ -574,7 +574,7 @@ plays the track from k × 8 s. The image stays exactly the approved slide, with 
 
 ---
 
-## 2. PUBLISH phase (starts 12:00 / 18:00 Tehran)
+## 2. PUBLISH phase (starts 12:00 Tehran, post days only)
 
 ### 2.1 Preconditions
 1. Setup (§0.1), control (§0.2), lock `__publish` (§0.4).
@@ -664,8 +664,8 @@ Before any retry of a publish call:
 ### 2.6 Finish
 - `unshare_public` on all six files.
 - Slot JSON final status; log row (§3) with links to the post and stories.
-- The evening (18:00) publish run also writes a `DAY_SUMMARY` log row: both post
-  links, story statuses, total image cost of the day.
+- The `DAY_SUMMARY` log row (the day's post and reel links, story statuses, total image cost) is written by
+  the 21:00 REEL_PUBLISH (moved 2026-10-27).
 
 ---
 
@@ -678,7 +678,7 @@ Before any retry of a publish call:
 > story, one narrator chosen per story, elements from ≤ 3 generated sheets, Story cut included.
 
 Goal: before the reel's time, slot file `slot_<date>_<HHMM>.json` (`"kind": "reel"`; `tehran.py reel prepare` gives it) with status `READY`, a
-QA-passed 60–90 s story reel MP4 + cover in Drive and a `Ready` row in the `Reels` tab.
+QA-passed 40–55 s story reel MP4 + cover in Drive and a `Ready` row in the `Reels` tab.
 Format (user decision 2026-10-21): **one trending AI story per reel**, told as a story with strong
 hooks for watch time; the on-screen text is the narration word by word; angle, story shape, look,
 voice and rhythm change every day — read `news-reel/STORY_SPEC.md` fully before starting. (The
@@ -883,6 +883,8 @@ narrator talks, nothing attractive in the picture").
    no per-element image calls). `python3 news-reel/sprite_sheet.py --dir work/story`; Read the sheet
    previews; regenerate a sheet at most twice. Real products: refs per §1.5.1. Real people: real photos
    (Wikimedia Commons first, `fetch_to_drive` + download), credited.
+3a. **English names (user rule 2026-10-29):** `node news-reel/pron_test.mjs --dir=work/story` (STORY_SPEC "English
+   names must SOUND English"); commit `news-reel/pron_cache.json`; Read the scores, exit 4 → respell/rephrase.
 3. `node news-reel/story_voice.mjs --dir=work/story --tempo=<tempo>` (eleven_v4; exit 3 → shorten,
    exit 4 → respell/rephrase the flagged beats). 40–55 s (§4.0).
 
@@ -927,6 +929,9 @@ narrator talks, nothing attractive in the picture").
    and review them yourself; Read every
    `out/sheet*.jpg`. Fix ISSUES (word mismatch), text overflow, wrong/ugly cut-outs, a visual that does
    not match its sentence, distorted people/products. Max 3 rounds.
+1b. **Sound design (user rule 2026-10-29):** the engine's `SCENES[].sfx` cues follow STORY_SPEC "Sound design"
+   (a sound that matches each motion, never a whoosh on every cut); run `node news-reel/sfx/generate.mjs` once if a
+   library file is missing. After assembly, `reel.json → sfx` must show ≤ 2 whooshes and no sound over 40 %.
 2. `--mode=video` in the background (run it with a timeout of at least 60 min), then `python3 news-reel/reel_assemble.py --dir work/story`:
    `reel.json` must show 40–55 s (§4.0), −15.5…−12 LUFS, true peak ≤ −1 dBFS; H.264 1080×1920 30 fps + AAC.
 3. **Attention gate (§4.0 rule 6, blocking):** `python3 news-reel/reel_qa.py work/story/reel.mp4`; exit 3 → fix

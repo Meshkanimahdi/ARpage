@@ -2,7 +2,7 @@
 
 **Goal:** two reels every day, at 09:00 and 15:00 Tehran (user 2026-10-21), each grabbing attention in the first second, keeps people
 watching to the end (watch time, completion, rewatches) and makes them comment — built from a
-**trending, verified AI story** and told as a short story. 60–90 s, one narrator, **the on-screen text
+**trending, verified AI story** and told as a short story. 40–55 s (RUNBOOK §4.0), one narrator, **the on-screen text
 is the narration, word by word**. Approved reference: REEL-002 (Hinton, «لوله‌کش شو»), inspired by
 @mgh.mobin «انسان‌ها، گاوهای آینده‌ان؟». The old two-news reel (REEL_SPEC.md) is retired; the
 neon/particles/3D rule of VOICES.md is no longer mandatory — it is one of the looks below.
@@ -164,8 +164,18 @@ photos, refined 3D renders with real materials, neon glass. Never flat clipart o
   Persian suffixes stay Persian after a space (`code ها`, `prompt ها`). The caption may still show
   Persian when that reads better: `{کدنویسی|code نویسی}`. `news-reel/fa_lexicon.mjs` converts the common
   Persian spellings on the spoken side automatically (story_voice and reel_voice); add story-specific
-  names in `story.json → lexicon: {"اسنپ فود": "Snappfood"}`. After the voice run, read `voice/qc.json`
-  and fix any name that still sounds wrong by respelling it in Latin.
+  names in `story.json → lexicon: {"اسنپ فود": "Snappfood"}`.
+- **English names must SOUND English (user rule 2026-10-29).** Mahdi: «نام برندها و یا اصطلاحات باید به انگلیسی
+  بیاد تا جای ممکنه مگر اینکه مشابه در فارسی نداشته باشه، الان داره ChatGPT رو chetgpt و Pro رو Pero میخونه. این
+  ایراد بزرگیه». Latin text alone is not enough: the Persian voice gives it a Persian accent. Before the voice
+  run, `node news-reel/pron_test.mjs --dir=work/story` tries every English term three ways (Latin with Persian
+  language, Latin with the language left to the model, a Persian respelling with diacritics from
+  `fa_lexicon.mjs → PRON_WORDS` such as «چَت‌جی‌پی‌تی»، «پْرو») and keeps the one an English speech-to-text
+  hears best; the result is cached in `news-reel/pron_cache.json` (commit it). `story_voice.mjs` refuses to
+  run (exit 5) while a term is untested and then uses the winner. Listen-check `voice/pron_samples.mp3`;
+  a term below 0.75 in every mode (exit 4) gets a better respelling in `PRON_WORDS` or is rephrased. A brand
+  with a common Persian name (گوگل، اینستاگرام) may stay Persian on screen; the voice still says it the
+  English way. Words with a natural Persian equivalent are said in Persian («هوش مصنوعی» is fine in speech).
 - A mispronounced word: add diacritics on the wrong syllable only, or respell; then regenerate.
 - `stability` 0.5 default; 0.35 for very expressive storytelling (set in story.json). No `style` /
   `speed` on v4 — pace comes from the writing and the reel's `tempo`.
@@ -339,3 +349,15 @@ python3 news-reel/reel_assemble.py --dir work/story                    # reel.mp
 python3 news-reel/story_cut.py     --dir work/story                    # story.mp4 (≤ 60 s) for the Story share
 ```
 `check` prints ISSUES when on-screen words and spoken words do not line up — fix before rendering.
+
+## Sound design (user rule 2026-10-29)
+Mahdi: «این چند ریلز آخر همشون دارند از یه ساند افکت برای تغییر تصاویر استفاده میکنند، یه صدایی شبیه "فیش، فیش" که
+اعصاب همه رو بهم ریخته؛ ریلزها برای موشن‌ها باید از ساند افکت‌های جذاب استفاده کنند». Every effect matches the
+motion it sits on: a number counting up gets `counter_tick`, a chart drawing `sweep_soft`, a UI tap `tap`/`click`, a
+chat bubble `notify`, a card popping in `pop`, a logo or reveal `shimmer`/`glass_ping`, the big number or turn
+`hit`/`bass_drop`, typing `typing`. Engines put these in `SCENES[].sfx` as `[time, name, volume]`. `reel_assemble.py`
+no longer adds a sound to every cut: it allows at most 2 whooshes per reel (6 s apart), never the same sound
+twice in a row, at most one effect per 1.2 s, and every other uncued cut gets a varied sound; it reports
+`reel.json → sfx`, and the gate fails a reel with more than 2 whooshes or one sound over 40 % of all effects.
+The library is `news-reel/sfx/*.mp3`; `node news-reel/sfx/generate.mjs` creates missing ones (ElevenLabs sound
+generation, audio key only). Silence between effects is good: the voice and the music carry the reel.

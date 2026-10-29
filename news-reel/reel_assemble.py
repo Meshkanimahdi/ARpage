@@ -74,20 +74,35 @@ def main():
         voice.append(add(d / 'voice/trim' / f'{k}.wav', v['start'] if isinstance(v, dict) else v[0], 1.0))
     m = music(d, spec, END)
     mus = add(m, max(0, START - 0.3) + spec.get('music_delay', 0), 0.30 if START else 0.22, f"aloop=loop=-1:size=2147483647,atrim=0:{END - START + 0.6},afade=t=in:d=0.6,afade=t=out:st={END - START - 0.9}:d=1.2,")
-    prev_bg = None
-    for s in scenes:
-        if START == 0:   # story reel: many quick cuts -> soft swish, stronger on a background change
-            fx.append(add(SFX / 'whoosh.mp3', s['t0'] - 0.12, 0.4 if s.get('bg') != prev_bg else 0.14)); prev_bg = s.get('bg')
-        else:
-            fx.append(add(SFX / 'whoosh.mp3', s['t0'] - 0.15, 0.45))
-        for at, name, vol in s.get('sfx', []):   # engine cues (glass.html): clicks, key ticks, hits on hard cuts
-            fx.append(add(SFX / f'{name}.mp3', at, vol))
-        if s['type'] in ('grid', 'steps', 'points', 'icon_grid', 'network', 'counter'):
-            fx.append(add(SFX / 'tick.mp3', s['t0'] + 0.7, 0.35))
-        if s['type'] == 'divider':
-            fx.append(add(SFX / 'riser.mp3', s['t0'] - 1.4, 0.35))
-        if s['type'] in ('divider', 'end'):
-            fx.append(add(SFX / 'hit.mp3', s['t0'], 0.6))
+    # sound design (user rule 2026-10-29: «همشون دارند از یه ساند افکت برای تغییر تصاویر استفاده میکنند… فیش،فیش… اعصاب
+    # همه رو بهم ریخته»): no automatic whoosh on every cut. Engine cues first; scenes without a cue get a varied,
+    # motion-matched sound on every other cut; the same sound never twice in a row; whoosh at most 2 per reel,
+    # 6 s apart; at most one effect per 1.2 s. Missing library files are skipped (news-reel/sfx/generate.mjs).
+    by_type = {'counter': 'counter_tick', 'stat': 'counter_tick', 'chart': 'sweep_soft', 'bars': 'sweep_soft', 'grid': 'pop',
+               'points': 'pop', 'steps': 'pop', 'icon_grid': 'pop', 'ui': 'tap', 'chat': 'notify', 'network': 'glass_ping',
+               'logo': 'shimmer', 'divider': 'riser', 'end': 'hit'}
+    palette = ['pop', 'tap', 'glass_ping', 'shimmer', 'click', 'sweep_soft']
+    cues = []
+    for i, s in enumerate(scenes):
+        mine = [(at, name, vol) for at, name, vol in s.get('sfx', [])]
+        if mine: cues += mine
+        elif i == 0 or i % 2 == 0:
+            cues.append((s['t0'] - 0.03, by_type.get(s.get('type'), palette[i % len(palette)]), 0.32))
+        if s.get('type') == 'divider': cues.append((s['t0'] - 1.4, 'riser', 0.3))
+    cues.sort()
+    kept, last_t, last_name, whooshes = [], -9, None, []
+    for at, name, vol in cues:
+        if name == 'whoosh':
+            if len(whooshes) >= 2 or (whooshes and at - whooshes[-1] < 6): name = 'sweep_soft'
+            else: whooshes.append(at)
+        if name == last_name:
+            name = next(p for p in palette if p != last_name and p != name)
+        if at - last_t < 1.2 or not (SFX / f'{name}.mp3').exists(): continue
+        kept.append((at, name, min(vol, 0.45))); last_t, last_name = at, name
+    for at, name, vol in kept:
+        fx.append(add(SFX / f'{name}.mp3', at, vol))
+    sfx_counts = {}
+    for _, name, _ in kept: sfx_counts[name] = sfx_counts.get(name, 0) + 1
     f.append(f"{''.join(voice)}amix=inputs={len(voice)}:normalize=0,apad=whole_dur={END},asplit=2[voice][key]")
     f.append(f"{mus}[key]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=350[duck]")
     f.append(f"[voice][duck]{''.join(fx)}amix=inputs={2 + len(fx)}:normalize=0,atrim=0:{END},loudnorm=I=-12:TP=-1.5:LRA=8[out]")
@@ -101,7 +116,7 @@ def main():
     lufs = [l.split()[1] for l in st.splitlines() if l.strip().startswith('I:')][-1]
     peak = [l.split()[1] for l in st.splitlines() if l.strip().startswith('Peak:')][-1]
     report = {'file': str(d / 'reel.mp4'), 'duration': round(probe(d / 'reel.mp4'), 2), 'lufs': float(lufs), 'true_peak_dbfs': float(peak),
-              'bytes': (d / 'reel.mp4').stat().st_size, 'frame_cover': str(d / 'frame_cover.jpg')}
+              'bytes': (d / 'reel.mp4').stat().st_size, 'frame_cover': str(d / 'frame_cover.jpg'), 'sfx': sfx_counts}
     (d / 'reel.json').write_text(json.dumps(report, indent=1))
     print(json.dumps(report))
     if report['duration'] > (57 if START == 0 else 61) or report['lufs'] > -12 or report['lufs'] < -15.5 or report['true_peak_dbfs'] > -1.0:

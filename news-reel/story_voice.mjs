@@ -10,7 +10,7 @@
 // alignment of the plain text → trim → fixed brisk tempo. Writes <dir>/timeline.json and voice/trim/<id>.wav.
 // Key: env Elevenlabs_API_KEY (audio only, never printed). Model: eleven_v4 (user rule).
 import fs from 'node:fs'; import path from 'node:path'; import crypto from 'node:crypto'; import {execFileSync} from 'node:child_process';
-import {latinize} from './fa_lexicon.mjs';
+import {latinize, latinTerms} from './fa_lexicon.mjs';
 const args = Object.fromEntries(process.argv.slice(2).map(a => a.replace(/^--/, '').split('=')));
 const dir = path.resolve(args.dir), TEMPO = +(args.tempo || 1.2);   // the brisk pace the user approved (2026-10-21)
 const key = process.env.Elevenlabs_API_KEY || process.env.ELEVENLABS_API_KEY;
@@ -20,6 +20,15 @@ const MODEL = 'eleven_v4';
 const vdir = path.join(dir, 'voice'); fs.mkdirSync(path.join(vdir, 'trim'), {recursive: true});
 const sh = (c, a) => execFileSync(c, a, {encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe']});
 const sq = t => t.replace(/\s+/g, ' ').trim();
+// pronunciation of English names (user rule 2026-10-29): run pron_test.mjs first; its cache decides per term
+const PRON_CACHE = (() => { const f = new URL('./pron_cache.json', import.meta.url); return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {}; })();
+const respell = t => { for (const term of latinTerms(t).sort((a, b) => b.length - a.length)) { const c = PRON_CACHE[term];
+  if (c && c.mode === 'C') t = t.split(term).join(c.spoken); } return t; };
+const latinOf = t => latinTerms(latinize(t.replace(/\{([^|}]*)\|([^}]*)\}/g, '$2'), S.lexicon));
+const untested = [...new Set(S.beats.flatMap(b => latinOf(b.text)).filter(x => !PRON_CACHE[x]))];
+if (untested.length) { console.error('run news-reel/pron_test.mjs first; untested English terms: ' + untested.join(', ')); process.exit(5); }
+const ttsText = t => respell(withTags(t));
+const langFor = t => latinOf(t).some(x => PRON_CACHE[x]?.mode === 'B') ? null : 'fa';
 const withTags = t => sq(latinize(t.replace(/\[icon:[^\]]*\]/g, '').replace(/\{([^|}]*)\|([^}]*)\}/g, '$2').replace(/\*/g, '').replace(/\s*\|\s*/g, ' '), S.lexicon));
 const plain = t => sq(withTags(t).replace(/\[[^\]]*\]/g, ''));
 const shownText = t => sq(t.replace(/\[icon:[^\]]*\]/g, '').replace(/\{([^|}]*)\|([^}]*)\}/g, '$1').replace(/\[[^\]]*\]/g, '').replace(/\*/g, '').replace(/\s*\|\s*/g, ' '));   // STT often writes numbers as digits
@@ -30,12 +39,12 @@ function sim(a, b) { a = norm(a); b = norm(b); const m = a.length, n = b.length;
   return 1 - p[n] / Math.max(m, n); }
 async function retry(fn, what) { for (let i = 0; i < 3; i++) { try { return await fn(); } catch (e) { console.error(what, String(e).slice(0, 200)); await new Promise(z => setTimeout(z, 2500 * (i + 1))); } } throw new Error(what + ' failed'); }
 
-async function tts(text, seed, out) {
+async function tts(text, seed, out, lang = 'fa') {
   if (fs.existsSync(out)) return;
   await retry(async () => {
     const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${S.voice}?output_format=mp3_44100_192`, {method: 'POST',
       headers: {'xi-api-key': key, 'Content-Type': 'application/json'},
-      body: JSON.stringify({text, model_id: MODEL, language_code: 'fa', seed,
+      body: JSON.stringify({text, model_id: MODEL, ...(lang ? {language_code: lang} : {}), seed,
         voice_settings: {stability: S.stability ?? 0.5, similarity_boost: 0.85, use_speaker_boost: true}})});
     if (!r.ok) throw new Error(`TTS ${r.status} ${(await r.text()).slice(0, 200)}`);
     fs.writeFileSync(out, Buffer.from(await r.arrayBuffer()));
@@ -57,11 +66,11 @@ async function align(f, text) {
 
 const items = [], qc = [];
 for (const b of S.beats) {
-  const spoken = withTags(b.text), ptxt = plain(b.text), pw = ptxt.split(' ');
-  const hsh = crypto.createHash('sha256').update(S.voice + '|' + MODEL + '|' + spoken).digest('hex').slice(0, 10);
+  const spoken = ttsText(b.text), lang = langFor(b.text), ptxt = plain(b.text), pw = ptxt.split(' ');
+  const hsh = crypto.createHash('sha256').update(S.voice + '|' + MODEL + '|' + lang + '|' + spoken).digest('hex').slice(0, 10);
   let best = null;
   for (let take = 0; take < 3; take++) {        // up to 3 takes, keep the clearest
-    const f = path.join(vdir, `${b.id}-${hsh}-${take}.mp3`); await tts(spoken, 7 + take * 101, f);
+    const f = path.join(vdir, `${b.id}-${hsh}-${take}.mp3`); await tts(spoken, 7 + take * 101, f, lang);
     const heard = await stt(f), score = Math.max(sim(ptxt, heard), sim(ptxt, latinize(heard, S.lexicon)), sim(shownText(b.text), heard));   // STT may write Latin names in Persian
     if (!best || score > best.score) best = {f, heard, score};
     if (score >= 0.9) break;

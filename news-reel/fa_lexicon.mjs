@@ -30,3 +30,30 @@ export function latinize(text, extra) {
   for (const [rx, en] of extra ? compile(extra).concat(BASE_RX) : BASE_RX) t = t.replace(rx, en);
   return t.replace(/([A-Za-z])‌/g, '$1 ').replace(/‌([A-Za-z])/g, ' $1');
 }
+
+// Persian respellings that make the Persian voice say the English name (user rule 2026-10-29: ChatGPT was read
+// "chetgpt", Pro "pero"). Diacritics and ZWNJ steer the vowels; a sukun (ْ) after the first consonant of a
+// cluster stops the voice inserting "e" (پْرو = "pro", not "pero"). Only a candidate: pron_test.mjs keeps it
+// when an English speech-to-text hears it better than the Latin spelling.
+const PRON_WORDS = {
+  'ChatGPT': 'چَت‌جی‌پی‌تی', 'GPT': 'جی‌پی‌تی', 'OpenAI': 'اُپِن‌اِی‌آی', 'AI': 'اِی‌آی', 'Pro': 'پْرو', 'Plus': 'پْلاس',
+  'Max': 'مَکس', 'Mini': 'مینی', 'Ultra': 'اولْترا', 'Claude': 'کْلاد', 'Anthropic': 'اَنْتروپیک', 'Gemini': 'جِمِنای',
+  'Google': 'گوگِل', 'Nvidia': 'اِنْویدیا', 'Microsoft': 'مایکْروسافت', 'Copilot': 'کوپایلَت', 'Meta': 'مِتا',
+  'Apple': 'اَپِل', 'iPhone': 'آیفون', 'Tesla': 'تِسْلا', 'Grok': 'گْراک', 'Sora': 'سورا', 'Perplexity': 'پِرْپِلِکْسیتی',
+  'DeepSeek': 'دیپ‌سیک', 'DeepMind': 'دیپ‌مایند', 'Midjourney': 'میدْجِرنی', 'Pinterest': 'پینْتِرِست', 'Adobe': 'اَدوبی',
+  'Airbnb': 'اِر‌بی‌اِن‌بی', 'Walmart': 'وال‌مارت', 'Amazon': 'اَمازون', 'Netflix': 'نِتْفلیکس', 'Spotify': 'اِسْپاتیفای',
+  'YouTube': 'یوتیوب', 'Instagram': 'اینستاگْرام', 'TikTok': 'تیک‌تاک', 'LinkedIn': 'لینْکْدین', 'WhatsApp': 'واتْس‌اَپ',
+  'Elon': 'ایلان', 'Musk': 'ماسک', 'Sam': 'سَم', 'Altman': 'آلْتْمَن', 'Jensen': 'جِنْسِن', 'Huang': 'هوانگ',
+  'Nasdaq': 'نَزْدَک', 'IPO': 'آی‌پی‌اُو', 'app': 'اَپ', 'agent': 'اِیجِنْت', 'prompt': 'پْرامْپْت', 'code': 'کُد',
+  'Science': 'ساینْس', 'Stanford': 'اِسْتَنْفورد', 'Georgia': 'جورْجیا', 'Tech': 'تِک',
+};
+export const PRON = new Proxy({}, {get: (_, term) => {
+  if (typeof term !== 'string') return undefined;
+  if (PRON_WORDS[term]) return PRON_WORDS[term];
+  const parts = term.split(/\s+/);
+  return parts.every(w => PRON_WORDS[w]) ? parts.map(w => PRON_WORDS[w]).join(' ') : undefined;
+}});
+// Latin phrases in a spoken text: runs of Latin words (ChatGPT Pro, Elon Musk, GPT-5).
+export function latinTerms(text) {
+  return (text.match(/[A-Za-z][A-Za-z0-9.+\-]*(?:\s+[A-Za-z0-9][A-Za-z0-9.+\-]*)*/g) || []).map(s => s.trim().replace(/[.\-]+$/, ''));
+}

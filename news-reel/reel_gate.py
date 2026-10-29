@@ -129,6 +129,16 @@ def main():
     if not cg.exists() or not json.loads(cg.read_text()).get('pass'):
         fails.append('no passing concept_gate.json: approve headline, hook, cover and motion plan before production (concept_gate.py)')
 
+    # 4b3. sound design (user rule 2026-10-29): no repeated whoosh, varied effects
+    rj = d / 'reel.json'
+    if rj.exists():
+        sx = json.loads(rj.read_text()).get('sfx')
+        if sx is None: fails.append('reel.json has no sfx report: re-assemble with the current reel_assemble.py')
+        else:
+            tot = sum(sx.values())
+            if sx.get('whoosh', 0) > 2: fails.append(f"{sx['whoosh']} whooshes (max 2)")
+            if tot >= 5 and max(sx.values()) > 0.4 * tot: fails.append(f'one sound effect is over 40% of all effects {sx}')
+
     # 4c. preflight (user rule 2026-10-27): cover, headline and hook were judged on stills before the full render
     pf = d / 'preflight.json'
     if not pf.exists() or not json.loads(pf.read_text()).get('pass'):
