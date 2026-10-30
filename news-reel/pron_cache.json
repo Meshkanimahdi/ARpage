@@ -138,5 +138,19 @@
   "score": 1,
   "voice": "xKk80LgyXTAl6McCiFke",
   "date": "2026-10-30"
+ },
+ "firm": {
+  "mode": "A",
+  "spoken": "firm",
+  "score": 1,
+  "voice": "GSj19hKjOQsPFCZlq1le",
+  "date": "2026-10-30"
+ },
+ "whispers": {
+  "mode": "A",
+  "spoken": "whispers",
+  "score": 1,
+  "voice": "GSj19hKjOQsPFCZlq1le",
+  "date": "2026-10-30"
  }
 }

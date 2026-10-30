@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — white ball UI motion loop (prompt 228)</title>
+<!-- Skill motion-graphy-2026, prompt 228 "White ball UI motion loop" (TOPIC/UI), built as its own engine.
+     Look from the prompt: a near-black canvas with a faint dot grid, charcoal controls, sharp white text, ONE electric-blue
+     accent and a white ball that travels through the whole film. A real cursor makes the opening click physical; after
+     that the ball guides every hand-off (toggle → card → slider → notifications → reply field → keyboard → return).
+     All UI lives in ONE world; a single camera (position + log-space zoom) moves through it, so every close-up is a
+     move inside that world, never a hard cut. Closed-form springs with a small overshoot and a brief squash on impact.
+     Banned by the prompt and kept out: hard cuts, stock footage, glows, particle bursts, disconnected transitions,
+     excessive bouncing, blurry text during camera moves. The opening photo (user realism rule, RUNBOOK §4.0 rule 4)
+     shrinks into the world as a card, so the first move is still continuous.
+     Page standards: 1080x1920, Persian narration (eleven_v4) with a word-by-word caption, music bed at 120 BPM, SFX via
+     SCENES[].sfx. Data: story.json beats[{id, text, scene{type, img?}}], end_text, end_sub; el/*.
+     Pure seek(t): every style is computed from t, no CSS animations, timers or Math.random. -->
+<style>
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-600-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --bg: #0B0B0E; --ch: #1D1E24; --ch2: #2A2C34; --line: #3A3C46; --w: #FFFFFF; --mu: #9A9CA8; --blue: #2F7BFF; --red: #FF4D5E; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+  #root { position: absolute; inset: 0; overflow: hidden; background: var(--bg); font-family: V; font-weight: 900; color: var(--w); }
+  #world { position: absolute; left: 0; top: 0; width: 1px; height: 1px; transform-origin: 0 0; }
+  #scr { position: absolute; inset: 0; }
+  .a { position: absolute; white-space: nowrap; }
+  .card { position: absolute; background: var(--ch); border: 3px solid var(--line); border-radius: 36px; box-sizing: border-box; }
+  .t { position: absolute; white-space: nowrap; }
+  #sub { position: absolute; left: 50px; right: 50px; top: 1450px; height: 150px; display: flex; align-items: center; justify-content: center; }
+  #sub .pill { padding: 10px 34px 20px; border-radius: 26px; font: 900 58px/1.3 V; white-space: nowrap; background: rgba(29,30,36,.94); border: 3px solid var(--line); color: #fff; }
+  #sub .w { display: inline-block; margin: 0 .12em; }
+</style>
+</head>
+<body>
+<div id="root"><div id="world"></div><div id="scr"></div><div id="sub"></div></div>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const U = s => s.startsWith('/') ? s : DIR + s, $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), mix = (a, b, k) => a + (b - a) * k, pr = (t, a, b) => cl((t - a) / (b - a));
+const ex = k => 1 - Math.pow(2, -10 * cl(k));
+const eio = k => { k = cl(k); return k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; };
+const spring = k => { k = cl(k); return 1 - Math.exp(-7 * k) * Math.cos(9 * k) * (1 - k * .2); };   // ~8% overshoot
+const fa = n => String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const ISSUES = [];
+let S, TL, B = [], END = 50;
+
+// ---- the one world: station centres (world px) and where the ball lands on each ----
+const ST = {
+  T: [0, 0], P: [1300, 0], C: [1300, 1500], D: [0, 1500], L: [-1300, 1500], SL: [-1300, 3000], H: [0, 3000],
+  G: [1300, 3000], K: [1300, 4500], F: [0, 4500], R: [-1300, 4500]
+};
+const BEAT_ST = {hook: 'T', found: 'P', cards: 'C', delay: 'D', photos: 'L', slider: 'SL', hotel: 'H', gift: 'G',
+  ask_ai: 'K', answer: 'K', night: 'K', flaw: 'F', tip: 'R', ask: 'T'};
+const SC_Y = 820;                                           // the screen point the camera centres stations on
+
+window.ready = (async () => {
+  S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json();
+  END = TL.total;
+  const shown = t => t.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/);
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) { ISSUES.push('no timing for ' + bt.id); continue; }
+    const raw = shown(bt.text); let on = false;
+    const words = raw.map(w => { const st = w.startsWith('*') || w.startsWith('«*'); if (st) on = true; const k = on || /\*/.test(w); if (/\*[.…،؛!؟?»]*$/.test(w)) on = false; return {w: w.replace(/\*/g, ''), k}; });
+    const wt = j => { const i = Math.round(cl(j / Math.max(1, words.length - 1)) * (L.words.length - 1)); return (L.words[i] || [L.start])[0]; };
+    B.push({bt, sc: bt.scene || {}, L, words, wt});
+  }
+  B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; b.st = BEAT_ST[b.sc.type] || 'T'; });
+  await Promise.all(['s00.jpg', 'telegram.png'].map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + f); })));
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'ربات Sofia')));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  // one idea per beat plus extra ideas on the beat's own moments (cards, ring, keys…), each with its matching sound
+  const SC = [];
+  for (const b of B) {
+    const pts = [[b.a, SFX0[b.sc.type] || 'pop']];
+    (MOM[b.sc.type] || (() => []))(b).forEach(m => { if (m[0] > b.a + .9 && m[0] < b.b - .7) pts.push(m); });
+    pts.sort((p, q) => p[0] - q[0]);
+    pts.forEach((p, i) => SC.push({t0: +p[0].toFixed(2), t1: +(i + 1 < pts.length ? pts[i + 1][0] : b.b).toFixed(2), type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: [[p[0] + .02, p[1], .32]]}));
+  }
+  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .15, 'shimmer', .4]]});
+  window.SCENES = SC;
+  for (const s of SC) if (s.t1 - s.t0 > 3.2) ISSUES.push(`idea ${s.bg} holds ${(s.t1 - s.t0).toFixed(1)} s (> 3): add a moment`);
+  seek(0);
+})();
+const W = (b, s) => { const i = b.words.findIndex(w => w.w.includes(s)); return b.wt(i < 0 ? 0 : i); };
+// sound that opens each beat, matched to its motion (never a whoosh)
+const SFX0 = {hook: 'notify', found: 'tap', cards: 'notify', delay: 'typing', photos: 'tap', slider: 'counter_tick', hotel: 'pop',
+  gift: 'pop', ask_ai: 'typing', answer: 'notify', night: 'notify', flaw: 'notify', tip: 'sweep_soft', ask: 'click'};
+// the moments inside a beat that get their own idea (camera kick) and sound
+const MOM = {
+  hook: b => [[1.2, 'click']],
+  found: b => [[W(b, 'Xiniu'), 'shimmer'], [W(b, 'بانکی'), 'tap']],
+  cards: b => [[b.a + 1.4, 'notify'], [b.a + 2.6, 'notify'], [W(b, 'روزها'), 'notify']],
+  delay: b => [[W(b, 'ثانیه'), 'counter_tick'], [b.b - 1.1, 'notify']],
+  photos: b => [[W(b, 'کتابخونه'), 'tap']],
+  slider: b => [[W(b, '۷۰'), 'hit'], [W(b, 'اعتماد'), 'counter_tick']],
+  hotel: b => [[W(b, 'پول'), 'click'], [W(b, 'لینک'), 'tap']],
+  gift: b => [[W(b, 'هدیه'), 'pop'], [W(b, 'پول'), 'click']],
+  ask_ai: b => [[W(b, 'AI'), 'tap']],
+  answer: b => [[W(b, 'واقعی'), 'hit']],
+  night: b => [[W(b, 'نصف'), 'notify']],
+  flaw: b => [[W(b, 'ساکت'), 'notify'], [b.a + 1.2, 'notify']],
+  tip: b => [[W(b, 'پول'), 'hit']],
+  ask: b => [[W(b, 'کامنت'), 'notify']],
+};
+
+// ---- camera: station to station through one world, log-space zoom dipping out and back in on each move ----
+function camAt(t) {
+  let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
+  const b = B[bi], prev = B[Math.max(0, bi - 1)], k = eio(pr(t, b.a, b.a + .75));
+  const p0 = ST[prev.st], p1 = ST[b.st];
+  const ZS = 1.12; let z1 = ZS, z0 = prev.sc.type === 'tip' ? .3 : ZS, c1 = p1;
+  if (b.sc.type === 'tip') { z1 = mix(.86, .3, eio(pr(t, b.a + .2, b.a + 1.6))); c1 = [mix(-1300, 0, eio(pr(t, b.a + .2, b.a + 1.6))), mix(4500, 2250, eio(pr(t, b.a + .2, b.a + 1.6)))]; }
+  if (b.sc.type === 'ask') { const kk = eio(pr(t, b.a, b.a + 1.1)); return {x: mix(0, 0, kk), y: mix(2250, 0, kk), z: Math.exp(mix(Math.log(.3), Math.log(1.12), kk))}; }
+  const dist = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]), dip = dist > 10 ? Math.min(.45, dist / 4200) : 0;
+  const lz = mix(Math.log(z0), Math.log(z1), k) - dip * Math.sin(Math.PI * k);
+  const drift = .03 * pr(t, b.a + .75, b.b);                      // the camera never sits still
+  return {x: mix(p0[0], c1[0], k), y: mix(p0[1], c1[1], k), z: Math.exp(lz) * (1 + drift)};
+}
+// ---- the white ball: one continuous route; lands on each station's contact point with a squash ----
+function ballAt(t) {
+  let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
+  const b = B[bi], cur = contact(b, t), prev = bi ? contact(B[bi - 1], b.a - .01) : cur;
+  const k = pr(t, b.a, b.a + .6), e = eio(k), arc = Math.sin(Math.PI * k) * -260;
+  const x = mix(prev[0], cur[0], e), y = mix(prev[1], cur[1], e) + arc;
+  const land = t - (b.a + .6), sq = land >= 0 && land < .25 ? Math.sin(land / .25 * Math.PI) * .22 : 0;
+  return [x, y, sq];
+}
+// contact point of the ball inside a beat (world px); some stations move it along (slider knob, keys…)
+function contact(b, t) {
+  const s = ST[b.st], u = t - b.a;
+  switch (b.sc.type) {
+    case 'hook': return [s[0] + 150, s[1]];
+    case 'found': return [s[0] + 300, s[1] + 250];
+    case 'cards': { const n = u < 1.4 ? 0 : u < 2.6 ? 1 : 2; return [s[0] + 380, s[1] - 260 + n * 230]; }
+    case 'delay': return [s[0] + 300 * Math.cos(-Math.PI / 2 + 2 * Math.PI * pr(t, W(b, 'ثانیه') - .5, b.b - 1.1)), s[1] - 40 + 300 * Math.sin(-Math.PI / 2 + 2 * Math.PI * pr(t, W(b, 'ثانیه') - .5, b.b - 1.1))];
+    case 'photos': return [s[0] + 140, s[1] - 60];
+    case 'slider': return [s[0] - 380 + 760 * sliderK(b, t), s[1] + 60];
+    case 'hotel': return [s[0], s[1] + 330];
+    case 'gift': return [s[0] + 230, s[1] + 330];
+    case 'ask_ai': { const kp = keyPress(b, t); return kp ? kp : [s[0] + 300, s[1] + 330]; }
+    case 'answer': return [s[0] + 380, s[1] + 330];
+    case 'night': return [s[0] - 300, s[1] - 260];
+    case 'flaw': return [s[0], s[1] + 380 - Math.abs(Math.sin((t - b.a) * 4.2)) * 220];
+    case 'tip': return [s[0], s[1] + 260];
+    case 'ask': return [ST.T[0] - 150, ST.T[1]];
+  }
+  return s;
+}
+const sliderK = (b, t) => eio(pr(t, b.a + .5, W(b, '۷۰') + .2));
+// keyboard: the ball strikes each key of "Are you AI?" at a fixed time
+const KEYROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+function keyXY(ch) {
+  const c = ch.toLowerCase(); for (let r = 0; r < 3; r++) { const i = KEYROWS[r].indexOf(c); if (i >= 0) return [ST.K[0] - 450 + i * 100 + r * 40, ST.K[1] + 170 + r * 120]; }
+  if (ch === ' ') return [ST.K[0], ST.K[1] + 530]; if (ch === '↵') return [ST.K[0] + 410, ST.K[1] + 530]; return [ST.K[0] + 410, ST.K[1] + 410];
+}
+const TYPED = 'Are you AI?';
+const keyTimes = b => { const t0 = b.a + .7, t1 = W(b, 'AI') + .35; return [...TYPED, '↵'].map((c, i) => [t0 + (t1 - t0) * i / TYPED.length, c]); };
+function keyPress(b, t) { const ks = keyTimes(b); let last = null; ks.forEach(([tk, c]) => { if (t >= tk - .12) last = keyXY(c); }); return t >= ks[0][0] - .12 ? last : null; }
+
+// ---- small UI kit, all vector (charcoal controls, white text, one blue accent) ----
+const box = (x, y, w, h, inner = '', st = '') => `<div class="card" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;${st}">${inner}</div>`;
+const txt = (x, y, s, size, col = '#fff', st = '', ltr = false) => `<div class="t" ${ltr ? 'dir="ltr"' : ''} style="left:${x}px;top:${y}px;font-size:${size}px;color:${col};${st}">${s}</div>`;
+const rtxt = (r, y, s, size, col = '#fff', st = '') => `<div class="t" style="left:${-r - 900}px;width:900px;text-align:right;top:${y}px;font-size:${size}px;color:${col};${st}">${s}</div>`;
+const pop = (k, inner, ox = '50%', oy = '50%') => `<div class="a" style="left:0;top:0;transform-origin:${ox} ${oy};transform:scale(${spring(k).toFixed(3)});opacity:${cl(k * 6)}">${inner}</div>`;
+function toggle(x, y, on, k = 1, label = 'AI') {
+  const kx = mix(0, 1, on);
+  return `<div class="a" style="left:${x - 170}px;top:${y - 90}px;width:340px;height:180px;border-radius:90px;background:${on > .5 ? 'var(--blue)' : 'var(--ch2)'};border:3px solid var(--line);transform:scale(${spring(k).toFixed(3)})"></div>` +
+    txt(x - 120, y - 210, label, 64, '#fff', '', true) + `<div class="a" style="left:${x - 150 + kx * 160}px;top:${y - 70}px;width:140px;height:140px;border-radius:50%;background:#2E3038"></div>`;
+}
+function bubble(x, y, w, s, k, me = false, sz = 50) {
+  const e = spring(k);
+  return `<div class="a" style="left:${x}px;top:${y}px;width:${w}px;transform:translateY(${(1 - ex(k)) * 60}px) scale(${e.toFixed(3)});transform-origin:${me ? '100%' : '0'} 100%;opacity:${cl(k * 5)}">
+    <div style="display:inline-block;padding:20px 34px 28px;border-radius:40px;${me ? 'border-bottom-right-radius:10px;background:var(--blue)' : 'border-bottom-left-radius:10px;background:#2E3038'};font:900 ${sz}px/1.3 V;color:#fff">${s}</div></div>`;
+}
+const dots = (x, y, t) => `<div class="a" style="left:${x}px;top:${y}px;padding:26px 34px;border-radius:40px;background:#2E3038;display:flex;gap:16px">${[0, 1, 2].map(i => `<div style="width:22px;height:22px;border-radius:50%;background:#fff;opacity:${(.35 + .65 * Math.abs(Math.sin(t * 5 - i * .7))).toFixed(2)}"></div>`).join('')}</div>`;
+const avatar = (x, y, d) => `<div class="a" style="left:${x}px;top:${y}px;width:${d}px;height:${d}px;border-radius:50%;background:#FF5C93;font:900 ${d * .45}px/${d}px V;text-align:center" dir="ltr">S</div>`;
+const tg = (x, y, d) => `<img class="a" src="${U('el/telegram.png')}" style="left:${x}px;top:${y}px;width:${d}px;height:${d}px;border-radius:50%">`;
+
+// ---- every station draws itself from the time (local progress), wherever the camera is ----
+function stations(t) {
+  let r = '';
+  const bt = type => B.find(b => b.sc.type === type);
+  // T: the AI-persona toggle (flips ON in the hook, OFF at the end)
+  { const h = bt('hook'), a = bt('ask'), on = (t >= 1.2 ? ex(pr(t, 1.2, 1.45)) : 0) * (a && t >= a.a + .9 ? 1 - ex(pr(t, a.a + .9, a.a + 1.15)) : 1);
+    r += box(-470, -330, 940, 660) + toggle(0, 60, on) + rtxt(-430, -280, 'حالت ربات', 54, 'var(--mu)');
+    if (a && t >= W(a, 'کامنت') - .1) r += pop(pr(t, W(a, 'کامنت') - .1, W(a, 'کامنت') + .35), bubble(-380, 420, 760, 'کامنت کن 👇', 1, true, 70)); }
+  // P: product card «Xiniu» + investigator badge + «sold on Telegram» chip
+  { const b = bt('found'), k = b ? pr(t, b.a + .2, b.a + .6) : 0, kn = b ? pr(t, W(b, 'Xiniu') - .1, W(b, 'Xiniu') + .3) : 0;
+    r += box(840, -380, 920, 760, '', `transform:scale(${(.9 + .1 * ex(k)).toFixed(3)})`) + txt(900, -330, 'AI CUSTOMER SERVICE', 40, 'var(--mu)', 'letter-spacing:4px', true);
+    r += txt(900, -260, 'Xiniu', 170, '#fff', `opacity:${(.15 + .85 * ex(kn)).toFixed(2)}`, true) + txt(910, -40, '夕牛', 80, 'var(--blue)', '', true);
+    r += pop(pr(t, (b ? b.a : 0) + .9, (b ? b.a : 0) + 1.3), `<div class="a" style="left:900px;top:90px;padding:16px 30px;border-radius:30px;background:var(--ch2);font:900 46px V">🔎 محقق کلاهبرداری بانکی</div>`);
+    r += pop(pr(t, (b ? b.a : 0) + 1.6, (b ? b.a : 0) + 2), `<div class="a" style="left:1300px;top:220px;padding:16px 34px;border-radius:30px;background:var(--blue);font:900 46px V">خرید ↗</div>`); }
+  // C: three notification cards, each on its beat, with the Telegram mark and a running day counter
+  { const b = bt('cards'), m = [['سلام عزیزم 😊', 0], ['دلم برات تنگ شده', 1.4], ['هنوز بیداری؟', 2.6]];
+    m.forEach(([s, d], i) => { const k = b ? pr(t, b.a + d, b.a + d + .45) : 0; const y = 1500 - 360 + i * 230;
+      r += pop(k, box(860, y, 900, 200, '', 'border-radius:44px') + avatar(890, y + 40, 120) + txt(1030, y + 30, 'Sofia', 50, '#fff', '', true) + rtxt(-1700, y + 100, s, 50, '#D8D9E0') + tg(1660, y + 30, 70), '1300px', y + 100 + 'px'); });
+    const days = b ? 1 + Math.floor(2.99 * pr(t, W(b, 'روزها'), b.b)) : 1;
+    r += box(1020, 1820, 560, 150) + rtxt(-1550, 1850, `روز ${fa(days)}`, 70, '#fff') + `<div class="a" style="left:1060px;top:1880px;width:${(220 * pr(t, b ? W(b, 'روزها') : 0, b ? b.b : 1)).toFixed(0)}px;height:24px;border-radius:12px;background:var(--blue)"></div>`; }
+  // D: typing dots + a 7–9 s timer ring filling, the bubble lands when the ring completes
+  { const b = bt('delay'), kr = b ? pr(t, W(b, 'ثانیه') - .5, b.b - 1.1) : 0, s = 7 + 2 * kr, C = 2 * Math.PI * 300;
+    r += `<svg class="a" style="left:-340px;top:1120px" width="680" height="680"><circle cx="340" cy="340" r="300" fill="none" stroke="#2A2C34" stroke-width="34"/><circle cx="340" cy="340" r="300" fill="none" stroke="#2F7BFF" stroke-width="34" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${(C * (1 - kr)).toFixed(1)}" transform="rotate(-90 340 340)"/></svg>`;
+    r += txt(-200, 1340, `${fa(kr > 0 ? s.toFixed(1) : '۰')}<span style="font-size:70px"> ثانیه</span>`, 150, '#fff', 'width:400px;text-align:center');
+    r += t < (b ? b.b - 1.1 : 0) ? dots(-110, 1560, t) : bubble(-260, 1560, 600, 'ببخشید، دیر دیدم ❤', b ? pr(t, b.b - 1.1, b.b - .7) : 1);
+    r += txt(-190, 1240, 'در حال نوشتن…', 52, 'var(--mu)', 'width:380px;text-align:center'); }
+  // L: the photo library: tiles (abstract, no real faces); the cursor/ball picks one, it flies into the chat as «asset, image 1»
+  { const b = bt('photos'), kp = b ? pr(t, W(b, 'کتابخونه'), W(b, 'کتابخونه') + .6) : 0;
+    r += box(-1760, 1080, 920, 840) + rtxt(880, 1110, 'کتابخونه‌ی عکس', 54, 'var(--mu)');
+    for (let i = 0; i < 9; i++) { const cx = -1720 + (i % 3) * 290, cy = 1200 + Math.floor(i / 3) * 230, pick = i === 4;
+      const hue = [330, 20, 280, 200, 345, 30, 260, 10, 300][i];
+      r += `<div class="a" style="left:${cx + (pick ? -40 * ex(kp) : 0)}px;top:${cy + (pick ? 120 * ex(kp) : 0)}px;width:250px;height:200px;border-radius:24px;background:linear-gradient(140deg,hsl(${hue} 55% 55%),hsl(${hue + 30} 50% 35%));transform:scale(${pick ? 1 + .25 * ex(kp) : 1});border:${pick && kp > 0 ? '6px solid #2F7BFF' : '0'}"><div style="position:absolute;left:30%;top:22%;width:40%;height:46%;border-radius:50%;background:rgba(255,255,255,.28)"></div></div>`; }
+    if (kp > .5) r += txt(-1760, 1950, '素材 图1  ←  «عکس ۱»', 50, 'var(--blue)', `opacity:${ex(pr(kp, .5, 1))}`); }
+  // SL: the slider, the ball drags the knob; the value bubble climbs to ۷۰ messages; a trust meter rises with it
+  { const b = bt('slider'), k = b ? sliderK(b, t) : 0, n = Math.round(70 * k), kx = -1680 + 760 * k;
+    r += box(-1760, 2620, 920, 800) + rtxt(880, 2660, 'قالب «هتل»', 60, '#fff');
+    r += `<div class="a" style="left:-1680px;top:3050px;width:760px;height:20px;border-radius:10px;background:#2A2C34"></div><div class="a" style="left:-1680px;top:3050px;width:${(760 * k).toFixed(1)}px;height:20px;border-radius:10px;background:var(--blue)"></div>`;
+    r += `<div class="a" style="left:${(kx - 40).toFixed(1)}px;top:3020px;width:80px;height:80px;border-radius:50%;background:#2E3038;border:4px solid var(--blue)"></div>`;
+    r += `<div class="a" style="left:${(kx - 110).toFixed(1)}px;top:2860px;width:220px;padding:10px 0 18px;border-radius:24px;background:var(--blue);font:900 70px V;text-align:center">${fa(n)}</div>`;
+    r += rtxt(880, 3150, 'پیام تا اعتماد', 50, 'var(--mu)');
+    const tr = b ? pr(t, W(b, 'اعتماد') - .2, b.b) : 0;
+    r += txt(-1700, 3260, 'اعتماد', 46, 'var(--mu)') + `<div class="a" style="left:-1540px;top:3275px;width:560px;height:30px;border-radius:15px;background:#2A2C34"></div><div class="a" style="left:-1540px;top:3275px;width:${(560 * Math.max(k * .6, tr)).toFixed(0)}px;height:30px;border-radius:15px;background:#4ED6A0"></div>`; }
+  // H: hotel booking card with a payment-link button the ball presses
+  { const b = bt('hotel'), kpay = b ? pr(t, W(b, 'لینک') - .1, W(b, 'لینک') + .3) : 0, pressed = kpay > 0 && kpay < .6;
+    r += box(-460, 2620, 920, 820) + rtxt(-400, 2660, '🏨 رزرو هتل', 66, '#fff') + rtxt(-400, 2770, 'یه شب · دو نفر', 48, 'var(--mu)');
+    r += `<div class="a" style="left:-380px;top:2880px;width:760px;height:2px;background:var(--line)"></div>` + rtxt(-400, 2910, 'پرداخت با:', 48, 'var(--mu)') + txt(-380, 2980, 'pay-link.xyz/…', 50, 'var(--blue)', '', true);
+    r += `<div class="a" style="left:-260px;top:${3290 + (pressed ? 8 : 0)}px;width:520px;height:120px;border-radius:60px;background:${kpay >= 1 ? '#4ED6A0' : 'var(--blue)'};font:900 58px/120px V;text-align:center">${kpay >= 1 ? 'پرداخت شد ✓' : 'پرداخت'}</div>`;
+    if (b && t >= W(b, 'تو') - .1) r += pop(pr(t, W(b, 'تو') - .1, W(b, 'تو') + .3), `<div class="a" style="left:120px;top:2700px;padding:12px 30px 18px;border-radius:28px;background:var(--red);font:900 56px V">پولش با تو!</div>`); }
+  // G: the gift test: a coffee gift card, the toggle «پول می‌ده؟» flips, check mark lands
+  { const b = bt('gift'), kg = b ? pr(t, W(b, 'هدیه') - .1, W(b, 'هدیه') + .4) : 0, kt = b ? pr(t, W(b, 'پول') - .1, W(b, 'پول') + .3) : 0;
+    r += box(840, 2620, 920, 820) + rtxt(-1700, 2660, 'تست هدیه', 60, '#fff');
+    r += pop(kg, `<div class="a" style="left:960px;top:2760px;width:680px;height:300px;border-radius:30px;background:linear-gradient(135deg,#6B4A2F,#3A281A);border:3px solid #8A6A4A"><div style="position:absolute;left:40px;top:40px;font:900 90px V">☕</div><div style="position:absolute;right:40px;top:60px;font:900 64px V;color:#fff">کارت هدیه</div><div style="position:absolute;right:40px;top:170px;font:900 48px V;color:#E8D5B5">قهوه برای «Sofia»</div></div>`, '1300px', '2910px');
+    r += toggle(1300, 3260, ex(kt), 1, '') + rtxt(-1640, 3110, 'پول می‌ده؟', 52, 'var(--mu)');
+    if (kt >= 1) r += txt(1520, 3200, '✓', 120, '#4ED6A0'); }
+  // K: reply field + keyboard; the ball strikes the keys of «Are you AI?»; then the answers land
+  { const b = bt('ask_ai'), ks = b ? keyTimes(b) : [], n = ks.filter(([tk]) => t >= tk).length, typed = TYPED.slice(0, Math.min(n, TYPED.length)), sent = n > TYPED.length;
+    const fieldK = b ? pr(t, b.a + .2, b.a + .7) : 0;
+    r += box(840, 3880, 920, 1300) + rtxt(-1700, 3920, 'Sofia', 56, '#fff') + avatar(880, 3910, 80);
+    if (!sent) r += `<div class="a" style="left:${mix(1520, 880, ex(fieldK))}px;top:4300px;width:${mix(200, 840, ex(fieldK))}px;height:110px;border-radius:55px;background:#2A2C34;border:3px solid ${fieldK > 0 ? 'var(--blue)' : 'var(--line)'};font:900 54px/104px V;padding:0 30px;box-sizing:border-box" dir="ltr">${fieldK < .3 ? 'Reply' : typed + `<span style="display:inline-block;width:5px;height:56px;background:#fff;vertical-align:-8px;opacity:${Math.floor(t * 3) % 2}"></span>`}</div>`;
+    else r += bubble(1250, 4060, 480, '<span dir="ltr">Are you AI?</span>', pr(t, ks[ks.length - 1][0], ks[ks.length - 1][0] + .35), true);
+    // keyboard rising as part of the same scene
+    const kbK = b ? ex(pr(t, b.a + .3, b.a + .8)) : 0, kbY = mix(500, 0, kbK);
+    let kb = ''; KEYROWS.forEach((row, ri) => [...row].forEach((c, i) => { const [kx, ky] = keyXY(c); const hit = ks.some(([tk, kc]) => kc.toLowerCase() === c && t >= tk - .1 && t < tk + .12);
+      kb += `<div class="a" style="left:${kx - 42}px;top:${ky - 50 + kbY}px;width:84px;height:100px;border-radius:16px;background:${hit ? 'var(--blue)' : '#2E3038'};font:600 44px/100px V;text-align:center" dir="ltr">${c}</div>`; }));
+    kb += `<div class="a" style="left:${ST.K[0] - 300}px;top:${ST.K[1] + 480 + kbY}px;width:600px;height:100px;border-radius:16px;background:#2E3038"></div><div class="a" style="left:${ST.K[0] + 340}px;top:${ST.K[1] + 480 + kbY}px;width:140px;height:100px;border-radius:16px;background:${sent ? 'var(--blue)' : '#2E3038'};font:900 50px/100px V;text-align:center">↵</div>`;
+    const a2 = bt('answer'), n2 = bt('night'), gone = a2 ? ex(pr(t, a2.a, a2.a + .5)) : 0;
+    r += `<div class="a" style="left:0;top:0;opacity:${(1 - gone).toFixed(2)}">${kb}</div>`;
+    if (a2 && t >= W(a2, 'واقعی') - .3) { const kk = pr(t, W(a2, 'واقعی') - .3, W(a2, 'واقعی') + .1); r += bubble(880, 4230, 840, 'من یه آدم واقعی‌ام!', kk, false, 62);
+      r += pop(pr(t, W(a2, 'واقعی') + .2, W(a2, 'واقعی') + .6), `<div class="a" style="left:880px;top:4130px;padding:8px 22px 14px;border-radius:24px;background:var(--red);font:900 50px V">🚩</div>`); }
+    if (n2 && t >= n2.a + .2) { r += bubble(880, 4440, 840, 'کلاهبردار وقت نداره<br>نصف شب باهات حرف بزنه', pr(t, n2.a + .2, n2.a + .6), false, 52);
+      r += pop(pr(t, W(n2, 'نصف') - .1, W(n2, 'نصف') + .3), `<div class="a" style="left:880px;top:4700px;padding:10px 26px 16px;border-radius:24px;background:#2A2C34;font:900 60px V" dir="ltr">🌙 02:14</div>`); } }
+  // F: the flaw: it cannot stop: bubbles keep stacking, the counter keeps running, «last word» badge
+  { const b = bt('flaw'), u = b ? Math.max(0, t - b.a) : 0, n = Math.floor(u * 2.6);
+    r += box(-460, 3880, 920, 1300) + rtxt(-400, 3920, 'آخرین پیام', 56, 'var(--mu)');
+    const msgs = ['باشه؟', 'هنوز اینجام 😊', 'جواب نمی‌دی؟', 'یه چیز دیگه…', 'شب بخیر ❤', 'راستی…', 'نرو!'];
+    for (let i = Math.max(0, n - 5); i <= n; i++) { const y = 4880 - (n - i) * 150 - 150 * ex((u * 2.6) % 1) * (i === n ? 0 : 1) + (i === n ? 150 * (1 - ex((u * 2.6) % 1)) : 0);
+      r += bubble(-400, y, 760, msgs[i % msgs.length], i === n ? cl(((u * 2.6) % 1) * 3) : 1, false, 48); }
+    r += `<div class="a" style="left:-380px;top:3990px;padding:10px 28px 16px;border-radius:24px;background:var(--blue);font:900 54px V">${fa(12 + n)} پیام</div>`;
+    if (b && t >= W(b, 'ساکت') - .1) r += pop(pr(t, W(b, 'ساکت') - .1, W(b, 'ساکت') + .3), `<div class="a" style="left:60px;top:3990px;padding:10px 26px 16px;border-radius:24px;background:var(--red);font:900 50px V">حرف آخر با منه</div>`); }
+  // R: the warning card (seen in the pull-back with the whole world)
+  { const b = bt('tip'), kw = b ? pr(t, W(b, 'پول') - .2, W(b, 'پول') + .3) : 0;
+    r += box(-1760, 3880, 920, 1300, '', `border-color:${kw > 0 ? 'var(--red)' : 'var(--line)'}`) + rtxt(880, 3940, 'قانون ساده', 70, '#fff');
+    r += pop(kw, `<div class="a" style="left:-1700px;top:4250px;width:800px;padding:30px 0 40px;border-radius:40px;background:var(--red);font:900 110px V;text-align:center">پول خواست؟</div><div class="a" style="left:-1700px;top:4520px;width:800px;font:900 120px V;text-align:center">⚠️ یعنی خطر</div>`, '-1300px', '4400px'); }
+  return r;
+}
+function seek(t) {
+  if (!B.length) return;
+  let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
+  const b = B[bi], endOn = t >= TL.end_start;
+  const c = camAt(t);
+  let w = `<svg class="a" style="left:-2400px;top:-1200px" width="4800" height="7200"><defs><pattern id="dg" width="60" height="60" patternUnits="userSpaceOnUse"><circle cx="30" cy="30" r="3" fill="#ffffff" opacity=".09"/></pattern></defs><rect width="4800" height="7200" fill="url(#dg)"/></svg>`;
+  w += stations(t);
+  // the white ball: always visible inside the world after the hook's toggle click
+  const [bx, by, sq] = ballAt(t);
+  if (t >= 1.0 && !endOn) w += `<div class="a" style="left:${(bx - 34).toFixed(1)}px;top:${(by - 34).toFixed(1)}px;width:68px;height:68px;border-radius:50%;background:#fff;transform:scale(${(1 + sq).toFixed(3)},${(1 - sq).toFixed(3)})"></div>`;
+  const wd = $('world'); if (wd._h !== w) { wd._h = w; wd.innerHTML = w; }
+  wd.style.transform = `translate(${(540 - c.x * c.z).toFixed(2)}px,${(SC_Y - c.y * c.z).toFixed(2)}px) scale(${c.z.toFixed(4)})`;
+  // screen layer: the opening photo (shrinks into the world as a card) and the end card
+  let s = '';
+  const h = B[0], ho = h.b;
+  if (t < ho + .8) {
+    const k = eio(pr(t, ho - .1, ho + .7)), z = 1 + .1 * pr(t, 0, ho);
+    const L = mix(0, 560, k), T = mix(0, 90, k), Wd = mix(1080, 440, k), Ht = mix(1920, 760, k);
+    s += `<div class="a" style="left:${L}px;top:${T}px;width:${Wd}px;height:${Ht}px;overflow:hidden;border-radius:${mix(0, 40, k)}px;opacity:${(1 - pr(t, ho + .4, ho + .8)).toFixed(2)}"><img src="${U('el/s00.jpg')}" style="width:100%;height:100%;object-fit:cover;transform:scale(${z.toFixed(3)})"></div>`;
+    if (t < ho) {
+      const kb = pr(t, .3, .7);
+      s += `<div class="a" style="left:60px;top:300px;transform:translateY(${(1 - ex(kb)) * 80}px);opacity:${cl(kb * 4)};display:flex;align-items:center;gap:20px"><div style="width:110px;height:110px;border-radius:50%;background:#FF5C93;font:900 54px/110px V;text-align:center" dir="ltr">S</div>${t < .7 ? dots(0, 0, t).replace('class="a" style="left:0px;top:0px;', 'style="') : `<div style="padding:22px 36px 30px;border-radius:40px;border-bottom-left-radius:10px;background:#fff;color:#111;font:900 58px V">سلام عزیزم 😊</div>`}</div>`;
+      const tk = pr(t, 1.2, 1.45);
+      if (t >= 1.0) s += `<div class="a" style="left:70px;top:470px;transform:scale(${spring(pr(t, 1.0, 1.3)).toFixed(3)});transform-origin:center"><div style="width:220px;height:120px;border-radius:60px;background:${tk > .5 ? 'var(--blue)' : '#2A2C34'};position:relative"><div style="position:absolute;left:${10 + 100 * ex(tk)}px;top:10px;width:100px;height:100px;border-radius:50%;background:#fff"></div></div><div style="font:900 50px V;text-align:center;margin-top:6px">AI</div></div>`;
+      s += `<div class="a" style="left:0;right:0;top:1090px;height:520px;background:linear-gradient(rgba(255,255,255,0),rgba(255,255,255,.92) 30%)"></div>`;
+      s += `<div class="t" style="left:0;right:0;top:1180px;text-align:center;font-size:132px;line-height:1.15;color:#111">دختر توی چتت<br>شاید <span style="background:#FF2E63;color:#fff;padding:0 .18em .06em;border-radius:.16em">ربات</span> باشه</div>`;
+    }
+  }
+  if (endOn) s += endCard(t - TL.end_start);
+  const sc = $('scr'); if (sc._h !== s) { sc._h = s; sc.innerHTML = s; }
+  caption(b, t, endOn);
+}
+function endCard(u) {
+  const k = ex(pr(u, 0, .5)), q = (S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:#FF4D5E">$1</span>');
+  return `<div class="a" style="inset:0;background:rgba(11,11,14,${(.92 * k).toFixed(2)})"></div>` +
+    `<div class="a" style="left:470px;top:${mix(900, 640, k)}px;width:140px;height:140px;border-radius:50%;background:#fff"></div>` +
+    `<div class="t" style="left:0;right:0;top:880px;text-align:center;font-size:86px;opacity:${pr(u, .2, .6)}">${q}</div>` +
+    `<div class="t" style="left:0;right:0;top:1030px;text-align:center;font:600 56px V;color:#9A9CA8;opacity:${pr(u, .4, .8)}">${S.end_sub || ''}</div>` +
+    `<div class="t" dir="ltr" style="left:0;right:0;top:1160px;text-align:center;font-size:44px;letter-spacing:4px;color:#2F7BFF;opacity:${pr(u, .6, 1)}">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;
+}
+function caption(b, t, endOn) {
+  const sub = $('sub');
+  if (endOn || t > b.L.end + .3 || (b.i === 0 && t < b.L.end + .3)) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
+  const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + c0;
+  if (sub._k !== key) { sub._k = key; const lat = w => /^[«]?[A-Za-z0-9.\-?]+[،,.!?؟…؛»]*$/.test(w.w); const gs = [];
+    ch.forEach((w, q) => { const g = gs[gs.length - 1]; if (g && lat(w) && g.l) { g.w += ' ' + w.w; g.k = g.k || w.k; } else gs.push({w: w.w, k: w.k, i: q, l: lat(w)}); });
+    sub.innerHTML = `<span class="pill">${gs.map(g => `<span class="w" data-i="${g.i}" ${g.l ? 'dir="ltr"' : ''} style="${g.k ? 'color:#2F7BFF' : ''}">${g.w}</span>`).join(' ')}</span>`; }
+  sub.querySelectorAll('.w').forEach(el => { const tw = b.wt(c0 + +el.dataset.i), k = ex(pr(t, tw - .05, tw + .2)); el.style.opacity = .35 + .65 * k; });
+}
+window.seek = seek;
+</script>
+</body>
+</html>
