@@ -227,19 +227,25 @@ function scene(b, t, u, si, off) {
   let r = blocks(si, pr(t, (window.SCENES[si] || {}).t0 || 0, ((window.SCENES[si] || {}).t0 || 0) + .5), t);
   switch (s.type) {
     case 'hook': {
-      // frame 0: the official neon-city world full-bleed, the headline huge from frame 0, the prompt box already typing,
-      // arrow keys tapping with a camera nudge; the Genie mark springs in at 1.0 s
-      const tap1 = .6, tap2 = 1.1, nud = (t >= tap1 ? 18 * ex(pr(t, tap1, tap1 + .4)) : 0) - (t >= tap2 ? 30 * ex(pr(t, tap2, tap2 + .4)) : 0);
-      const z = 1.0 + .12 * io(pr(t, 0, 2.2)) + .04 * io(pr(t, 2.2, B1)), rv = ex(pr(t, .25, .95));
-      // the world renders out of the prompt: a soft grey draft from frame 0, a sharp colour pass grows from the cursor
-      r = bleed(s.photo, z, `${50 + nud / 12}% 50%`, 'filter:blur(4px) grayscale(.4) brightness(1.15)');
-      r += `<div style="position:absolute;inset:0;clip-path:circle(${(40 + 1900 * rv).toFixed(0)}px at 430px 1250px)">${bleed(s.photo, z, `${50 + nud / 12}% 50%`)}</div>`;
+      // frame 0: the official neon-city world full-bleed and already rendering out of the prompt (a sharp colour pass grows
+      // from the cursor), the headline huge from frame 0, arrow keys driving the camera; at 1.4 s the next prompt
+      // «A backyard race track.» grows a second official world out of the box (circle mask), and the keys drive through it
+      const tap1 = .5, tap2 = 1.0, nud = (t >= tap1 ? 30 * ex(pr(t, tap1, tap1 + .4)) : 0) - (t >= tap2 ? 50 * ex(pr(t, tap2, tap2 + .4)) : 0);
+      const z = 1.0 + .16 * io(pr(t, 0, 1.6)), rv = ex(pr(t, .1, .7)), sw = 1.4, k2 = ex(pr(t, sw, sw + .5));
+      r = bleed(s.photo, z, `${50 + nud / 8}% 50%`, 'filter:blur(3px) grayscale(.3) brightness(1.2)');
+      r += `<div style="position:absolute;inset:0;clip-path:circle(${(60 + 1900 * rv).toFixed(0)}px at 430px 1250px)">${bleed(s.photo, z, `${50 + nud / 8}% 50%`)}</div>`;
+      if (t >= sw) { const z2 = 1.12 + .14 * io(pr(t, sw, B1)), px = mix(14, 22, io(pr(t, sw + .4, B1)));
+        r += `<div style="position:absolute;inset:0;clip-path:circle(${(40 + 1500 * k2).toFixed(0)}px at 540px 1260px)">${photoCard('g5.jpg', 50, 590, 980, 980, -2, z2 - .1, `50% ${mix(50, 62, io(pr(t, sw, B1)))}%`)}</div>`; }
       r += `<div style="position:absolute;left:0;right:0;top:0;height:640px;background:linear-gradient(rgba(29,26,47,.8),rgba(29,26,47,.4) 65%,rgba(29,26,47,0))"></div>`;
       r += `<div class="t" style="top:250px;font-size:124px;color:#fff;mix-blend-mode:normal;text-shadow:7px 7px 0 ${INK.pink}"><span dir="ltr">Google</span> با یه جمله</div>`;
       r += `<div class="t" style="top:405px;font-size:124px;color:#fff;mix-blend-mode:normal;text-shadow:7px 7px 0 ${INK.blue}"><span style="background:${INK.yel};color:${INK.ink};padding:0 .16em .06em;border-radius:.14em;text-shadow:none">دنیای بازی</span> می‌سازه</div>`;
-      r += promptBox(110, 1170, 860, 'Describe a world', 'A neon city at night', cl(.5 + u * .9), t);
-      r += keys(760, 960, 1.4, t >= tap2 && t < tap2 + .25 ? 'left' : t >= tap1 && t < tap1 + .25 ? 'up' : t > 2.2 && Math.floor(t * 2) % 3 === 0 ? 'right' : '', t);
-      r += logoChip(90, 1000, 96, 'genie.png', pr(t, 1.0, 1.4), 'Genie 4');
+      const second = t >= sw - .5, txt = second ? 'A backyard race track.' : 'A neon city at night', kb = second ? cl(.15 + (t - (sw - .5)) * 1.4) : cl(.45 + u * 1.1);
+      if (t < sw + .35) r += promptBox(110, 1170, 860, 'Describe a world', txt, kb, t);
+      const act = t >= tap2 && t < tap2 + .25 ? 'left' : t >= tap1 && t < tap1 + .25 ? 'up' : t > sw + .6 && Math.floor(t * 3) % 2 === 0 ? 'up' : '';
+      const mv = ex(pr(t, sw, sw + .4));
+      r += keys(mix(760, 790, mv), mix(960, 1290, mv), 1.4, act, t);
+      r += logoChip(mix(90, 70, mv), mix(1000, 560, mv), 96, 'genie.png', pr(t, .8, 1.2), 'Genie 4');
+      if (t >= sw + .3) r += chip(700, 560, `دنیا ${fa(2)}`, INK.yel, INK.ink, 64, pr(t, sw + .3, sw + .6), 4);
       return r;
     }
     case 'type': {
@@ -292,7 +298,10 @@ function scene(b, t, u, si, off) {
       // three changes, each lit on its own word: weather · camera angle · a new person; the neon still swings angle
       const w1 = A + .05, w2 = W(b, 'زاویه'), w3 = W(b, 'آدم');
       const ang = t >= w2 ? ex(pr(t, w2, w2 + .5)) : 0, z = 1.05 + .25 * ang;
-      r += photoCard(s.photo, 80, 260, 920, 1000, mix(-2, 4, ang), z, `${mix(50, 70, ang)}% ${mix(55, 35, ang)}%`, pr(t, A, A + .35));
+      const z2 = 1.05 + .55 * ang;
+      r += photoCard(s.photo, 80, 260, 920, 1000, mix(-2, 6, ang), z2, `${mix(50, 72, ang)}% ${mix(55, 30, ang)}%`, pr(t, A, A + .35));
+      if (t < w2 + .3) { const rk = ex(pr(t, w1, w1 + .6)) * (1 - pr(t, w2, w2 + .3)); let rn = ''; for (let i = 0; i < 46 * rk; i++) { const x = 100 + (i * 157) % 880, y0 = 280 + ((i * 263) % 960 + t * 1100) % 960; rn += `<line x1="${x}" y1="${y0}" x2="${x - 18}" y2="${Math.min(1250, y0 + 90)}" stroke="${INK.blue}" stroke-width="8" stroke-linecap="round" opacity=".9"/>`; } r += svg2(rn); }
+      if (t >= w2 - .05 && t < w3) r += svg2(`<g transform="translate(540 760)" opacity="${(1 - pr(t, w2 + .6, w3)).toFixed(2)}"><rect x="-200" y="-150" width="400" height="300" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="40 300"/><circle r="14" fill="${INK.red}"/></g>`);
       [['☔ هوا', w1, INK.blue, '#fff'], ['🎥 زاویه', w2, INK.yel, INK.ink], ['🧍 آدم جدید', w3, INK.pink, INK.ink]].forEach(([c, tq, bg, fg], i) => { if (t >= tq - .05) r += chip(90 + i * 320, 1330, c, bg, fg, 58, pr(t, tq - .05, tq + .3), [-3, 2, -2][i]); });
       if (t >= w3 - .05) { const e = spring(pr(t, w3 - .05, w3 + .45)); r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(760 1000) scale(${e.toFixed(3)})"><circle cx="0" cy="-120" r="56" fill="${INK.pink}" stroke="${INK.ink}" stroke-width="8"/><path d="M-80 60 Q-80 -50 0 -50 Q80 -50 80 60 Z" fill="${INK.pink}" stroke="${INK.ink}" stroke-width="8"/><circle cx="70" cy="-150" r="34" fill="${INK.green}" stroke="${INK.ink}" stroke-width="6"/><path d="M56 -150 h28 M70 -164 v28" stroke="${INK.ink}" stroke-width="8"/></g></svg>`; }
       return r;
@@ -300,7 +309,7 @@ function scene(b, t, u, si, off) {
     case 'sound': {
       // three audio tracks draw on (music · ambience · dialogue), level meters move with the voice, a speech bubble grows
       const ts = W(b, 'صدا'), t1 = W(b, 'موسیقی'), t2 = W(b, 'محیط'), t3 = W(b, 'دیالوگ');
-      r += photoCard(s.photo, 140, 250, 800, 560, -3, 1.05 + .06 * io(pr(t, A, B1)), '55% 50%', pr(t, A, A + .4));
+      r += photoCard(s.photo, 60, 230, 960, 620, -2, 1.05 + .08 * io(pr(t, A, B1)), '55% 50%', pr(t, A, A + .3)) + chip(600, 260, 'صدای خودِ صحنه', INK.pink, INK.ink, 50, pr(t, A + .3, A + .6), 4);
       r += bigT('صدا هم داره!', 880, 120, INK.ink, pr(t, ts - .05, ts + .35), INK.yel);
       if (t >= ts - .05) for (let i = 0; i < 3; i++) { const ph = ((t - ts) * 1.2 + i / 3) % 1; r += svg2(`<g transform="translate(220 700)"><path d="M-30 -30 h30 l40 -40 v140 l-40 -40 h-30z" fill="${INK.ink}"/><path d="M ${30 + 60 * ph} -60 q ${40 + 40 * ph} 60 0 120" fill="none" stroke="${INK.pink}" stroke-width="12" stroke-linecap="round" opacity="${(1 - ph).toFixed(2)}"/></g>`); }
       let q = ''; [[t1, INK.pink, 'موسیقی'], [t2, INK.blue, 'محیط'], [t3, INK.green, 'دیالوگ']].forEach(([tq, c, lb], i) => { if (t >= tq - .1) { const y = 1110 + i * 110; q += `<rect x="90" y="${y - 46}" width="900" height="92" rx="46" fill="#FFFDF8" stroke="${INK.ink}" stroke-width="6"/>` + wave(110, y, 600, 70, c, pr(t, tq - .1, tq + .6), t, i * 3); r += `<div style="position:absolute;right:110px;top:${y - 40}px;font:900 56px V;color:${INK.ink}">${lb}</div>`; } });
@@ -328,7 +337,7 @@ function scene(b, t, u, si, off) {
       r += chip(380, 430, '🎬 کارگردان', INK.yel, INK.ink, 70, pr(t, W(b, 'کارگردان') - .05, W(b, 'کارگردان') + .3), -3);
       let q = '', lbl = ''; ['۱  محیط', '۲  حرکت', '۳  اتفاق بعدی'].forEach((s2, i) => { const ti = tq + i * .3, k = ex(pr(t, ti - .1, ti + .3)); if (t >= ti - .1) { q += `<rect x="${980 - 520 * k}" y="${620 + i * 120}" width="${520 * k}" height="96" rx="20" fill="#FFFDF8" stroke="${INK.ink}" stroke-width="6"/><path d="M ${1010 - 520} ${668 + i * 120} l 20 20 l 36 -44" stroke="${INK.green}" stroke-width="14" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(t, ti + .2, ti + .5))).toFixed(3)}"/>`; lbl += `<div style="position:absolute;right:130px;top:${630 + i * 120}px;font:900 54px V;color:${INK.ink};opacity:${k}">${s2}</div>`; } });
       // film strip of the official stills, a scan bar runs across, each frame gets a check as it passes
-      const sk = ex(pr(t, tf - .4, tf + .2)), scan = pr(t, tf, B1 - .1);
+      const sk = ex(pr(t, A + .2, A + .7)), scan = pr(t, tf, B1 - .1);
       q += `<rect x="40" y="1050" width="1000" height="300" fill="${INK.ink}" opacity="${sk}"/>`;
       for (let i = 0; i < 18; i++) q += `<rect x="${60 + i * 56}" y="1062" width="30" height="20" rx="4" fill="#FFFDF8" opacity="${sk}"/><rect x="${60 + i * 56}" y="1318" width="30" height="20" rx="4" fill="#FFFDF8" opacity="${sk}"/>`;
       r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${q}</svg>` + lbl;
@@ -342,8 +351,8 @@ function scene(b, t, u, si, off) {
       r += bigT('به چه درد می‌خوره؟', 230, 104, INK.ink, pr(t, A, A + .35), INK.yel);
       const C = [['🎮', 'بازی', INK.pink], ['🎓', 'آموزش', INK.yel], ['🤖', 'تمرین ربات', INK.green]];
       let q = '';
-      C.forEach(([ic, lb, c], i) => { const ti = ws[i], k = pr(t, ti - .15, ti + .35), on = t >= ti - .05, y = 520 + i * 330;
-        if (t >= ti - .15) { r += `<div style="position:absolute;left:120px;top:${y}px;width:840px;height:280px;border-radius:36px;background:${on ? c : '#FFFDF8'};border:8px solid ${INK.ink};box-shadow:14px 14px 0 ${INK.ink};transform:translateX(${(1 - ex(k)) * 400}px) rotate(${[-2, 1.5, -1][i]}deg);opacity:${cl(k * 4)};display:flex;align-items:center;justify-content:space-between;padding:0 60px;box-sizing:border-box"><span style="font:900 96px V;color:${INK.ink}">${lb}</span><span style="font-size:130px">${ic}</span></div>`;
+      C.forEach(([ic, lb, c], i) => { const ti0 = Math.min(ws[i] - .15, A + .15 + i * .2), ti = ws[i], k = pr(t, ti0, ti0 + .5), on = t >= ti - .05, y = 520 + i * 330;
+        if (t >= ti0) { r += `<div style="position:absolute;left:120px;top:${y}px;width:840px;height:280px;border-radius:36px;background:${on ? c : '#FFFDF8'};border:8px solid ${INK.ink};box-shadow:14px 14px 0 ${INK.ink};transform:translateX(${(1 - ex(k)) * 400}px) rotate(${[-2, 1.5, -1][i]}deg);opacity:${cl(k * 4)};display:flex;align-items:center;justify-content:space-between;padding:0 60px;box-sizing:border-box"><span style="font:900 96px V;color:${INK.ink}">${lb}</span><span style="font-size:130px">${ic}</span></div>`;
           r += `<div style="position:absolute;left:30px;top:${y + 90}px;width:96px;height:96px;border-radius:50%;background:${INK.ink};color:#fff;font:900 56px/96px V;text-align:center;transform:scale(${spring(k).toFixed(3)})">${fa(i + 1)}</div>`; } });
       return r;
     }
@@ -353,12 +362,12 @@ function scene(b, t, u, si, off) {
       const cl1 = spring(pr(t, A, A + .4)), clap = t >= tf ? -24 * (1 - ex(pr(t, tf, tf + .25))) : -24;
       r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(540 380) scale(${cl1.toFixed(3)})"><rect x="-220" y="-40" width="440" height="230" rx="14" fill="${INK.ink}"/><g transform="translate(-220 -40) rotate(${clap})">${[0, 1, 2, 3, 4].map(i => `<rect x="${i * 88}" y="-64" width="88" height="64" fill="${i % 2 ? '#FFFDF8' : INK.ink}" stroke="${INK.ink}" stroke-width="6"/>`).join('')}</g><text x="0" y="110" text-anchor="middle" font-family="V" font-weight="900" font-size="72" fill="#fff">طرح فیلم</text></g></svg>`;
       ['g3.jpg', 'g4.jpg', 'g5.jpg'].forEach((f, i) => { const ti = A + .4 + i * .35; if (t >= ti) r += photoCard(f, 70 + i * 320, 720 + [0, 60, 10][i], 300, 520, [-4, 3, -2][i], 1.15, '50% 50%', pr(t, ti, ti + .4)); r += `<div style="position:absolute;left:${90 + i * 320}px;top:${1300 + [0, 60, 10][i]}px;font:900 52px V;color:${INK.ink};opacity:${cl((t - ti) * 3)}">شات ${fa(i + 1)}</div>`; });
-      r += chip(240, 1460 - 40, 'تسترها می‌گن', INK.yel, INK.ink, 60, pr(t, A + .1, A + .4), -2);
+      r += chip(560, 560, 'تسترها می‌گن', INK.yel, INK.ink, 56, pr(t, A + .1, A + .4), 3);
       return r;
     }
     case 'limits': {
       // not finished: the neon world drifts — misregistration and a slow warp grow with a run-time bar; the warning stamp lands
-      const tn = W(b, 'کامل'), tl = W(b, 'جزئیات'), d = pr(t, tl - .4, B1), wob = Math.sin(t * 7) * 6 * d;
+      const tn = W(b, 'کامل'), tl = W(b, 'جزئیات'), d = .25 * pr(t, A + .3, tl) + .75 * pr(t, tl - .2, B1), wob = Math.sin(t * 7) * 6 * d;
       r += `<div style="position:absolute;left:80px;top:420px;width:920px;height:820px;border:10px solid #FFFDF8;border-radius:28px;box-shadow:16px 16px 0 ${INK.ink};overflow:hidden"><img src="${elimg(s.photo)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(${(6 * d).toFixed(1)}px) hue-rotate(${(60 * d).toFixed(0)}deg);transform:scale(${(1.08 + .1 * d).toFixed(3)}) skewX(${(wob * .6).toFixed(2)}deg)"><img src="${elimg(s.photo)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;mix-blend-mode:screen;opacity:${(.6 * d).toFixed(2)};transform:translate(${(28 * d).toFixed(1)}px,${(-18 * d).toFixed(1)}px) scale(1.1)"></div>`;
       const run = pr(t, A, B1); r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><rect x="80" y="1300" width="920" height="60" rx="30" fill="#FFFDF8" stroke="${INK.ink}" stroke-width="6"/><rect x="86" y="1306" width="${908 * run}" height="48" rx="24" fill="${run > .6 ? INK.red : INK.yel}"/></svg><div style="position:absolute;left:100px;top:1370px;font:900 50px V;color:${INK.ink}">زمان اجرا ⟵</div>`;
       r += bigT('هنوز کامل نیست', 230, 118, INK.ink, pr(t, tn - .3, tn + .1), INK.yel);
@@ -384,7 +393,7 @@ function scene(b, t, u, si, off) {
       // the empty prompt box with the blinking cursor; ghost prompts cycle; the comment bubble grows
       const tq = W(b, 'چیه'), tcm = W(b, 'کامنت'), ghosts = ['A castle in the clouds', 'My childhood street', 'A city on Mars'], gi = Math.floor((t - A) / .9) % 3;
       r += bigT('اولین دنیات؟', 250, 140, INK.ink, pr(t, tq - .4, tq), INK.pink);
-      r += promptBox(110, 700, 860, 'Describe a world', ghosts[gi], pr(t - (gi * .9), A, A + .7) + .2, t);
+      r += promptBox(110, 700, 860, 'Describe a world', ghosts[gi], .65 + .35 * cl(((t - A) % .9) / .5), t);
       if (t >= tcm - .1) { const e = spring(pr(t, tcm - .1, tcm + .4)); r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(540 1180) scale(${e.toFixed(3)})"><path d="M-300 -110 h600 a40 40 0 0 1 40 40 v140 a40 40 0 0 1 -40 40 h-460 l-70 70 v-70 h-70 a40 40 0 0 1 -40 -40 v-140 a40 40 0 0 1 40 -40z" fill="${INK.yel}" stroke="${INK.ink}" stroke-width="10"/></g></svg><div class="t" style="top:1110px;font-size:84px;color:${INK.ink};mix-blend-mode:normal;transform:scale(${e.toFixed(3)})">کامنت کن 👇</div>`; }
       return r;
     }
