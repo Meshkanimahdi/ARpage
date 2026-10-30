@@ -116,7 +116,17 @@ function camAt(t) {
   const dist = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]), dip = dist > 10 ? Math.min(.45, dist / 4200) : 0;
   const lz = mix(Math.log(z0), Math.log(z1), k) - dip * Math.sin(Math.PI * k);
   const drift = .03 * pr(t, b.a + .75, b.b);                      // the camera never sits still
-  return {x: mix(p0[0], c1[0], k), y: mix(p0[1], c1[1], k), z: Math.exp(lz) * (1 + drift)};
+  let x = mix(p0[0], c1[0], k), y = mix(p0[1], c1[1], k), z = Math.exp(lz) * (1 + drift);
+  // screen-studio punch: every moment inside a beat alternates a wide and a tight framing on where the ball works,
+  // so each idea fills the frame (closed-form ease, ~0.3 s, a move through the same world, never a cut)
+  if (b.sc.type !== 'tip' && b.sc.type !== 'hook') {
+    const ids = (window.SCENES || []).filter(sc => sc.bg.split('.')[0] === b.bt.id && sc.t0 <= t);
+    const i = ids.length - 1, t0 = i >= 0 ? ids[i].t0 : b.a, f = (j) => j % 2 ? 1 : 0;
+    const prevF = i > 0 ? f(i - 1) : 0, curF = i >= 0 ? f(i) : 0, kk = eio(pr(t, t0, t0 + .32)), pf = mix(prevF, curF, kk);
+    const [fx, fy] = contact(b, t), cx = mix(p1[0], fx, .75), cy = mix(p1[1], fy, .75);
+    if (t > b.a + .75) { x = mix(x, cx, pf); y = mix(y, cy, pf); z *= 1 + .38 * pf; }
+  }
+  return {x, y, z};
 }
 // ---- the white ball: one continuous route; lands on each station's contact point with a squash ----
 function ballAt(t) {
@@ -135,10 +145,10 @@ function contact(b, t) {
     case 'found': return [s[0] + 300, s[1] + 250];
     case 'cards': { const n = u < 1.4 ? 0 : u < 2.6 ? 1 : 2; return [s[0] + 380, s[1] - 260 + n * 230]; }
     case 'delay': return [s[0] + 300 * Math.cos(-Math.PI / 2 + 2 * Math.PI * pr(t, W(b, 'ثانیه') - .5, b.b - 1.1)), s[1] - 40 + 300 * Math.sin(-Math.PI / 2 + 2 * Math.PI * pr(t, W(b, 'ثانیه') - .5, b.b - 1.1))];
-    case 'photos': return [s[0] + 140, s[1] - 60];
+    case 'photos': return [s[0] + 40, s[1] + 500];
     case 'slider': return [s[0] - 380 + 760 * sliderK(b, t), s[1] + 60];
-    case 'hotel': return [s[0], s[1] + 330];
-    case 'gift': return [s[0] + 230, s[1] + 330];
+    case 'hotel': return [s[0] + 330, s[1] + 360];
+    case 'gift': return [s[0] + 330, s[1] + 380];
     case 'ask_ai': { const kp = keyPress(b, t); return kp ? kp : [s[0] + 300, s[1] + 330]; }
     case 'answer': return [s[0] + 380, s[1] + 330];
     case 'night': return [s[0] - 300, s[1] - 260];
@@ -210,7 +220,7 @@ function stations(t) {
     for (let i = 0; i < 9; i++) { const cx = -1720 + (i % 3) * 290, cy = 1200 + Math.floor(i / 3) * 230, pick = i === 4;
       const hue = [330, 20, 280, 200, 345, 30, 260, 10, 300][i];
       r += `<div class="a" style="left:${cx + (pick ? -40 * ex(kp) : 0)}px;top:${cy + (pick ? 120 * ex(kp) : 0)}px;width:250px;height:200px;border-radius:24px;background:linear-gradient(140deg,hsl(${hue} 55% 55%),hsl(${hue + 30} 50% 35%));transform:scale(${pick ? 1 + .25 * ex(kp) : 1});border:${pick && kp > 0 ? '6px solid #2F7BFF' : '0'}"><div style="position:absolute;left:30%;top:22%;width:40%;height:46%;border-radius:50%;background:rgba(255,255,255,.28)"></div></div>`; }
-    if (kp > .5) r += txt(-1760, 1950, '素材 图1  ←  «عکس ۱»', 50, 'var(--blue)', `opacity:${ex(pr(kp, .5, 1))}`); }
+    if (kp > .5) r += txt(-1760, 1950, 'برچسب: «عکس ۱ از کتابخونه»', 50, 'var(--blue)', `opacity:${ex(pr(kp, .5, 1))}`); }
   // SL: the slider, the ball drags the knob; the value bubble climbs to ۷۰ messages; a trust meter rises with it
   { const b = bt('slider'), k = b ? sliderK(b, t) : 0, n = Math.round(70 * k), kx = -1680 + 760 * k;
     r += box(-1760, 2620, 920, 800) + rtxt(880, 2660, 'قالب «هتل»', 60, '#fff');
@@ -225,7 +235,7 @@ function stations(t) {
     r += box(-460, 2620, 920, 820) + rtxt(-400, 2660, '🏨 رزرو هتل', 66, '#fff') + rtxt(-400, 2770, 'یه شب · دو نفر', 48, 'var(--mu)');
     r += `<div class="a" style="left:-380px;top:2880px;width:760px;height:2px;background:var(--line)"></div>` + rtxt(-400, 2910, 'پرداخت با:', 48, 'var(--mu)') + txt(-380, 2980, 'pay-link.xyz/…', 50, 'var(--blue)', '', true);
     r += `<div class="a" style="left:-260px;top:${3290 + (pressed ? 8 : 0)}px;width:520px;height:120px;border-radius:60px;background:${kpay >= 1 ? '#4ED6A0' : 'var(--blue)'};font:900 58px/120px V;text-align:center">${kpay >= 1 ? 'پرداخت شد ✓' : 'پرداخت'}</div>`;
-    if (b && t >= W(b, 'تو') - .1) r += pop(pr(t, W(b, 'تو') - .1, W(b, 'تو') + .3), `<div class="a" style="left:120px;top:2700px;padding:12px 30px 18px;border-radius:28px;background:var(--red);font:900 56px V">پولش با تو!</div>`); }
+    if (b && t >= W(b, 'تو') - .1) r += pop(pr(t, W(b, 'تو') - .1, W(b, 'تو') + .3), `<div class="a" style="left:-400px;top:3100px;padding:12px 30px 18px;border-radius:28px;background:var(--red);font:900 56px V">پولش با تو!</div>`); }
   // G: the gift test: a coffee gift card, the toggle «پول می‌ده؟» flips, check mark lands
   { const b = bt('gift'), kg = b ? pr(t, W(b, 'هدیه') - .1, W(b, 'هدیه') + .4) : 0, kt = b ? pr(t, W(b, 'پول') - .1, W(b, 'پول') + .3) : 0;
     r += box(840, 2620, 920, 820) + rtxt(-1700, 2660, 'تست هدیه', 60, '#fff');
@@ -268,7 +278,7 @@ function seek(t) {
   let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
   const b = B[bi], endOn = t >= TL.end_start;
   const c = camAt(t);
-  let w = `<svg class="a" style="left:-2400px;top:-1200px" width="4800" height="7200"><defs><pattern id="dg" width="60" height="60" patternUnits="userSpaceOnUse"><circle cx="30" cy="30" r="3" fill="#ffffff" opacity=".09"/></pattern></defs><rect width="4800" height="7200" fill="url(#dg)"/></svg>`;
+  let w = `<svg class="a" style="left:-2400px;top:-1200px" width="4800" height="7200"><defs><pattern id="dg" width="60" height="60" patternUnits="userSpaceOnUse"><circle cx="30" cy="30" r="4.5" fill="#ffffff" opacity=".2"/></pattern></defs><rect width="4800" height="7200" fill="url(#dg)"/></svg>`;
   w += stations(t);
   // the white ball: always visible inside the world after the hook's toggle click
   const [bx, by, sq] = ballAt(t);
