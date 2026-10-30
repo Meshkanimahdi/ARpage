@@ -75,5 +75,26 @@
   "score": 1,
   "voice": "PEdcOLzbXYhL8IKOswXB",
   "date": "2026-10-29"
+ },
+ "excited": {
+  "mode": "A",
+  "spoken": "excited",
+  "score": 1,
+  "voice": "N7wuKHXQQ5fKd75noieq",
+  "date": "2026-10-30"
+ },
+ "Mercor": {
+  "mode": "B",
+  "spoken": "Mercor",
+  "score": 1,
+  "voice": "N7wuKHXQQ5fKd75noieq",
+  "date": "2026-10-30"
+ },
+ "Bloomberg": {
+  "mode": "A",
+  "spoken": "Bloomberg",
+  "score": 1,
+  "voice": "N7wuKHXQQ5fKd75noieq",
+  "date": "2026-10-30"
  }
 }
