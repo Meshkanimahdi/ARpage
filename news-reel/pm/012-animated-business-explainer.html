@@ -66,7 +66,7 @@ const KEYS = {
   twist: x => [x.at('درس'), x.at('جاشونو')], ask: x => [x.at('کامنت')]
 };
 const CUES = {
-  hook: x => [[.05, 'counter_tick', .3], [.6, 'notify', .25], [.8, 'hit', .5]],
+  hook: x => [[.05, 'notify', .3], [.35, 'hit', .5], [1.0, 'counter_tick', .25]],
   who: x => [[x.a + .1, 'sweep_soft', .25], [x.at('Mercor'), 'pop', .35]],
   before: x => [[x.a + .1, 'click', .3], [x.at('ارزون'), 'counter_tick', .25]],
   now: x => [[x.at('دکتر'), 'pop', .3], [x.at('وکیل'), 'pop', .3], [x.at('مهندس'), 'pop', .3]],
@@ -81,7 +81,7 @@ window.ready = (async () => {
   S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json();
   DUR = TL.total; BB = S.beats.map(words).filter(Boolean);
   BB.forEach((x, i) => { x.a = i ? x.Lw.start - .1 : 0; x.z = i + 1 < BB.length ? BB[i + 1].Lw.start - .1 : TL.end_start; });
-  const pics = ['s01', 's02', 's03', 's04', 's05', 's06', 's07', 's08', 's10'].map(n => U('raw/' + n + '.png')).concat([U('el/' + LG())]);
+  const pics = ['s00', 's01', 's02', 's03', 's04', 's05', 's06', 's07', 's08', 's10'].map(n => U('raw/' + n + '.png')).concat([U('el/' + LG())]);
   await Promise.all(pics.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = u; })));
   await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'دلار Mercor')));
   BB.forEach(x => { x.keys = (KEYS[x.s.type] || (() => []))(x).filter(v => v > x.a + .6 && v < x.z - .6).sort((p, q) => p - q); });
@@ -141,7 +141,7 @@ function cur(t, path) { let i = 0; for (let j = 0; j < path.length; j++) if (t >
   const p = path[i], q = path[Math.min(i + 1, path.length - 1)], m = q === p ? 0 : io(T(t, p[0] + .1, q[0]));
   let pr = 0; for (const c of path) if (c[3]) pr = Math.max(pr, Math.exp(-((t - c[0]) ** 2) / .006)); return curs(L(p[1], q[1], m), L(p[2], q[2], m), pr); }
 function money(x0, y0, w, k) { // ticker strip of hourly earnings
-  return `<div class="a" style="left:${x0}px;top:${y0}px;width:${w}px;height:90px;border-radius:45px;background:var(--ink);overflow:hidden;opacity:${K(k * 3).toFixed(2)}"><div class="a" style="left:${(-(NOW * 220) % 600).toFixed(0)}px;top:14px;white-space:nowrap;font:900 52px V;color:#7CF0A9;direction:ltr">+$110 · +$120 · +$170 · +$400 · +$110 · +$120 · +$170 · +$400 · +$110 · +$120</div></div>`; }
+  return `<div class="a" style="left:${x0}px;top:${y0}px;width:${w}px;height:90px;border-radius:45px;background:var(--ink);overflow:hidden;opacity:${K(k * 3).toFixed(2)}"><div class="a" style="left:${(-(NOW * 220) % 600).toFixed(0)}px;top:14px;white-space:nowrap;font:900 52px V;color:#7CF0A9;direction:ltr">MAX $400 · $170 · $120 · AVG $110 · MAX $400 · $170 · $120 · AVG $110</div></div>`; }
 
 // ---------- captions: spoken words in chunks of ≤ 4, cream pill with ink type, accent in green ----------
 function cap(x, t) {
@@ -160,13 +160,13 @@ function scene(x, t) {
     case 'hook': {
       // frame 0: the lawyer photo full-bleed (face fully in frame), pushing in; the headline with the subject from frame 0;
       // the rate card counts $0 → $400 in 0.8 s and slams; at 0.6 s the twist chip; at 0.3 s the earnings ticker runs
-      const z = L(1.0, 1.1, io(T(t, 0, 2.6))), kr = T(t, 0, .8), slam = t > .8 && t < 1 ? 1 + .12 * (1 - T(t, .8, 1)) : 1;
-      return `<div class="a" style="inset:0;transform:scale(${z.toFixed(4)});transform-origin:520px 600px"><img src="${U('raw/s01.png')}" style="position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover;object-position:50% 0%"></div>` +
+      const z = L(1.18, 1.0, ex(T(t, 0, 1.2))), kr = T(t, 0, .8), slam = t > .35 && t < .6 ? 1 + .25 * (1 - T(t, .35, .6)) : 1;
+      return `<div class="a" style="inset:0;transform:scale(${z.toFixed(4)});transform-origin:520px 400px;filter:none"><img src="${U('raw/s00.png')}" style="position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover;object-position:50% 0%"></div>` +
         `<div class="a" style="left:0;right:0;top:920px;height:1000px;background:linear-gradient(rgba(246,241,231,0),rgba(246,241,231,.95) 20%,var(--cr))"></div>` +
         `<div class="a" style="left:30px;right:30px;top:1080px;text-align:center;font-size:104px;line-height:1.2"><div>شرکت‌های AI به وکیل‌ها</div><div>ساعتی تا <span style="display:inline-block;padding:0 24px 12px;border-radius:24px;background:var(--g);color:#fff;transform:scale(${slam.toFixed(3)})">${fa(400)} دلار</span> می‌دن</div></div>` +
         `<div class="a" style="left:0;right:0;top:1360px;text-align:center"><span style="display:inline-block;padding:8px 34px 18px;border-radius:24px;background:var(--ink);color:#fff;font:900 52px V">برای درس دادن به AI</span></div>` +
         (t > .3 ? money(90, 1480, 900, T(t, .3, .7)) : '') +
-        tag(90, 220, 60, 'همون AI که شاید یه روز جاشونو بگیره؟', t, .6, 'var(--rd)', '#fff');
+        tag(90, 220, 60, 'همون AI که شاید یه روز جاشونو بگیره؟', t, -1, 'var(--rd)', '#fff');
     }
     case 'who': {
       const k1 = pp(t, A + .05), km = pp(t, at('Mercor') - .05), kc = T(t, A + .3, at('Mercor'));
@@ -210,7 +210,7 @@ function scene(x, t) {
     case 'proof': {
       const D2 = [['وکیل حقوق مدنی', 400, A + .1, 'var(--g)'], ['متخصص فیزیک', 170, at('فیزیک') - .1, 'var(--ink)'], ['برنامه‌نویس', 120, at('برنامه‌نویس') - .1, 'var(--vi)']];
       return ground() + `<div class="a" style="left:0;right:0;top:200px;text-align:center">${up('<span dir="ltr">Bloomberg</span> · سقف ساعتی آگهی‌ها', T(t, A, A + .4), 64)}</div>` +
-        D2.map(([l, v, t0, col], i) => { const k = T(t, t0, t0 + .9), w = 820 * v / 400 * ex(k);
+        D2.map(([l, v, t0, col], i) => { const k = T(t, t0, t0 + .9), w = 820 * v / 400 * ex(k); if (k <= 0) return `<div class="a" style="left:130px;top:${420 + i * 300}px;font:900 50px V;color:#C9C2B4">${l}</div><div class="a" style="left:130px;top:${490 + i * 300}px;width:820px;height:120px;border-radius:24px;border:5px dashed #D6CFC1;box-sizing:border-box"></div>`;
           return `<div class="a" style="left:130px;top:${420 + i * 300}px;font:900 50px V">${l}</div>` +
             `<div class="a" style="left:130px;top:${490 + i * 300}px;width:${w.toFixed(0)}px;height:120px;border-radius:24px;background:${col}"></div>` +
             (w > 520 ? `<div class="a" style="left:${(130 + w - 330).toFixed(0)}px;top:${500 + i * 300}px;width:300px;text-align:right;font:900 90px V;color:#fff;direction:ltr">$${num(v, k)}</div>` : `<div class="a" style="left:${(150 + Math.max(w, 10)).toFixed(0)}px;top:${495 + i * 300}px;font:900 96px V;color:${col};direction:ltr">$${num(v, k)}</div>`); }).join('') +
