@@ -96,5 +96,47 @@
   "score": 1,
   "voice": "N7wuKHXQQ5fKd75noieq",
   "date": "2026-10-30"
+ },
+ "Google": {
+  "mode": "C",
+  "spoken": "گوگِل",
+  "score": 1,
+  "voice": "xKk80LgyXTAl6McCiFke",
+  "date": "2026-10-30"
+ },
+ "playful": {
+  "mode": "A",
+  "spoken": "playful",
+  "score": 1,
+  "voice": "xKk80LgyXTAl6McCiFke",
+  "date": "2026-10-30"
+ },
+ "surprised": {
+  "mode": "A",
+  "spoken": "surprised",
+  "score": 1,
+  "voice": "xKk80LgyXTAl6McCiFke",
+  "date": "2026-10-30"
+ },
+ "Gemini": {
+  "mode": "C",
+  "spoken": "جِمِنای",
+  "score": 1,
+  "voice": "xKk80LgyXTAl6McCiFke",
+  "date": "2026-10-30"
+ },
+ "Google AI Ultra": {
+  "mode": "C",
+  "spoken": "گوگِل اِی‌آی اولْترا",
+  "score": 1,
+  "voice": "xKk80LgyXTAl6McCiFke",
+  "date": "2026-10-30"
+ },
+ "Genie 4": {
+  "mode": "B",
+  "spoken": "Genie 4",
+  "score": 1,
+  "voice": "xKk80LgyXTAl6McCiFke",
+  "date": "2026-10-30"
  }
 }

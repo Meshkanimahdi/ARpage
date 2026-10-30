@@ -98,21 +98,40 @@ window.ready = (async () => {
     B.push({bt, sc: bt.scene || {}, L, words, wt, kis, kt: kis.map(wt)});
   }
   B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
-  await Promise.all([S.logo || 'pinterest.png', ...S.beats.map(b => (b.scene || {}).photo).filter(Boolean)].map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + f); })));
-  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'آرایشگرها Beauty')));
+  await Promise.all([S.logo || 'pinterest.png', ...(S.preload || []), ...S.beats.map(b => (b.scene || {}).photo).filter(Boolean)].map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + f); })));
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'دنیای بازی Genie')));
   window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
   const SC = [];
   for (const b of B) {
     const pts = [b.a, ...b.kt.filter(h => h > b.a + .9 && h < b.b - .9)];
     if (b.sc.extra_hits) b.sc.extra_hits.forEach(j => { const h = b.wt(j); if (h > b.a + .9 && h < b.b - .9) pts.push(h); });
     const ps = [...new Set(pts.map(x => +x.toFixed(2)))].sort((p, q) => p - q);
-    ps.forEach((p, i) => SC.push({t0: p, t1: i + 1 < ps.length ? ps[i + 1] : b.b, type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: i ? [[p, 'hit', .35]] : [[p, 'whoosh', .3]]}));
+    ps.forEach((p, i) => SC.push({t0: p, t1: i + 1 < ps.length ? ps[i + 1] : b.b, type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: i ? [[p, 'pop', .3]] : (SFX[b.sc.type] || (() => [[p, 'pop', .3]]))(b, p)}));
   }
-  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .2, 'hit', .5]]});
+  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .2, 'shimmer', .45]]});
+  SC.forEach(c => c.sfx = c.sfx.filter(x => x[0] < c.t1 + .5));
   window.SCENES = SC;
   for (const s of SC) if (s.t1 - s.t0 > 3.2) ISSUES.push(`idea ${s.bg} holds ${(s.t1 - s.t0).toFixed(1)} s (> 3): add a hit`);
   seek(0);
 })();
+// motion-matched sound cues per scene (STORY_SPEC "Sound design"): typing for the prompt box, taps for keys and buttons,
+// a shimmer when a world is revealed, ticks for counters, a hit for the ×2 stamp; never a whoosh on every cut
+const SFX = {
+  hook: (b, p) => [[.05, 'typing', .35], [.6, 'tap', .4], [1.0, 'shimmer', .35], [1.1, 'tap', .4]],
+  type: (b, p) => [[p + .05, 'pop', .3], [W(b, 'پیست') - .2, 'typing', .4], [Math.min(b.b - .5, W(b, 'پیست') + 1.1), 'click', .45]],
+  reveal: (b, p) => [[p + .02, 'glass_ping', .4], [W(b, 'واقعی'), 'pop', .3]],
+  walk: (b, p) => [[p + .05, 'tap', .4], [W(b, 'راه'), 'tap', .4], [W(b, 'دوربین'), 'sweep_soft', .3]],
+  steer: (b, p) => [[W(b, 'بارون') - .3, 'typing', .4], [W(b, 'بارون') + .4, 'sweep_soft', .3]],
+  steer2: (b, p) => [[p + .05, 'pop', .3], [W(b, 'زاویه'), 'click', .35], [W(b, 'آدم'), 'pop', .35]],
+  sound: (b, p) => [[W(b, 'صدا'), 'shimmer', .35], [W(b, 'دیالوگ'), 'notify', .35]],
+  minutes: (b, p) => [[p + .1, 'counter_tick', .35], [W(b, 'برابر'), 'hit', .45]],
+  director: (b, p) => [[p + .05, 'glass_ping', .35], [W(b, 'قدم'), 'tap', .35], [W(b, 'فریم'), 'sweep_soft', .3]],
+  uses: (b, p) => [[W(b, 'بازی'), 'pop', .35], [W(b, 'آموزش'), 'pop', .3], [W(b, 'ربات'), 'pop', .35]],
+  film: (b, p) => [[W(b, 'طرح'), 'click', .45], [p + .4, 'tap', .3]],
+  limits: (b, p) => [[W(b, 'کامل'), 'bass_drop', .4], [W(b, 'جزئیات'), 'hit', .4]],
+  access: (b, p) => [[p + 1.1, 'click', .45], [W(b, 'مشترک'), 'shimmer', .35]],
+  ask: (b, p) => [[p + .05, 'typing', .3], [W(b, 'کامنت'), 'notify', .4]],
+};
 function seek(t) {
   if (!B.length) return;
   let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
@@ -128,7 +147,7 @@ function seek(t) {
 }
 function caption(b, t, endOn) {
   const sub = $('sub');
-  if (endOn || t > b.L.end + .3) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  if (endOn || t > b.L.end + .3 || (b.sc.type === 'hook' && t < b.wt(6) - .05)) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
   let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
   const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + c0;
   if (sub._k !== key) { sub._k = key; const lat = w => /^[«]?[A-Za-z0-9.\-]+[،,.!?؟…؛»]*$/.test(w.w); const gs = [];
@@ -167,191 +186,206 @@ function phone(x, y, w, inner, k = 1) {
 }
 const chip = (x, y, txt, bg, fg, size, k, rot = 0, ltr = false) => { const e = spring(k);
   return `<div style="position:absolute;left:${x}px;top:${y}px;padding:${size * .2}px ${size * .5}px ${size * .32}px;border-radius:${size * .4}px;background:${bg};color:${fg};font:900 ${size}px V;white-space:nowrap;box-shadow:10px 10px 0 ${INK.ink};transform:rotate(${rot}deg) scale(${e.toFixed(3)});transform-origin:50% 50%;opacity:${cl(k * 4)}" ${ltr ? 'dir="ltr"' : ''}>${txt}</div>`; };
+// ---- Genie 4 props (REEL-021), all vector except the official Google DeepMind stills ----
+const W = (b, s) => { const i = b.words.findIndex(w => w.w.includes(s)); return b.wt(i < 0 ? 0 : i); };   // time of the word that says s
+const elimg = (f) => U('el/' + f);
+// an official still printed into a riso frame: ink shadow, paper border, slow push, optional mask reveal (k) from a point
+function photoCard(src, x, y, w, h, rot, z, pos = '50% 50%', k = 1, o = 1) {
+  const e = spring(k);
+  return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${rot}deg) scale(${e.toFixed(3)});opacity:${o};box-shadow:16px 16px 0 ${INK.ink};border:10px solid #FFFDF8;border-radius:28px;overflow:hidden;background:#000"><img src="${elimg(src)}" style="width:100%;height:100%;object-fit:cover;object-position:${pos};transform:scale(${z.toFixed(3)})"></div>`;
+}
+// full-bleed still with a push-in
+const bleed = (src, z, pos = '50% 50%', extra = '') => `<div style="position:absolute;inset:0;overflow:hidden;background:#000"><img src="${elimg(src)}" style="width:100%;height:100%;object-fit:cover;object-position:${pos};transform:scale(${z.toFixed(4)});${extra}"></div>`;
+// the through-line object: the prompt box with its text cursor (the cursor becomes the Genie mark on the end card)
+function promptBox(x, y, w, label, txt, k, t, blink = true, ltr = true) {
+  const e = spring(k), n = Math.round(txt.length * cl(k * 1.6 - .2)), shown = txt.slice(0, n), on = !blink || Math.floor(t * 2.4) % 2 === 0;
+  return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;transform:scale(${e.toFixed(3)});transform-origin:50% 50%;opacity:${cl(k * 5)}">
+    <div style="background:#FFFDF8;border:8px solid ${INK.ink};border-radius:34px;box-shadow:14px 14px 0 ${INK.pink};padding:22px 34px 30px">
+      <div dir="ltr" style="font:600 36px V;color:${INK.blue};text-align:left">${label}</div>
+      <div ${ltr ? 'dir="ltr"' : ''} style="font:900 58px/1.25 V;color:${INK.ink};text-align:${ltr ? 'left' : 'right'};white-space:nowrap">${shown}<span style="display:inline-block;width:8px;height:62px;margin:0 4px;vertical-align:-10px;background:${INK.red};opacity:${on ? 1 : 0}"></span></div></div></div>`;
+}
+// arrow-key cluster; the key whose name is in `act` is pressed
+function keys(x, y, s, act, t) {
+  const K = {up: [70, 0, 'M0 14 L-16 -6 L16 -6Z'], left: [0, 74, 'M-14 0 L6 -16 L6 16Z'], down: [70, 74, 'M0 14 L-16 -6 L16 -6Z'], right: [140, 74, 'M14 0 L-6 -16 L-6 16Z']};
+  let r = '';
+  for (const [n, [kx, ky, d]] of Object.entries(K)) { const p = act === n ? 1 : 0;
+    r += `<g transform="translate(${kx} ${ky + p * 8})"><rect x="0" y="${p ? 0 : 8}" width="64" height="64" rx="14" fill="${INK.ink}"/><rect x="0" y="0" width="64" height="64" rx="14" fill="${p ? INK.yel : '#FFFDF8'}" stroke="${INK.ink}" stroke-width="5"/><path d="${d}" transform="translate(32 32) rotate(${n === 'up' ? 180 : n === 'down' ? 0 : 0})" fill="${INK.ink}"/></g>`; }
+  return `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(${x} ${y}) scale(${s})">${r}</g></svg>`;
+}
+const logoChip = (x, y, d, f, k, label = '', ltr = true) => { const e = spring(k);
+  return `<div style="position:absolute;left:${x}px;top:${y}px;display:flex;align-items:center;gap:18px;padding:14px 30px 14px 14px;border-radius:${d}px;background:#FFFDF8;border:6px solid ${INK.ink};box-shadow:10px 10px 0 ${INK.ink};transform:scale(${e.toFixed(3)});opacity:${cl(k * 5)}" dir="ltr"><img src="${elimg(f)}" style="width:${d}px;height:${d}px;object-fit:contain">${label ? `<span style="font:900 ${Math.round(d * .55)}px V;color:${INK.ink}">${label}</span>` : ''}</div>`; };
+// waveform track that draws on (seeded, pure function of t)
+function wave(x, y, w, h, col, k, t, seed) {
+  let p = ''; const n = 46;
+  for (let i = 0; i < n * cl(k); i++) { const a = Math.abs(Math.sin(i * 1.7 + seed) * Math.cos(i * .37 + seed * 2)) * (.45 + .55 * Math.abs(Math.sin(t * 6 + i * .5 + seed))); const bh = 8 + a * h;
+    p += `<rect x="${x + i * (w / n)}" y="${y - bh / 2}" width="${w / n * .62}" height="${bh}" rx="4" fill="${col}"/>`; }
+  return p;
+}
+const bigT = (txt, y, size, col, k, sh = INK.pink) => `<div class="t" style="top:${y}px;font-size:${size}px;color:${col};mix-blend-mode:normal;text-shadow:8px 8px 0 ${sh};transform:scale(${spring(k).toFixed(3)});opacity:${cl(k * 5)}">${txt}</div>`;
 function scene(b, t, u, si, off) {
-  const s = b.sc, kt = b.kt, A = b.a;
+  const s = b.sc, kt = b.kt, A = b.a, B1 = b.b;
   let r = blocks(si, pr(t, (window.SCENES[si] || {}).t0 || 0, ((window.SCENES[si] || {}).t0 || 0) + .5), t);
   switch (s.type) {
     case 'hook': {
-      // call-out stamped from frame 0, pins flying in; then the old line «شبیه این عکس؟» that the red dot punches through
-      const t1 = kt[0];
-      if (t < t1 - .05) {
-        // payoff first: a big Pin, the red dot hits it and unfolds a salon guide with the stylist's words — inside the first second
-        const k = b.i === 0 ? cl(.55 + u * 1.2) : pr(t, A, A + .4), dy = Math.sin(t * 2) * 10;
-        if (s.photo && t < A + 1.5) {
-          // opening: the real-looking salon moment (the client holding her inspiration photo); the red dot taps her phone,
-          // the camera whips into the phone screen and match-cuts to the Pin card below
-          const z = mix(1, 2.7, Math.pow(pr(t, A + .75, A + 1.5), 2.2)), S2 = 2.7 * z, Fx = mix(400, 210, ex(pr(t, A + .5, A + 1.2))), Fy = mix(370, 340, ex(pr(t, A + .5, A + 1.2)));
-          const ox = 540 - Fx * S2, oy = 900 - Fy * S2, px = ox + 210 * S2, py = oy + 340 * S2, bl = 8 * pr(t, A + 1.1, A + 1.5);
-          let q = `<div style="position:absolute;inset:0;overflow:hidden;background:#000"><img src="${U('el/' + s.photo)}" style="position:absolute;left:${ox.toFixed(1)}px;top:${oy.toFixed(1)}px;width:${(1080 * S2).toFixed(1)}px;height:${(780 * S2).toFixed(1)}px;filter:blur(${bl.toFixed(1)}px)"></div>`;
-          q += `<div style="position:absolute;left:0;right:0;top:0;height:420px;background:linear-gradient(#000c,#0000)"></div>`;
-          const tdot = A + .45; if (t >= tdot) { const kd = ex(pr(t, tdot, tdot + .35)); q += dot(mix(1180, px, kd), mix(300, py, kd), 46 + 10 * spring(pr(t, tdot + .35, tdot + .6))); }
-          return q + `<div class="t" style="top:120px;font-size:200px;color:#fff;mix-blend-mode:normal;text-shadow:10px 10px 0 ${INK.pink}">آرایشگرها!</div>`;
-        }
-        r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(330 ${880 + dy}) rotate(-6)"><rect x="-252" y="-332" width="520" height="680" rx="36" fill="${INK.ink}"/>${hairArt(-270, -350, 520, 680, 0)}</g></svg>`;
-        const td = s.photo ? A + 1.55 : .35, tg = s.photo ? A + 1.75 : .8, fx = mix(1200, 520, ex(pr(t, td - .3, td))), fy = mix(400, 640, ex(pr(t, td - .3, td)));
-        const g = ex(pr(t, tg - .1, tg + .35));
-        if (t < tg) r += dot(fx, fy, 70);
-        else { const w = mix(140, 470, g), hh = mix(140, 640, g), x = 560, y = 620;
-          r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="rotate(5 ${x + w / 2} ${y + hh / 2})"><rect x="${x + 14}" y="${y + 14}" width="${w}" height="${hh}" rx="30" fill="${INK.ink}"/><rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="30" fill="#FFFDF8"/><rect x="${x}" y="${y}" width="${w}" height="${mix(140, 110, g)}" rx="30" fill="${INK.red}"/></g></svg>`;
-          if (g > .7) [['balayage', INK.pink], ['root melt', INK.yel], ['almond', INK.blue]].forEach(([w2, c], q) => { const tq = tg + .25 + q * .2; if (t >= tq) r += chip(610, 780 + q * 150, w2, c, q === 2 ? '#fff' : INK.ink, 66, pr(t, tq, tq + .3), 5, true); }); }
-        const tx = b.wt(1); if (t >= tx - .05) r += chip(120, 1290, 'مشتریِ بعدی‌تون…', INK.yel, INK.ink, 92, pr(t, tx - .05, tx + .35), -3);
-        return r + type('آرایشگرها!', 150, 230, INK.blue, INK.pink, k, off);
-      }
-      const k = pr(t, t1 - .05, t1 + .35), tp = t1 + .55, hit = t >= tp;
-      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(540 1000) rotate(-4) scale(${spring(k).toFixed(3)}) translate(-540 -1000)">${hairArt(290, 700, 500, 640, 0)}</g></svg>`;
-      const split = hit ? ex(pr(t, tp, tp + .35)) * 80 : 0;
-      r += `<div style="position:absolute;inset:0;clip-path:inset(0 0 50% 0);transform:translateY(${-split}px)">${type('شبیه این عکس؟', 330, 150, INK.ink, INK.pink, k * 1.4, off)}</div>`;
-      r += `<div style="position:absolute;inset:0;clip-path:inset(50% 0 0 0);transform:translateY(${split}px)">${type('شبیه این عکس؟', 330, 150, INK.ink, INK.pink, k * 1.4, off)}</div>`;
-      // the through-line object: the red Guide dot flies in and punches through the line
-      const fx = mix(-120, 540, ex(pr(t, t1 + .2, tp))), fy = mix(560, 420, ex(pr(t, t1 + .2, tp)));
-      if (t >= t1 + .2) r += dot(fx, fy, hit ? 70 + 20 * spring(pr(t, tp, tp + .4)) : 60);
-      if (hit) r += svg2(`<path d="M 200 430 L 880 410" stroke="${INK.red}" stroke-width="22" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(t, tp, tp + .3))).toFixed(3)}"/>`);
+      // frame 0: the official neon-city world full-bleed, the headline huge from frame 0, the prompt box already typing,
+      // arrow keys tapping with a camera nudge; the Genie mark springs in at 1.0 s
+      const tap1 = .6, tap2 = 1.1, nud = (t >= tap1 ? 18 * ex(pr(t, tap1, tap1 + .4)) : 0) - (t >= tap2 ? 30 * ex(pr(t, tap2, tap2 + .4)) : 0);
+      const z = 1.0 + .12 * io(pr(t, 0, 2.2)) + .04 * io(pr(t, 2.2, B1)), rv = ex(pr(t, .25, .95));
+      // the world renders out of the prompt: a soft grey draft from frame 0, a sharp colour pass grows from the cursor
+      r = bleed(s.photo, z, `${50 + nud / 12}% 50%`, 'filter:blur(4px) grayscale(.4) brightness(1.15)');
+      r += `<div style="position:absolute;inset:0;clip-path:circle(${(40 + 1900 * rv).toFixed(0)}px at 430px 1250px)">${bleed(s.photo, z, `${50 + nud / 12}% 50%`)}</div>`;
+      r += `<div style="position:absolute;left:0;right:0;top:0;height:640px;background:linear-gradient(rgba(29,26,47,.8),rgba(29,26,47,.4) 65%,rgba(29,26,47,0))"></div>`;
+      r += `<div class="t" style="top:250px;font-size:124px;color:#fff;mix-blend-mode:normal;text-shadow:7px 7px 0 ${INK.pink}"><span dir="ltr">Google</span> با یه جمله</div>`;
+      r += `<div class="t" style="top:405px;font-size:124px;color:#fff;mix-blend-mode:normal;text-shadow:7px 7px 0 ${INK.blue}"><span style="background:${INK.yel};color:${INK.ink};padding:0 .16em .06em;border-radius:.14em;text-shadow:none">دنیای بازی</span> می‌سازه</div>`;
+      r += promptBox(110, 1170, 860, 'Describe a world', 'A neon city at night', cl(.5 + u * .9), t);
+      r += keys(760, 960, 1.4, t >= tap2 && t < tap2 + .25 ? 'left' : t >= tap1 && t < tap1 + .25 ? 'up' : t > 2.2 && Math.floor(t * 2) % 3 === 0 ? 'right' : '', t);
+      r += logoChip(90, 1000, 96, 'genie.png', pr(t, 1.0, 1.4), 'Genie 4');
       return r;
     }
-    case 'hook2': {
-      // frame 0: a huge two-line promise over a bright, large real subject (face + whole hairstyle + her inspiration photo);
-      // the Pinterest «Get the Guide» tap is secondary; at ~1.2 s the time · cost · upkeep card slams in; then the call-out
-      const t1 = kt[0], t2 = s.extra_hits ? b.wt(s.extra_hits[0]) : t1 + 1.5;
-      const tap = A + .4, slam = A + 1.2;
-      const card = (kk) => { const e = spring(kk), y = mix(1920, 990, ex(kk));
-        let q = `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(0 ${(y - 990).toFixed(1)}) rotate(${(-3 + 3 * e).toFixed(2)} 540 1200)"><rect x="96" y="1006" width="920" height="430" rx="36" fill="${INK.ink}"/><rect x="80" y="990" width="920" height="430" rx="36" fill="#FFFDF8"/><rect x="80" y="990" width="920" height="100" rx="36" fill="${INK.red}"/>`;
-        [INK.yel, INK.pink, INK.green].forEach((c, i) => { const ki = ex(pr(kk, .1 + i * .12, .4 + i * .12));
-          q += `<rect x="120" y="${1108 + i * 102}" width="${(840 * ki).toFixed(1)}" height="88" rx="44" fill="${c}"/><path d="M 150 ${1150 + i * 102} l 22 22 l 40 -48" stroke="${INK.ink}" stroke-width="14" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(kk, .3 + i * .12, .55 + i * .12))).toFixed(3)}"/>`; });
-        q += `</g></svg><div dir="ltr" style="position:absolute;left:120px;top:${(y + 14).toFixed(1)}px;font:900 62px V;color:#fff">Beauty Guide</div>`;
-        ['زمان', 'هزینه', 'نگهداری'].forEach((w, i) => { const ki = ex(pr(kk, .15 + i * .12, .45 + i * .12)); q += `<div style="position:absolute;right:120px;top:${(y + 112 + i * 102).toFixed(1)}px;font:900 66px/1.2 V;color:${INK.ink};opacity:${ki.toFixed(2)}">${w}</div>`; });
-        return q; };
-      if (t < t2 - .05) {
-        const z = 1.0 + .06 * io(pr(t, A, t2));
-        r = `<div style="position:absolute;inset:0;background:#FFE6F2"></div>` + blocks(si, 1, t).replace('opacity=".32"', 'opacity=".18"');
-        r += `<div style="position:absolute;left:30px;top:450px;width:1020px;height:950px;border-radius:44px;overflow:hidden;box-shadow:16px 16px 0 ${INK.ink}"><img src="${U('el/' + s.photo)}" style="width:100%;height:100%;object-fit:cover;object-position:18% 40%;transform:scale(${z.toFixed(3)});transform-origin:45% 35%"></div>`;
-        r += logo(110, 530, 96, 1);
-        const press = t >= tap ? Math.exp(-10 * (t - tap)) : 0, bk = t < slam ? 1 : 1 - ex(pr(t, slam, slam + .3));
-        if (bk > .02) r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(800 1300) scale(${(.8 * bk * (1 - .14 * press)).toFixed(3)})"><rect x="-230" y="-62" width="460" height="124" rx="62" fill="${INK.red}"/><text x="0" y="20" text-anchor="middle" font-family="V" font-weight="900" font-size="54" fill="#fff">Get the Guide</text></g></svg>` + cursor(860, 1310, t, tap);
-        if (t >= slam) r += card(pr(t, slam, slam + .55));
-        // the promise, huge and readable from frame 0; replaced by «چقدر خرج؟» on the keyword
-        if (t < t1 - .05) r += `<div class="t" style="top:120px;font-size:124px;color:${INK.ink};mix-blend-mode:normal">عکس مدل مو بده،</div><div class="t" style="top:275px;font-size:124px;color:${INK.ink};mix-blend-mode:normal"><span style="background:${INK.red};color:#fff;padding:0 .18em .05em;border-radius:.15em">قیمتش</span> رو بگیر</div>`;
-        else { const k2 = pr(t, t1 - .05, t1 + .3); r += `<div class="t" style="top:150px;font-size:150px;color:${INK.red};mix-blend-mode:normal;text-shadow:8px 8px 0 ${INK.ink};transform:scale(${spring(k2).toFixed(3)})">چقدر خرج؟</div>`; }
-        return r;
-      }
-      r += card(1);
-      r += `<div style="position:absolute;left:140px;top:300px;width:420px;height:525px;border-radius:30px;overflow:hidden;box-shadow:12px 12px 0 ${INK.ink};transform:rotate(-5deg)"><img src="${U('el/' + s.photo)}" style="width:100%;height:100%;object-fit:cover;object-position:40% 30%"></div>`;
-      r += chip(560, 520, 'مشتریِ بعدی‌تون', INK.yel, INK.ink, 76, pr(t, t2 + .15, t2 + .5), 4);
-      return r + type('آرایشگرها!', 140, 190, INK.blue, INK.pink, pr(t, t2 - .05, t2 + .3), off);
-    }
-    case 'brand': {
-      // the red dot grows into the real logo; the product name prints in passes
-      const t1 = kt[0], g = spring(.6 + pr(t, A, A + .4));
-      r += dot(540, 640, 90 + 150 * g) + logo(540, 640, 300 * g, pr(t, A, A + .2));
-      r += type(S.brand, 930, 120, INK.ink, INK.yel, pr(t, A, A + .4), off, true) + (t < t1 - .05 ? type('هوش مصنوعیِ تازه', 1110, 110, INK.red, INK.pink, pr(t, A + .1, A + .5), off) : '');
-      if (t >= t1 - .05) { const k = pr(t, t1 - .05, t1 + .4); r += type('BEAUTY', 1090, 190, INK.pink, INK.blue, k, off, true) + type('GUIDES', 1270, 190, INK.blue, INK.pink, pr(t, t1 + .1, t1 + .55), [-off[0], -off[1]], true); }
+    case 'type': {
+      // rebuilt Project Genie input card: Environment field types «A backyard race track.», mode chips light, cursor clicks Create
+      const t1 = W(b, 'پیست'), tc = Math.min(B1 - .5, t1 + 1.1);
+      r += bigT('یه جمله تایپ کن', 250, 112, INK.ink, pr(t, A, A + .4), INK.yel);
+      r += promptBox(90, 560, 900, 'Environment', 'A backyard race track.', pr(t, t1 - .3, t1 + .9), t);
+      r += promptBox(90, 860, 900, 'Character', 'A blue sports car', pr(t, A + .3, A + 1.2), t, false);
+      ['Third person', 'Real-time', 'Audio on'].forEach((c, i) => { const tq = A + .9 + i * .25; if (t >= tq) r += chip(90 + i * 310, 1160, c, [INK.yel, INK.pink, INK.green][i], INK.ink, 46, pr(t, tq, tq + .3), 0, true); });
+      const bx = 700, by = 1290, press = t >= tc ? Math.exp(-10 * (t - tc)) : 0;
+      r += `<div dir="ltr" style="position:absolute;left:${bx}px;top:${by}px;padding:16px 46px 22px;border-radius:50px;background:${INK.red};color:#fff;font:900 56px V;box-shadow:10px 10px 0 ${INK.ink};transform:scale(${1 - .12 * press})">Create ↵</div>`;
+      r += cursor(mix(560, bx + 150, ex(pr(t, tc - .8, tc))), mix(1500, by + 40, ex(pr(t, tc - .8, tc))), t, tc);
       return r;
     }
-    case 'grid': {
-      // the real flow rebuilt as vectors: a masonry grid of Pins, a tap opens one, a tap on the red «Get the Guide»
-      const tOpen = b.wt(7), t1 = kt[0], W = 560, X = 260, Y = 220, open = ez2(pr(t, tOpen, tOpen + .45));
-      let inner = '';
-      const cards = [[24, 140, 248, 330, 'h'], [288, 140, 248, 250, 'n'], [24, 486, 248, 260, 'n'], [288, 406, 248, 340, 'h'], [24, 762, 248, 300, 'h'], [288, 762, 248, 300, 'n']];
-      cards.forEach(([x, y, w, h, kind], i) => { if (i === 0 && open > 0) return; const e = spring(pr(t, A + i * .08, A + i * .08 + .4));
-        inner += `<g transform="translate(${x + w / 2} ${y + h / 2}) scale(${e.toFixed(3)}) translate(${-x - w / 2} ${-y - h / 2})">${kind === 'h' ? hairArt(x, y, w, h, i) : nailArt(x, y, w, h, i)}</g>`; });
-      inner += `<text x="${W / 2}" y="100" text-anchor="middle" font-family="V" font-weight="900" font-size="40" fill="${INK.ink}">Beauty</text>`;
-      if (open > 0) { const x = mix(24, 0, open), y = mix(140, 0, open), w = mix(248, W, open), h = mix(330, W * 2.05, open);
-        inner += hairArt(x, y, w, h * .78, 0);
-        const bk = spring(pr(t, tOpen + .3, tOpen + .7)), press = t >= t1 ? Math.exp(-8 * (t - t1)) : 0;
-        inner += `<g transform="translate(${W / 2} ${W * 2.05 * .88}) scale(${(bk * (1 - .12 * press)).toFixed(3)})"><rect x="-210" y="-56" width="420" height="112" rx="56" fill="${INK.red}"/><text x="0" y="16" text-anchor="middle" font-family="V" font-weight="900" font-size="46" fill="#fff">Get the Guide</text></g>`; }
-      r += phone(X, Y, W, inner, pr(t, A, A + .4));
-      const p0 = [900, 1500], p1 = [X + 140, Y + 300], p2 = [X + W / 2 + 60, Y + W * 2.05 * .88 + 10];
-      const m1 = ex(pr(t, A + .3, tOpen - .05)), m2 = ex(pr(t, tOpen + .5, t1 - .05));
-      const cx = t < tOpen + .5 ? mix(p0[0], p1[0], m1) : mix(p1[0], p2[0], m2), cy = t < tOpen + .5 ? mix(p0[1], p1[1], m1) : mix(p1[1], p2[1], m2);
-      r += cursor(cx, cy, t, t >= t1 - .05 ? t1 : tOpen);
-      if (t >= t1 + .1) r += type('Get the Guide', 60, 120, INK.red, INK.pink, pr(t, t1 + .1, t1 + .5), off, true);
+    case 'reveal': {
+      // the world grows out of the Create point as an expanding mask (nothing appears from nothing), then a push-in;
+      // the official race-track still is shown whole (its own real Project Genie UI) in a big card
+      const k = ex(pr(t, A, A + .7)), rad = mix(30, 1300, k), z = 1.0 + .08 * io(pr(t, A, B1)), tw = W(b, 'واقعی');
+      r += `<div style="position:absolute;inset:0;clip-path:circle(${rad.toFixed(0)}px at 820px 1000px)">${photoCard(s.photo, 30, 640, 1020, 574, -1.5, z, '50% 50%')}</div>`;
+      r += bigT('همون لحظه', 250, 120, INK.ink, pr(t, A + .3, A + .7), INK.yel);
+      if (t >= tw - .05) r += chip(330, 430, 'واقعی‌نما', INK.pink, INK.ink, 90, pr(t, tw - .05, tw + .3), -3);
+      r += logoChip(90, 1270, 80, 'genie.png', pr(t, A + .4, A + .8), 'Genie 4');
+      r += keys(780, 1250, 1, Math.floor(t * 2.5) % 4 === 0 ? 'up' : '', t);
       return r;
     }
-    case 'scan': {
-      // AI reads the look: a scan bar sweeps the Pin, tags pop where it finds hair cut, colour, nail shape, finish
-      const sweep = ((t - A) * .9) % 1;
-      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}${hairArt(120, 260, 520, 680, 1)}${nailArt(470, 820, 480, 560, 0)}
-        <rect x="80" y="${240 + sweep * 1180}" width="920" height="16" fill="${INK.green}" opacity=".9"/><rect x="80" y="${240 + sweep * 1180 - 70}" width="920" height="70" fill="url(#ht-green)" opacity=".5"/></svg>`;
-      const tags = [[A + .2, 'مدل', 560, 330, INK.yel, INK.ink], [kt[0], 'رنگ مو', 520, 760, INK.pink, INK.ink], [kt[1] - .5, 'فرم ناخن', 90, 1000, INK.blue, '#fff'], [kt[1], 'براقی', 120, 1220, INK.yel, INK.ink]];
-      tags.forEach(([tt, txt, x, y, bg, fg], i) => { if (t >= tt - .05) r += chip(x, y, txt, bg, fg, 70, pr(t, tt - .05, tt + .35), i % 2 ? 4 : -4); });
-      return r + type('هوش مصنوعی می‌بینه', 90, 86, INK.ink, INK.green, pr(t, A, A + .5), off);
-    }
-    case 'guide': {
-      // the red dot unfolds into the guide card
-      const t1 = kt[0], g = ex(pr(t, A - .25, A + .35)), w = mix(140, 860, g), h = mix(140, 1060, g), x = 540 - w / 2, y = 300;
-      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><rect x="${x + 16}" y="${y + 16}" width="${w}" height="${h}" rx="${mix(70, 40, g)}" fill="${INK.ink}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${mix(70, 40, g)}" fill="#FFFDF8"/><rect x="${x}" y="${y}" width="${w}" height="${mix(140, 170, g)}" rx="${mix(70, 40, g)}" fill="${INK.red}"/></svg>`;
-      if (g > .8) { r += `<div class="t" dir="ltr" style="top:${y + 40}px;font-size:80px;color:#fff;mix-blend-mode:normal">Beauty Guide</div>`;
-        r += chip(170, 560, 'سرِ سالن بگو:', INK.yel, INK.ink, 88, pr(t, A + .5, A + .9), -2);
-        [0, 1, 2].forEach(i => { const k = ex(pr(t, A + .7 + i * .2, A + 1.1 + i * .2)); r += `<div style="position:absolute;left:200px;top:${800 + i * 130}px;width:${680 * k}px;height:52px;border-radius:26px;background:${[INK.pink, INK.blue, INK.green][i]};mix-blend-mode:multiply"></div>`; }); }
-      if (t >= t1 - .05) r += type('چی بخوای؟', 1220, 200, INK.red, INK.pink, pr(t, t1 - .05, t1 + .4), off);
+    case 'walk': {
+      // the official grid of worlds; each arrow-key press moves the camera to another world; a visited counter counts up
+      const kt1 = W(b, 'راه'), kt2 = W(b, 'دوربین'), steps = [A, kt1, (kt1 + kt2) / 2, kt2], pos = [[50, 50], [30, 45], [62, 40], [55, 70]];
+      let st = 0; steps.forEach((p, i) => { if (t >= p) st = i; });
+      const kk = ex(pr(t, steps[st], steps[st] + .5)), p0 = pos[Math.max(0, st - 1)], p1 = pos[st];
+      const px = mix(p0[0], p1[0], kk), py = mix(p0[1], p1[1], kk), z = 1.35 + .1 * io(pr(t, A, B1));
+      r += photoCard(s.photo, 60, 300, 960, 880, -1.5, z, `${px}% ${py}%`, pr(t, A, A + .4));
+      r += keys(700, 1220, 1.25, ['up', 'left', 'right', 'down'][st] , t);
+      r += chip(90, 1240, `دنیا: ${fa(st + 1)}`, INK.yel, INK.ink, 64, pr(t, A + .2, A + .5), -3);
+      r += bigT('با کیبورد', 160, 100, INK.ink, pr(t, A, A + .35), INK.green);
       return r;
     }
-    case 'terms': {
-      // the stylist's own words, each with its swatch
-      const sw = [
-        ['balayage', INK.pink, `<rect x="0" y="0" width="200" height="200" rx="30" fill="${INK.blue}"/><path d="M 0 110 L 200 60 L 200 200 L 0 200 Z" fill="url(#ht-yel)"/><path d="M 0 150 L 200 120 L 200 200 L 0 200 Z" fill="${INK.yel}"/>`],
-        ['root melt', INK.yel, `<rect x="0" y="0" width="200" height="200" rx="30" fill="${INK.pink}"/><rect x="0" y="0" width="200" height="80" rx="30" fill="${INK.ink}"/><rect x="0" y="50" width="200" height="60" fill="url(#ht-blue)"/>`],
-        ['almond', INK.blue, `<rect x="0" y="0" width="200" height="200" rx="30" fill="${INK.green}"/><path d="M 70 170 C 66 90, 90 40, 100 30 C 110 40, 134 90, 130 170 Z" fill="${INK.red}"/>`]];
-      r += type('به زبونِ آرایشگرها', 120, 100, INK.ink, INK.yel, pr(t, A, A + .5), off);
-      sw.forEach(([w, bg, art], i) => { const wi = b.words.findIndex(x => x.w.toLowerCase().startsWith(w.split(' ')[0])), tt = wi >= 0 ? b.wt(wi) : A + .5 + i * .6;
-        if (t < tt - .1) { const y0 = 300 + i * 370; r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(${i % 2 ? 90 : 690} ${y0}) scale(${(1.5 * spring(pr(t, A + i * .15, A + i * .15 + .4))).toFixed(3)})" opacity=".45">${art}</g></svg>` + `<div style="position:absolute;left:${i % 2 ? 450 : 90}px;top:${y0 + 80}px;width:420px;height:150px;background:${bg};border-radius:44px;opacity:.55;box-shadow:10px 10px 0 ${INK.ink}"></div>`; return; }
-        const k = pr(t, tt - .1, tt + .35), y = 300 + i * 370;
-        r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(${i % 2 ? 90 : 690} ${y}) scale(${(1.5 * spring(k)).toFixed(3)})">${art}</g></svg>`;
-        r += chip(i % 2 ? 450 : 90, y + 80, w, bg, i === 2 ? '#fff' : INK.ink, 112, k, i % 2 ? 3 : -3, true); });
+    case 'steer': {
+      // mid-simulation prompt «بارون بیاد» typed under the live race track; rain is drawn in riso blue and builds up
+      const tp = W(b, 'بارون'), rk = pr(t, tp, tp + 1.2), z = 1.06 + .1 * io(pr(t, A, B1));
+      r += `<div style="position:absolute;left:30px;top:430px;width:1020px;height:640px;box-shadow:16px 16px 0 ${INK.ink};border:10px solid #FFFDF8;border-radius:28px;overflow:hidden;background:#000;transform:rotate(1deg)"><img src="${elimg(s.photo)}" style="width:100%;height:100%;object-fit:cover;object-position:50% 75%;transform:scale(${z.toFixed(3)});filter:saturate(${mix(1, .55, rk)}) brightness(${mix(1, .75, rk)})"></div>`;
+      let rain = ''; for (let i = 0; i < 60 * rk; i++) { const x = 40 + (i * 157) % 1000, y0 = 440 + ((i * 263) % 640 + t * 900) % 640; rain += `<line x1="${x}" y1="${y0}" x2="${x - 18}" y2="${Math.min(1070, y0 + 80)}" stroke="${INK.blue}" stroke-width="7" stroke-linecap="round" opacity=".9"/>`; }
+      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${rain}</svg>`;
+      r += bigT('وسط کار', 230, 120, INK.ink, pr(t, A, A + .35), INK.pink);
+      r += promptBox(110, 1130, 860, 'Steer the world', 'بارون بیاد', pr(t, tp - .35, tp + .5), t, true, false);
+      r += chip(90, 470, 'LIVE ●', INK.red, '#fff', 54, pr(t, A + .1, A + .4), 0, true);
       return r;
     }
-    case 'rows': {
-      // the guide's rows tick on one per keyword: appointment, time, cost, upkeep
-      const rows = [['چی پیش میاد', INK.pink, 'cal'], ['چقدر وقت', INK.yel, 'clock'], ['چقدر هزینه', INK.green, 'tag'], ['کِی ترمیم', INK.blue, 'loop']];
-      r += type('توی گاید', 110, 110, INK.red, INK.pink, pr(t, A, A + .4), off);
-      rows.forEach(([txt, col, ic], i) => { const tt = kt[i] === undefined ? A + .4 + i * .7 : kt[i]; if (t < tt - .15) { r += `<div style="position:absolute;left:110px;top:${330 + i * 250}px;width:860px;height:190px;background:${col};opacity:.45;border-radius:30px;transform:scaleX(${spring(pr(t, A + i * .1, A + i * .1 + .4)).toFixed(3)})"></div>`; return; }
-        const k = pr(t, tt - .15, tt + .3), y = 330 + i * 250, e = ex(k);
-        const icon = {cal: `<rect x="-60" y="-50" width="120" height="110" rx="14" fill="${INK.ink}"/><rect x="-48" y="-18" width="96" height="66" fill="#fff"/><rect x="-30" y="0" width="22" height="22" fill="${INK.red}"/>`,
-          clock: `<circle r="62" fill="${INK.ink}"/><circle r="50" fill="#fff"/><line x1="0" y1="0" x2="0" y2="-38" stroke="${INK.ink}" stroke-width="10" stroke-linecap="round" transform="rotate(${(t * 400) % 360})"/><line x1="0" y1="0" x2="26" y2="0" stroke="${INK.red}" stroke-width="10" stroke-linecap="round"/>`,
-          tag: `<path d="M -60 -40 L 30 -40 L 66 0 L 30 40 L -60 40 Z" fill="${INK.ink}"/><circle cx="34" cy="0" r="10" fill="#fff"/><text x="-14" y="18" text-anchor="middle" font-family="V" font-weight="900" font-size="46" fill="#fff">$</text>`,
-          loop: `<path d="M -40 -30 A 50 50 0 1 1 -50 20" fill="none" stroke="${INK.ink}" stroke-width="16" transform="rotate(${t * 220})"/><path d="M -70 0 L -50 30 L -26 4 Z" fill="${INK.ink}" transform="rotate(${t * 220})"/>`}[ic];
-        r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><rect x="${110 + 16}" y="${y + 16}" width="${860 * e}" height="190" rx="30" fill="${INK.ink}"/><rect x="110" y="${y}" width="${860 * e}" height="190" rx="30" fill="${col}"/><g transform="translate(${880} ${y + 95}) scale(${spring(k).toFixed(3)})">${icon}</g>
-          <path d="M 180 ${y + 95} l 28 30 l 50 -64" stroke="${INK.ink}" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(t, tt + .1, tt + .4))).toFixed(3)}"/></svg>`;
-        r += `<div style="position:absolute;left:300px;top:${y + 38}px;font:900 84px V;color:${INK.ink};clip-path:inset(0 0 0 ${(100 - e * 100).toFixed(1)}%)">${txt}</div>`; });
+    case 'steer2': {
+      // three changes, each lit on its own word: weather · camera angle · a new person; the neon still swings angle
+      const w1 = A + .05, w2 = W(b, 'زاویه'), w3 = W(b, 'آدم');
+      const ang = t >= w2 ? ex(pr(t, w2, w2 + .5)) : 0, z = 1.05 + .25 * ang;
+      r += photoCard(s.photo, 80, 260, 920, 1000, mix(-2, 4, ang), z, `${mix(50, 70, ang)}% ${mix(55, 35, ang)}%`, pr(t, A, A + .35));
+      [['☔ هوا', w1, INK.blue, '#fff'], ['🎥 زاویه', w2, INK.yel, INK.ink], ['🧍 آدم جدید', w3, INK.pink, INK.ink]].forEach(([c, tq, bg, fg], i) => { if (t >= tq - .05) r += chip(90 + i * 320, 1330, c, bg, fg, 58, pr(t, tq - .05, tq + .3), [-3, 2, -2][i]); });
+      if (t >= w3 - .05) { const e = spring(pr(t, w3 - .05, w3 + .45)); r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(760 1000) scale(${e.toFixed(3)})"><circle cx="0" cy="-120" r="56" fill="${INK.pink}" stroke="${INK.ink}" stroke-width="8"/><path d="M-80 60 Q-80 -50 0 -50 Q80 -50 80 60 Z" fill="${INK.pink}" stroke="${INK.ink}" stroke-width="8"/><circle cx="70" cy="-150" r="34" fill="${INK.green}" stroke="${INK.ink}" stroke-width="6"/><path d="M56 -150 h28 M70 -164 v28" stroke="${INK.ink}" stroke-width="8"/></g></svg>`; }
       return r;
     }
-    case 'home': {
-      // products and step-by-step at home
-      const t1 = kt[0];
-      [[160, INK.pink, 'tube'], [440, INK.blue, 'bottle'], [720, INK.green, 'jar']].forEach(([x, col, kind], i) => { const k = spring(pr(t, A + i * .15, A + i * .15 + .45)), dy = Math.sin(t * 3 + i) * 10;
-        const art = kind === 'tube' ? `<rect x="-55" y="-170" width="110" height="300" rx="20" fill="${col}"/><rect x="-40" y="130" width="80" height="50" fill="${INK.ink}"/>` : kind === 'bottle' ? `<rect x="-80" y="-120" width="160" height="300" rx="40" fill="${col}"/><rect x="-26" y="-190" width="52" height="80" fill="${INK.ink}"/><rect x="-60" y="-40" width="120" height="90" fill="url(#ht-yel)"/>` : `<rect x="-95" y="-40" width="190" height="200" rx="34" fill="${col}"/><rect x="-105" y="-100" width="210" height="70" rx="20" fill="${INK.ink}"/>`;
-        r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(${x + 100} ${560 + dy}) scale(${k.toFixed(3)})">${art}</g></svg>`; });
-      if (t >= t1 - .1) [0, 1, 2].forEach(i => { const tt = t1 - .1 + i * .25; if (t >= tt) r += chip(130 + i * 290, 860, fa(i + 1), [INK.yel, INK.pink, INK.blue][i], INK.ink, 150, pr(t, tt, tt + .35), (i - 1) * 6); });
-      return r + (t >= t1 ? type('توی خونه', 1150, 180, INK.red, INK.yel, pr(t, t1, t1 + .4), off) : type('محصولاتش', 140, 130, INK.ink, INK.pink, pr(t, A, A + .4), off));
-    }
-    case 'quote': {
-      const t1 = kt[0], q = spring(pr(t, A, A + .5));
-      r += `<div class="t" style="top:120px;font-size:${520 * q}px;color:${INK.pink};line-height:.8">«</div>`;
-      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(540 820) scale(${q.toFixed(3)})"><path d="M -400 -220 h 800 a 40 40 0 0 1 40 40 v 300 a 40 40 0 0 1 -40 40 h -500 l -110 100 l 20 -100 h -210 a 40 40 0 0 1 -40 -40 v -300 a 40 40 0 0 1 40 -40 z" fill="${INK.yel}" stroke="${INK.ink}" stroke-width="14"/>` +
-        (t < t1 ? `<path d="M -300 -40 c 40 -80 80 80 120 0 s 80 -80 120 0 s 80 80 120 0 s 80 -80 120 0 s 60 60 100 0" fill="none" stroke="${INK.ink}" stroke-width="18" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(t, A + .3, A + 1.2))).toFixed(3)}"/>` : '') + `</g></svg>`;
-      r += type('سلیقه داری؛', 1180, 130, INK.ink, INK.blue, pr(t, A + .3, A + .8), off);
-      if (t >= t1 - .05) r += `<div class="t" style="top:700px;font-size:190px;color:${INK.red};mix-blend-mode:normal;transform:scale(${spring(pr(t, t1 - .05, t1 + .35)).toFixed(3)})">کلمه‌ش!</div>`;
+    case 'sound': {
+      // three audio tracks draw on (music · ambience · dialogue), level meters move with the voice, a speech bubble grows
+      const ts = W(b, 'صدا'), t1 = W(b, 'موسیقی'), t2 = W(b, 'محیط'), t3 = W(b, 'دیالوگ');
+      r += photoCard(s.photo, 140, 250, 800, 560, -3, 1.05 + .06 * io(pr(t, A, B1)), '55% 50%', pr(t, A, A + .4));
+      r += bigT('صدا هم داره!', 880, 120, INK.ink, pr(t, ts - .05, ts + .35), INK.yel);
+      if (t >= ts - .05) for (let i = 0; i < 3; i++) { const ph = ((t - ts) * 1.2 + i / 3) % 1; r += svg2(`<g transform="translate(220 700)"><path d="M-30 -30 h30 l40 -40 v140 l-40 -40 h-30z" fill="${INK.ink}"/><path d="M ${30 + 60 * ph} -60 q ${40 + 40 * ph} 60 0 120" fill="none" stroke="${INK.pink}" stroke-width="12" stroke-linecap="round" opacity="${(1 - ph).toFixed(2)}"/></g>`); }
+      let q = ''; [[t1, INK.pink, 'موسیقی'], [t2, INK.blue, 'محیط'], [t3, INK.green, 'دیالوگ']].forEach(([tq, c, lb], i) => { if (t >= tq - .1) { const y = 1110 + i * 110; q += `<rect x="90" y="${y - 46}" width="900" height="92" rx="46" fill="#FFFDF8" stroke="${INK.ink}" stroke-width="6"/>` + wave(110, y, 600, 70, c, pr(t, tq - .1, tq + .6), t, i * 3); r += `<div style="position:absolute;right:110px;top:${y - 40}px;font:900 56px V;color:${INK.ink}">${lb}</div>`; } });
+      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${q}</svg>`;
+      if (t >= t3) { const e = spring(pr(t, t3, t3 + .4)); r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(860 300) scale(${e.toFixed(3)})"><path d="M-110 -70 h220 a30 30 0 0 1 30 30 v90 a30 30 0 0 1 -30 30 h-120 l-50 50 v-50 h-50 a30 30 0 0 1 -30 -30 v-90 a30 30 0 0 1 30 -30z" fill="${INK.yel}" stroke="${INK.ink}" stroke-width="8"/><text x="0" y="22" text-anchor="middle" font-family="V" font-weight="900" font-size="56" fill="${INK.ink}">Hi!</text></g></svg>`; }
       return r;
     }
-    case 'avail': {
-      const t1 = kt[0], t2 = kt[1];
-      let inner = `<rect width="440" height="902" fill="${INK.pink}"/><rect width="440" height="902" fill="url(#ht-yel)" opacity=".6"/><circle cx="220" cy="420" r="${80 * spring(pr(t, A + .2, A + .6))}" fill="${INK.red}"/>`;
-      r += phone(t >= t2 - .05 ? mix(320, 90, ex(pr(t, t2 - .05, t2 + .4))) : 320, 300, 440, inner, pr(t, A, A + .4));
-      if (t >= t1 - .05) r += chip(560, 240, 'iPhone', INK.yel, INK.ink, 110, pr(t, t1 - .05, t1 + .35), 4, true);
-      if (t >= t2 - .05) { const k = pr(t, t2 - .05, t2 + .4), e = spring(k);
-        let st = ''; for (let i = 0; i < 7; i++) st += `<rect x="0" y="${i * 46}" width="420" height="23" fill="${INK.red}"/>`;
-        r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${HT}<g transform="translate(600 640) rotate(-5) scale(${e.toFixed(3)})"><rect width="420" height="300" fill="#fff" stroke="${INK.ink}" stroke-width="12"/>${st}<rect width="190" height="160" fill="${INK.blue}"/><rect width="190" height="160" fill="url(#ht-yel)" opacity=".7"/></g></svg>`;
-        r += type('فقط آمریکا', 1080, 150, INK.blue, INK.pink, k, off); }
-      return r + type('فعلاً', 120, 120, INK.ink, INK.green, pr(t, A, A + .4), off);
+    case 'minutes': {
+      // Genie 3 vs Genie 4: two bars fill to 1 and 2 minutes, a counter rolls to ۲, the ×۲ stamp lands on «دو برابر»
+      const tm = W(b, 'دقیقه'), t2 = W(b, 'برابر'), k3 = ex(pr(t, A + .1, A + .9)), k4 = ex(pr(t, A + .3, tm + .4));
+      r += bigT(`تا ${fa(2)} دقیقه`, 230, 140, INK.ink, pr(t, tm - .3, tm + .1), INK.yel);
+      let q = '';
+      for (let i = 0; i <= 4; i++) q += `<line x1="${140 + i * 200}" y1="760" x2="${140 + i * 200}" y2="1260" stroke="${INK.ink}" stroke-width="4" stroke-dasharray="10 12" opacity="${ex(pr(t, A + i * .08, A + .3 + i * .08))}"/><text x="${140 + i * 200}" y="1320" text-anchor="middle" font-family="V" font-weight="900" font-size="44" fill="${INK.ink}">${fa(i * .5)}</text>`;
+      q += `<rect x="140" y="830" width="${400 * k3}" height="140" rx="20" fill="${INK.blue}"/><rect x="140" y="1050" width="${800 * k4}" height="140" rx="20" fill="${INK.pink}"/>`;
+      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${q}</svg>`;
+      r += `<div dir="ltr" style="position:absolute;left:160px;top:860px;font:900 64px V;color:#fff">Genie 3 · ${fa((1 * k3).toFixed(1))}</div><div dir="ltr" style="position:absolute;left:160px;top:1080px;font:900 64px V;color:${INK.ink}">Genie 4 · ${fa((2 * k4).toFixed(1))}</div>`;
+      r += `<div class="t" style="top:1360px;font-size:56px;color:${INK.ink};mix-blend-mode:normal;opacity:${cl((t - A) * 3)}">دقیقه</div>`;
+      if (t >= t2 - .05) { const k = pr(t, t2 - .05, t2 + .35); r += `<div style="position:absolute;left:720px;top:520px;width:250px;height:250px;border-radius:50%;background:${INK.red};color:#fff;font:900 120px/250px V;text-align:center;box-shadow:10px 10px 0 ${INK.ink};transform:rotate(-12deg) scale(${(2.2 - 1.2 * ex(k)).toFixed(3)});opacity:${cl(k * 4)}">×${fa(2)}</div>`; }
+      return r;
+    }
+    case 'director': {
+      // Gemini as the director: the real Gemini mark, a 3-step plan ticking on its words, a film strip scanned frame by frame
+      const tg = A + .05, tq = W(b, 'قدم'), tf = W(b, 'فریم');
+      r += logoChip(330, 230, 110, 'gemini.png', pr(t, tg, tg + .4), 'Gemini');
+      r += chip(380, 430, '🎬 کارگردان', INK.yel, INK.ink, 70, pr(t, W(b, 'کارگردان') - .05, W(b, 'کارگردان') + .3), -3);
+      let q = '', lbl = ''; ['۱  محیط', '۲  حرکت', '۳  اتفاق بعدی'].forEach((s2, i) => { const ti = tq + i * .3, k = ex(pr(t, ti - .1, ti + .3)); if (t >= ti - .1) { q += `<rect x="${980 - 520 * k}" y="${620 + i * 120}" width="${520 * k}" height="96" rx="20" fill="#FFFDF8" stroke="${INK.ink}" stroke-width="6"/><path d="M ${1010 - 520} ${668 + i * 120} l 20 20 l 36 -44" stroke="${INK.green}" stroke-width="14" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(t, ti + .2, ti + .5))).toFixed(3)}"/>`; lbl += `<div style="position:absolute;right:130px;top:${630 + i * 120}px;font:900 54px V;color:${INK.ink};opacity:${k}">${s2}</div>`; } });
+      // film strip of the official stills, a scan bar runs across, each frame gets a check as it passes
+      const sk = ex(pr(t, tf - .4, tf + .2)), scan = pr(t, tf, B1 - .1);
+      q += `<rect x="40" y="1050" width="1000" height="300" fill="${INK.ink}" opacity="${sk}"/>`;
+      for (let i = 0; i < 18; i++) q += `<rect x="${60 + i * 56}" y="1062" width="30" height="20" rx="4" fill="#FFFDF8" opacity="${sk}"/><rect x="${60 + i * 56}" y="1318" width="30" height="20" rx="4" fill="#FFFDF8" opacity="${sk}"/>`;
+      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${q}</svg>` + lbl;
+      ['g3.jpg', 'g5.jpg', 'g2.jpg'].forEach((f, i) => { r += `<div style="position:absolute;left:${70 + i * 320}px;top:1095px;width:300px;height:210px;overflow:hidden;opacity:${sk}"><img src="${elimg(f)}" style="width:100%;height:100%;object-fit:cover"></div>`; if (scan > (i + .8) / 3) r += `<div style="position:absolute;left:${300 + i * 320}px;top:1110px;width:56px;height:56px;border-radius:50%;background:${INK.green};color:#fff;font:900 40px/56px V;text-align:center">✓</div>`; });
+      if (t >= tf) r += `<div style="position:absolute;left:${70 + scan * 960}px;top:1040px;width:10px;height:320px;background:${INK.red}"></div>`;
+      return r;
+    }
+    case 'uses': {
+      // what it is for: three cards (games · learning · robot practice), each springs in and lights up on its word
+      const tq = W(b, 'درد'), ws = [W(b, 'بازی'), W(b, 'آموزش'), W(b, 'ربات')];
+      r += bigT('به چه درد می‌خوره؟', 230, 104, INK.ink, pr(t, A, A + .35), INK.yel);
+      const C = [['🎮', 'بازی', INK.pink], ['🎓', 'آموزش', INK.yel], ['🤖', 'تمرین ربات', INK.green]];
+      let q = '';
+      C.forEach(([ic, lb, c], i) => { const ti = ws[i], k = pr(t, ti - .15, ti + .35), on = t >= ti - .05, y = 520 + i * 330;
+        if (t >= ti - .15) { r += `<div style="position:absolute;left:120px;top:${y}px;width:840px;height:280px;border-radius:36px;background:${on ? c : '#FFFDF8'};border:8px solid ${INK.ink};box-shadow:14px 14px 0 ${INK.ink};transform:translateX(${(1 - ex(k)) * 400}px) rotate(${[-2, 1.5, -1][i]}deg);opacity:${cl(k * 4)};display:flex;align-items:center;justify-content:space-between;padding:0 60px;box-sizing:border-box"><span style="font:900 96px V;color:${INK.ink}">${lb}</span><span style="font-size:130px">${ic}</span></div>`;
+          r += `<div style="position:absolute;left:30px;top:${y + 90}px;width:96px;height:96px;border-radius:50%;background:${INK.ink};color:#fff;font:900 56px/96px V;text-align:center;transform:scale(${spring(k).toFixed(3)})">${fa(i + 1)}</div>`; } });
+      return r;
+    }
+    case 'film': {
+      // testers: storyboard frames for a film — the official stills drop into a 3-panel board under a clapperboard
+      const tf = W(b, 'طرح');
+      const cl1 = spring(pr(t, A, A + .4)), clap = t >= tf ? -24 * (1 - ex(pr(t, tf, tf + .25))) : -24;
+      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(540 380) scale(${cl1.toFixed(3)})"><rect x="-220" y="-40" width="440" height="230" rx="14" fill="${INK.ink}"/><g transform="translate(-220 -40) rotate(${clap})">${[0, 1, 2, 3, 4].map(i => `<rect x="${i * 88}" y="-64" width="88" height="64" fill="${i % 2 ? '#FFFDF8' : INK.ink}" stroke="${INK.ink}" stroke-width="6"/>`).join('')}</g><text x="0" y="110" text-anchor="middle" font-family="V" font-weight="900" font-size="72" fill="#fff">طرح فیلم</text></g></svg>`;
+      ['g3.jpg', 'g4.jpg', 'g5.jpg'].forEach((f, i) => { const ti = A + .4 + i * .35; if (t >= ti) r += photoCard(f, 70 + i * 320, 720 + [0, 60, 10][i], 300, 520, [-4, 3, -2][i], 1.15, '50% 50%', pr(t, ti, ti + .4)); r += `<div style="position:absolute;left:${90 + i * 320}px;top:${1300 + [0, 60, 10][i]}px;font:900 52px V;color:${INK.ink};opacity:${cl((t - ti) * 3)}">شات ${fa(i + 1)}</div>`; });
+      r += chip(240, 1460 - 40, 'تسترها می‌گن', INK.yel, INK.ink, 60, pr(t, A + .1, A + .4), -2);
+      return r;
+    }
+    case 'limits': {
+      // not finished: the neon world drifts — misregistration and a slow warp grow with a run-time bar; the warning stamp lands
+      const tn = W(b, 'کامل'), tl = W(b, 'جزئیات'), d = pr(t, tl - .4, B1), wob = Math.sin(t * 7) * 6 * d;
+      r += `<div style="position:absolute;left:80px;top:420px;width:920px;height:820px;border:10px solid #FFFDF8;border-radius:28px;box-shadow:16px 16px 0 ${INK.ink};overflow:hidden"><img src="${elimg(s.photo)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(${(6 * d).toFixed(1)}px) hue-rotate(${(60 * d).toFixed(0)}deg);transform:scale(${(1.08 + .1 * d).toFixed(3)}) skewX(${(wob * .6).toFixed(2)}deg)"><img src="${elimg(s.photo)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;mix-blend-mode:screen;opacity:${(.6 * d).toFixed(2)};transform:translate(${(28 * d).toFixed(1)}px,${(-18 * d).toFixed(1)}px) scale(1.1)"></div>`;
+      const run = pr(t, A, B1); r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><rect x="80" y="1300" width="920" height="60" rx="30" fill="#FFFDF8" stroke="${INK.ink}" stroke-width="6"/><rect x="86" y="1306" width="${908 * run}" height="48" rx="24" fill="${run > .6 ? INK.red : INK.yel}"/></svg><div style="position:absolute;left:100px;top:1370px;font:900 50px V;color:${INK.ink}">زمان اجرا ⟵</div>`;
+      r += bigT('هنوز کامل نیست', 230, 118, INK.ink, pr(t, tn - .3, tn + .1), INK.yel);
+      if (t >= tl) r += `<div style="position:absolute;left:560px;top:1120px;padding:10px 30px 18px;border:10px solid ${INK.red};border-radius:20px;color:${INK.red};font:900 80px V;background:#FFFDF8;transform:rotate(-8deg) scale(${(2 - ex(pr(t, tl, tl + .35))).toFixed(3)});opacity:${cl((t - tl) * 4)}">به‌هم می‌ریزه</div>`;
+      return r;
+    }
+    case 'access': {
+      // who gets it: a rebuilt waitlist card, the cursor clicks Join, the timeline pill runs now → coming weeks, Ultra chip lands
+      const tt = W(b, 'تستر'), tu = W(b, 'Ultra') > A ? W(b, 'Ultra') : W(b, 'مشترک'), tc = A + 1.1;
+      r += `<div style="position:absolute;left:110px;top:300px;width:860px;height:520px;border-radius:40px;background:#FFFDF8;border:8px solid ${INK.ink};box-shadow:16px 16px 0 ${INK.blue};transform:scale(${spring(pr(t, A, A + .4)).toFixed(3)})"></div>`;
+      r += logoChip(160, 350, 90, 'genie.png', pr(t, A + .1, A + .45), 'Project Genie');
+      const press = t >= tc ? Math.exp(-10 * (t - tc)) : 0, joined = t >= tc;
+      r += `<div dir="ltr" style="position:absolute;left:300px;top:620px;padding:18px 50px 24px;border-radius:60px;background:${joined ? INK.green : INK.red};color:#fff;font:900 60px V;box-shadow:10px 10px 0 ${INK.ink};transform:scale(${1 - .12 * press})">${joined ? 'On the waitlist ✓' : 'Join waitlist'}</div>`;
+      r += cursor(mix(980, 640, ex(pr(t, A + .4, tc))), mix(1100, 680, ex(pr(t, A + .4, tc))), t, tc);
+      let q = `<line x1="150" y1="1100" x2="930" y2="1100" stroke="${INK.ink}" stroke-width="10" stroke-linecap="round"/><line x1="150" y1="1100" x2="${150 + 780 * ex(pr(t, tt, tu + .3))}" y2="1100" stroke="${INK.pink}" stroke-width="22" stroke-linecap="round"/>`;
+      q += `<circle cx="930" cy="1100" r="34" fill="${INK.yel}" stroke="${INK.ink}" stroke-width="8"/><circle cx="150" cy="1100" r="34" fill="${INK.pink}" stroke="${INK.ink}" stroke-width="8"/>`;
+      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${q}</svg>`;
+      r += chip(640, 1170, 'الان: تسترها', INK.pink, INK.ink, 54, pr(t, tt - .1, tt + .3), 2) + chip(90, 1170, 'چند هفته بعد', INK.yel, INK.ink, 54, pr(t, tu - .6, tu - .3), -2);
+      if (t >= tu - .1) r += logoChip(230, 1330, 90, 'google.png', pr(t, tu - .1, tu + .3), 'Google AI Ultra');
+      return r;
     }
     case 'ask': {
-      // the stylist's scissors vs the client's full guide card; the red dot becomes the question mark's dot
-      const t1 = kt[0], t2 = kt[1] === undefined ? t1 + 1.2 : kt[1], sn = Math.sin(t * 9) * 14;
-      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(270 640) scale(${spring(pr(t, A, A + .45)).toFixed(3)})"><g transform="rotate(${sn})"><ellipse cx="-60" cy="140" rx="54" ry="40" fill="none" stroke="${INK.blue}" stroke-width="22"/><path d="M -40 110 L 120 -160" stroke="${INK.ink}" stroke-width="26" stroke-linecap="round"/></g><g transform="rotate(${-sn})"><ellipse cx="60" cy="140" rx="54" ry="40" fill="none" stroke="${INK.pink}" stroke-width="22"/><path d="M 40 110 L -120 -160" stroke="${INK.ink}" stroke-width="26" stroke-linecap="round"/></g></g>
-        <g transform="translate(790 640) rotate(6) scale(${spring(pr(t, t1 - .1, t1 + .35)).toFixed(3)})"><rect x="-190" y="-250" width="380" height="500" rx="30" fill="#FFFDF8" stroke="${INK.ink}" stroke-width="12"/><rect x="-190" y="-250" width="380" height="100" rx="30" fill="${INK.red}"/>${[0, 1, 2, 3].map(i => `<rect x="-140" y="${-110 + i * 80}" width="${[260, 200, 240, 160][i]}" height="34" rx="17" fill="${[INK.pink, INK.blue, INK.green, INK.yel][i]}"/>`).join('')}</g></svg>`;
-      r += chip(150, 980, 'آرایشگر', INK.yel, INK.ink, 80, pr(t, A + .2, A + .6), -4) + (t >= t1 - .1 ? chip(640, 980, 'مشتری', INK.pink, INK.ink, 80, pr(t, t1 - .1, t1 + .3), 4) : '');
-      if (t >= t2 - .1) { const k = pr(t, t2 - .1, t2 + .4); r += `<div class="t" style="top:1060px;font-size:330px;color:${INK.blue};transform:scale(${spring(k).toFixed(3)})">؟</div>` + dot(540, 1400, 40 * spring(k)) + type('راحت‌تر یا سخت‌تر', 120, 110, INK.ink, INK.pink, k, off); }
-      else if (t >= b.wt(9) - .05) r += type('راحت‌تر؟', 120, 150, INK.green, INK.yel, pr(t, b.wt(9) - .05, b.wt(9) + .35), off);
-      else r += type('نقشه‌ی کامل', 120, 130, INK.red, INK.yel, pr(t, t1 - .1, t1 + .4), off);
+      // the empty prompt box with the blinking cursor; ghost prompts cycle; the comment bubble grows
+      const tq = W(b, 'چیه'), tcm = W(b, 'کامنت'), ghosts = ['A castle in the clouds', 'My childhood street', 'A city on Mars'], gi = Math.floor((t - A) / .9) % 3;
+      r += bigT('اولین دنیات؟', 250, 140, INK.ink, pr(t, tq - .4, tq), INK.pink);
+      r += promptBox(110, 700, 860, 'Describe a world', ghosts[gi], pr(t - (gi * .9), A, A + .7) + .2, t);
+      if (t >= tcm - .1) { const e = spring(pr(t, tcm - .1, tcm + .4)); r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(540 1180) scale(${e.toFixed(3)})"><path d="M-300 -110 h600 a40 40 0 0 1 40 40 v140 a40 40 0 0 1 -40 40 h-460 l-70 70 v-70 h-70 a40 40 0 0 1 -40 -40 v-140 a40 40 0 0 1 40 -40z" fill="${INK.yel}" stroke="${INK.ink}" stroke-width="10"/></g></svg><div class="t" style="top:1110px;font-size:84px;color:${INK.ink};mix-blend-mode:normal;transform:scale(${e.toFixed(3)})">کامنت کن 👇</div>`; }
       return r;
     }
   }
@@ -364,7 +398,8 @@ function endCard(u, t, off) {
   // the through-line dot becomes the real logo, the name prints in passes, then the question
   const g = spring(.4 + pr(u, 0, .4)), q = (S.end_text || '').replace(/\*([^*]+)\*/g, `<span style="color:${INK.red}">$1</span>`);
   let r = blocks(3, pr(u, 0, .4), t) + dot(540, 640, 150 * g) + logo(540, 640, 300 * g, pr(u, 0, .15));
-  r += type(`${S.brand} ${S.product}`, 860, 90, INK.ink, INK.pink, pr(u, .2, .6), off, true);
+  for (let i = 0; i < 3; i++) { const ph = ((u * .9 + i / 3) % 1); r += svg2(`<circle cx="540" cy="640" r="${(190 + 260 * ph).toFixed(1)}" fill="none" stroke="${[INK.pink, INK.blue, INK.yel][i]}" stroke-width="${(14 * (1 - ph)).toFixed(1)}" opacity="${(1 - ph).toFixed(2)}"/>`); }
+  r += type(`${S.brand}${S.product ? ' ' + S.product : ''}`, 860, 90, INK.ink, INK.pink, pr(u, .2, .6), off, true);
   r += `<div class="t" style="top:1020px;font-size:${Math.min(100, Math.floor(1700 / (S.end_text || 'x').length))}px;color:${INK.ink};opacity:${pr(u, .4, .7)}">${q}</div>`;
   r += `<div class="t" style="top:1190px;font-size:60px;font-weight:600;color:${INK.ink};opacity:${pr(u, .6, .9)}">${S.end_sub || ''}</div>`;
   return r + `<div class="t" dir="ltr" style="top:1300px;font-size:44px;letter-spacing:4px;color:${INK.blue};opacity:${pr(u, .8, 1.1)}">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;

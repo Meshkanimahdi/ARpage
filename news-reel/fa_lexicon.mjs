@@ -40,7 +40,7 @@ const PRON_WORDS = {
   'Max': 'مَکس', 'Mini': 'مینی', 'Ultra': 'اولْترا', 'Claude': 'کْلاد', 'Anthropic': 'اَنْتروپیک', 'Gemini': 'جِمِنای',
   'Google': 'گوگِل', 'Nvidia': 'اِنْویدیا', 'Microsoft': 'مایکْروسافت', 'Copilot': 'کوپایلَت', 'Meta': 'مِتا',
   'Apple': 'اَپِل', 'iPhone': 'آیفون', 'Tesla': 'تِسْلا', 'Grok': 'گْراک', 'Sora': 'سورا', 'Perplexity': 'پِرْپِلِکْسیتی',
-  'DeepSeek': 'دیپ‌سیک', 'DeepMind': 'دیپ‌مایند', 'Midjourney': 'میدْجِرنی', 'Pinterest': 'پینْتِرِست', 'Adobe': 'اَدوبی',
+  'Genie': 'جینی', 'four': 'فور', 'DeepSeek': 'دیپ‌سیک', 'DeepMind': 'دیپ‌مایند', 'Midjourney': 'میدْجِرنی', 'Pinterest': 'پینْتِرِست', 'Adobe': 'اَدوبی',
   'Airbnb': 'اِر‌بی‌اِن‌بی', 'Walmart': 'وال‌مارت', 'Amazon': 'اَمازون', 'Netflix': 'نِتْفلیکس', 'Spotify': 'اِسْپاتیفای',
   'YouTube': 'یوتیوب', 'Instagram': 'اینستاگْرام', 'TikTok': 'تیک‌تاک', 'LinkedIn': 'لینْکْدین', 'WhatsApp': 'واتْس‌اَپ',
   'Elon': 'ایلان', 'Musk': 'ماسک', 'Sam': 'سَم', 'Altman': 'آلْتْمَن', 'Jensen': 'جِنْسِن', 'Huang': 'هوانگ',
