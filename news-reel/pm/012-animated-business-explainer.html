@@ -126,8 +126,11 @@ function morph(t) {
 // ---------- parts ----------
 const pp = (t, t0) => K(sp(t, t0), 0, 1.06);
 const ground = () => `<div class="a" style="inset:0;background:var(--cr)"></div>` +
-  `<div class="a" style="left:-200px;right:-200px;top:${(-NOW * 40 % 180 - 180).toFixed(0)}px;height:2400px;background-image:repeating-linear-gradient(0deg,rgba(18,18,18,.06) 0 3px,transparent 3px 180px)"></div>` +
-  `<div class="a" style="left:${(60 - (NOW * 30) % 1300).toFixed(0)}px;top:1780px;font:900 120px V;color:rgba(18,161,80,.13);white-space:nowrap;direction:ltr">$ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $</div>`;
+  `<div class="a" style="inset:-80px;background-image:radial-gradient(rgba(18,18,18,.22) 3px,transparent 3px);background-size:40px 40px;background-position:${(-NOW * 14 % 40).toFixed(1)}px ${(-NOW * 22 % 40).toFixed(1)}px"></div>` +
+  [[-160, 120, 620, 'rgba(18,161,80,.16)', 18], [640, 760, 560, 'rgba(108,92,231,.12)', -14], [-120, 1300, 700, 'rgba(18,18,18,.07)', 10]].map(([x0, y0, d, c, v]) =>
+    `<div class="a" style="left:${(x0 + Math.sin(NOW * .6 + d) * 40).toFixed(0)}px;top:${(y0 + NOW * v % 300).toFixed(0)}px;width:${d}px;height:${d}px;border-radius:50%;background:${c}"></div>`).join('') +
+  `<div class="a" style="left:-200px;right:-200px;top:${(-NOW * 40 % 180 - 180).toFixed(0)}px;height:2400px;background-image:repeating-linear-gradient(0deg,rgba(18,18,18,.10) 0 4px,transparent 4px 180px)"></div>` +
+  `<div class="a" style="left:${(60 - (NOW * 30) % 1300).toFixed(0)}px;top:1760px;font:900 150px V;color:rgba(18,161,80,.22);white-space:nowrap;direction:ltr">$ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $</div>`;
 const up = (h, k, sz, col = 'var(--ink)') => `<span class="m" style="font-size:${sz}px;line-height:1.28;color:${col}"><span style="display:inline-block;transform:translateY(${((1 - ex(k)) * 110).toFixed(1)}%)">${h}</span></span>`;
 function tag(x0, y0, sz, txt, t, t0, bg = 'var(--g)', fg = '#fff', dir = 'rtl') { const k = pp(t, t0); if (k <= 0) return '';
   return `<div class="a" style="left:${x0}px;top:${y0}px;padding:${sz * .12}px ${sz * .38}px ${sz * .22}px;border-radius:${sz * .32}px;background:${bg};color:${fg};font:900 ${sz}px/1.15 V;white-space:nowrap;direction:${dir};transform:scale(${k.toFixed(3)})">${txt}</div>`; }
