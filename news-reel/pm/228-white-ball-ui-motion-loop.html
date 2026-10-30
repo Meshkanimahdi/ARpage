@@ -111,15 +111,16 @@ function camAt(t) {
   const b = B[bi], prev = B[Math.max(0, bi - 1)], k = eio(pr(t, b.a, b.a + .75));
   const p0 = ST[prev.st], p1 = ST[b.st];
   const ZS = 1.12; let z1 = ZS, z0 = prev.sc.type === 'tip' ? .3 : ZS, c1 = p1;
-  if (b.sc.type === 'tip') { z1 = mix(.86, .3, eio(pr(t, b.a + .2, b.a + 1.6))); c1 = [mix(-1300, 0, eio(pr(t, b.a + .2, b.a + 1.6))), mix(4500, 2250, eio(pr(t, b.a + .2, b.a + 1.6)))]; }
-  if (b.sc.type === 'ask') { const kk = eio(pr(t, b.a, b.a + 1.1)); return {x: mix(0, 0, kk), y: mix(2250, 0, kk), z: Math.exp(mix(Math.log(.3), Math.log(1.12), kk))}; }
+  if (b.sc.type === 'tip') { c1 = [-1300, 4420]; z1 = 1.12 * (1 + .12 * eio(pr(t, b.a + .3, b.b))); }
+  if (b.sc.type === 'ask') { const kk = eio(pr(t, b.a, b.a + 1.3)); return {x: mix(-1300, 0, kk), y: mix(4420, 0, kk), z: Math.exp(mix(Math.log(1.12), Math.log(1.12), kk) - 1.25 * Math.sin(Math.PI * kk))}; }
   const dist = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]), dip = dist > 10 ? Math.min(.45, dist / 4200) : 0;
+  z0 = prev.sc.type === 'tip' ? 1.12 : z0;
   const lz = mix(Math.log(z0), Math.log(z1), k) - dip * Math.sin(Math.PI * k);
   const drift = .03 * pr(t, b.a + .75, b.b);                      // the camera never sits still
   let x = mix(p0[0], c1[0], k), y = mix(p0[1], c1[1], k), z = Math.exp(lz) * (1 + drift);
   // screen-studio punch: every moment inside a beat alternates a wide and a tight framing on where the ball works,
   // so each idea fills the frame (closed-form ease, ~0.3 s, a move through the same world, never a cut)
-  if (b.sc.type !== 'tip' && b.sc.type !== 'hook') {
+  if (b.sc.type !== 'tip' && b.sc.type !== 'hook' && b.sc.type !== 'night') {
     const ids = (window.SCENES || []).filter(sc => sc.bg.split('.')[0] === b.bt.id && sc.t0 <= t);
     const i = ids.length - 1, t0 = i >= 0 ? ids[i].t0 : b.a, f = (j) => j % 2 ? 1 : 0;
     const prevF = i > 0 ? f(i - 1) : 0, curF = i >= 0 ? f(i) : 0, kk = eio(pr(t, t0, t0 + .32)), pf = mix(prevF, curF, kk);
@@ -151,7 +152,7 @@ function contact(b, t) {
     case 'gift': return [s[0] + 330, s[1] + 380];
     case 'ask_ai': { const kp = keyPress(b, t); return kp ? kp : [s[0] + 300, s[1] + 330]; }
     case 'answer': return [s[0] + 380, s[1] + 330];
-    case 'night': return [s[0] - 300, s[1] - 260];
+    case 'night': return [s[0] + 60, s[1] + 120];
     case 'flaw': return [s[0], s[1] + 380 - Math.abs(Math.sin((t - b.a) * 4.2)) * 220];
     case 'tip': return [s[0], s[1] + 260];
     case 'ask': return [ST.T[0] - 150, ST.T[1]];
@@ -237,7 +238,7 @@ function stations(t) {
     r += `<div class="a" style="left:-260px;top:${3290 + (pressed ? 8 : 0)}px;width:520px;height:120px;border-radius:60px;background:${kpay >= 1 ? '#4ED6A0' : 'var(--blue)'};font:900 58px/120px V;text-align:center">${kpay >= 1 ? 'پرداخت شد ✓' : 'پرداخت'}</div>`;
     if (b && t >= W(b, 'تو') - .1) r += pop(pr(t, W(b, 'تو') - .1, W(b, 'تو') + .3), `<div class="a" style="left:-400px;top:3100px;padding:12px 30px 18px;border-radius:28px;background:var(--red);font:900 56px V">پولش با تو!</div>`); }
   // G: the gift test: a coffee gift card, the toggle «پول می‌ده؟» flips, check mark lands
-  { const b = bt('gift'), kg = b ? pr(t, W(b, 'هدیه') - .1, W(b, 'هدیه') + .4) : 0, kt = b ? pr(t, W(b, 'پول') - .1, W(b, 'پول') + .3) : 0;
+  { const b = bt('gift'), kg = b ? pr(t, b.a + .2, b.a + .6) : 0, kt = b ? pr(t, W(b, 'پول') - .1, W(b, 'پول') + .3) : 0;
     r += box(840, 2620, 920, 820) + rtxt(-1700, 2660, 'تست هدیه', 60, '#fff');
     r += pop(kg, `<div class="a" style="left:960px;top:2760px;width:680px;height:300px;border-radius:30px;background:linear-gradient(135deg,#6B4A2F,#3A281A);border:3px solid #8A6A4A"><div style="position:absolute;left:40px;top:40px;font:900 90px V">☕</div><div style="position:absolute;right:40px;top:60px;font:900 64px V;color:#fff">کارت هدیه</div><div style="position:absolute;right:40px;top:170px;font:900 48px V;color:#E8D5B5">قهوه برای «Sofia»</div></div>`, '1300px', '2910px');
     r += toggle(1300, 3260, ex(kt), 1, '') + rtxt(-1640, 3110, 'پول می‌ده؟', 52, 'var(--mu)');
@@ -268,7 +269,7 @@ function stations(t) {
     r += `<div class="a" style="left:-380px;top:3990px;padding:10px 28px 16px;border-radius:24px;background:var(--blue);font:900 54px V">${fa(12 + n)} پیام</div>`;
     if (b && t >= W(b, 'ساکت') - .1) r += pop(pr(t, W(b, 'ساکت') - .1, W(b, 'ساکت') + .3), `<div class="a" style="left:60px;top:3990px;padding:10px 26px 16px;border-radius:24px;background:var(--red);font:900 50px V">حرف آخر با منه</div>`); }
   // R: the warning card (seen in the pull-back with the whole world)
-  { const b = bt('tip'), kw = b ? pr(t, W(b, 'پول') - .2, W(b, 'پول') + .3) : 0;
+  { const b = bt('tip'), kw = b ? pr(t, b.a + .15, b.a + .55) : 0;
     r += box(-1760, 3880, 920, 1300, '', `border-color:${kw > 0 ? 'var(--red)' : 'var(--line)'}`) + rtxt(880, 3940, 'قانون ساده', 70, '#fff');
     r += pop(kw, `<div class="a" style="left:-1700px;top:4250px;width:800px;padding:30px 0 40px;border-radius:40px;background:var(--red);font:900 110px V;text-align:center">پول خواست؟</div><div class="a" style="left:-1700px;top:4520px;width:800px;font:900 120px V;text-align:center">⚠️ یعنی خطر</div>`, '-1300px', '4400px'); }
   return r;
@@ -289,12 +290,14 @@ function seek(t) {
   let s = '';
   const h = B[0], ho = h.b;
   if (t < ho + .8) {
-    const k = eio(pr(t, ho - .1, ho + .7)), z = 1 + .1 * pr(t, 0, ho);
+    const k = eio(pr(t, ho - .1, ho + .7)), z = 1 + .18 * eio(pr(t, 0, ho));
     const L = mix(0, 560, k), T = mix(0, 90, k), Wd = mix(1080, 440, k), Ht = mix(1920, 760, k);
     s += `<div class="a" style="left:${L}px;top:${T}px;width:${Wd}px;height:${Ht}px;overflow:hidden;border-radius:${mix(0, 40, k)}px;opacity:${(1 - pr(t, ho + .4, ho + .8)).toFixed(2)}"><img src="${U('el/s00.jpg')}" style="width:100%;height:100%;object-fit:cover;transform:scale(${z.toFixed(3)})"></div>`;
     if (t < ho) {
       const kb = pr(t, .3, .7);
       s += `<div class="a" style="left:60px;top:300px;transform:translateY(${(1 - ex(kb)) * 80}px);opacity:${cl(kb * 4)};display:flex;align-items:center;gap:20px"><div style="width:110px;height:110px;border-radius:50%;background:#FF5C93;font:900 54px/110px V;text-align:center" dir="ltr">S</div>${t < .7 ? dots(0, 0, t).replace('class="a" style="left:0px;top:0px;', 'style="') : `<div style="padding:22px 36px 30px;border-radius:40px;border-bottom-left-radius:10px;background:#fff;color:#111;font:900 58px V">سلام عزیزم 😊</div>`}</div>`;
+      if (t >= 1.25) { const kr = pr(t, 1.25, 1.55), fl = t < 1.6 && Math.floor(t * 30) % 2 ? .4 : 1;
+        s += `<div class="a" style="left:60px;top:280px;width:640px;height:150px;border:8px solid #FF2E63;border-radius:46px;opacity:${(cl(kr * 4) * fl).toFixed(2)}"></div><div class="a" style="left:520px;top:230px;padding:10px 30px 16px;border-radius:30px;background:#FF2E63;font:900 64px V;transform:rotate(-6deg) scale(${(2.2 - 1.2 * ex(kr)).toFixed(3)});opacity:${cl(kr * 4)}" dir="ltr">BOT 🤖</div>`; }
       const tk = pr(t, 1.2, 1.45);
       if (t >= 1.0) s += `<div class="a" style="left:70px;top:470px;transform:scale(${spring(pr(t, 1.0, 1.3)).toFixed(3)});transform-origin:center"><div style="width:220px;height:120px;border-radius:60px;background:${tk > .5 ? 'var(--blue)' : '#2A2C34'};position:relative"><div style="position:absolute;left:${10 + 100 * ex(tk)}px;top:10px;width:100px;height:100px;border-radius:50%;background:#fff"></div></div><div style="font:900 50px V;text-align:center;margin-top:6px">AI</div></div>`;
       s += `<div class="a" style="left:0;right:0;top:1090px;height:520px;background:linear-gradient(rgba(255,255,255,0),rgba(255,255,255,.92) 30%)"></div>`;
@@ -309,7 +312,7 @@ function endCard(u) {
   const k = ex(pr(u, 0, .5)), q = (S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:#FF4D5E">$1</span>');
   return `<div class="a" style="inset:0;background:rgba(11,11,14,${(.92 * k).toFixed(2)})"></div>` +
     `<div class="a" style="left:470px;top:${mix(900, 640, k)}px;width:140px;height:140px;border-radius:50%;background:#fff"></div>` +
-    `<div class="t" style="left:0;right:0;top:880px;text-align:center;font-size:86px;opacity:${pr(u, .2, .6)}">${q}</div>` +
+    `<div class="t" style="left:40px;right:40px;top:880px;text-align:center;white-space:normal;line-height:1.3;font-size:80px;opacity:${pr(u, .2, .6)}">${q}</div>` +
     `<div class="t" style="left:0;right:0;top:1030px;text-align:center;font:600 56px V;color:#9A9CA8;opacity:${pr(u, .4, .8)}">${S.end_sub || ''}</div>` +
     `<div class="t" dir="ltr" style="left:0;right:0;top:1160px;text-align:center;font-size:44px;letter-spacing:4px;color:#2F7BFF;opacity:${pr(u, .6, 1)}">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;
 }
