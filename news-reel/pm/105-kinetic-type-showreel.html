@@ -118,7 +118,7 @@ V.pills = async (sc, v, b) => {  // a row of glass pills sliding; a search lens 
   return t => { let xx = 0; const W = ps.map(p => p.offsetWidth + 30); const act = Math.min(items.length - 1, Math.floor(P(t, b.a + .2, b.b - .2) * items.length));
     const center = W.slice(0, act).reduce((s, w) => s + w, 0) + W[act] / 2;
     const tot = W.reduce((s, w) => s + w, 0), fits = tot < 1000; const off = lerp(540 + 600, fits ? 540 - tot / 2 : 540 - center, E.o(P(t, b.a - .1, b.a + .6))) + Math.sin(t) * 6;
-    ps.forEach((p, i) => { p.style.left = (off + xx) + 'px'; xx += W[i]; p.classList.toggle('on', i === act); p.style.transform = `scale(${i === act ? 1.08 : .92})`; p.style.opacity = i === act ? 1 : .6; });
+    ps.forEach((p, i) => { p.style.left = (off + xx) + 'px'; xx += W[i]; p.classList.toggle('on', i === act); if (v.red_last && i === items.length - 1 && i === act) { p.style.background = '#FF3B3B'; p.style.color = '#fff'; p.style.transform = `translateX(${(Math.sin(t * 40) * 6).toFixed(1)}px) scale(1.12)`; } else if (v.red_last) { p.style.background = ''; p.style.color = ''; } p.style.transform = `scale(${i === act ? 1.08 : .92})`; p.style.opacity = i === act ? 1 : .6; });
     const lx = fits ? off + W.slice(0, act).reduce((s, w) => s + w, 0) + W[act] - 50 : 540 + W[act] / 2 - 10; lens.style.left = lx + 'px'; lens.style.top = '1050px'; lens.style.opacity = P(t, b.a + .3, b.a + .6); if (lgE) { const k = inn(lgE, t, lg.t - .1, .45, 0, 50); lgE.style.transform += ` scale(${.8 + .2 * k})`; } };
 };
 V.kpi = async (sc, v, b) => {    // dark KPI card: label, a number that climbs, a delta badge, a chart that draws
@@ -155,6 +155,109 @@ V.zoom = async (sc, v, b) => {   // an icon tile that lands, then zooms through 
     const hd = sc.querySelector('.head'); if (hd) { inn(hd, t, b.a + .25, .45); hd.style.opacity *= 1 - o; } };
 };
 
+V.hook = async (sc, v, b) => {   // REEL-025: full-bleed real photo (bgs) with the headline band at the bottom unchanged from frame 0; a small chip flips AI → ابرهوش; logo tile after 1.5 s
+  const band = h('div', '', 'position:absolute; left:50px; right:50px; top:1180px; padding:26px 30px 36px; border-radius:30px; background:rgba(5,8,20,.86); box-shadow:0 20px 50px rgba(0,0,0,.5); text-align:center; direction:rtl');
+  band.append(h('div', '', 'font:900 108px/1.2 Vaz; color:#fff', esc(v.head || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--acc)">$1</span>')), h('div', '', 'margin-top:14px; font:800 62px Vaz; color:#BFD3FF', esc(v.gloss || ''))); sc.append(band);
+  const ch = v.chip ? h('div', '', 'position:absolute; left:70px; top:980px; padding:14px 34px 22px; border-radius:60px; background:#fff; font:900 70px Vaz; color:#111; box-shadow:0 16px 40px rgba(0,0,0,.4); direction:ltr') : null; if (ch) sc.append(ch);
+  let chair = null, qm = null; if (v.chair) { chair = h('div', '', 'position:absolute; left:340px; top:760px; width:400px; height:400px', (await icon('armchair')).replace('<svg', '<svg style="width:100%;height:100%;stroke:#fff;stroke-width:1.6;filter:drop-shadow(0 20px 40px #000)"')); sc.append(chair);
+    qm = h('div', '', 'position:absolute; left:110px; top:1080px; font:900 170px Vaz; color:#FF3B3B; text-shadow:0 10px 30px #000', '؟'); sc.append(qm); }
+  let lg = null; if (v.logo) { lg = h('div', '', 'position:absolute; right:60px; top:150px; width:220px; height:220px; border-radius:50px; background:#fff; display:grid; place-items:center; box-shadow:0 20px 50px rgba(0,0,0,.45)', `<img src="${url(v.logo)}" style="width:170px">`); sc.append(lg); }
+  return t => { if (ch) { const f = P(t, .45, .7); ch.innerHTML = t < .57 ? `<s style="text-decoration-color:#FF3B3B;text-decoration-thickness:8px">${v.chip[0]}</s>` : `${v.chip[0].strike ? '' : '<s style="text-decoration-color:#FF3B3B;text-decoration-thickness:8px;opacity:.5">' + v.chip[0] + '</s>'} → <span style="color:var(--acc)">${v.chip[1]}</span>`; ch.style.transform = `rotateX(${(Math.sin(f * Math.PI) * 80).toFixed(1)}deg) scale(${(.9 + .1 * E.o(P(t, 0, .3))).toFixed(3)})`; }
+    if (chair) { const y = E.p4i ? P(t, 1.2, 2.0) : P(t, 1.2, 2.0), k = y * y; chair.style.opacity = (Math.min(1, P(t, 0, .2) * 1) * (1 - P(t, 1.8, 2.2))).toFixed(2); chair.style.transform = `translate(${(k * 700).toFixed(1)}px, ${(k * 300 - Math.sin(y * Math.PI) * 120).toFixed(1)}px) rotate(${(k * 300).toFixed(1)}deg)`;
+      const q = P(t, 3.5, 3.8); qm.style.opacity = q; qm.style.transform = `scale(${(1.8 - .8 * E.o(q)).toFixed(3)}) rotate(-12deg)`; band.style.transform = `scale(${(1 + .02 * Math.sin(Math.max(0, t - 5.5) * 9) * (t > 5.5 && t < 6.2 ? 1 : 0)).toFixed(3)})`; }
+    if (lg) inn(lg, t, v.logo_at || 1.5, .45, 0, -40); };
+};
+V.cage = async (sc, v, b) => {   // REEL-025: the giant brain returns, cage bars draw around it, then it pulses and the bars snap off
+  const ns = 'http://www.w3.org/2000/svg', sv = document.createElementNS(ns, 'svg'); sv.setAttribute('width', 1080); sv.setAttribute('height', 1920); sv.style.cssText = 'position:absolute; inset:0'; sc.append(sv);
+  sv.innerHTML = '<defs><radialGradient id="cgr"><stop offset="0" stop-color="#FFB3D9"/><stop offset=".6" stop-color="#D0457A"/><stop offset="1" stop-color="#5A1030" stop-opacity="0"/></radialGradient></defs><circle id="cb" cx="540" cy="760" fill="url(#cgr)"/>';
+  const bars = []; for (let i = 0; i < 9; i++) { const l = document.createElementNS(ns, 'rect'); l.setAttribute('width', 18); l.setAttribute('height', 640); l.setAttribute('rx', 9); l.setAttribute('fill', '#E8EEF8'); sv.append(l); bars.push(l); }
+  const top = document.createElementNS(ns, 'rect'), bot = document.createElementNS(ns, 'rect'); for (const r of [top, bot]) { r.setAttribute('x', 250); r.setAttribute('width', 580); r.setAttribute('height', 24); r.setAttribute('rx', 12); r.setAttribute('fill', '#E8EEF8'); sv.append(r); }
+  top.setAttribute('y', 430); bot.setAttribute('y', 1070);
+  const lab = h('div', '', 'position:absolute; left:0; right:0; top:1180px; text-align:center; font:900 200px Vaz; color:#FF7A7A', 'مهار؟'); sc.append(lab);
+  const tk = (b.shown.find(w => w.k) || {t: b.b - 1.2}).t, cb = sv.querySelector('#cb');
+  return t => { const kb = E.o(P(t, b.a, b.a + .5)), snap = E.o(P(t, tk - .1, tk + .6)); cb.setAttribute('r', (240 * kb + 18 * Math.sin(t * 6) + 60 * snap).toFixed(1));
+    bars.forEach((l, i) => { const x = 270 + i * 65, k = E.o(P(t, b.a + .3 + i * .12, b.a + .6 + i * .12)), dir = i < 4 ? -1 : 1;
+      l.setAttribute('x', (x + dir * snap * (300 + i * 40)).toFixed(1)); l.setAttribute('y', (440 + (1 - k) * -700 + snap * snap * 500).toFixed(1)); l.setAttribute('transform', `rotate(${(dir * snap * (40 + i * 9)).toFixed(1)} ${x} 760)`); l.setAttribute('opacity', (k * (1 - P(t, tk + .5, tk + 1))).toFixed(2)); });
+    for (const r of [top, bot]) r.setAttribute('opacity', (E.o(P(t, b.a + .2, b.a + .5)) * (1 - snap)).toFixed(2));
+    lab.style.opacity = P(t, tk - .1, tk + .3); lab.style.transform = `scale(${(.6 + .4 * E.o(P(t, tk - .1, tk + .4))).toFixed(3)})`; };
+};
+V.poll2 = async (sc, v, b) => {  // REEL-025: two big poll buttons «کمک» / «جایگزین»; each bar fills as it is named; a pointer taps
+  const mk = (top, txt, col) => { const e = h('div', '', `position:absolute; left:110px; right:110px; top:${top}px; height:200px; border-radius:100px; background:rgba(255,255,255,.12); overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,.4)`);
+    const f = h('div', '', `position:absolute; left:0; top:0; bottom:0; width:0; background:${col}`), l = h('div', '', 'position:absolute; inset:0; display:grid; place-items:center; font:900 96px Vaz; color:#fff', txt); e.append(f, l); sc.append(e); return [e, f]; };
+  const [a, fa] = mk(560, 'کمک', '#3D8BFF'), [c, fc] = mk(840, 'جایگزین', '#FF3B3B');
+  const ptr = h('div', '', 'position:absolute; width:140px; height:140px', (await icon('pointer')).replace('<svg', '<svg style="width:100%;height:100%;stroke:#fff;fill:#111"')); sc.append(ptr);
+  const q = h('div', '', 'position:absolute; left:0; right:0; top:330px; text-align:center; font:900 110px Vaz; color:#fff', 'تو کدوم طرفی؟'); sc.append(q);
+  return t => { inn(q, t, b.a); inn(a, t, b.a + .1, .45, 0, 60); inn(c, t, b.a + .25, .45, 0, 60); const ph = (t - b.a) % 2.4;
+    fa.style.width = (100 * E.o(P(ph, .2, 1))).toFixed(1) + '%'; fc.style.width = (100 * E.o(P(ph, 1.2, 2))).toFixed(1) + '%';
+    const onA = ph < 1.2; ptr.style.left = (onA ? 760 : 760) + 'px'; ptr.style.top = (onA ? 640 : 920) + 'px'; ptr.style.transform = `scale(${(1 - .15 * Math.max(0, Math.sin((ph % 1.2) * 6))).toFixed(3)})`; };
+};
+V.seat = async (sc, v, b) => {   // REEL-025 payoff: the empty office chair slides in; the word «ابرهوش» slides onto it and sits with a bounce; then the comment card
+  const chair = h('div', '', 'position:absolute; left:290px; top:640px; width:500px; height:500px', (await icon('armchair')).replace('<svg', '<svg style="width:100%;height:100%;stroke:#fff;stroke-width:1.5;filter:drop-shadow(0 24px 50px #000)"'));
+  const w = h('div', '', 'position:absolute; left:0; right:0; top:560px; text-align:center; font:900 170px Vaz; color:var(--acc); text-shadow:0 0 40px var(--acc)', 'ابرهوش');
+  const card = h('div', '', 'position:absolute; left:90px; right:90px; top:1180px; padding:26px 30px 34px; border-radius:30px; background:#fff; color:#111; text-align:center; font:900 74px/1.35 Vaz; box-shadow:0 24px 60px rgba(0,0,0,.5)', 'کمکت می‌کنه یا جاتو می‌گیره؟<br><span style="font-size:58px;color:#3D8BFF">کامنت کن 💬</span>');
+  sc.append(chair, w, card);
+  return t => { const kc = E.o(P(t, b.a + .3, b.a + 1)); chair.style.transform = `translateX(${((1 - kc) * -900).toFixed(1)}px)`; chair.style.opacity = kc;
+    const kw = P(t, b.a + .9, b.a + 1.5), land = t > b.a + 1.5 ? Math.exp(-6 * (t - b.a - 1.5)) * Math.sin((t - b.a - 1.5) * 18) * 30 : 0;
+    w.style.opacity = P(t, b.a + .9, b.a + 1.1); w.style.transform = `translate(${((1 - E.o(kw)) * 900).toFixed(1)}px, ${(E.o(kw) * 190 + land).toFixed(1)}px)`;
+    inn(card, t, b.a + 2.4, .5, 0, 80); };
+};
+V.phoneui = async (sc, v, b) => {   // REEL-025: a labelled concept phone: inbox rows swipe away with checks, a search types «هدفون», three price cards drop, the cheapest flies into the cart
+  const ph = h('div', '', 'position:absolute; left:230px; top:240px; width:620px; height:1120px; border-radius:80px; background:#0E0E12; padding:26px; box-sizing:border-box; box-shadow:0 40px 90px rgba(0,0,0,.6)');
+  const sc2 = h('div', '', 'position:relative; width:100%; height:100%; border-radius:58px; background:#F4F6FB; overflow:hidden; direction:rtl'); ph.append(sc2); sc.append(ph);
+  sc.append(h('div', '', 'position:absolute; left:0; right:0; top:180px; text-align:center; font:800 32px Vaz; color:#BFD3FF', 'نمای مفهومی'));
+  const rows = []; for (let i = 0; i < 5; i++) { const r = h('div', '', `position:absolute; left:30px; right:30px; top:${110 + i * 120}px; height:96px; border-radius:24px; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.08); display:flex; align-items:center; gap:18px; padding:0 22px`,
+    `<div style="width:56px;height:56px;border-radius:50%;background:${['#3D8BFF','#FFB020','#22C55E','#A855F7','#EF4444'][i]}"></div><div style="flex:1"><div style="height:14px;width:70%;background:#C9D2E3;border-radius:7px"></div><div style="height:12px;width:45%;background:#E2E7F0;border-radius:6px;margin-top:12px"></div></div><div class="ck" style="font:900 52px Vaz;color:#22C55E;opacity:0">✓</div>`); sc2.append(r); rows.push(r); }
+  const ttl = h('div', '', 'position:absolute; left:30px; right:30px; top:30px; font:900 52px Vaz; color:#111', 'ایمیل‌ها'); sc2.append(ttl);
+  const sb = h('div', '', 'position:absolute; left:30px; right:30px; top:110px; height:96px; border-radius:48px; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.08); font:800 50px/96px Vaz; padding:0 34px; color:#111; opacity:0'); sc2.append(sb);
+  const prices = [['۲۹۰', '#fff'], ['۱۸۹', '#fff'], ['۲۴۵', '#fff']], cards = prices.map(([p], i) => { const e = h('div', '', `position:absolute; left:30px; right:30px; top:${250 + i * 200}px; height:170px; border-radius:30px; background:#fff; box-shadow:0 6px 16px rgba(0,0,0,.1); display:flex; align-items:center; gap:24px; padding:0 26px; opacity:0`, `<div style="width:120px;height:120px;border-radius:24px;background:#E8EDF6;display:grid;place-items:center">${'🎧'}</div><div style="flex:1;font:900 60px Vaz;color:#111">${p} دلار</div>`); sc2.append(e); return e; });
+  const cart = h('div', '', 'position:absolute; left:40px; bottom:40px; width:130px; height:130px; border-radius:40px; background:#3D8BFF; display:grid; place-items:center; font-size:70px; opacity:0', '🛒'); const badge = h('div', '', 'position:absolute; right:-10px; top:-10px; width:60px; height:60px; border-radius:50%; background:#EF4444; color:#fff; font:900 40px/60px Vaz; text-align:center; opacity:0', '۱'); cart.append(badge); sc2.append(cart);
+  return t => { const u = t - b.a; inn(ph, t, b.a, .5, 0, 200);
+    rows.forEach((r, i) => { const k = E.o(P(u, 1 + i * .25, 1.3 + i * .25)); r.querySelector('.ck').style.opacity = P(u, .8 + i * .25, 1 + i * .25); r.style.transform = `translateX(${(-k * 700).toFixed(1)}px)`; r.style.opacity = 1 - k; });
+    ttl.style.opacity = 1 - P(u, 2.4, 2.6); const ks = P(u, 2.5, 3.2); sb.style.opacity = P(u, 2.4, 2.6); sb.textContent = '🔍 ' + 'هدفون'.slice(0, Math.round(ks * 5));
+    cards.forEach((c, i) => { const k = E.o(P(u, 3.4 + i * .15, 3.8 + i * .15)); c.style.opacity = k; c.style.transform = `translateY(${((1 - k) * -120).toFixed(1)}px)`; });
+    const best = cards[1], kf = E.o(P(u, 4.6, 5.3)); best.style.background = u > 4.4 ? '#DBEAFE' : '#fff'; best.style.boxShadow = u > 4.4 ? '0 0 0 6px #3D8BFF' : '';
+    best.style.transform = `translate(${(-kf * 260).toFixed(1)}px, ${(kf * 420).toFixed(1)}px) scale(${(1 - .7 * kf).toFixed(3)})`; best.style.opacity = u < 4.6 ? best.style.opacity : (1 - P(u, 5.1, 5.3)).toFixed(2);
+    cart.style.opacity = P(u, 4.2, 4.5); badge.style.opacity = P(u, 5.3, 5.5); badge.style.transform = `scale(${(1 + .4 * Math.exp(-8 * Math.max(0, u - 5.3)) * (u > 5.3 ? 1 : 0)).toFixed(3)})`; };
+};
+V.crack = async (sc, v, b) => {  // REEL-025: giant «AI» cracks into two halves with shards; «SI» rises out of the crack with a glow
+  const L = h('div', '', 'position:absolute; left:0; right:0; top:560px; text-align:center; font:900 420px/1 Inter, Vaz; color:#fff; direction:ltr; clip-path:polygon(0 0,52% 0,46% 100%,0 100%)', 'AI');
+  const R = h('div', '', 'position:absolute; left:0; right:0; top:560px; text-align:center; font:900 420px/1 Inter, Vaz; color:#fff; direction:ltr; clip-path:polygon(52% 0,100% 0,100% 100%,46% 100%)', 'AI');
+  const S2 = h('div', '', 'position:absolute; left:0; right:0; top:600px; text-align:center; font:900 360px/1 Inter, Vaz; color:var(--acc); direction:ltr; text-shadow:0 0 60px var(--acc)', 'SI'); sc.append(L, R, S2); const G2 = v.gloss ? h('div', '', 'position:absolute; left:0; right:0; top:1000px; text-align:center; font:900 80px Vaz; color:#fff; direction:rtl', esc(v.gloss)) : null; if (G2) sc.append(G2);
+  const sh = []; for (let i = 0; i < 14; i++) { const e = h('div', '', `position:absolute; left:${520 + (i % 3) * 10}px; top:${620 + i * 22}px; width:${18 + (i % 4) * 8}px; height:${18 + (i % 3) * 10}px; background:#fff; transform:rotate(${i * 27}deg)`); sc.append(e); sh.push(e); }
+  const tk = (b.shown.find(w => w.k && /SI/.test(w.w)) || {t: b.a + 1.6}).t;
+  return t => { const kin = E.o(P(t, b.a, b.a + .4)), c = E.o(P(t, tk - .5, tk)), r = E.o(P(t, tk, tk + .5));
+    L.style.opacity = R.style.opacity = kin * (1 - P(t, tk + .4, tk + .8)); L.style.transform = `translate(${-c * 220}px, ${c * 60}px) rotate(${-c * 14}deg)`; R.style.transform = `translate(${c * 220}px, ${c * 80}px) rotate(${c * 12}deg)`;
+    sh.forEach((e, i) => { const a = i * 0.9, d = c * (200 + i * 30); e.style.opacity = c * (1 - P(t, tk + .2, tk + .9)); e.style.transform = `translate(${(Math.cos(a) * d).toFixed(1)}px, ${(Math.sin(a) * d + c * c * 300).toFixed(1)}px) rotate(${(i * 27 + c * 200).toFixed(0)}deg)`; });
+    S2.style.opacity = r; if (G2) G2.style.opacity = P(t, tk + .3, tk + .7); S2.style.transform = `translateY(${((1 - r) * 200).toFixed(1)}px) scale(${(.7 + .3 * r).toFixed(3)})`; };
+};
+V.split = async (sc, v, b) => {  // REEL-025: split screen — left a person with helper bots orbiting (کمک), right an empty desk with a fading person outline (جایگزین)
+  const L = h('div', '', 'position:absolute; left:0; top:300px; width:530px; height:1080px; background:rgba(61,139,255,.16)'), R = h('div', '', 'position:absolute; left:550px; top:300px; width:530px; height:1080px; background:rgba(255,59,59,.14)');
+  const dv = h('div', '', 'position:absolute; left:532px; top:300px; width:16px; height:1080px; background:#fff; transform-origin:top'); sc.append(L, R, dv);
+  const person = h('div', 'zoomic', 'left:105px; top:620px; width:320px; height:320px', await icon('user')), desk = h('div', 'zoomic', 'left:655px; top:620px; width:320px; height:320px; background:#222', await icon('armchair'));
+  const ghost = h('div', '', 'position:absolute; left:700px; top:430px; width:230px; height:230px; opacity:.6', (await icon('user')).replace('<svg', '<svg style="width:100%;height:100%;stroke:#fff"')); sc.append(person, desk, ghost);
+  const bots = []; for (let i = 0; i < 3; i++) { const e = h('div', '', 'position:absolute; width:130px; height:130px; border-radius:34px; background:var(--acc); display:grid; place-items:center', (await icon('bot')).replace('<svg', '<svg style="width:70%;height:70%;stroke:#111"')); sc.append(e); bots.push(e); }
+  const l1 = h('div', '', 'position:absolute; left:0; width:530px; top:330px; text-align:center; font:900 96px Vaz; color:#7FB2FF', 'کمک'), l2 = h('div', '', 'position:absolute; left:550px; width:530px; top:330px; text-align:center; font:900 96px Vaz; color:#FF7A7A', 'جایگزین'); sc.append(l1, l2);
+  const kis = b.shown.filter(w => w.k), t1 = (kis[0] || {t: b.a + .8}).t, t2 = (kis[kis.length - 1] || {t: b.a + 1.8}).t;
+  return t => { dv.style.transform = `scaleY(${E.o(P(t, b.a, b.a + .5)).toFixed(3)})`; inn(person, t, b.a + .1); inn(desk, t, b.a + .25);
+    bots.forEach((e, i) => { const a = t * 1.6 + i * 2.09, k = E.o(P(t, t1 - .1 + i * .12, t1 + .3 + i * .12)); e.style.left = (205 + Math.cos(a) * 200 * k).toFixed(1) + 'px'; e.style.top = (715 + Math.sin(a) * 260 * k).toFixed(1) + 'px'; e.style.opacity = k; });
+    ghost.style.opacity = (.6 * (1 - P(t, t2, t2 + 1))).toFixed(2); ghost.style.transform = `translateY(${(-P(t, t2, t2 + 1) * 120).toFixed(1)}px)`;
+    inn(l1, t, t1 - .1); inn(l2, t, t2 - .1); };
+};
+V.swarm = async (sc, v, b) => {  // REEL-025: one giant glowing brain on the right vs a swarm of tiny dots streaming in and snapping into a grid
+  const N = 420, sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.setAttribute('width', 1080); sv.setAttribute('height', 1920); sv.style.cssText = 'position:absolute; inset:0'; sc.append(sv);
+  const ns = 'http://www.w3.org/2000/svg', dots = [];
+  const brain = document.createElementNS(ns, 'circle'); brain.setAttribute('cx', 760); brain.setAttribute('cy', 560); brain.setAttribute('fill', 'url(#bgr)');
+  sv.innerHTML = '<defs><radialGradient id="bgr"><stop offset="0" stop-color="#FFB3D9"/><stop offset=".6" stop-color="#D0457A"/><stop offset="1" stop-color="#5A1030" stop-opacity="0"/></radialGradient></defs>'; sv.append(brain);
+  for (let i = 0; i < N; i++) { const c = document.createElementNS(ns, 'circle'); c.setAttribute('r', 9); c.setAttribute('fill', i % 7 ? '#3D8BFF' : '#7FE3FF'); sv.append(c);
+    const gx = 120 + (i % 21) * 40, gy = 760 + Math.floor(i / 21) * 34, sx = -200 - ((i * 97) % 600), sy = 200 + ((i * 53) % 1400); dots.push([c, sx, sy, gx, gy, (i % 37) * .012]); }
+  const l1 = h('div', '', 'position:absolute; left:600px; top:860px; width:320px; text-align:center; font:900 56px Vaz; color:#FFB3D9', '۱ مغز غول‌پیکر');
+  const l2 = h('div', '', 'position:absolute; left:80px; right:80px; top:1500px; text-align:center; font:900 92px Vaz; color:#7FE3FF; direction:ltr', '۱٬۰۰۰٬۰۰۰٬۰۰۰٬۰۰۰'); sc.append(l1, l2);
+  const tk = (b.shown.find(w => w.k && /تریلیون/.test(w.w)) || {t: b.a + 1.6}).t;
+  return t => { const kb = E.o(P(t, b.a, b.a + .5)), fade = P(t, tk, tk + .8);
+    brain.setAttribute('r', (260 * kb * (1 - .55 * fade) + 10 * Math.sin(t * 3)).toFixed(1)); brain.setAttribute('opacity', (1 - .5 * fade).toFixed(2)); l1.style.opacity = kb * (1 - fade);
+    dots.forEach(([c, sx, sy, gx, gy, d]) => { const k = E.o(P(t, tk - .4 + d, tk + .5 + d)); c.setAttribute('cx', (sx + (gx - sx) * k).toFixed(1)); c.setAttribute('cy', (sy + (gy - sy) * k + Math.sin(t * 4 + gx) * 3 * k).toFixed(1)); c.setAttribute('opacity', P(t, tk - .5, tk - .2)); });
+    l2.style.opacity = P(t, tk + .3, tk + .7); l2.style.transform = `scale(${(.8 + .2 * E.o(P(t, tk + .3, tk + .8))).toFixed(3)})`; };
+};
 let S, TL, B = [], END = 60;
 window.ready = (async () => {
   S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json();
@@ -199,7 +302,7 @@ function seek(t) {
   if (b.upd) b.upd(t);
   // caption (the narration) for scenes whose main visual is not the typed sentence
   const cap = $('cap');
-  if (!inEnd && b.v.type !== 'type') { if (cap._b !== b) { cap._b = b; cap.innerHTML = b.shown.filter(w => !w.icon).map(w => `<span>${esc(w.w)}</span>`).join(' '); }
+  if (!inEnd && b.v.type !== 'type' && b.v.type !== 'hook') { if (cap._b !== b) { cap._b = b; cap.innerHTML = b.shown.filter(w => !w.icon).map(w => `<span>${esc(w.w)}</span>`).join(' '); }
     const ws = b.shown.filter(w => !w.icon); [...cap.children].forEach((s, j) => s.classList.toggle('on', t >= ws[j].t - .05)); cap.style.opacity = 1 - outK; }
   else { cap.innerHTML = ''; cap._b = null; }
   const e = $('end'), ek = P(t, TL.end_start, TL.end_start + .6); e.style.opacity = ek;

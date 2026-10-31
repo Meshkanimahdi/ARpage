@@ -264,5 +264,61 @@
   "score": 1,
   "voice": "RBEKbcQ62sKk2tsmPsAU",
   "date": "2026-10-31"
+ },
+ "Zuckerberg": {
+  "mode": "A",
+  "spoken": "Zuckerberg",
+  "score": 1,
+  "voice": "Mn0jJ3FC9Ijz7lQe8ELI",
+  "date": "2026-10-31"
+ },
+ "icon": {
+  "mode": "A",
+  "spoken": "icon",
+  "score": 1,
+  "voice": "Mn0jJ3FC9Ijz7lQe8ELI",
+  "date": "2026-10-31"
+ },
+ "mail": {
+  "mode": "A",
+  "spoken": "mail",
+  "score": 0.5,
+  "voice": "Mn0jJ3FC9Ijz7lQe8ELI",
+  "date": "2026-10-31"
+ },
+ "shopping-cart": {
+  "mode": "A",
+  "spoken": "shopping-cart",
+  "score": 1,
+  "voice": "Mn0jJ3FC9Ijz7lQe8ELI",
+  "date": "2026-10-31"
+ },
+ "Sam Altman": {
+  "mode": "C",
+  "spoken": "سَم آلْتْمَن",
+  "score": 1,
+  "voice": "Mn0jJ3FC9Ijz7lQe8ELI",
+  "date": "2026-10-31"
+ },
+ "el.openai": {
+  "mode": "B",
+  "spoken": "el.openai",
+  "score": 1,
+  "voice": "Mn0jJ3FC9Ijz7lQe8ELI",
+  "date": "2026-10-31"
+ },
+ "Meta": {
+  "mode": "C",
+  "spoken": "مِتا",
+  "score": 1,
+  "voice": "Mn0jJ3FC9Ijz7lQe8ELI",
+  "date": "2026-10-31"
+ },
+ "el.meta": {
+  "mode": "A",
+  "spoken": "el.meta",
+  "score": 1,
+  "voice": "Mn0jJ3FC9Ijz7lQe8ELI",
+  "date": "2026-10-31"
  }
 }
