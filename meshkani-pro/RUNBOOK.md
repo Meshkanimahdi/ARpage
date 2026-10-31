@@ -788,6 +788,17 @@ narrator talks, nothing attractive in the picture").
 3. `bash news-reel/setup.sh`.
 
 ### 4.2 Story research (trending)
+00. **Real famous faces and trending people (user rule 2026-10-31).** Mahdi: «یه پستی ما گذاشتیم از انویدیا که عکس خود
+   صاحب انویدیا رو گذاشتیم، اون خیلی خوب بود… عکس آدمای واقعی باید بیاد… مثلاً ترامپ… ایلان ماسک… کاور خیلی مهمه یا
+   قسمت اول ویدئو… مخصوصاً ترامپ که الان خودش واقعاً ترند دنیاست و ما هم باید روی این موج سواری بکنیم».
+   - Prefer stories in which a famous, trending person acts or speaks (Trump, Elon Musk, Jensen Huang, Sam Altman,
+     Mark Zuckerberg, Sundar Pichai…); when two stories are equal, the one with the more famous face wins. Search
+     "Trump AI", "Musk AI" etc. in the 7-day window every day.
+   - When the story has such a person, the **cover and frame 0 show their real photo**, face large (≥ 40 % of the
+     frame), cut out or framed, bright, with the plain headline. Sources: Wikimedia Commons, official/government
+     or company press photos (White House, company newsroom), credited in the caption («عکس: …»).
+   - Never a generated or altered likeness, never a fake quote: the words on screen are what the person really
+     said or did, from the source. A real statement may be paraphrased in Persian, not invented or sharpened.
 0. **Viral radar first (user rule 2026-10-31).** Mahdi: «بریم تو پیجای هوش مصنوعی دیگه و نگاه کنیم ببینیم کدوم ریلز ها
    ریچ خوبی گرفته… مثل همون رو بسازیم». Once per day (the 09:00 REEL_PREPARE; the others reuse the file), read
    the last 7 days of reels from the Persian AI pages in `config.json → radar.pages` (start: mohamadesfehaniyan,
@@ -899,6 +910,20 @@ narrator talks, nothing attractive in the picture").
    no per-element image calls). `python3 news-reel/sprite_sheet.py --dir work/story`; Read the sheet
    previews; regenerate a sheet at most twice. Real products: refs per §1.5.1. Real people: real photos
    (Wikimedia Commons first, `fetch_to_drive` + download), credited.
+3b. **Voices, music and sound effects from the library first (user rule 2026-10-31).** Mahdi: «ساوند افکت‌ها رو حتماً
+   عوض کن، ما کلی ساوند افکت آماده هم داریم… نیازی نیست دائم تولید کنی یا از کردیت کم کنی… موزیک آماده هم زیاده… ما
+   کلی صدای خوب داریم… بسیار هاسکی و از ته حلق، برای خبر عالی‌ان، صدای خانم‌های خیلی خوب. همه رو صداهای مشابه هم
+   انتخاب نکن».
+   - `news-reel/audio_library.json` lists what the ElevenLabs account already has: `voices` (from `GET /v1/voices`,
+     with a one-line character note: deep husky male news voice, warm female, young energetic, …), `music`
+     (ready tracks: news-reel/sfx music files, ElevenLabs history/library tracks, licensed Drive music) and `sfx`
+     (news-reel/sfx/*.mp3 plus ready library effects). Build it once from the account (list, do not generate),
+     commit it, and refresh it weekly.
+   - **Voice:** pick by the story's mood from the library; never the voice of either of the last 2 reels (the gate
+     checks `story.json → voice` against motion_history), and alternate male/female across the day. Deep, husky
+     voices for serious news; bright female voices for everyday/beauty/lifestyle.
+   - **Music and sound effects:** choose from the library; generate a new one only when nothing fits, at most one
+     new file a day. Rotate music tracks: not the track of the last 3 reels.
 3a. **English names (user rule 2026-10-29):** `node news-reel/pron_test.mjs --dir=work/story` (STORY_SPEC "English
    names must SOUND English"); commit `news-reel/pron_cache.json`; Read the scores, exit 4 → respell/rephrase.
 3. `node news-reel/story_voice.mjs --dir=work/story --tempo=<tempo>` (eleven_v4; exit 3 → shorten,

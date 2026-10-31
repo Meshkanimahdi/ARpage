@@ -1,0 +1,2 @@
+{"_note": "Ready audio of the ElevenLabs account and the repo (user rule 2026-10-31: use the library, do not keep generating). The publisher fills voices/music/sfx from GET /v1/voices, the account's history/library and news-reel/sfx, with a one-line character note each, and refreshes it weekly.",
+ "voices": [], "music": [], "sfx": []}

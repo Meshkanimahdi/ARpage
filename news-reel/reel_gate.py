@@ -139,6 +139,11 @@ def main():
             if sx.get('whoosh', 0) > 2: fails.append(f"{sx['whoosh']} whooshes (max 2)")
             if tot >= 5 and max(sx.values()) > 0.4 * tot: fails.append(f'one sound effect is over 40% of all effects {sx}')
 
+    # 4b4. voice rotation (user rule 2026-10-31): not the same narrator as the last 2 reels
+    vc = story.get('voice', '')
+    if not vc: fails.append('story.json must name voice')
+    elif vc in [h.get('voice') for h in hist[-2:]]: fails.append(f'voice {vc} was used in one of the last 2 reels: pick another from audio_library.json')
+
     # 4c. preflight (user rule 2026-10-27): cover, headline and hook were judged on stills before the full render
     pf = d / 'preflight.json'
     if not pf.exists() or not json.loads(pf.read_text()).get('pass'):
@@ -158,7 +163,7 @@ def main():
 
     out = {'pass': not fails, 'fails': fails, 'info': info,
            'history_entry': {'reel': story.get('content_id', ''), 'date': story.get('date', ''), 'prompt': pid, 'engine': eng,
-                             'category': cat, 'field': story.get('field', ''), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else '')}}
+                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else '')}}
     (d / 'gate.json').write_text(json.dumps(out, ensure_ascii=False, indent=1))
     print(json.dumps(out, ensure_ascii=False))
     sys.exit(0 if not fails else 3)
