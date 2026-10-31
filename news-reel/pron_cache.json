@@ -187,5 +187,82 @@
   "score": 1,
   "voice": "XzieuK0bwYWT9Kl1LhLs",
   "date": "2026-10-31"
+ },
+ "Trump": {
+  "mode": "A",
+  "spoken": "Trump",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-10-31"
+ },
+ "Truth Social": {
+  "mode": "A",
+  "spoken": "Truth Social",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-10-31"
+ },
+ "SI": {
+  "mode": "A",
+  "spoken": "SI",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-10-31"
+ },
+ "Super Intelligence": {
+  "mode": "A",
+  "spoken": "Super Intelligence",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-10-31"
+ },
+ "ChatGPT": {
+  "mode": "C",
+  "spoken": "چَت‌جی‌پی‌تی",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-10-31"
+ },
+ "amused": {
+  "mode": "A",
+  "spoken": "amused",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-10-31"
+ },
+ "Elon Musk": {
+  "mode": "C",
+  "spoken": "ایلان ماسک",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-10-31"
+ },
+ "SpaceXSI": {
+  "mode": "B",
+  "spoken": "SpaceXSI",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-10-31"
+ },
+ "OpenAI": {
+  "mode": "C",
+  "spoken": "اُپِن‌اِی‌آی",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-10-31"
+ },
+ "Anthropic": {
+  "mode": "C",
+  "spoken": "اَنْتروپیک",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-10-31"
+ },
+ "x.ai": {
+  "mode": "A",
+  "spoken": "x.ai",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-10-31"
  }
 }

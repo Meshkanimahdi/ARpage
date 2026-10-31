@@ -87,6 +87,7 @@ window.ready = (async () => {
   // real photos used by the scenes (el/<name>.jpg), preloaded so the first frame already shows them
   const imgs = [...new Set(S.beats.map(b => (b.scene || {}).img).filter(Boolean))];
   await Promise.all(imgs.map(n => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + n + '.jpg'); })));
+  await Promise.all((S.preload || []).map(n => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + n); })));
   await document.fonts.ready; await Promise.all(['500 40px V', '900 40px V', '700 40px H'].map(f => document.fonts.load(f, 'صدای Dessa')));
   window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
   // one scene per idea: the beat start and each keyword hit inside it (a new idea every 1.5–2 s)
@@ -395,6 +396,111 @@ function scene(b, t, u, ink, dark) {
       r += `<div class="big" style="top:300px;font-size:110px;color:${ink};opacity:${cl(u * 3)}">بار اول نشد؟</div>`;
       return r + (t >= tk - .05 ? bigWord('دوباره', 520, 170, 'var(--a2)', pr(t, tk - .05, tk + .4)) + handNote(`بار ${fa(n + 1)}`, 680, 800, 1, ink, -4, 70) : '');
     }
+    case 'strike': {
+      // hook (REEL-024): the real portrait print fills the frame from frame 0; a giant «AI» lower right gets a red marker slash, then «SI» drops in
+      const z = mix(1.28, 1.0, ez.out(pr(t, 0, .45))) * mix(1.0, 1.06, ez.io(pr(t, .45, b.b))), shk = Math.exp(-6 * t) * Math.sin(t * 70) * 16;
+      let r = `<div style="position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden"><img src="${U('el/' + s.img + '.jpg')}" style="position:absolute;left:-120px;top:0;width:1320px;height:1920px;object-fit:cover;object-position:50% 12%;filter:brightness(1.18) saturate(1.1);transform:translate(${shk.toFixed(1)}px,0) scale(${z.toFixed(4)});transform-origin:45% 35%"></div>`;
+      r += `<div style="position:absolute;inset:0;background:linear-gradient(#0000 55%,#0008)"></div>`;
+      const ka = Math.max(.85, ez.back(pr(t, 0, .25))), [sx, sy] = squash(pr(t, 0, .25) - .3);
+      r += `<div style="position:absolute;left:0;right:0;top:1250px;text-align:center;font:900 360px/1 V;color:#fff;text-shadow:0 14px 30px #000a;transform:scale(${(ka * sx).toFixed(3)},${(ka * sy).toFixed(3)}) rotate(-4deg)" dir="ltr">AI</div>`;
+      r += svg(markerPath('M 230 1560 L 870 1280', pr(t, .25, .45), '#FF2D2D', 44));
+      if (t > .25 && t < .55) r = `<div style="position:absolute;inset:0;transform:translate(${(Math.sin(t * 90) * 10).toFixed(1)}px,0)">${r}</div>`;
+      const t2 = .55; if (t >= t2) { const k2 = pr(t, t2, t2 + .35), e2 = ez.back(k2), [qx, qy] = squash(k2 - .3);
+        r += `<div style="position:absolute;left:0;right:0;top:${(1640 - (1 - e2) * 300).toFixed(1)}px;text-align:center;font:900 230px/1 V;color:#FFD23F;text-shadow:0 12px 28px #000a;transform:scale(${(qx).toFixed(3)},${(qy).toFixed(3)}) rotate(3deg)" dir="ltr">SI</div>` +
+          handNote('به جاش:', 600, 1660, pr(t, t2 + .1, t2 + .6), '#FFD23F', -4, 118); }
+      return r + `<div style="position:absolute;left:60px;right:60px;top:110px;padding:24px 34px 34px;background:#E8202A;border-radius:22px;text-align:center;font:900 92px/1.25 V;color:#fff;box-shadow:0 14px 30px #0006">Trump می‌خواد کلمهٔ <span dir="ltr">AI</span> رو ممنوع کنه</div>`;
+    }
+    case 'post': {
+      // a paper social-post card with the official Truth Social logo; the quote types on; official papers get an «AI» crossed one by one
+      const kc = ez.back(pr(t, b.a, b.a + .5)), kis = b.words.map((w, i) => w.k && (i === 0 || !b.words[i - 1].k) ? i : -1).filter(i => i >= 0);
+      const tq = b.a + .5, td = b.wt(kis[2] ?? 8), q = 'اسم بد و نادرست!'; const n = Math.round(q.length * pr(t, tq - .2, tq + .6));
+      let r = `<div style="position:absolute;left:90px;top:${(260 + (1 - kc) * 500).toFixed(1)}px;width:900px;height:560px;background:#fff;border-radius:34px;box-shadow:0 22px 44px rgba(0,0,0,.22);transform:rotate(-2deg)">
+        <img src="${U('el/truth.png')}" style="position:absolute;right:50px;top:44px;height:92px">
+        <img src="${U('el/trump.jpg')}" style="position:absolute;left:44px;top:30px;width:120px;height:120px;border-radius:50%;object-fit:cover;object-position:50% 20%;border:4px solid #E8202A"><div style="position:absolute;left:184px;top:66px;font:500 40px V;color:#666">Trump · ۲۷ اکتبر</div>
+        <div style="position:absolute;right:50px;left:50px;top:200px;font:900 104px/1.3 V;color:#1B1A18;text-align:right">${q.slice(0, n)}</div></div>`;
+      if (t < td - .1) { const kw = ez.back(pr(t, b.a + .3, b.a + .8)); r += `<div style="position:absolute;left:120px;top:900px;width:840px;height:430px;background:#F7F4EC;box-shadow:0 18px 34px rgba(0,0,0,.2);transform:rotate(3deg) scale(${kw.toFixed(3)})"><img src="${U('el/wsj.png')}" style="position:absolute;left:40px;right:40px;top:30px;width:760px"><div style="position:absolute;left:40px;right:40px;top:150px;height:8px;background:#1B1A18"></div>${[0,1,2,3,4].map(i => `<div style="position:absolute;left:40px;top:${190 + i * 44}px;width:${i % 2 ? 560 : 760}px;height:18px;background:#CFCAC0"></div>`).join('')}</div>` + svg(markerPath('M 150 1100 C 200 860, 900 860, 950 1110 C 900 1360, 200 1360, 150 1100', pr(t, b.a + .9, b.a + 1.6), '#E8202A', 12)); }
+      if (t >= tq + .4) r += svg(markerPath('M 180 690 C 400 720, 700 660, 900 700', pr(t, tq + .4, tq + .9), '#E8202A', 16));
+      if (t >= td - .1) for (let i = 0; i < 4; i++) { const ti = td - .1 + i * .22, k = ez.back(pr(t, ti, ti + .3)); if (t < ti) break;
+        r += `<div style="position:absolute;left:${170 + i * 170}px;top:${940 + i * 40}px;width:420px;height:300px;background:#FBFAF6;border:3px solid #ddd;transform:rotate(${(i % 2 ? 6 : -5)}deg) scale(${k.toFixed(3)});box-shadow:0 10px 20px rgba(0,0,0,.15)">
+          <div style="margin:40px 40px 0;height:14px;background:#ccc;border-radius:7px"></div><div style="margin:20px 40px 0;height:14px;width:60%;background:#ccc;border-radius:7px"></div>
+          <div dir="ltr" style="position:absolute;left:90px;top:120px;font:900 110px V;color:#1B1A18">AI</div>${svg(markerPath('M 70 230 L 300 130', pr(t, ti + .15, ti + .35), '#E8202A', 20), 0, 0, 420, 300)}</div>`; }
+      return r;
+    }
+    case 'stamp': {
+      // a giant rubber stamp slams «SI»; then an executive-order sheet slides in and a signature draws on
+      const kis = b.words.map((w, i) => w.k && (i === 0 || !b.words[i - 1].k) ? i : -1).filter(i => i >= 0), ts = b.wt(kis[0]), to = b.wt(kis[1] ?? 9);
+      const drop = ez.out(pr(t, ts - .35, ts)), hit = t >= ts, shake = hit ? Math.exp(-8 * (t - ts)) * Math.sin((t - ts) * 60) * 14 : 0;
+      let r = print('trump', 690, 90, 320, 6, pr(t, b.a, b.a + .4), 1.15, '50% 25%') + `<div style="position:absolute;inset:0;transform:translate(${shake.toFixed(1)}px,${(shake * .5).toFixed(1)}px)">`;
+      if (!hit) r += `<div dir="ltr" style="position:absolute;left:0;right:0;top:560px;text-align:center;font:900 420px/1 V;color:#1B1A18;opacity:.85">AI</div>` + svg(markerPath('M 220 1000 L 860 640', pr(t, b.a + .1, b.a + .5), '#E8202A', 40));
+      if (hit) { const k = ez.back(pr(t, ts, ts + .3)); r += `<div dir="ltr" style="position:absolute;left:0;right:0;top:520px;text-align:center;font:900 420px/1 V;color:#E8202A;opacity:.92;transform:rotate(-8deg) scale(${(1.4 - .4 * k).toFixed(3)})">SI</div>`;
+        for (let i = 0; i < 9; i++) { const a = i * 0.7, d = 260 + 200 * ez.out(pr(t, ts, ts + .5)); r += `<div style="position:absolute;left:${(540 + Math.cos(a) * d - 18).toFixed(1)}px;top:${(760 + Math.sin(a) * d * .7 - 18).toFixed(1)}px;width:36px;height:36px;border-radius:50%;background:#E8202A;opacity:${(1 - pr(t, ts + .3, ts + .9)).toFixed(2)}"></div>`; }
+        r += handNote('Super Intelligence', 260, 980, pr(t, ts + .2, ts + 1), 'var(--a2)', -4, 84); }
+      r += `<div style="position:absolute;left:340px;top:${(-500 + 820 * drop).toFixed(1)}px;width:400px;height:420px;opacity:${(1 - pr(t, ts + .15, ts + .45)).toFixed(2)}"><div style="margin:0 auto;width:150px;height:150px;background:radial-gradient(circle at 35% 30%,#ff6b6b,#B5121B);border-radius:50%"></div><div style="margin:-10px auto 0;width:90px;height:110px;background:#8B0D14"></div><div style="width:400px;height:130px;background:linear-gradient(#d9d9d9,#9a9a9a);border-radius:18px"></div></div></div>`;
+      { const k = pr(t, b.a + .2, b.a + .7); r += `<div style="position:absolute;left:160px;top:${(1200 + (1 - ez.out(k)) * 600).toFixed(1)}px;width:760px;height:300px;background:#fff;box-shadow:0 18px 34px rgba(0,0,0,.2);transform:rotate(2deg)"><div style="position:absolute;right:40px;top:30px;font:900 56px V;color:#1B1A18">فرمان اجرایی</div><div style="position:absolute;left:40px;top:40px;padding:6px 20px 12px;background:var(--a2);color:#fff;border-radius:14px;font:900 40px V">۲۹ سپتامبر</div></div>` +
+          (t >= to ? svg(markerPath('M 260 1440 C 320 1380, 360 1470, 420 1410 S 520 1380, 600 1430', pr(t, to, to + .7), '#1B1A18', 8)) : ''); }
+      return r;
+    }
+    case 'phone': {
+      // a paper-cut phone home screen; app labels flip AI→SI like a split-flap; then the answer stamp «فقط دولت آمریکا»
+      const kis = b.words.map((w, i) => w.k && (i === 0 || !b.words[i - 1].k) ? i : -1).filter(i => i >= 0), tf = b.wt(kis[1] ?? 6), ta = b.wt(kis[2] ?? 12);
+      const kp = ez.back(pr(t, b.a, b.a + .5));
+      let r = `<div style="position:absolute;left:200px;top:${(240 + (1 - kp) * 600).toFixed(1)}px;width:680px;height:1120px;background:#1B1A18;border-radius:70px;padding:26px;box-sizing:border-box;box-shadow:0 26px 50px rgba(0,0,0,.3)"><div style="width:100%;height:100%;background:linear-gradient(160deg,#C4D5EE,#F3EEE4);border-radius:50px;position:relative">`;
+      const apps = [['chatgpt', 'ChatGPT'], ['gemini', 'Gemini'], ['claude', 'Claude'], ['meta', 'Meta'], ['xai', 'Grok'], ['openai', 'OpenAI']];
+      apps.forEach(([lg, nm], i) => { const x = 40 + (i % 3) * 200, y = 90 + Math.floor(i / 3) * 280, ti = tf + i * .15, flip = pr(t, ti, ti + .25);
+        const lab = flip < .5 ? 'AI' : 'SI', sc = Math.abs(1 - 2 * flip);
+        r += `<div style="position:absolute;left:${x}px;top:${y}px;width:160px;height:160px;border-radius:38px;background:#fff;display:grid;place-items:center;box-shadow:0 6px 12px rgba(0,0,0,.15)">${lg ? `<img src="${U('el/' + lg + '.png')}" style="max-width:130px;max-height:120px">` : `<div style="font:900 60px V;color:#1B1A18" dir="ltr">${nm[0]}</div>`}</div>
+          <div dir="ltr" style="position:absolute;left:${x}px;top:${y + 172}px;width:160px;text-align:center;font:900 66px V;color:${lab === 'SI' ? '#E8202A' : '#1B1A18'};transform:scaleY(${sc.toFixed(2)})">${lab}</div>`; });
+      r += `</div></div>`;
+      if (t < ta - .1) r += bigWord('؟', 1080, 300, 'var(--a1)', pr(t, b.a + .4, b.a + .8));
+      else { const k = ez.back(pr(t, ta - .1, ta + .25)); r += `<div style="position:absolute;left:110px;top:1080px;width:860px;padding:26px 0 36px;text-align:center;border:12px solid #E8202A;border-radius:26px;color:#E8202A;font:900 92px V;background:rgba(243,238,228,.92);transform:rotate(-7deg) scale(${(1.5 - .5 * k).toFixed(3)});opacity:${cl(k * 2)}">نه؛ فقط دولت آمریکا</div>`; }
+      return r;
+    }
+    case 'portrait': {
+      // the real photo as a taped print; a quote bubble types on; a thumbs-up pops
+      const ik = b.words.findIndex((w, i) => w.k && i > 2), tk = b.wt(ik < 0 ? b.words.length - 1 : ik), kp = pr(t, b.a, b.a + .45);
+      let r = print(s.img, 330, 180, 640, 3, kp, mix(1.08, 1.18, pr(t, b.a, b.b)), '50% 30%');
+      r += handNote('Elon Musk', 60, 330, pr(t, b.a + .2, b.a + .8), 'var(--a1)', -6, 86);
+      const qt = 'دیگه AI نه، SI بهتره', n = Math.round(qt.length * pr(t, b.a + .6, tk + .2));
+      r += bubble(470, 1300, 760, 220, pr(t, b.a + .4, b.a + .8), `<foreignObject x="-360" y="-80" width="720" height="160"><div xmlns="http://www.w3.org/1999/xhtml" style="font:900 74px V;color:#1B1A18;text-align:center;direction:rtl">${qt.slice(0, n)}</div></foreignObject>`);
+      if (t >= tk - .05) { const k = ez.back(pr(t, tk - .05, tk + .3)); r += `<div style="position:absolute;left:820px;top:1040px;font-size:170px;transform:scale(${k.toFixed(3)}) rotate(-12deg)">👍</div>`; }
+      return r;
+    }
+    case 'logos': {
+      // official SpaceX and xAI tiles; xAI flips to the SpaceXSI wordmark; then the gag: the site is still x.ai
+      const kis = b.words.map((w, i) => w.k && (i === 0 || !b.words[i - 1].k) ? i : -1).filter(i => i >= 0), tn = b.wt(kis[0]), tg = b.wt(kis[1] ?? b.words.length - 2);
+      const tile = (x, y, src, k, rot, flip = 1) => `<div style="position:absolute;left:${x}px;top:${y}px;width:420px;height:300px;background:#fff;border-radius:30px;display:grid;place-items:center;box-shadow:0 16px 30px rgba(0,0,0,.18);transform:rotate(${rot}deg) scale(${ez.back(cl(k)).toFixed(3)}) scaleX(${flip.toFixed(2)})"><img src="${U('el/' + src + '.png')}" style="max-width:340px;max-height:200px"></div>`;
+      const fl = pr(t, tn - .3, tn), flipX = Math.abs(Math.cos(fl * Math.PI));
+      let r = tile(560, 300, 'spacex', pr(t, b.a, b.a + .4), -3);
+      if (fl < .5) r += tile(100, 300, 'xai', pr(t, b.a + .15, b.a + .55), 4, flipX);
+      else r += `<div dir="ltr" style="position:absolute;left:60px;top:330px;width:500px;height:250px;background:#1B1A18;border-radius:30px;display:grid;place-items:center;font:900 92px V;color:#fff;transform:rotate(4deg) scaleX(${flipX.toFixed(2)})">SpaceXSI</div>`;
+      r += print('musk', 70, 650, 280, -5, pr(t, b.a + .2, b.a + .6), 1.12, '50% 25%');
+      if (t >= tn) r += handNote('اسم جدید!', 560, 700, pr(t, tn, tn + .7), 'var(--a1)', -4, 100);
+      if (t >= tg - .1) { const k = ez.back(pr(t, tg - .1, tg + .3)); r += `<div style="position:absolute;left:160px;top:1130px;width:760px;height:220px;background:#fff;border-radius:22px;box-shadow:0 14px 26px rgba(0,0,0,.18);transform:rotate(-3deg) scale(${k.toFixed(3)})"><div style="position:absolute;left:30px;top:30px;width:700px;height:70px;border-radius:35px;background:#EEE;font:900 50px V;color:#1B1A18;padding-left:40px;line-height:70px" dir="ltr">🔒 x.ai</div><div style="position:absolute;right:30px;bottom:24px;font:900 64px V;color:#E8202A">هنوز AI!</div></div>`; }
+      return r;
+    }
+    case 'faceoff': {
+      // face-off: Trump + Musk prints on the SI side, official OpenAI + Anthropic tiles on the AI side; a vote meter swings; a blank «جریمه؟» sheet flutters down
+      const kis = b.words.map((w, i) => w.k && (i === 0 || !b.words[i - 1].k) ? i : -1).filter(i => i >= 0), tw = b.wt(kis[kis.length - 1] ?? 10);
+      let r = `<div style="position:absolute;left:540px;top:180px;width:8px;height:1000px;background:#1B1A18;opacity:.4"></div>`;
+      r += print('trump', 60, 230, 260, -5, pr(t, b.a, b.a + .4), 1.15, '50% 25%') + print('musk', 250, 520, 240, 4, pr(t, b.a + .15, b.a + .55), 1.1, '50% 25%');
+      const lt = (x, y, src, k, rot) => `<div style="position:absolute;left:${x}px;top:${y}px;width:420px;height:170px;background:#fff;border-radius:22px;display:grid;place-items:center;box-shadow:0 12px 24px rgba(0,0,0,.18);transform:rotate(${rot}deg) scale(${ez.back(cl(k)).toFixed(3)})"><img src="${U('el/' + src + '.png')}" style="max-width:340px;max-height:110px"></div>`;
+      r += lt(600, 300, 'openai', pr(t, b.a + .3, b.a + .7), 3) + lt(600, 560, 'anthropic', pr(t, b.a + .45, b.a + .85), -3);
+      r += `<div dir="ltr" style="position:absolute;left:150px;top:820px;font:900 140px V;color:#E8202A">SI</div><div dir="ltr" style="position:absolute;left:720px;top:820px;font:900 140px V;color:var(--a2)">AI</div>`;
+      const ang = Math.sin((t - b.a) * 3.2) * 50 * Math.exp(-(t - b.a) * .25);
+      r += svg(`<path d="M 290 1330 A 250 250 0 0 1 790 1330" fill="none" stroke="#1B1A18" stroke-width="18"/><line x1="540" y1="1330" x2="540" y2="1120" stroke="#E8202A" stroke-width="16" stroke-linecap="round" transform="rotate(${ang.toFixed(1)} 540 1330)"/><circle cx="540" cy="1330" r="26" fill="#1B1A18"/>`);
+      if (t >= tw - .4) { const f = pr(t, tw - .4, tw + .8); r += `<div style="position:absolute;left:${(40 + Math.sin(t * 4) * 30).toFixed(1)}px;top:${(-300 + 1350 * ez.out(f)).toFixed(1)}px;width:260px;height:300px;background:#fff;box-shadow:0 14px 26px rgba(0,0,0,.2);transform:rotate(${(Math.sin(t * 3) * 14).toFixed(1)}deg)"><div style="text-align:center;margin-top:30px;font:900 70px V;color:#1B1A18">جریمه؟</div><div style="margin:30px 40px 0;height:10px;background:#eee"></div><div style="margin:24px 40px 0;height:10px;background:#eee"></div><div style="margin:24px 40px 0;height:10px;background:#eee"></div></div>`; }
+      return r;
+    }
+    case 'poll': {
+      // two big paper buttons AI | SI pressed in turn; a comment bubble with a pencil writing
+      const ph = Math.floor((t - b.a) * 1.6) % 2, kis = b.words.map((w, i) => w.k && (i === 0 || !b.words[i - 1].k) ? i : -1).filter(i => i >= 0);
+      const btn = (x, txt, col, on, k) => `<div dir="ltr" style="position:absolute;left:${x}px;top:${on ? 720 : 690}px;width:400px;height:400px;border-radius:50%;background:${col};box-shadow:0 ${on ? 6 : 30}px 0 rgba(0,0,0,.25);display:grid;place-items:center;font:900 200px V;color:#fff;transform:scale(${ez.back(cl(k)).toFixed(3)})">${txt}</div>`;
+      let r = print('trump', 60, 90, 250, -5, pr(t, b.a, b.a + .4), 1.15, '50% 25%') + print('musk', 760, 90, 250, 5, pr(t, b.a + .15, b.a + .55), 1.1, '50% 25%') + bigWord('تو کدومو می‌گی؟', 470, 100, ink, pr(t, b.a, b.a + .4));
+      r += btn(80, 'AI', 'var(--a2)', ph === 0, pr(t, b.a + .1, b.a + .5)) + btn(600, 'SI', '#E8202A', ph === 1, pr(t, b.a + .25, b.a + .65));
+      const tc = b.wt(b.words.length - 2);
+      if (t >= tc - .2) r += bubble(540, 1260, 680, 200, pr(t, tc - .2, tc + .2), `<foreignObject x="-320" y="-70" width="640" height="140"><div xmlns="http://www.w3.org/1999/xhtml" style="font:900 80px V;color:#1B1A18;text-align:center">کامنت کن ✍️</div></foreignObject>`);
+      return r;
+    }
     case 'ask': {
       const ik = b.words.findIndex(w => w.k), tk = b.wt(ik);
       let r = print('robot', 590, 420, 400, 4, pr(t, b.a + .2, b.a + .6), 1.05, '50% 40%');
@@ -414,6 +520,14 @@ function scene(b, t, u, ink, dark) {
 }
 
 function endCard(u, ink) {
+  if (S.end_style === 'poll') {
+    const ph = Math.floor(u * 1.6) % 2, btn = (x, txt, col, on, k) => `<div dir="ltr" style="position:absolute;left:${x}px;top:${on ? 1000 : 975}px;width:330px;height:330px;border-radius:50%;background:${col};box-shadow:0 ${on ? 6 : 26}px 0 rgba(0,0,0,.25);display:grid;place-items:center;font:900 160px V;color:#fff;transform:scale(${ez.back(cl(k)).toFixed(3)})">${txt}</div>`;
+    return print('trump', 90, 170, 380, -5, pr(u, 0, .4), 1.15, '50% 25%') + print('musk', 600, 200, 380, 5, pr(u, .15, .55), 1.1, '50% 25%') +
+      btn(140, 'AI', 'var(--a2)', ph === 0, pr(u, .3, .7)) + btn(610, 'SI', '#E8202A', ph === 1, pr(u, .45, .85)) +
+      `<div class="big" style="top:1420px;font-size:96px;color:${ink};opacity:${pr(u, .6, 1)}">${(S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--a1)">$1</span>')}</div>` +
+      `<div class="big" style="top:1560px;font-size:56px;font-weight:500;color:${ink};opacity:${pr(u, .9, 1.3)}">${S.end_sub || ''}</div>` +
+      `<div class="big" dir="ltr" style="top:1680px;font-size:40px;font-weight:500;letter-spacing:3px;color:${ink};opacity:${pr(u, 1.1, 1.5)}">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;
+  }
   // the ball drops onto the mark, the mark builds, the wordmark lands, then the question
   const f = fall(u, -160, 560, .45, 6200), [sx, sy] = squash(f.hit >= 0 ? u - f.hit : -1);
   const ball2 = `<div style="position:absolute;left:${(540 + Math.sin(u * 2.2) * 330 - 35).toFixed(1)}px;top:${(1480 - Math.abs(Math.sin(u * 4.4)) * 160).toFixed(1)}px;width:70px;height:70px;border-radius:50%;background:var(--a1)"></div>`;
@@ -429,6 +543,7 @@ function endCard(u, ink) {
 
 function caption(b, t, dark, endOn) {
   const sub = $('sub');
+  if (b.sc.type === 'strike' && !endOn) { sub.innerHTML = ''; sub._k = null; return; }
   if (endOn || t > b.L.end + .3) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
   let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
   const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + c0 + dark;
