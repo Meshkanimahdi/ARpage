@@ -202,5 +202,15 @@
   "motion": {
     "skill": ".claude/skills/motion-graphy-2026/SKILL.md",
     "built_pages": "news-reel/pm/README.md"
+  },
+  "radar": {
+    "pages": [
+      "mohamadesfehaniyan",
+      "radin_trade",
+      "mehdi.naddaf"
+    ],
+    "search": "هوش مصنوعی",
+    "days": 7,
+    "credits_note": "ScrapeCreators: 1 credit per page/search; top up when under 30"
   }
 }

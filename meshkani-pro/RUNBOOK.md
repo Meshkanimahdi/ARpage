@@ -788,6 +788,22 @@ narrator talks, nothing attractive in the picture").
 3. `bash news-reel/setup.sh`.
 
 ### 4.2 Story research (trending)
+0. **Viral radar first (user rule 2026-10-31).** Mahdi: «بریم تو پیجای هوش مصنوعی دیگه و نگاه کنیم ببینیم کدوم ریلز ها
+   ریچ خوبی گرفته… مثل همون رو بسازیم». Once per day (the 09:00 REEL_PREPARE; the others reuse the file), read
+   the last 7 days of reels from the Persian AI pages in `config.json → radar.pages` (start: mohamadesfehaniyan,
+   radin_trade, mehdi.naddaf; add any page whose reel beats us) with `SCRAPECREATORS_LIST_INSTAGRAM_USER_REELS`
+   (1 credit a page), plus one `SCRAPECREATORS_SEARCH_INSTAGRAM_REELS` for «هوش مصنوعی» this week. Rank by plays and
+   by plays ÷ the page's usual plays (an outlier beats a big page's average). Write `_automation/radar.json`:
+   top 10 with link, page, plays, likes, comments, the topic, the hook line, the format (talking head, motion,
+   POV, list, debate) and the CTA trick (e.g. "comment «آموزش»"). At least one reel a day is **our own remake of a
+   radar winner**: the same topic and angle, told with our headline system, our voice and our motion-graphics
+   look, with newer or better facts, never their footage, audio or script text. Copy techniques freely (hook
+   structure, keyword-comment CTA, debate question); credit the page in the caption when the idea is clearly
+   theirs («ایده از @page»).
+   **Never download and repost another page's reel** without written permission from its owner: it is their
+   copyright, a report can remove it and strike the account, and Instagram's originality ranking gives reposts
+   less reach in recommendations. With permission, post it as an Instagram Collab or with the owner credited and
+   tagged, and log the permission in the Reels row.
 00. Read `meshkani-pro/REQUESTS.md` first. A request for this slot overrides the rotation choices below
     (topic area, angle, look, shape) but none of the safety / fact / budget rules.
 0. Three reels a day (09:00, 15:00, 21:00): each must differ from the day's earlier reels and the 21:00 reel from the next morning's; the 15:00 reel must differ from the same day's 09:00 reel (read its slot file
