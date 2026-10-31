@@ -2,6 +2,102 @@
  "_note": "Ready audio of the ElevenLabs account and the repo (user rule 2026-10-31: use the library, do not keep generating). The publisher fills voices/music/sfx from GET /v1/voices, the account's history/library and news-reel/sfx, with a one-line character note each, and refreshes it weekly.",
  "voices": [
   {
+   "id": "4Uw730VKF274NsJJmpdv",
+   "name": "Farshad (fa shared)",
+   "category": "professional (shared)",
+   "gender": "male",
+   "age": "young",
+   "language": "fa",
+   "use_case": "narrative_story",
+   "note": "Farshad: Persian male podcast voice, neutral",
+   "persian_ready": true,
+   "avoid": null
+  },
+  {
+   "id": "RBEKbcQ62sKk2tsmPsAU",
+   "name": "Sara (fa shared)",
+   "category": "professional (shared)",
+   "gender": "female",
+   "age": "young",
+   "language": "fa",
+   "use_case": "conversational",
+   "note": "Sara: Persian female, neutral and clear, good for explainers",
+   "persian_ready": true,
+   "avoid": null
+  },
+  {
+   "id": "Mn0jJ3FC9Ijz7lQe8ELI",
+   "name": "Arash (fa shared)",
+   "category": "professional (shared)",
+   "gender": "male",
+   "age": "young",
+   "language": "fa",
+   "use_case": "narrative_story",
+   "note": "Arash: Persian male narrator, clear and confident, young (shared, popular)",
+   "persian_ready": true,
+   "avoid": null
+  },
+  {
+   "id": "C2wYIMnQQbFDm3qaosBN",
+   "name": "Amitis (fa shared)",
+   "category": "professional (shared)",
+   "gender": "female",
+   "age": "young",
+   "language": "fa",
+   "use_case": "narrative_story",
+   "note": "Amitis: Persian female, young and soft, lifestyle/beauty",
+   "persian_ready": true,
+   "avoid": null
+  },
+  {
+   "id": "yPRQMUW8csecd8blHFfA",
+   "name": "Danesh (fa shared)",
+   "category": "professional (shared)",
+   "gender": "male",
+   "age": "young",
+   "language": "fa",
+   "use_case": "narrative_story",
+   "note": "Danesh: Persian male, chill young narrator",
+   "persian_ready": true,
+   "avoid": null
+  },
+  {
+   "id": "sfhAAJOJsezV06RnSptt",
+   "name": "Mammo (fa shared)",
+   "category": "professional (shared)",
+   "gender": "male",
+   "age": "middle_aged",
+   "language": "fa",
+   "use_case": "social_media",
+   "note": "Mammo: Persian male, casual social-media, middle-aged",
+   "persian_ready": true,
+   "avoid": null
+  },
+  {
+   "id": "01Hje9fLgarTAqnLKNEK",
+   "name": "Mitra (fa shared)",
+   "category": "professional (shared)",
+   "gender": "female",
+   "age": "middle_aged",
+   "language": "fa",
+   "use_case": "narrative_story",
+   "note": "Mitra: Persian female storyteller, calm, warm, middle-aged",
+   "persian_ready": true,
+   "avoid": null
+  },
+  {
+   "id": "IsLN9xDFXCtAgmdMDUEQ",
+   "name": "Mr O (fa shared)",
+   "category": "professional (shared)",
+   "gender": "male",
+   "age": "middle_aged",
+   "language": "fa",
+   "use_case": "conversational",
+   "note": "Mr O: Persian male, warm and natural, confident, middle-aged",
+   "persian_ready": true,
+   "avoid": null
+  },
+  {
    "id": "PEdcOLzbXYhL8IKOswXB",
    "name": "Aran (fa)",
    "category": "professional",
@@ -1526,7 +1622,8 @@
    "note": "confident",
    "users": 344,
    "public_owner_id": "be34365e1a1396b49856665fe726ecafa45bdcc75625cf180e0668d5774e7117",
-   "in_account": false
+   "in_account": true,
+   "account_voice_id": "IsLN9xDFXCtAgmdMDUEQ"
   },
   {
    "id": "01Hje9fLgarTAqnLKNEK",
@@ -1537,7 +1634,8 @@
    "note": "calm",
    "users": 726,
    "public_owner_id": "13900299da36e5f6fff6d5100634833c3ddd48fe60d318d8610d2808e8bc61ec",
-   "in_account": false
+   "in_account": true,
+   "account_voice_id": "01Hje9fLgarTAqnLKNEK"
   },
   {
    "id": "sfhAAJOJsezV06RnSptt",
@@ -1548,7 +1646,8 @@
    "note": "casual",
    "users": 502,
    "public_owner_id": "ddfdcedf5c20d289392ea9d9c8df432aa93ea7f33184cd6487102883d23c786a",
-   "in_account": false
+   "in_account": true,
+   "account_voice_id": "sfhAAJOJsezV06RnSptt"
   },
   {
    "id": "yPRQMUW8csecd8blHFfA",
@@ -1559,7 +1658,8 @@
    "note": "chill",
    "users": 421,
    "public_owner_id": "06ff5f70914975bc4ceddd6bede30e22765654f8e4e3516f14e1f3f1ae4f2df6",
-   "in_account": false
+   "in_account": true,
+   "account_voice_id": "yPRQMUW8csecd8blHFfA"
   },
   {
    "id": "C2wYIMnQQbFDm3qaosBN",
@@ -1570,7 +1670,8 @@
    "note": "soft",
    "users": 1297,
    "public_owner_id": "1c07ef5740387faa0fd1f7e624ce51055c0b270674ab3da0f0e22c2882bce3c4",
-   "in_account": false
+   "in_account": true,
+   "account_voice_id": "C2wYIMnQQbFDm3qaosBN"
   },
   {
    "id": "Mn0jJ3FC9Ijz7lQe8ELI",
@@ -1581,7 +1682,8 @@
    "note": "confident",
    "users": 1709,
    "public_owner_id": "e31a3edd51358a6536f2c971ef39c3499615d39cc49a01bff2eaeb7150dec87a",
-   "in_account": false
+   "in_account": true,
+   "account_voice_id": "Mn0jJ3FC9Ijz7lQe8ELI"
   },
   {
    "id": "XqnVPciRh2hweNNLdltA",
@@ -1603,7 +1705,8 @@
    "note": "neutral",
    "users": 2368,
    "public_owner_id": "78b9cc6ad6cd8183c84a5098f5f28444d43d138d8344165d92f32bfdbaed85bf",
-   "in_account": false
+   "in_account": true,
+   "account_voice_id": "RBEKbcQ62sKk2tsmPsAU"
   },
   {
    "id": "4Uw730VKF274NsJJmpdv",
@@ -1614,7 +1717,8 @@
    "note": "neutral",
    "users": 160,
    "public_owner_id": "fe6e309c284fbcd8e63d4cf0f40a41fc7253c3dca0cd28b137de64e7f4c8b425",
-   "in_account": false
+   "in_account": true,
+   "account_voice_id": "4Uw730VKF274NsJJmpdv"
   },
   {
    "id": "PEdcOLzbXYhL8IKOswXB",
