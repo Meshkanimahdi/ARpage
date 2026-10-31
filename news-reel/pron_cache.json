@@ -152,5 +152,40 @@
   "score": 1,
   "voice": "GSj19hKjOQsPFCZlq1le",
   "date": "2026-10-30"
+ },
+ "Amazon": {
+  "mode": "C",
+  "spoken": "اَمازون",
+  "score": 1,
+  "voice": "XzieuK0bwYWT9Kl1LhLs",
+  "date": "2026-10-31"
+ },
+ "Echo Time": {
+  "mode": "A",
+  "spoken": "Echo Time",
+  "score": 1,
+  "voice": "XzieuK0bwYWT9Kl1LhLs",
+  "date": "2026-10-31"
+ },
+ "Alexa": {
+  "mode": "A",
+  "spoken": "Alexa",
+  "score": 1,
+  "voice": "XzieuK0bwYWT9Kl1LhLs",
+  "date": "2026-10-31"
+ },
+ "Batman": {
+  "mode": "A",
+  "spoken": "Batman",
+  "score": 1,
+  "voice": "XzieuK0bwYWT9Kl1LhLs",
+  "date": "2026-10-31"
+ },
+ "Harry Potter": {
+  "mode": "A",
+  "spoken": "Harry Potter",
+  "score": 1,
+  "voice": "XzieuK0bwYWT9Kl1LhLs",
+  "date": "2026-10-31"
  }
 }

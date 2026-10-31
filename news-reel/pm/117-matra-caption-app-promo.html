@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — product promo film (prompt 117)</title>
+<!-- Skill motion-graphy-2026, prompt 117 "Matra caption app promo" (UI), built as its own engine.
+     Look from the prompt: Apple-keynote white space, one idea per shot, the device as the hero; one typeface, one accent
+     colour used only on the through-line object and the key word; the real UI rebuilt as vector layers driven by a
+     cursor with real clicks and drags; springs with at most a small overshoot; nothing appears from nothing (it grows,
+     unfolds or is revealed by a mask); the camera never sits still (1.0 → 1.04 per scene, each scene starting at the zoom
+     the last ended on); something changes on every beat.
+     Through-line object: the product's own round screen (a circle). It starts as the glowing clock on the nightstand,
+     becomes the product lockup, a sonar ring, a sleep chart's marker, a wake-window dial, a sunrise, a clock-face
+     carousel, a mute button, a data dot, and finally the brand mark on the end card.
+     Brand slot: the product's own colours (navy #232F3E, accent orange #FF9900) on a warm white page.
+     Page standards: 1080x1920, Persian narration (eleven_v4) + word-by-word caption, music at 120 BPM, SFX via SCENES[].sfx.
+     Data: story.json beats[{id, text, scene{type, img?}}], end_text, end_sub, brand; el/*.
+     Pure seek(t): no CSS animations, timers or Math.random. -->
+<style>
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-600-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --page: #F6F3EE; --ink: #232F3E; --mu: #7A8494; --acc: #FF9900; --card: #FFFFFF; --line: #E4DED5; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--page); }
+  #root { position: absolute; inset: 0; overflow: hidden; background: var(--page); font-family: V; font-weight: 900; color: var(--ink); }
+  #cam { position: absolute; inset: 0; transform-origin: 540px 800px; }
+  .a { position: absolute; white-space: nowrap; }
+  .card { position: absolute; background: var(--card); border-radius: 44px; box-shadow: 0 24px 60px rgba(35,47,62,.12); overflow: hidden; }
+  #sub { position: absolute; left: 50px; right: 50px; top: 1460px; height: 150px; display: flex; align-items: center; justify-content: center; }
+  #sub .pill { padding: 10px 34px 20px; border-radius: 30px; font: 900 58px/1.3 V; white-space: nowrap; background: var(--ink); color: #fff; }
+  #sub .w { display: inline-block; margin: 0 .12em; }
+</style>
+</head>
+<body>
+<div id="root"><div id="cam"><div id="stage"></div></div><div id="sub"></div></div>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const U = s => s.startsWith('/') ? s : DIR + s, $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), mix = (a, b, k) => a + (b - a) * k, pr = (t, a, b) => cl((t - a) / (b - a));
+const ex = k => 1 - Math.pow(2, -10 * cl(k));
+const sp = k => { k = cl(k); return 1 - Math.exp(-6.5 * k) * Math.cos(8 * k) * (1 - k * .15); };   // small overshoot
+const fa = n => String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const ACC = '#FF9900', INK = '#232F3E';
+const ISSUES = [];
+let S, TL, B = [], END = 50;
+
+window.ready = (async () => {
+  S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json();
+  END = TL.total;
+  const shown = t => t.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/);
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) { ISSUES.push('no timing for ' + bt.id); continue; }
+    let on = false;
+    const words = shown(bt.text).map(w => { if (w.startsWith('*')) on = true; const k = on || /\*/.test(w); if (/\*[.…،؛!؟?»]*$/.test(w)) on = false; return {w: w.replace(/\*/g, ''), k}; });
+    const wt = j => { const i = Math.round(cl(j / Math.max(1, words.length - 1)) * (L.words.length - 1)); return (L.words[i] || [L.start])[0]; };
+    B.push({bt, sc: bt.scene || {}, L, words, wt});
+  }
+  B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
+  await Promise.all(['e1.png', 'e2.png', 'e3.png', 'amazon.png'].map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + f); })));
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'ساعت Amazon')));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  const SC = [];
+  for (const b of B) {
+    const pts = [[b.a, (OPEN[b.sc.type] || 'pop')]];
+    (MOM[b.sc.type] || (() => []))(b).forEach(m => { if (m[0] > b.a + .9 && m[0] < b.b - .6) pts.push(m); });
+    pts.sort((p, q) => p[0] - q[0]);
+    pts.forEach((p, i) => SC.push({t0: +p[0].toFixed(2), t1: +(i + 1 < pts.length ? pts[i + 1][0] : b.b).toFixed(2), type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: [[p[0] + .02, p[1], .32]]}));
+  }
+  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .15, 'shimmer', .4]]});
+  window.SCENES = SC;
+  for (const s of SC) if (s.t1 - s.t0 > 3.2) ISSUES.push(`idea ${s.bg} holds ${(s.t1 - s.t0).toFixed(1)} s (> 3): add a moment`);
+  seek(0);
+})();
+const W = (b, s) => { const i = b.words.findIndex(w => w.w.includes(s)); return b.wt(i < 0 ? 0 : i); };
+// opening sound of each scene, matched to its motion (never a whoosh)
+const OPEN = {hook: 'glass_ping', what: 'pop', sonar: 'sweep_soft', stages: 'sweep_soft', window: 'click', sunrise: 'shimmer',
+  faces: 'tap', question: 'hit', privacy: 'click', data: 'notify', ask: 'pop'};
+const MOM = {
+  hook: b => [[1.2, 'pop']],
+  what: b => [[W(b, 'Echo'), 'tap'], [W(b, 'دلاری'), 'counter_tick'], [W(b, 'Alexa'), 'tap']],
+  sonar: b => [[W(b, 'ساعت'), 'tap'], [W(b, 'فراصوت'), 'sweep_soft']],
+  stages: b => [[W(b, 'سبک'), 'hit']],
+  window: b => [[W(b, '۱۰'), 'counter_tick'], [W(b, 'بهترین'), 'click']],
+  sunrise: b => [[W(b, 'طلوع'), 'shimmer'], [W(b, 'شب'), 'sweep_soft']],
+  faces: b => [[W(b, '۱۰۰'), 'counter_tick'], [W(b, 'Batman'), 'tap']],
+  question: b => [[W(b, 'نفس'), 'notify']],
+  privacy: b => [[W(b, 'اختیاری'), 'click'], [W(b, 'قطع'), 'tap']],
+  data: b => [[W(b, 'کجا'), 'hit']],
+  ask: b => [[W(b, 'کامنت'), 'notify']],
+};
+// ---- kit ----
+const card = (x, y, w, h, inner = '', st = '') => `<div class="card" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;${st}">${inner}</div>`;
+const T = (x, y, s, size, col = INK, st = '') => `<div class="a" style="left:${x}px;top:${y}px;font-size:${size}px;color:${col};${st}">${s}</div>`;
+const C = (y, s, size, col = INK, st = '') => `<div class="a" style="left:0;right:0;top:${y}px;text-align:center;font-size:${size}px;color:${col};white-space:normal;${st}">${s}</div>`;
+const grow = (k, inner, ox, oy) => `<div class="a" style="left:0;top:0;width:1080px;height:1920px;transform-origin:${ox}px ${oy}px;transform:scale(${sp(k).toFixed(3)});opacity:${cl(k * 6).toFixed(2)}">${inner}</div>`;
+const mask = (k, inner) => `<div class="a" style="left:0;top:0;width:1080px;height:1920px;clip-path:inset(0 0 ${(100 - 100 * ex(k)).toFixed(1)}% 0)">${inner}</div>`;
+const chip = (x, y, s, bg, fg, size, k, ltr = false) => grow(k, `<div class="a" ${ltr ? 'dir="ltr"' : ''} style="left:${x}px;top:${y}px;padding:${size * .22}px ${size * .5}px ${size * .34}px;border-radius:${size}px;background:${bg};color:${fg};font:900 ${size}px V;box-shadow:0 12px 30px rgba(35,47,62,.14)">${s}</div>`, x + 100, y + size / 2);
+function cursor(x, y, t, tc) {
+  const p = tc !== undefined && t >= tc ? Math.exp(-9 * (t - tc)) : 0, ring = tc !== undefined && t >= tc ? pr(t, tc, tc + .45) : 1;
+  return `<svg class="a" style="left:0;top:0" width="1080" height="1920">${ring < 1 ? `<circle cx="${x}" cy="${y}" r="${24 + 70 * ring}" fill="none" stroke="${ACC}" stroke-width="${6 * (1 - ring)}"/>` : ''}<g transform="translate(${x} ${y}) scale(${1 - .16 * p})"><path d="M0 0 L0 64 L16 50 L28 76 L40 70 L28 46 L50 46 Z" fill="#fff" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/></g></svg>`;
+}
+// the through-line circle (accent ring with a soft screen inside)
+const ring = (cx, cy, r, fill = '#1B2430', inner = '', stroke = ACC) => `<svg class="a" style="left:0;top:0" width="1080" height="1920"><circle cx="${cx}" cy="${cy}" r="${Math.max(0, r)}" fill="${fill}"/><circle cx="${cx}" cy="${cy}" r="${Math.max(0, r)}" fill="none" stroke="${stroke}" stroke-width="10"/>${inner}</svg>`;
+const toggle = (x, y, on, label) => `<div class="a" style="left:${x}px;top:${y}px;display:flex;align-items:center;gap:26px;flex-direction:row-reverse"><div style="font:900 52px V;color:${INK}">${label}</div><div style="width:150px;height:84px;border-radius:42px;background:${on > .5 ? ACC : '#D9D3CA'};position:relative"><div style="position:absolute;top:8px;left:${8 + 66 * on}px;width:68px;height:68px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.2)"></div></div></div>`;
+const head = (s, k, y = 250) => mask(k, C(y, s, 96, INK, 'line-height:1.15'));
+function scene(b, t) {
+  const s = b.sc, A = b.a, Bb = b.b, u = t - A;
+  let r = '';
+  switch (s.type) {
+    case 'hook': {
+      // frame 0: the official bedroom photo, the clock's screen pulsing breathing rings, headline from frame 0; price chip at 1.2 s
+      const z = 1 + .1 * pr(t, 0, Bb);
+      r += `<div class="a" style="left:0;top:560px;width:1080px;height:1360px;overflow:hidden"><img src="${U('el/e1.png')}" style="position:absolute;left:-700px;top:0;height:1360px;transform:scale(${z.toFixed(3)});transform-origin:1637px 628px"></div>`;
+      r += `<div class="a" style="left:0;top:0;width:1080px;height:760px;background:linear-gradient(#FFF1E0 0%,#FCE3CB 70%,rgba(252,227,203,0))"></div>`;
+      const cx = 937, cy = 560 + 628;
+      let rings = ''; for (let i = 0; i < 4; i++) { const ph = ((t * .45 + i / 4) % 1); rings += `<circle cx="${cx}" cy="${cy}" r="${60 + 420 * ph}" fill="none" stroke="#fff" stroke-width="${12 * (1 - ph) + 2}" opacity="${(.9 * (1 - ph)).toFixed(2)}"/>`; }
+      r += `<svg class="a" style="left:0;top:0" width="1080" height="1920">${rings}<circle cx="${cx}" cy="${cy}" r="${46 + 6 * Math.sin(t * 2.8)}" fill="none" stroke="${ACC}" stroke-width="8"/></svg>`;
+      r += `<div class="a" style="left:0;right:0;top:220px;text-align:center;font-size:104px;color:${INK}">ساعت زنگ‌دار <span style="display:inline-block;background:${INK};color:#fff;padding:0 .2em .08em;border-radius:.18em;direction:ltr">Amazon</span></div><div class="a" style="left:0;right:0;top:378px;text-align:center;font-size:104px;color:${INK}">نفس‌هاتو حس می‌کنه</div>`;
+      if (t >= 1.2) r += chip(90, 600, '$199.99', ACC, INK, 64, pr(t, 1.2, 1.5), true);
+      let wv = ''; for (let i = 0; i <= 60; i++) { const x = 90 + i * 15, y = 1380 + Math.sin(i * .35 - t * 2.8) * 26 * cl(u * 2); wv += (i ? 'L' : 'M') + x + ' ' + y.toFixed(1); }
+      r += `<svg class="a" style="left:0;top:0;opacity:${cl(u * 2)}" width="1080" height="1920"><path d="${wv}" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/></svg>`;
+      return r;
+    }
+    case 'what': {
+      // the screen grows into the product lockup; price counts up; no-camera; Amazon mark; Alexa
+      const k = pr(t, A, A + .6), tp = W(b, 'دلاری'), ta = W(b, 'Alexa');
+      r += card(90, 800, 900, 480, `<img src="${U('el/e3.png')}" style="width:100%;height:100%;object-fit:cover;object-position:30% 50%">`, `transform:scale(${sp(pr(t, A + .2, A + .7)).toFixed(3)});transform-origin:540px 1100px`);
+      r += ring(540, 560, mix(40, 200, ex(k)), '#1B2430', `<text x="540" y="595" text-anchor="middle" font-family="V" font-weight="900" font-size="100" fill="#fff">7:00</text>`);
+      r += T(90, 180, 'Echo Time', 92, INK, 'direction:ltr') + `<img class="a" src="${U('el/amazon.png')}" style="left:830px;top:170px;width:160px;height:146px;border-radius:26px">`;
+      const pv = 199.99 * ex(pr(t, tp - .3, tp + .4)); r += chip(620, 1310, '$' + pv.toFixed(2), ACC, INK, 70, pr(t, tp - .35, tp), true);
+      r += chip(90, 1320, '📷 ✕ بدون دوربین', '#fff', INK, 54, pr(t, A + .9, A + 1.2));
+      if (t >= ta - .1) r += chip(400, 720, 'Alexa+', INK, '#fff', 50, pr(t, ta - .1, ta + .25), true);
+      return r;
+    }
+    case 'sonar': {
+      // the circle becomes a sonar: ultrasound rings, a breathing wave drawing on, the three sensors lighting up
+      const tw = W(b, 'فراصوت'), kw = pr(t, tw - .5, Bb - .2);
+      let rings = ''; for (let i = 0; i < 5; i++) { const ph = ((t * .6 + i / 5) % 1); rings += `<circle cx="540" cy="760" r="${110 + 380 * ph}" fill="none" stroke="${ACC}" stroke-width="${8 * (1 - ph) + 1.5}" opacity="${(1 - ph).toFixed(2)}"/>`; }
+      r += `<svg class="a" style="left:0;top:0" width="1080" height="1920">${rings}</svg>` + ring(540, 760, 110, '#1B2430', `<text x="540" y="790" text-anchor="middle" font-size="80">🌙</text>`);
+      let wv = ''; const n = Math.round(80 * kw); for (let i = 0; i <= n; i++) { const x = 100 + i * 11, y = 1290 + Math.sin(i * .28) * 70; wv += (i ? 'L' : 'M') + x + ' ' + y.toFixed(1); }
+      r += `<svg class="a" style="left:0;top:0" width="1080" height="1920"><line x1="100" x2="980" y1="1290" y2="1290" stroke="${'#E4DED5'}" stroke-width="4"/><path d="${wv}" fill="none" stroke="${INK}" stroke-width="10" stroke-linecap="round"/></svg>` + T(100, 1170, 'نفس', 44, '#7A8494');
+      [['🌡 دما', A + .3], ['👤 حضور', A + .7], ['〰 فراصوت', tw - .1]].forEach(([c, tq], i) => { if (t >= tq) r += chip(90 + i * 320, 1380, c, i === 2 ? ACC : '#fff', INK, 50, pr(t, tq, tq + .3)); });
+      r += mask(pr(t, A, A + .5), C(230, 'بدون دوربین و ساعت مچی', 84, INK, 'white-space:nowrap'));
+      return r;
+    }
+    case 'stages': {
+      // a sleep-stage chart draws on; the light-sleep dip lights up on «سبک‌تره»; the alarm marker sits at 7:00
+      const kd = pr(t, A + .1, A + 1.4), tl = W(b, 'سبک');
+      const pts = [[0, 1], [.12, 2], [.25, 3], [.38, 2], [.5, 3], [.62, 1], [.72, 2], [.83, 1], [.9, 2], [1, 1]];
+      let path = ''; pts.forEach(([x, l], i) => { const X = 120 + 840 * x, Y = 640 + l * 150; path += (i ? `L${X} ${(+path.split(' ').pop()) || Y} L${X} ${Y}` : `M${X} ${Y}`); });
+      let d2 = ''; pts.forEach(([x, l], i) => { const X = 120 + 840 * x, Y = 640 + l * 150; d2 += (i ? ` H${X} V${Y}` : `M${X} ${Y}`); });
+      r += card(70, 520, 940, 760) + `<svg class="a" style="left:0;top:0" width="1080" height="1920"><path d="${d2}" fill="none" stroke="${INK}" stroke-width="14" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(kd)).toFixed(3)}"/>
+        <line x1="876" x2="876" y1="600" y2="1200" stroke="${ACC}" stroke-width="8" stroke-dasharray="20 14" opacity="${ex(kd)}"/></svg>`;
+      r += T(720, 1190, '⏰ 7:00', 52, ACC, 'direction:ltr') + T(110, 1190, 'عمیق', 44, '#7A8494') + T(110, 660, 'سبک', 44, '#7A8494');
+      if (t >= tl - .1) { const k = pr(t, tl - .1, tl + .3); r += ring(876 - 120 * 0 - 120 + 120, 800, 70 * sp(k), ACC, '', ACC) + chip(250, 1310, 'خواب سبک = وقت بیداری', ACC, INK, 54, k); }
+      r += cursor(mix(980, 900, ex(pr(t, A + .6, tl))), mix(1500, 830, ex(pr(t, A + .6, tl))), t, tl);
+      r += head('چرا نفس؟', pr(t, A, A + .4), 250);
+      return r;
+    }
+    case 'window': {
+      // the circle becomes a dial: an arc sweeps 10 → 60 minutes; the «Smart alarm» toggle is clicked
+      const t1 = W(b, '۱۰'), tb = W(b, 'بهترین'), ka = ex(pr(t, t1 - .2, t1 + 1.1)), mins = Math.round(10 + 50 * ka), ang = 2 * Math.PI * (mins / 60);
+      const x2 = 540 + 300 * Math.sin(ang), y2 = 760 - 300 * Math.cos(ang);
+      r += ring(540, 760, 300, '#fff', `<path d="M540 460 A300 300 0 ${ang > Math.PI ? 1 : 0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${ACC}" stroke-width="40" stroke-linecap="round" opacity="${ka > .01 ? 1 : 0}"/><text x="540" y="790" text-anchor="middle" font-family="V" font-weight="900" font-size="150" fill="${INK}">${fa(mins)}</text><text x="540" y="880" text-anchor="middle" font-family="V" font-weight="900" font-size="54" fill="#7A8494">دقیقه</text>`, INK);
+      const on = t >= tb ? ex(pr(t, tb, tb + .25)) : 0;
+      r += card(120, 1150, 840, 200) + toggle(180, 1208, on, 'زنگ هوشمند');
+      r += cursor(mix(1000, 330, ex(pr(t, tb - .7, tb))), mix(1600, 1260, ex(pr(t, tb - .7, tb))), t, tb);
+      r += T(100, 250, '⏰ 7:00', 90, INK, 'direction:ltr');
+      return r;
+    }
+    case 'sunrise': {
+      // the screen brightens like a sunrise (% climbs, digits tick to 7:00); at night it dims and blue light drops
+      const ts = W(b, 'طلوع'), tn = W(b, 'شب'), kb = ex(pr(t, A + .1, tn - .1)), kn = ex(pr(t, tn, tn + .6));
+      const top = `hsl(${mix(230, 35, kb) * (1 - kn) + 235 * kn} ${mix(40, 95, kb)}% ${mix(18, 70, kb) * (1 - .7 * kn)}%)`, bot = `hsl(${mix(260, 20, kb)} ${mix(40, 90, kb)}% ${mix(12, 55, kb) * (1 - .7 * kn)}%)`;
+      const mm = Math.round(50 + 10 * kb) % 60, hh = kb >= .999 ? 7 : 6;
+      r += `<div class="a" style="left:240px;top:460px;width:600px;height:600px;border-radius:50%;background:linear-gradient(${top},${bot});border:12px solid ${ACC};box-sizing:border-box"></div>`;
+      r += C(680, `${hh}:${String(kb >= .999 ? 0 : mm).padStart(2, '0')}`, 150, '#fff', `direction:ltr;opacity:${1 - .5 * kn}`);
+      r += T(110, 1150, 'روشنایی', 48, '#7A8494') + `<div class="a" style="left:330px;top:1170px;width:560px;height:36px;border-radius:18px;background:#E4DED5"></div><div class="a" style="left:330px;top:1170px;width:${(560 * kb * (1 - .75 * kn)).toFixed(0)}px;height:36px;border-radius:18px;background:${ACC}"></div>` + T(910, 1160, fa(Math.round(100 * kb * (1 - .75 * kn))) + '٪', 48, INK);
+      r += T(110, 1250, 'نور آبی', 48, '#7A8494') + `<div class="a" style="left:330px;top:1270px;width:560px;height:36px;border-radius:18px;background:#E4DED5"></div><div class="a" style="left:330px;top:1270px;width:${(560 * (1 - .8 * kn)).toFixed(0)}px;height:36px;border-radius:18px;background:#3B6BFF"></div>`;
+      r += head(t < tn - .1 ? 'صبح: طلوع ☀️' : 'شب: کم‌نور 🌙', pr(t, t < tn - .1 ? ts - .4 : tn - .1, t < tn - .1 ? ts : tn + .3), 240);
+      return r;
+    }
+    case 'faces': {
+      // clock faces swap inside the circle (analog, digital, weather), a counter climbs to ۱۰۰+, the official photo as a card
+      const tc = W(b, '۱۰۰'), n = Math.round(100 * ex(pr(t, tc - .4, tc + .5))), fi = Math.floor(u / .6) % 3;
+      let face = '';
+      if (fi === 0) { face = `<line x1="540" y1="760" x2="540" y2="600" stroke="#fff" stroke-width="16" stroke-linecap="round"/><line x1="540" y1="760" x2="${540 + 120 * Math.sin(t * 2)}" y2="${760 - 120 * Math.cos(t * 2)}" stroke="${ACC}" stroke-width="10" stroke-linecap="round"/>` + [...Array(12)].map((_, i) => `<circle cx="${540 + 230 * Math.sin(i * Math.PI / 6)}" cy="${760 - 230 * Math.cos(i * Math.PI / 6)}" r="10" fill="#fff"/>`).join(''); }
+      else if (fi === 1) face = `<text x="540" y="800" text-anchor="middle" font-family="V" font-weight="900" font-size="150" fill="#fff">12:45</text>`;
+      else face = `<text x="540" y="740" text-anchor="middle" font-size="140">⛅</text><text x="540" y="880" text-anchor="middle" font-family="V" font-weight="900" font-size="80" fill="#fff">21°</text>`;
+      r += ring(540, 760, 280, ['#1B2430', '#3A2A6B', '#1E5A8C'][fi], face);
+      r += card(560, 1100, 430, 250, `<img src="${U('el/e2.png')}" style="width:100%;height:100%;object-fit:cover">`, `transform:rotate(3deg) scale(${sp(pr(t, W(b, 'Batman') - .2, W(b, 'Batman') + .2)).toFixed(3)})`);
+      r += T(110, 1130, fa(n) + (n >= 100 ? '+' : ''), 150, ACC) + T(120, 1300, 'صفحه‌ی ساعت', 48, '#7A8494');
+      r += cursor(mix(820, 300, (u % .6) / .6), 700 + 30 * Math.sin(u * 5), t, A + .6 * Math.floor(u / .6));
+      return r;
+    }
+    case 'question': {
+      // back to the bedroom: the photo dims, the rings keep pulsing, the question card unfolds
+      r += card(60, 300, 960, 1080, `<img src="${U('el/e1.png')}" style="width:100%;height:100%;object-fit:cover;object-position:62% 50%;filter:brightness(${(1 - .35 * pr(t, A, A + .8)).toFixed(2)})">`);
+      let rings = ''; for (let i = 0; i < 3; i++) { const ph = ((t * .45 + i / 3) % 1); rings += `<circle cx="800" cy="850" r="${50 + 260 * ph}" fill="none" stroke="#fff" stroke-width="${10 * (1 - ph) + 2}" opacity="${(1 - ph).toFixed(2)}"/>`; }
+      r += `<svg class="a" style="left:0;top:0" width="1080" height="1920">${rings}</svg>`;
+      const tq = W(b, 'نفس'); r += grow(pr(t, A + .3, A + .7), `<div class="a" style="left:120px;top:1120px;padding:20px 40px 30px;border-radius:40px;background:${INK};color:#fff;font:900 70px V">تو اتاق خوابت؟ 🤔</div>`, 540, 1200);
+      if (t >= tq - .2) r += chip(560, 360, '🎤 همیشه روشن؟', ACC, INK, 52, pr(t, tq - .2, tq + .2));
+      return r;
+    }
+    case 'privacy': {
+      // the circle becomes the mute button: the cursor presses it, the mic is struck through, sleep sensing turns off
+      const to = W(b, 'اختیاری'), tm = W(b, 'قطع'), off = t >= to ? ex(pr(t, to, to + .25)) : 0, muted = t >= tm;
+      r += ring(540, 640, 200, muted ? '#C0392B' : INK, `<text x="540" y="690" text-anchor="middle" font-size="150">🎤</text>${muted ? `<line x1="440" y1="540" x2="640" y2="740" stroke="#fff" stroke-width="24" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(t, tm, tm + .3))).toFixed(3)}"/>` : ''}`, muted ? '#C0392B' : ACC);
+      r += card(120, 960, 840, 200) + toggle(180, 1018, 1 - off, 'حس خواب');
+      r += cursor(mix(260, 600, ex(pr(t, A + .2, to))) + (t > to ? mix(0, -40, ex(pr(t, to + .1, tm))) : 0), mix(1060, 720, ex(pr(t, to + .1, tm))), t, t >= tm ? tm : to);
+      r += chip(260, 1220, 'اختیاری ✓', '#fff', INK, 56, pr(t, to - .1, to + .2)) + head('حریم خصوصی', pr(t, A, A + .4), 220);
+      return r;
+    }
+    case 'data': {
+      // where does the data go? a dot travels from the clock toward a device box and a cloud box, both with question marks
+      const tk = W(b, 'کجا'), kk = pr(t, A + .3, tk), q = t >= tk - .1 ? sp(pr(t, tk - .1, tk + .3)) : 0;
+      r += card(80, 760, 400, 360, C(0, '', 10) + `<div class="a" style="left:0;right:0;top:80px;text-align:center;font-size:120px">⏰</div><div class="a" style="left:0;right:0;top:250px;text-align:center;font:900 52px V">روی دستگاه</div>`);
+      r += card(600, 760, 400, 360, `<div class="a" style="left:0;right:0;top:80px;text-align:center;font-size:120px">☁️</div><div class="a" style="left:0;right:0;top:250px;text-align:center;font:900 52px V">روی سرور</div>`);
+      const dx = mix(280, 800, (Math.sin(t * 2.2) + 1) / 2), dy = 700 - 120 * Math.sin(Math.PI * ((Math.sin(t * 2.2) + 1) / 2));
+      r += ring(dx, dy, 34, ACC, '', ACC);
+      r += `<div class="a" style="left:240px;top:1180px;font:900 200px V;color:${ACC};transform:scale(${q.toFixed(3)});transform-origin:60px 120px">؟</div><div class="a" style="left:760px;top:1180px;font:900 200px V;color:${ACC};transform:scale(${q.toFixed(3)});transform-origin:60px 120px">؟</div>`;
+      r += head('داده‌ی خوابت کجا می‌ره؟', pr(t, A, A + .5), 250) + chip(300, 520, 'اعلام نشده', INK, '#fff', 54, pr(t, tk, tk + .3));
+      return r;
+    }
+    case 'ask': {
+      // the circle shrinks into the brand mark; yes / no chips; the comment bubble
+      const k = ex(pr(t, A, A + .6)), tc = W(b, 'کامنت');
+      r += ring(540, 700, mix(300, 140, k), INK, '', ACC) + `<img class="a" src="${U('el/amazon.png')}" style="left:${540 - 110}px;top:${700 - 100}px;width:220px;height:200px;border-radius:30px;opacity:${k}">`;
+      r += chip(170, 980, 'آره 👍', '#fff', INK, 72, pr(t, A + .5, A + .8)) + chip(620, 980, 'نه 👎', '#fff', INK, 72, pr(t, A + .8, A + 1.1));
+      if (t >= tc - .1) r += grow(pr(t, tc - .1, tc + .3), `<div class="a" style="left:250px;top:1200px;padding:20px 50px 30px;border-radius:50px;border-bottom-right-radius:10px;background:${ACC};font:900 70px V">کامنت کن 👇</div>`, 540, 1250);
+      r += head('کنار تختت؟', pr(t, A, A + .4), 250);
+      return r;
+    }
+  }
+  ISSUES.push('unknown scene ' + s.type); return r;
+}
+function endCard(u) {
+  const k = ex(pr(u, 0, .5)), q = (S.end_text || '').replace(/\*([^*]+)\*/g, `<span style="color:${ACC}">$1</span>`);
+  return ring(540, 640, mix(40, 150, k), INK, '', ACC) + `<img class="a" src="${U('el/amazon.png')}" style="left:430px;top:540px;width:220px;height:200px;border-radius:30px;opacity:${k}">` +
+    C(860, (S.brand || ''), 96, INK, `direction:ltr;opacity:${pr(u, .1, .5)}`) + C(1000, q, 80, INK, `opacity:${pr(u, .3, .7)}`) +
+    C(1130, S.end_sub || '', 56, '#7A8494', `font-weight:600;opacity:${pr(u, .5, .9)}`) + C(1240, (S.handle || '').replace('@', '').toUpperCase(), 44, ACC, `direction:ltr;letter-spacing:4px;opacity:${pr(u, .7, 1)}`);
+}
+function seek(t) {
+  if (!B.length) return;
+  let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
+  const b = B[bi], endOn = t >= TL.end_start;
+  // camera: 1.0 → 1.04 across a scene, starting at the zoom the last one ended on; small kick on every idea
+  let si = 0, sc = (window.SCENES || [])[0] || {t0: 0, t1: 1}; (window.SCENES || []).forEach((x, i) => { if (t >= x.t0) { si = i; sc = x; } });
+  const z = 1 + .04 * pr(t, b.a, b.b) + Math.exp(-10 * (t - sc.t0)) * .025;
+  $('cam').style.transform = `scale(${z.toFixed(4)})`;
+  // scene entry: the next scene is revealed by a circular mask growing from the through-line circle (never a crossfade)
+  let h = endOn ? endCard(t - TL.end_start) : scene(b, t);
+  if (!endOn && b.i > 0 && t < b.a + .45) { const k = ex(pr(t, b.a, b.a + .45)); h = scene(B[b.i - 1], t) + `<div class="a" style="left:0;top:0;width:1080px;height:1920px;background:var(--page);clip-path:circle(${(30 + 1300 * k).toFixed(0)}px at 540px 760px)">${h}</div>`; }
+  const st = $('stage'); if (st._h !== h) { st._h = h; st.innerHTML = h; }
+  caption(b, t, endOn);
+}
+function caption(b, t, endOn) {
+  const sub = $('sub');
+  if (endOn || t > b.L.end + .3 || (b.i === 0)) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
+  const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + c0;
+  if (sub._k !== key) { sub._k = key; const lat = w => /^[«]?[A-Za-z0-9.\-+$]+[،,.!?؟…؛»]*$/.test(w.w); const gs = [];
+    ch.forEach((w, q) => { const g = gs[gs.length - 1]; if (g && lat(w) && g.l) { g.w += ' ' + w.w; g.k = g.k || w.k; } else gs.push({w: w.w, k: w.k, i: q, l: lat(w)}); });
+    sub.innerHTML = `<span class="pill">${gs.map(g => `<span class="w" data-i="${g.i}" ${g.l ? 'dir="ltr"' : ''} style="${g.k ? 'color:' + ACC : ''}">${g.w}</span>`).join(' ')}</span>`; }
+  sub.querySelectorAll('.w').forEach(el => { const tw = b.wt(c0 + +el.dataset.i), k = ex(pr(t, tw - .05, tw + .2)); el.style.opacity = .35 + .65 * k; });
+}
+window.seek = seek;
+</script>
+</body>
+</html>
