@@ -90,7 +90,7 @@ window.ready = (async () => {
   await Promise.all([...document.images].map(i => i.decode().catch(() => ISSUES.push('image failed: ' + i.src))));
   // fit: hook titles start large; shrink until the box fits between top and bottom
   const T = box.querySelector('.title, .quote, .label');
-  let fs = it.kind === 'hook' ? 132 : (it.kind === 'quote' ? 64 : 86), min = it.kind === 'hook' ? 104 : 60;
+  let fs = it.fs ? it.fs : it.kind === 'hook' ? 132 : (it.kind === 'quote' ? 64 : 86), min = it.kind === 'hook' ? 104 : 60;
   if (T) T.style.fontSize = fs + 'px';
   const place = () => { if (pos === 'top') { box.style.top = top + 'px'; box.style.bottom = ''; } else { box.style.top = ''; box.style.bottom = (H - bottom) + 'px'; } };
   place();
