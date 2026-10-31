@@ -139,10 +139,10 @@ def main():
             if sx.get('whoosh', 0) > 2: fails.append(f"{sx['whoosh']} whooshes (max 2)")
             if tot >= 5 and max(sx.values()) > 0.4 * tot: fails.append(f'one sound effect is over 40% of all effects {sx}')
 
-    # 4b4. voice rotation (user rule 2026-10-31): not the same narrator as the last 2 reels
+    # 4b4. voice rotation (user rule 2026-10-31): not the narrator of any of the last 12 reels
     vc = story.get('voice', '')
     if not vc: fails.append('story.json must name voice')
-    elif vc in [h.get('voice') for h in hist[-2:]]: fails.append(f'voice {vc} was used in one of the last 2 reels: pick another from audio_library.json')
+    elif vc in [h.get('voice') for h in hist[-12:]]: fails.append(f'voice {vc} was used in the last 12 reels: pick another from audio_library.json')
 
     # 4c. preflight (user rule 2026-10-27): cover, headline and hook were judged on stills before the full render
     pf = d / 'preflight.json'

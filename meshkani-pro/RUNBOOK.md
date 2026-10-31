@@ -919,8 +919,9 @@ narrator talks, nothing attractive in the picture").
      (ready tracks: news-reel/sfx music files, ElevenLabs history/library tracks, licensed Drive music) and `sfx`
      (news-reel/sfx/*.mp3 plus ready library effects). Build it once from the account (list, do not generate),
      commit it, and refresh it weekly.
-   - **Voice:** pick by the story's mood from the library; never the voice of either of the last 2 reels (the gate
-     checks `story.json → voice` against motion_history), and alternate male/female across the day. Deep, husky
+   - **Voice:** pick by the story's mood from the library; **never the voice of any of the last 12 reels** (user rule 2026-10-31,
+     «صدای ۱۲ ریلز اخیر نباشه»; the gate checks `story.json → voice` against motion_history), so the library needs
+     at least 13 good voices: add more from the shared Voice Library, and alternate male/female across the day. Deep, husky
      voices for serious news; bright female voices for everyday/beauty/lifestyle.
    - **Music and sound effects:** choose from the library; generate a new one only when nothing fits, at most one
      new file a day. Rotate music tracks: not the track of the last 3 reels.
