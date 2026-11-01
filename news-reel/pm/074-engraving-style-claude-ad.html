@@ -100,8 +100,8 @@ function seek(t) {
   const endOn = t >= TL.end_start, b = B[bi];
   let sc = (window.SCENES || [])[0] || {t0: 0, t1: 1}; (window.SCENES || []).forEach(s => { if (t >= s.t0) sc = s; });
   // camera: a zoom on every idea (punch in, then a slow push), never still
-  const kick = Math.exp(-8 * (t - sc.t0)) * .06, push = .035 * io(pr(t, sc.t0, sc.t1));
-  $('cam').style.transform = `scale(${(1 + push + kick).toFixed(4)})`;
+  const kick = Math.exp(-8 * (t - sc.t0)) * .06, push = .035 * io(pr(t, sc.t0, sc.t1)), si = (window.SCENES || []).indexOf(sc), alt = S.punch && si % 2 ? S.punch : 0;
+  $('cam').style.transform = `scale(${(1 + push + kick + alt).toFixed(4)})`;
   const h = endOn ? endCard(t - TL.end_start) : scene(b, t, t - b.a);
   const st = $('stage'); if (st._h !== h) { st._h = h; st.innerHTML = h; }
   caption(b, t, endOn);
