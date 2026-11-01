@@ -194,7 +194,7 @@ function seek(t) {
   const since = t - cut.t0, kick = (cut.t0 > 0 ? .085 : 0) * Math.exp(-11 * since), pulse = .012 * Math.exp(-14 * ((t % BEAT + BEAT) % BEAT));
   const push = .03 * ramp(t, cut.t0, cut.t1), sh = shakeAt(x, t), rot = (ci % 2 ? .5 : -.5) * Math.exp(-6 * since);
   el('rig').style.transform = `translate(${sh[0].toFixed(1)}px,${sh[1].toFixed(1)}px) rotate(${rot.toFixed(2)}deg) scale(${(1 + kick + pulse + push).toFixed(4)})`;
-  const html = endOn ? (D.end_kind === 'login' ? ending2(t - T.end_start, t) : ending(t - T.end_start, t)) : draw(x, t);
+  const html = endOn ? (D.end_kind === 'login' ? ending2(t - T.end_start, t) : D.end_kind === 'logo' ? ending3(t - T.end_start, t) : ending(t - T.end_start, t)) : draw(x, t);
   const lay = el('layer'); if (lay._h !== html) { lay._h = html; lay.innerHTML = html; }
   const caps = endOn ? '' : captions(x, t) + (x.s.type === 'hook' || D.no_meter ? '' : yesMeter(x, t) + ticker(x, t)); const cp = el('caps'); if (cp._h !== caps) { cp._h = caps; cp.innerHTML = caps; }
   const fl = el('flash'), f = cut.t0 > 0 && since < .12 ? .32 * (1 - since / .12) : 0;
@@ -209,7 +209,7 @@ function shakeAt(x, t) {
 // stacked meme captions: the spoken chunk big, the previous chunk stacked above it, smaller and tilted
 function captions(x, t) {
   const ty = x.s.type;
-  if (ty === 'hook' || ty === 'a_hook' || ty === 'a_id') { if (D.hook_caps) return hookCaps(x, t); }
+  if (ty === 'hook' || ty === 'a_hook' || ty === 'a_id' || ty === 'c_hook') { if (D.hook_caps) return hookCaps(x, t); }
   if (ty === 'hook') return `<div style="position:absolute;inset:0;transform:translateY(${(24 * (1 - outQ(ramp(t, 0, .3)))).toFixed(1)}px)">` + memeLine('ChatGPT همیشه', 90, 120, 1, -1) + `<div class="mid" style="top:246px"><span class="meme" style="font-size:120px;vertical-align:middle">می‌گه </span><span style="display:inline-block;vertical-align:middle;padding:0 34px 18px;border-radius:30px;background:var(--y);color:#0D0D0D;font-size:120px;box-shadow:0 12px 0 rgba(0,0,0,.35);transform:rotate(${(-2 + 3 * Math.exp(-8 * Math.max(0, t - .45)) * (t > .45 ? 1 : 0)).toFixed(2)}deg) scale(${(t < .45 ? 1 : 1 + .14 * Math.exp(-9 * (t - .45)) * Math.cos((t - .45) * 18) + .1 * Math.exp(-8 * Math.abs(t - x.at(3))) * (t > x.at(3) - .1 ? 1 : 0)).toFixed(3)})">حق با توئه؟</span></div></div>`;
   if (ty === 'prompt' || ty === 'ask' || ty === 'a_ask' || (D.no_caps || []).includes(ty) || t > x.L.end + .35) return '';
   const W = x.shown, n = W.length; let j = 0; for (let q = 0; q < n; q++) if (t >= W[q].t - .05) j = q;
@@ -328,7 +328,7 @@ function draw(x, t) {
 // ===== REEL-028 (Anthropic S-1: models reached real systems in a test) =====
 function hookCaps(x, t) {
   const [l1, l2] = D.hook_caps;
-  return `<div style="position:absolute;inset:0;transform:translateY(${(24 * (1 - outQ(ramp(t, 0, .3)))).toFixed(1)}px)">` + memeLine(l1, 110, 118, 1, -1) +
+  return `<div style="position:absolute;inset:0;transform:translateY(${(24 * (1 - outQ(ramp(t, 0, .3)))).toFixed(1)}px)">` + memeLine(l1, 110, D.hook_s1 || 118, 1, -1) +
     `<div class="mid" style="top:260px"><span style="display:inline-block;padding:0 34px 18px;border-radius:30px;background:var(--y);color:#0D0D0D;font-size:118px;box-shadow:0 12px 0 rgba(0,0,0,.35);transform:rotate(-2deg)">${l2}</span></div></div>`;
 }
 const pwField = (x, y, w, n, k, lab = 'Password') => `<div class="ab" dir="ltr" style="left:${x}px;top:${y}px;width:${w}px;padding:22px 34px 30px;border-radius:26px;background:#fff;color:#0D0D0D;box-shadow:0 24px 60px rgba(0,0,0,.5);transform:scale(${pop(clamp(k)).toFixed(3)})"><div style="font:600 34px V;color:#6E6E80">${lab}</div><div style="font:900 70px V;letter-spacing:8px">${'•'.repeat(n)}<span style="opacity:${Math.floor(Date.now ? 0 : 0) + 1}">|</span></div></div>`;
@@ -336,6 +336,56 @@ const bar = (x, y, w, v, col) => `<div class="ab" style="left:${x}px;top:${y}px;
 function draw2(x, t) {
   const s = x.s, A = x.a, at = x.at, H = (s.hits || []).map(at);
   switch (s.type) {
+    case 'c_hook': {
+      const k = outQ(ramp(t, 0, 1.6)), v = lerp(4.1, 6.3, k), sec = Math.min(1200, Math.round(lerp(380, 1200, ramp(t, 0, 2.4)))), mm = Math.floor(sec / 60), ss = sec % 60, g = .6 + .4 * Math.sin(t * 7);
+      let coins = ''; for (let i = 0; i < 14; i++) { const q = ((t * .9 + i / 14) % 1), x0 = 540 + Math.sin(i * 2.3) * 60, x1 = 140 + (i * 71) % 800; coins += `<circle cx="${lerp(x0, x1, q).toFixed(0)}" cy="${(700 + q * q * 900).toFixed(0)}" r="${(26 - 8 * q).toFixed(1)}" fill="#F3BA2F" stroke="#9C7A1C" stroke-width="5" opacity="${(1 - q * .7).toFixed(2)}"/>`; }
+      return `<div class="ab" style="inset:0;background:radial-gradient(800px 800px at 540px 700px,#3A2C00,#050505 70%)"></div>` +
+        `<svg class="ab" width="1080" height="1920" style="left:0;top:0">${coins}</svg>` +
+        `<div class="ab" style="left:340px;top:${lerp(560, 470, outQ(ramp(t, 0, .5))).toFixed(0)}px;filter:drop-shadow(0 0 ${(70 * g).toFixed(0)}px rgba(243,186,47,.9))"><img src="${src('el/binance.png')}" style="width:400px;height:400px"></div>` +
+        `<div class="mid" dir="ltr" style="top:930px;font:900 210px V;color:#F3BA2F;text-shadow:0 12px 0 #000">$${v.toFixed(1)}B</div>` +
+        `<div class="mid" dir="ltr" style="top:1170px"><span style="display:inline-block;padding:10px 40px 20px;border-radius:30px;background:#111;border:4px solid #F3BA2F;font:900 96px V;color:#fff">⏱ ${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}</span></div>` +
+        stamp('رکورد', 1330, ramp(t, 1.0, 1.25), 'var(--red)', '#fff', -8);
+    }
+    case 'c_who': {
+      const kd = ramp(t, A + .3, A + .7);
+      return framed(s.img, x, t, .1) + chip('Binance', 120, 1340, 70, '#F3BA2F', '#0D0D0D', ramp(t, A, A + .3), -3, true) + chip('بزرگ‌ترین صرافی دنیا', 420, 1340, 60, '#fff', '#0D0D0D', ramp(t, A + .2, A + .5), 2) +
+        chip('Richard Teng · مدیرعامل مشترک', 120, 1470, 46, '#0D0D0D', '#fff', ramp(t, A + .4, A + .7), 0) +
+        (H[0] ? `<div class="ab" style="left:640px;top:200px;width:330px;height:330px;border-radius:40px;background:#fff;color:#0D0D0D;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.5);transform:rotate(6deg) scale(${pop(ramp(t, H[0] - .05, H[0] + .3)).toFixed(3)})"><div style="background:var(--red);color:#fff;border-radius:40px 40px 0 0;font:900 56px/100px V">اکتبر</div><div style="font:900 170px/220px V">${faNum(29)}</div></div>` : '');
+    }
+    case 'c_chains': {
+      const kt = ramp(t, A, (H[0] || A + 1) + .6); let r = ground(t, x.i), cols = ['#627EEA', '#F3BA2F', '#F7931A', '#8247E5', '#E84142', '#14F195', '#28A0F0', '#FF0420', '#0052FF', '#26A17B'];
+      for (let i = 0; i < 10; i++) { const kk = clamp(kt * 10 * 1.1 - i); if (kk <= 0) continue;
+        r += `<div class="ab" style="left:${60 + (i % 5) * 196}px;top:${360 + Math.floor(i / 5) * 230}px;width:170px;height:190px;border-radius:40px;background:${cols[i]};display:flex;align-items:center;justify-content:center;font:900 96px V;color:#fff;transform:scale(${pop(kk).toFixed(3)}) rotate(${((i % 2) * 2 - 1) * 5}deg);box-shadow:0 14px 30px rgba(0,0,0,.4)">${faNum(i + 1)}</div>`; }
+      return r + memeLine('*۱۰* تا بلاک‌چین', 900, 120, ramp(t, A + .6, A + .9), -2);
+    }
+    case 'c_vs': {
+      const k = outQ(ramp(t, A + .3, A + 1.6)), H1 = 760 * 1.5 / 6.36;
+      return ground(t, x.i) + `<div class="ab" style="left:150px;top:${(1060 - H1 * k).toFixed(0)}px;width:300px;height:${(H1 * k).toFixed(0)}px;border-radius:30px 30px 0 0;background:#fff"></div>` +
+        `<div class="ab" style="left:630px;top:${(1060 - 760 * k).toFixed(0)}px;width:300px;height:${(760 * k).toFixed(0)}px;border-radius:30px 30px 0 0;background:#F3BA2F;box-shadow:0 0 60px rgba(243,186,47,.6)"></div>` +
+        `<div class="ab" style="left:150px;top:1080px;width:300px;text-align:center"><img src="${src('el/bybit.png')}" style="width:260px;filter:invert(1)"><div style="font:900 64px V;direction:ltr">$1.5B</div><div style="font:600 40px V">۲۰۲۵</div></div>` +
+        `<div class="ab" style="left:630px;top:1080px;width:300px;text-align:center"><img src="${src('el/binance.png')}" style="width:120px"><div style="font:900 64px V;direction:ltr;color:#F3BA2F">$6.36B</div><div style="font:600 40px V">۲۰۲۶</div></div>` +
+        stamp('×۴', 200, H[0] ? ramp(t, H[0] - .05, H[0] + .4) : 0, 'var(--y)', '#0D0D0D', -6);
+    }
+    case 'c_suspect': {
+      const kq = ramp(t, A, A + .3), kn = H[0] ? ramp(t, H[0] - .05, H[0] + .3) : 0, kc = H[1] ? ramp(t, H[1] - .05, H[1] + .3) : 0;
+      return ground(t, x.i) + `<div class="mid" style="top:240px;font:900 360px V;color:var(--red);transform:scale(${pop(kq).toFixed(3)})">؟</div>` +
+        chip('TRM Labs: «با اطمینان بالا»', 160, 760, 64, '#fff', '#0D0D0D', ramp(t, A + .4, A + .7), -2) +
+        (kn > 0 ? `<div class="mid meme" style="top:930px;font-size:150px;color:var(--y);transform:scale(${lerp(1.5, 1, outQ(kn)).toFixed(3)})">کره‌ی شمالی؟</div>` : '') +
+        chip('هنوز رسمی تأیید نشده', 230, 1200, 66, 'var(--red)', '#fff', kc, 3);
+    }
+    case 'c_freeze': {
+      const kf = outQ(ramp(t, A + .2, A + 1.2)), ks = H[0] ? ramp(t, H[0] - .05, H[0] + .35) : 0;
+      let st = ''; for (let i = 0; i < 12; i++) st += `<div class="ab" style="left:${300 + (i % 2) * 14}px;top:${1250 - i * 50}px;width:420px;height:44px;border-radius:8px;background:${i < 6 ? `linear-gradient(90deg,#9FE3FF ${(100 * kf).toFixed(0)}%,#F3BA2F ${(100 * kf).toFixed(0)}%)` : '#F3BA2F'};border:3px solid ${i < 6 && kf > .5 ? '#E8FAFF' : '#9C7A1C'}"></div>`;
+      return ground(t, x.i) + st + `<div class="mid meme" dir="ltr" style="top:330px;font-size:150px;color:#9FE3FF">$3B ❄</div><div class="mid" style="top:520px;font-size:70px">فریز شد</div>` +
+        (ks > 0 ? `<div class="ab" style="left:740px;top:740px;width:280px;height:320px;transform:scale(${pop(ks).toFixed(3)})"><svg width="280" height="320" viewBox="0 0 280 320"><path d="M140 10 L260 60 V160 Q260 260 140 310 Q20 260 20 160 V60 Z" fill="#28C840" stroke="#fff" stroke-width="10"/><text x="140" y="190" text-anchor="middle" font-family="V" font-size="62" font-weight="900" fill="#fff">SAFU</text></svg></div>` : '') +
+        chip('ضرر کاربرا جبران می‌شه', 160, 600, 62, '#28C840', '#fff', ks, -2);
+    }
+    case 'c_btc': {
+      const k = ramp(t, A + .2, A + 1.4), pts = [[0, 300], [120, 280], [240, 320], [360, 300], [480, 420], [600, 520], [720, 600], [840, 640]], m = Math.max(1, Math.ceil(k * (pts.length - 1)));
+      return ground(t, x.i) + `<div class="mid" style="top:220px"><img src="${src('el/bitcoin.png')}" style="width:620px;filter:drop-shadow(0 10px 30px rgba(0,0,0,.5))"></div>` +
+        `<svg class="ab" width="1080" height="1920" style="left:0;top:0"><g transform="translate(120 500)"><polyline points="${pts.slice(0, m + 1).map(p => p.join(',')).join(' ')}" fill="none" stroke="var(--red)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></g></svg>` +
+        stamp('−۴٪', 1000, H[0] ? ramp(t, H[0] - .05, H[0] + .4) : ramp(t, A + 1.2, A + 1.6), 'var(--red)', '#fff', -6);
+    }
     case 'a_id': {
       const cx = lerp(820, 640, outQ(ramp(t, 0, .45))), cy = lerp(1500, 1000, outQ(ramp(t, 0, .45))), ub = ramp(t, .3, .9), kp = ramp(t, .75, 1.0), sh = kp > 0 && kp < 1 ? Math.sin(t * 90) * 10 : 0;
       const rows = ['Name: ●●●● ●●●●●●', 'Email: ●●●●●@●●●●.com', 'Phone: +● ●●● ●●● ●●●●', 'Address: ●● ●●●●● St.'];
@@ -411,14 +461,20 @@ function draw2(x, t) {
     }
     case 'a_ask': {
       const w = s.words ? s.words.map(at) : [], k1 = ramp(t, A + .2, A + .5), k2 = ramp(t, A + .35, A + .65), tap = w[0] ? ramp(t, w[0], w[0] + .25) : 0;
-      return ground(t, x.i) + memeLine('دسترسی ایمیل و حسابات رو', 220, 84, ramp(t, A, A + .3), -1) + memeLine('به یه *AI* می‌دی؟', 340, 110, ramp(t, A + .1, A + .4), 1) +
-        `<div class="ab" style="left:110px;right:110px;top:620px;height:230px;border-radius:115px;background:var(--teal);font:900 110px/230px V;text-align:center;transform:scale(${(pop(k1) * (1 - .06 * Math.sin(Math.PI * tap))).toFixed(3)})">✅ آره</div>` +
-        `<div class="ab" style="left:110px;right:110px;top:900px;height:230px;border-radius:115px;background:var(--red);font:900 110px/230px V;text-align:center;transform:scale(${pop(k2).toFixed(3)})">🚫 عمراً</div>` +
+      return ground(t, x.i) + memeLine((s.q || ['دسترسی ایمیل و حسابات رو'])[0], 220, 84, ramp(t, A, A + .3), -1) + memeLine((s.q || [0, 'به یه *AI* می‌دی؟'])[1], 340, 110, ramp(t, A + .1, A + .4), 1) +
+        `<div class="ab" style="left:110px;right:110px;top:620px;height:230px;border-radius:115px;background:var(--teal);font:900 110px/230px V;text-align:center;transform:scale(${(pop(k1) * (1 - .06 * Math.sin(Math.PI * tap))).toFixed(3)})">${(s.opts || ['✅ آره'])[0]}</div>` +
+        `<div class="ab" style="left:110px;right:110px;top:900px;height:230px;border-radius:115px;background:var(--red);font:900 110px/230px V;text-align:center;transform:scale(${pop(k2).toFixed(3)})">${(s.opts || [0, '🚫 عمراً'])[1]}</div>` +
         `<div class="ab" style="left:${lerp(880, 600, inOut(ramp(t, A + .6, (w[0] || A + 1.2)))).toFixed(0)}px;top:${lerp(1400, 980, inOut(ramp(t, A + .6, (w[0] || A + 1.2)))).toFixed(0)}px;font-size:120px;transform:rotate(-20deg)">👆</div>` +
         botBub('کامنت کن 👇', 200, 1220, w[1] ? ramp(t, w[1] - .1, w[1] + .2) : 0, 60);
     }
   }
   return null;
+}
+function ending3(u, t) {
+  return `<div class="ab" style="inset:0;background:radial-gradient(800px 800px at 540px 700px,#3A2C00,#050505 70%)"></div><div class="mid" style="top:440px"><img src="${src('el/' + LOGO())}" style="width:${(380 * lerp(1.2, 1, outQ(ramp(u, 0, .5)))).toFixed(0)}px;filter:drop-shadow(0 0 60px rgba(243,186,47,.8))"></div>` +
+    `<div style="position:absolute;inset:0;transform:scale(${(1 + .03 * Math.sin(u * 6)).toFixed(4)});transform-origin:540px 1000px">` + memeLine(D.end_text || '', 960, 104, ramp(u, .1, .4)) + '</div>' +
+    `<div class="mid" style="top:1140px;font-size:60px;opacity:${ramp(u, .3, .6)}">${D.end_sub || ''}</div>` +
+    `<div class="mid" dir="ltr" style="top:1240px;font:600 42px V;letter-spacing:6px;color:var(--y);opacity:${ramp(u, .4, .7)}">${(D.handle || '').replace('@', '').toUpperCase()}</div>`;
 }
 // the end loops back to the login screen: the field is empty and locked, the question stays
 function ending2(u, t) {
