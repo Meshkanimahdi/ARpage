@@ -33,9 +33,11 @@ The evidence (live, 2026-11-01): «همه می‌دونن…» 311k views / 39k 
 آماده کردی؟» 59k / 10.7k shares in its first 14 hours. Every other reel: 1.5–2.5k views. Almost all followers came
 from these. They share one thing: **the viewer's own life** — their job, money, safety, family, health or daily
 routine in Iran — told so that people **send it to someone they care about**.
-1. **The page's job:** useful, shareable content about how AI and the world change the daily life of Iranians.
-   AI is the lens, not a requirement: a life-impact topic with no AI (emergency readiness) is in scope; an AI
-   story with no life impact is the exception.
+1. **The page's job (refined 2026-11-02):** the role of AI and technology in the daily life of Iranians, told so
+   people share it. Mahdi: «باید سناریوها جذاب باشه و حتماً هم به تکنولوژی و هوش مصنوعی ربط داشته باشه، ما قراره از
+   نقش هوش مصنوعی تو زندگی حرف بزنیم، پس موضوعات به‌تنهایی اجتماعی مد نظر نیست». Every topic links life AND
+   AI/tech: what AI changes in your job, money, family, safety, health or mind, or what AI can do for you there. A
+   purely social or purely tech topic is out, except when Mahdi asks for one (like the 2026-11-01 readiness reel).
 2. **Topic test (concept.json → `story.life`, `story.life_impact`):** whose money, job, safety, health, family or
    daily routine changes, and what should they do about it? At least **2 of every 3 reels** are `life: true`
    (concept_gate.py enforces it); corporate/tech news only when it changes the viewer's life, framed that way
@@ -78,6 +80,17 @@ routine in Iran — told so that people **send it to someone they care about**.
    impact, series potential, sources, suggested format, and an empty `Approved` checkbox. Mahdi ticks; REEL_PREPARE
    takes the next ticked, unused topic (oldest first) and marks it `Used`; when none is ticked it falls back to
    §4.2 research. Seed topics from Mahdi (2026-11-01) are in `meshkani-pro/TOPIC_SEED.md`.
+16. **Format «از دید هوش مصنوعی» (AI point of view), user rule 2026-11-02.** Evidence: @ensan.besham's AI-POV reels
+   (13M plays: «۵۰ میلیون و بقیه ۲۵، یا ۱۰۰ و بقیه ۲۰۰؟»; 5.1M: 1397 vs 1405 prices) and our own 311k «همه می‌دونن…».
+   - An AI narrator looks at human life in Iran and says what it sees that people do not.
+   - The hook is the first spoken sentence, not the cover: either a two-option dilemma the viewer answers in
+     their head and in the comments («۱ یا ۲؟ تو کامنت بگو»), or one shocking official number.
+   - The middle uses real, sourced data or a real study (Iranian official statistics, Statistical Centre,
+     Central Bank, Health Ministry, peer-reviewed studies): numbers only from the source, said exactly.
+   - It must reach AI/tech (§00.1): what AI notices, how AI is changing this, or what AI can do for the viewer.
+   - The ending is a short human line and, on emotional topics, the Mirror bridge (§00.15).
+   - Our own scripts, data and visuals; never copy another page's script or numbers without checking the
+     source. Make 2–3 a week, as a named series («هوش مصنوعی می‌پرسه» / «از دید هوش مصنوعی»).
 15. **Mirror (user rule 2026-11-02):** a main goal of the page is sending people to Mirror (https://mirror-pro.com). Follow `meshkani-pro/MIRROR.md`: an honest Mirror bridge on fitting social topics (about 1 reel in 4, 1 carousel in 3, max one a day, never on news/tragedy/safety), the URL in the caption and the first comment, «لینک در بیو», and none of the claims MIRROR.md forbids.
 14. **Images: one sheet, at most two, then crop (user rule, repeated 2026-11-01).** Every image a post, its
    stories, a reel or its cover needs is generated in ONE storyboard sheet, at most TWO, and cut into panels

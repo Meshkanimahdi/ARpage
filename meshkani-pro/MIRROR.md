@@ -18,6 +18,12 @@ Source of truth: repo `Meshkanimahdi/mirror` (README, `mirror-knowledge.txt`, `a
 Mahdi's seed line «هوش مصنوعی‌ای که خودشو پاک می‌کنه» is turned into a true angle:
 «یه هوش مصنوعی که فقط یه بار باهات حرف می‌زنه» / «یه گفتگو، یه آینه».
 
+## Bridge lines (Mahdi's idea, 2026-11-02, kept true)
+Mahdi's line: «هنوز یکی هست که دوست داره درد و دل‌هاتو بشنوه ولی قول میده فراموشت کنه». Until Mahdi confirms the
+product really deletes conversations, use the true version (Mirror keeps no memory between sessions and asks no
+name): «هنوز یکی هست که دوست داره درد و دل‌هاتو بشنوه… و دفعه‌ی بعد یادش نمی‌مونه کی بودی». If Mahdi confirms a
+deletion policy that is live on the site (terms/FAQ), his exact line may be used.
+
 ## Where the call to action goes
 - **Fit topics** (stress, overthinking, burnout, loneliness, big decisions, career change, «کی هستم؟»،
   relationships, emigration doubts, parenting pressure): about 1 reel in 4 and 1 carousel in 3 end with a Mirror
