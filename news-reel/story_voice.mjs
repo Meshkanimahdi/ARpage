@@ -45,7 +45,7 @@ async function tts(text, seed, out, lang = 'fa') {
     const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${S.voice}?output_format=mp3_44100_192`, {method: 'POST',
       headers: {'xi-api-key': key, 'Content-Type': 'application/json'},
       body: JSON.stringify({text, model_id: MODEL, ...(lang ? {language_code: lang} : {}), seed,
-        voice_settings: {stability: S.stability ?? 0.5, similarity_boost: 0.85, use_speaker_boost: true}})});
+        voice_settings: {stability: S.stability ?? 0.38, similarity_boost: 0.85, use_speaker_boost: true}})});
     if (!r.ok) throw new Error(`TTS ${r.status} ${(await r.text()).slice(0, 200)}`);
     fs.writeFileSync(out, Buffer.from(await r.arrayBuffer()));
   }, 'tts');
