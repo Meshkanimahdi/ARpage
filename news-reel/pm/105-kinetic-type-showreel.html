@@ -359,7 +359,7 @@ V.tip = async (sc, v, b) => {   // small tip: phone with an offline badge and an
   const q = phn.querySelector('.q'), a = phn.querySelector('.a'), Tn = wAt(b, 9), Ts = wAt(b, 16);
   return t => { inn(tg, t, b.a - .1, .4); tg.style.transform += ' translateX(-50%)'; inn(phn, t, b.a, .5, 0, 120); inn(q, t, b.a + .5, .4, 40, 0); inn(a, t, b.a + 1.1, .4, -40, 0); inn(phn.querySelector('.q2'), t, b.a + 1.8, .4, 40, 0); inn(phn.querySelector('.a2'), t, Tn - .3, .4, -40, 0);
     const k = E.o(P(t, Tn, Tn + .4)); nt.style.opacity = k; nt.style.transform = `scale(${lerp(1.3, 1, k).toFixed(3)})`;
-    const s = E.p4i(P(t, Ts, b.b)); phn.style.transform += ` translate(${(s * 900).toFixed(0)}px, ${(-s * 1200).toFixed(0)}px) rotate(${(s * 30).toFixed(0)}deg)`; };
+    const s = E.p4i(P(t, Ts, b.b)); const fl = t - b.a; phn.style.transform += ` translate(${(s * 900 + Math.sin(fl * 1.6) * 26).toFixed(0)}px, ${(-s * 1200 - fl * 14).toFixed(0)}px) rotate(${(s * 30 + Math.sin(fl * 1.2) * 3).toFixed(2)}deg) scale(${(1 + fl * .02).toFixed(3)})`; nt.style.transform += ` rotate(${(Math.sin(fl * 2.4) * 2).toFixed(2)}deg)`; tg.style.transform += ` translateY(${(Math.sin(fl * 2) * 10).toFixed(1)}px)`; };
 };
 let S, TL, B = [], END = 60;
 window.ready = (async () => {
