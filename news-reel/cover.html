@@ -70,6 +70,7 @@ window.ready = (async () => {
   const T = $('title'), out = () => { const r = T.getBoundingClientRect(); return POS === 'bottom' ? r.top < 470 : (r.top < 320 || r.bottom > 1600); };
   // big enough to read in the Explore grid (user rule 2026-10-25): start at 150 px, never below 120 px (raised 2026-10-27)
   if (C.title_lr) { T.style.left = T.style.right = C.title_lr + 'px'; }
+  if (C.lh) T.style.lineHeight = C.lh;
   let fs = C.fs0 || 150; T.style.fontSize = fs + 'px';
   while (fs > 120 && (T.offsetHeight > fs * 1.12 * 3 + 4 || out())) { fs -= 2; T.style.fontSize = fs + 'px'; }
   const nWords = C.title.replace(/[*|]/g, ' ').trim().split(/\s+/).filter(w => w.length > 0).length;
