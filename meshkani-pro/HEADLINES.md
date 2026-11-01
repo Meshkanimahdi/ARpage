@@ -66,3 +66,9 @@ tension. They never lead with "هوش مصنوعی" (AI). The AI angle belongs i
    `headline_lessons` in insights.json and adds new winning words to
    `meshkani-pro/headline_lexicon.json` (in the `learned` key, via a commit). Each week, rank the
    angles by median reach. Keep 1 cover in 4 on an under-tested angle.
+
+## Angle H — your life, your family (user rule 2026-11-01, the strongest angle so far)
+Speak to the viewer's own money, job, safety, health or family, as a question or a direct "you":
+«اگه می‌خوای شغلت امن بمونه… لوله‌کش شو؟» (116k views), «خودتو برای جنگ آماده کردی؟» (59k in 14 h),
+«همه می‌دونن…» (311k). Score +4 in headline_score.py when the headline names the viewer («تو»، «شغلت»، «پولت»،
+«خانواده‌ت») and a concrete life stake.

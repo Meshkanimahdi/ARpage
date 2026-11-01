@@ -163,7 +163,7 @@ def main():
 
     out = {'pass': not fails, 'fails': fails, 'info': info,
            'history_entry': {'reel': story.get('content_id', ''), 'date': story.get('date', ''), 'prompt': pid, 'engine': eng,
-                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else '')}}
+                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'life': story.get('life'), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else '')}}
     (d / 'gate.json').write_text(json.dumps(out, ensure_ascii=False, indent=1))
     print(json.dumps(out, ensure_ascii=False))
     sys.exit(0 if not fails else 3)

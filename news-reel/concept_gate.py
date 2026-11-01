@@ -26,8 +26,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 AI_WORDS = ('هوش مصنوعی', 'هوش‌مصنوعی')
-BARS = {'reel': {'headline_clarity': 6, 'hook_plan': 6, 'cover_plan': 6, 'story_appeal': 6, 'motion_plan': 6},
-        'post': {'headline_clarity': 6, 'cover_plan': 6, 'story_appeal': 6, 'save_value': 6}}
+BARS = {'reel': {'headline_clarity': 6, 'hook_plan': 6, 'cover_plan': 6, 'story_appeal': 6, 'motion_plan': 6, 'share_value': 6},
+        'post': {'headline_clarity': 6, 'cover_plan': 6, 'story_appeal': 6, 'save_value': 6, 'share_value': 6}}
 
 
 def words(s):
@@ -46,6 +46,14 @@ def lint(d, kind, hist_path):
     if any(w in h for w in AI_WORDS): f.append('no «هوش مصنوعی» on the cover (HEADLINES.md)')
     for k in ('summary', 'source', 'date', 'field'):
         if not (c.get('story') or {}).get(k): f.append(f'story.{k} missing')
+    # north star (RUNBOOK §00, 2026-11-01): everyday life of Iranians; 2 of every 3 reels must be "life" stories
+    st = c.get('story') or {}
+    if st.get('life') is None or not st.get('life_impact'):
+        f.append('story.life (true/false) and story.life_impact ("whose money/job/safety/health/family/daily life, and how") are required')
+    if kind == 'reel' and not st.get('life') and hist_path and Path(hist_path).exists():
+        prev = json.loads(Path(hist_path).read_text())[-2:]
+        if len(prev) == 2 and not any(x.get('life') for x in prev):
+            f.append('the last 2 reels were not "life" stories: this one must be (RUNBOOK §00)')
     cv = c.get('cover') or {}
     if not cv.get('subject'): f.append('cover.subject missing (a real face, product or place)')
     hist = json.loads(Path(hist_path).read_text()) if hist_path and Path(hist_path).exists() else []

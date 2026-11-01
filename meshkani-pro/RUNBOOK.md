@@ -1,7 +1,7 @@
 # meshkani.pro cloud publisher — runbook
 
 This file is the operating procedure for the scheduled cloud runs that research,
-design, store and publish one Persian AI-news package per slot for the
+design, store and publish one Persian package per slot about how AI and the world change daily life (§00) for the
 Instagram account `meshkani.pro`. Each scheduled run starts a fresh Claude
 session and is told which phase to run: **PREPARE** or **PUBLISH** (posts, §1–§2) or
 **REEL_PREPARE** / **REEL_PUBLISH** (the daily reel, §4–§5).
@@ -17,7 +17,7 @@ Daily schedule (Tehran, user rule 2026-10-24):
 | ~~18:00~~ | disabled 2026-10-27 (carousels every other day) | — |
 | **21:00** | reel + its story | 18:45, 19:45 |
 
-Publish runs start at :57 the hour before. Each reel (one trending AI story, news-reel/STORY_SPEC.md) is
+Publish runs start at :57 the hour before. Each reel (one story that matters to the viewer's daily life, §00; news-reel/STORY_SPEC.md) is
 also shared to the Story. The comment and DM responder runs separately (responder/).
 
 Source of the rules: `TASK_SPEC.md` (standing task + cloud overrides) and «دستور کار انتقال انتشار محتوای meshkani.pro» (20 Oct 2026).
@@ -25,6 +25,37 @@ Where this file and that brief disagree, the brief's safety rules win: never
 publish twice, never publish late, never publish unverified content.
 
 ---
+
+## 00. North star — read first, it overrides everything below (user rule 2026-11-01)
+Mahdi: «تقریباً تمام فالوورهای پیج از همون دو ریلز اومدن… نتیجه‌ای که فعلاً از همین سه پست می‌گیریم باید این باشه که
+پست‌هایی دست‌به‌دست میشه، ذخیره میشن و ویو می‌خورن که یه نقشی در زندگی روزمره‌ی مردم داشته باشند».
+The evidence (live, 2026-11-01): «همه می‌دونن…» 311k views / 39k shares, «لوله‌کش شو؟» 116k / 9.5k, «خودتو برای جنگ
+آماده کردی؟» 59k / 10.7k shares in its first 14 hours. Every other reel: 1.5–2.5k views. Almost all followers came
+from these. They share one thing: **the viewer's own life** — their job, money, safety, family, health or daily
+routine in Iran — told so that people **send it to someone they care about**.
+1. **The page's job:** useful, shareable content about how AI and the world change the daily life of Iranians.
+   AI is the lens, not a requirement: a life-impact topic with no AI (emergency readiness) is in scope; an AI
+   story with no life impact is the exception.
+2. **Topic test (concept.json → `story.life`, `story.life_impact`):** whose money, job, safety, health, family or
+   daily routine changes, and what should they do about it? At least **2 of every 3 reels** are `life: true`
+   (concept_gate.py enforces it); corporate/tech news only when it changes the viewer's life, framed that way
+   («شغلت…»، «پولت…»، «خانواده‌ت…»).
+3. **Share value first:** the critic scores `share_value` (would a viewer send this to family or a friend?). Every
+   reel and carousel ends with one share ask that fits the topic («برای خانواده‌ت بفرست»، «برای اون دوستت که… بفرست»),
+   and gives one concrete thing to do or keep (a checklist, a step, a number, a prompt).
+4. **Follow trigger:** the end card promises the next useful thing («هر روز یه نکته که زندگیتو راحت‌تر می‌کنه —
+   فالو کن»). A reel that passes 20k views in 24 h gets a **part 2** within 48 h (same topic, the next useful
+   step), announced in the caption of part 1 («قسمت دوم فردا»).
+5. **Real people and real stakes:** real faces of famous people when the story has them (§4.2 step 00); for life
+   topics, real-looking everyday Iranian scenes, prices in toman, Iranian places — never generic stock tech.
+6. **Clear beats fancy:** for life topics, clarity of the message and the checklist wins over motion
+   complexity; the motion rules (§4.0) serve readability.
+7. **Tone:** calm, practical, true. No fear-mongering, no predictions of war or crashes, no fake numbers. A
+   frightening subject is told as "how to be ready", with a reputable source.
+8. **Measure what matters:** ANALYTICS (§6) ranks every post by shares per 1k reach, saves per 1k reach and
+   follower change on its day, and feeds `insights.json → life_topics` (the topic families that won) to every
+   prepare. Likes are secondary.
+9. **Publish first (§4.0a):** bars 6, at most 3 rounds, never an empty slot.
 
 ## 0. Ground rules (both phases)
 
@@ -318,7 +349,7 @@ Mahdi: one storyboard image, cut into slides, gives better quality, lower cost a
    The critic is a fresh subagent (Agent tool, no shared context) that gets only `concept.json` and the previous
    3 covers' headlines; it answers JSON `{"scores": {…}, "paraphrase": "<what a newcomer thinks the headline
    means, one sentence>", "notes": {…}}` → `critic_concept.json`. Scores 1–10: `headline_clarity` (≥ 7, user rule 2026-10-29; ≤ 4 when
-   the paraphrase does not match who did what to whom), `story_appeal` (would a Persian scroller who is not into
+   the paraphrase does not match who did what to whom), `share_value` (would a viewer send it to family or a friend? §00), `story_appeal` (would a Persian scroller who is not into
    tech care? jobs, money, everyday life win), `hook_plan` (is frame 0 a real, bright, big subject with the
    headline on screen and moving?), `cover_plan` (real face/product, big plain headline, clear at thumbnail size),
    and `save_value` (would someone save or send it?). Bars: all 7 (clarity lowered from 8 to 7 by Mahdi on 2026-10-29: «حد نصاب وضوح رو ۷ کن»; 18 rounds on 2026-10-29 stuck at 7 while critics asked for wordings that do not fit 7 words). Fix and repeat (text
@@ -874,7 +905,7 @@ narrator talks, nothing attractive in the picture").
    The critic is a fresh subagent (Agent tool, no shared context) that gets only `concept.json` and the previous
    3 covers' headlines; it answers JSON `{"scores": {…}, "paraphrase": "<what a newcomer thinks the headline
    means, one sentence>", "notes": {…}}` → `critic_concept.json`. Scores 1–10: `headline_clarity` (≥ 7, user rule 2026-10-29; ≤ 4 when
-   the paraphrase does not match who did what to whom), `story_appeal` (would a Persian scroller who is not into
+   the paraphrase does not match who did what to whom), `share_value` (would a viewer send it to family or a friend? §00), `story_appeal` (would a Persian scroller who is not into
    tech care? jobs, money, everyday life win), `hook_plan` (is frame 0 a real, bright, big subject with the
    headline on screen and moving?), `cover_plan` (real face/product, big plain headline, clear at thumbnail size),
    and for reels `motion_plan` (every scene ≥ 4 animated layers: numbers, charts, UI, glow; not photos sliding)
@@ -1131,6 +1162,12 @@ narrator talks, nothing attractive in the picture").
 ---
 
 ## 6. ANALYTICS phase — daily performance review (06:00 Tehran, before the day's first prepare; Fridays also weekly)
+
+**North-star metrics (user rule 2026-11-01, §00 point 8):** for every post and reel also compute shares per 1k
+reach, saves per 1k reach and the account's follower change on its publish day (followers_count from
+`INSTAGRAM_GET_USER_INFO` each morning, kept in `_automation/followers.json`); rank by shares/1k first. Write
+`insights.json → life_topics` (topic families with the best shares/1k and follower gain, e.g. job safety,
+prices, family safety) and `part2_candidates` (any reel past 20k views in 24 h, §00 point 4).
 
 Goal: measure what the audience really does with every post, story and reel, then turn it into
 `_automation/insights.json`, which steers the next PREPARE and REEL_PREPARE runs. Read-only on Instagram.
