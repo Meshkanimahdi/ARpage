@@ -5,7 +5,7 @@ Checks what the audio/spec QA never saw: empty screens, frozen pictures, slow sh
 two seconds and the length. It also writes a 1-frame-per-second contact sheet that must be Read before
 publishing (cropped elements, cut-off text and visuals that do not match the narration are judged there).
 
-  python3 news-reel/reel_qa.py work/story/reel.mp4 [--out work/story/qa] [--min 40 --max 55]
+  python3 news-reel/reel_qa.py work/story/reel.mp4 [--out work/story/qa] [--min 30 --max 150]
 
 Exit 0 = pass, 3 = fail (reasons in qa.json and on stdout).
 """
@@ -48,8 +48,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('video')
     ap.add_argument('--out')
-    ap.add_argument('--min', type=float, default=40)
-    ap.add_argument('--max', type=float, default=55)
+    ap.add_argument('--min', type=float, default=30)
+    ap.add_argument('--max', type=float, default=150)   # length follows the topic (2026-11-02)
     ap.add_argument('--max-flat', type=float, default=0.45, help='max mean flat share over the reel')
     ap.add_argument('--max-flat-frames', type=float, default=0.15, help='max share of seconds that are >60%% flat')
     ap.add_argument('--max-hold', type=float, default=1.5, help='longest allowed still stretch, seconds')

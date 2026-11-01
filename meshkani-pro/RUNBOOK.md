@@ -750,7 +750,7 @@ Before any retry of a publish call:
 > story, one narrator chosen per story, elements from ≤ 3 generated sheets, Story cut included.
 
 Goal: before the reel's time, slot file `slot_<date>_<HHMM>.json` (`"kind": "reel"`; `tehran.py reel prepare` gives it) with status `READY`, a
-QA-passed 40–55 s story reel MP4 + cover in Drive and a `Ready` row in the `Reels` tab.
+QA-passed story reel MP4 (30–150 s, §4.0 rule 3) + cover in Drive and a `Ready` row in the `Reels` tab.
 Format (user decision 2026-10-21): **one trending AI story per reel**, told as a story with strong
 hooks for watch time; the on-screen text is the narration word by word; angle, story shape, look,
 voice and rhythm change every day — read `news-reel/STORY_SPEC.md` fully before starting. (The
@@ -805,7 +805,7 @@ narrator talks, nothing attractive in the picture").
 3. **Rhythm and sync.** (User rule 2026-10-27, after REEL-014 failed visual_match on late numbers:) every number, name or
    result appears on screen within 0.3 s of the word that says it (time it from the voice word timings, never by scene
    order), and no frame between shots is empty or near-empty. A new shot or a clear camera change every 1.5–3 s; no still picture longer than 1.5 s,
-   except a final CTA of at most 2 s. Cut on action. Length 40–55 s (the 60–92 s ranges below are replaced).
+   except a final CTA of at most 2 s. Cut on action. **Length follows the topic (user rule 2026-11-02, «بسته به موضوع باز باشه… ۵۰، ۶۰، ۹۰ یا حتی ۱۲۰ ثانیه»):** 30–150 s, chosen in concept.json → `length` and story.json → `target_len` (a quick news hit 35–50 s; a checklist or explainer 60–90 s; an AI-POV story with data 90–120 s). Longer is allowed only while every 2–3 s still brings something new (the rhythm rules stay).
 4. **Hook in 2 seconds.** (User rule 2026-10-26, after REEL-013 failed the critic's hook score twice:) from frame 0 a huge,
    readable Persian hook line (≥ 120 px, ≤ 2 short lines, never clipped, inside the safe area) over a bright, large
    subject (≥ 60 % of the frame); never a tight dark crop, small buttons or tiny card words as the opening.
@@ -865,7 +865,7 @@ narrator talks, nothing attractive in the picture").
    Story/character prompts (074, 191, 020, 079, 160, 086, 184, 211…) are used only when the story itself is a
    character story, and they must still meet rule 2b.
    Already used (blocked until 10 other reels): 089, 168, 211 (019), 001 (105), 149, 178, 074 (REEL-014).
-   The 40–55 s, hook, storyboard and gate rules above stay; a 15–30 s prompt is stretched by
+   The length (rule 3), hook, storyboard and gate rules above stay; a 15–30 s prompt is stretched by
    giving each voiced beat its own section in that prompt's look, not by repeating sections.
 
 ### 4.1 Preconditions
@@ -1016,7 +1016,7 @@ narrator talks, nothing attractive in the picture").
 3a. **English names (user rule 2026-10-29):** `node news-reel/pron_test.mjs --dir=work/story` (STORY_SPEC "English
    names must SOUND English"); commit `news-reel/pron_cache.json`; Read the scores, exit 4 → respell/rephrase.
 3. `node news-reel/story_voice.mjs --dir=work/story --tempo=<tempo>` (eleven_v4; exit 3 → shorten,
-   exit 4 → respell/rephrase the flagged beats). 40–55 s (§4.0).
+   exit 4 → respell/rephrase the flagged beats). Length = story.json target_len (§4.0 rule 3).
 
 ### 4.4 Render and QC
 0. **Pass the critic before rendering (user rule 2026-10-27, blocking).** Mahdi: «چرا هی میره تو گیت رد میشه…
@@ -1063,7 +1063,7 @@ narrator talks, nothing attractive in the picture").
    (a sound that matches each motion, never a whoosh on every cut); run `node news-reel/sfx/generate.mjs` once if a
    library file is missing. After assembly, `reel.json → sfx` must show ≤ 2 whooshes and no sound over 40 %.
 2. `--mode=video` in the background (run it with a timeout of at least 60 min), then `python3 news-reel/reel_assemble.py --dir work/story`:
-   `reel.json` must show 40–55 s (§4.0), −15.5…−12 LUFS, true peak ≤ −1 dBFS; H.264 1080×1920 30 fps + AAC.
+   `reel.json` must show the planned length, 30–150 s (§4.0), −15.5…−12 LUFS, true peak ≤ −1 dBFS; H.264 1080×1920 30 fps + AAC.
 3. **Attention gate (§4.0 rule 6, blocking):** `python3 news-reel/reel_qa.py work/story/reel.mp4`; exit 3 → fix
    and re-render. Read `work/story/qa/contact.jpg` second by second against the narration.
 3b. **Designed cover (user rule 2026-10-23).** Every reel gets its own cover, not a video frame. It works

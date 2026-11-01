@@ -101,5 +101,6 @@ for (const [i, x] of items.entries()) {
 const end_start = +(t + .5).toFixed(3), total = +(end_start + ENDCARD).toFixed(3);
 fs.writeFileSync(path.join(dir, 'timeline.json'), JSON.stringify({start: 0, lines, end_start, total, endcard: [end_start, total], tempo, voice: S.voice, model: MODEL}, null, 1));
 console.log(`timeline: ${total}s (${items.length} beats, tempo ${tempo}, min STT ${Math.min(...qc.map(q => q.score)).toFixed(2)})`);
-if (total > 56) { console.error('too long: shorten the script (max 55 s, RUNBOOK §4.0)'); process.exit(3); }
+const MAXLEN = Math.min(152, (S.target_len || 150) + 6);   // length follows the topic (user rule 2026-11-02): 30–150 s, set story.json → target_len
+if (total > MAXLEN) { console.error(`too long: ${total}s > ${MAXLEN}s (story.json target_len ${S.target_len || 150}, hard max 150 s, RUNBOOK §4.0)`); process.exit(3); }
 if (qc.some(q => q.score < 0.8)) { console.error('speech-to-text below 0.8 on some beats (voice/qc.json): respell with diacritics or rephrase'); process.exit(4); }

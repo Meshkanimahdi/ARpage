@@ -2,7 +2,7 @@
 
 **Goal:** two reels every day, at 09:00 and 15:00 Tehran (user 2026-10-21), each grabbing attention in the first second, keeps people
 watching to the end (watch time, completion, rewatches) and makes them comment — built from a
-**trending, verified AI story** and told as a short story. 40–55 s (RUNBOOK §4.0), one narrator, **the on-screen text
+**trending, verified AI story** and told as a short story. 30–150 s by topic (RUNBOOK §4.0 rule 3), one narrator, **the on-screen text
 is the narration, word by word**. Approved reference: REEL-002 (Hinton, «لوله‌کش شو»), inspired by
 @mgh.mobin «انسان‌ها، گاوهای آینده‌ان؟». The old two-news reel (REEL_SPEC.md) is retired; the
 neon/particles/3D rule of VOICES.md is no longer mandatory — it is one of the looks below.
