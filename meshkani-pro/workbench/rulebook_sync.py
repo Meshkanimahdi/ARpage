@@ -37,6 +37,10 @@ def rulebook_sync(file_id, commit=""):
     sid = tabs[RULEBOOK_TAB]
     now = (datetime.datetime.utcnow() + datetime.timedelta(hours=3, minutes=30)).strftime("%Y-%m-%d %H:%M")
     rows = [[f"RUNBOOK.md — synced {now} Tehran", f"commit {commit}"]] + [[ln, ""] for ln in lines]
+    # RUNBOOK grows past the default 1000-row grid: resize to fit before writing.
+    _sx("POST", base + ":batchUpdate", body={"requests": [{"updateSheetProperties": {"properties": {
+        "sheetId": sid, "gridProperties": {"rowCount": len(rows) + 50, "columnCount": 2}},
+        "fields": "gridProperties(rowCount,columnCount)"}}]})
     _sx("POST", f"{base}/values/{RULEBOOK_TAB}!A:B:clear", body={})
     for i in range(0, len(rows), 500):
         _sx("PUT", f"{base}/values/{RULEBOOK_TAB}!A{i + 1}", params={"valueInputOption": "RAW"}, body={"values": rows[i:i + 500]})
