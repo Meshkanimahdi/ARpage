@@ -684,6 +684,22 @@ hooks for watch time; the on-screen text is the narration word by word; angle, s
 voice and rhythm change every day — read `news-reel/STORY_SPEC.md` fully before starting. (The
 two-news reel in REEL_SPEC.md is retired.)
 
+### 4.0a Publish first, then improve (user rule 2026-11-01, overrides the gate wording below)
+Mahdi: «اینی که میگی یه ریلز ۸ بار اصلاح شده… فعلاً نیاز به بازبینی و سختگیری زیاد نیست تا کمی پیج جون بگیره…
+اگه ریلزهایی تولید شده از قبل و انتشار نیافته بزار تو صف انتشار بدون بازبینی». Standing approval from Mahdi:
+- **Bars are 6** (concept gate, preflight, final critic). **At most 3 rounds** of fixes at any stage; after the
+  third, take the best version and continue. Never spend more than one full re-render on a reel.
+- **A slot is never left empty.** A reel that misses a bar but passes the technical checks (reel_qa, length,
+  loudness, no clipped text, facts true to the source, real names spelled right) is published as it is, with a
+  `low_score` note in the Reels row; no human approval is needed for it. Only a factual error, a broken file or
+  a policy risk (copyright, a fake quote, a generated likeness of a real person) stops a reel.
+- **Backlog first:** any reel already rendered and not published goes into the publish queue (oldest first,
+  one per free slot) without another review.
+- **Proven formulas (2026-11-01):** our two biggest reels were «اگه می‌خوای شغلت امن بمونه… لوله‌کش شو؟» (89k reach)
+  and the petrol/Pezeshkian reel (45k): both hit Iranians' own money, job or daily life, with a famous face or a
+  clear threat/benefit. At least one reel a day follows that formula (job safety, prices, money, everyday
+  Iranian life), using the radar (§4.2 step 0) for proven topics.
+
 ### 4.0 Reel visual rules (user rule 2026-10-24, after REEL-007; these override any older rule below)
 Mahdi on REEL-007: «سبک بد، قلاب افتضاح، صدا با تصاویر همخوانی نداره، همش صفحه خالیه و راوی حرف می‌زنه، بدون هیچ
 جذابیتی در تصویر» ("bad style, terrible hook, the audio doesn't match the pictures, the screen is always empty while the

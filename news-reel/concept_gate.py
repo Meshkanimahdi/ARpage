@@ -26,8 +26,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 AI_WORDS = ('هوش مصنوعی', 'هوش‌مصنوعی')
-BARS = {'reel': {'headline_clarity': 7, 'hook_plan': 7, 'cover_plan': 7, 'story_appeal': 7, 'motion_plan': 7},
-        'post': {'headline_clarity': 7, 'cover_plan': 7, 'story_appeal': 7, 'save_value': 7}}
+BARS = {'reel': {'headline_clarity': 6, 'hook_plan': 6, 'cover_plan': 6, 'story_appeal': 6, 'motion_plan': 6},
+        'post': {'headline_clarity': 6, 'cover_plan': 6, 'story_appeal': 6, 'save_value': 6}}
 
 
 def words(s):

@@ -155,11 +155,11 @@ def main():
         fails.append('no critic.json (independent review, RUNBOOK §4.4)')
     else:
         cr = json.loads(cp.read_text()); sc = cr.get('scores', {}); info['critic'] = sc
-        low = {k: v for k, v in sc.items() if (v or 0) < 7}
+        low = {k: v for k, v in sc.items() if (v or 0) < 6}
         need = ('cover_stop_power', 'headline_clarity', 'hook', 'visual_match', 'style_distinct', 'motion_richness')
         miss = [k for k in need if k not in sc]
         if miss: fails.append(f'critic.json is missing scores {miss} (RUNBOOK §4.4 step 5; motion_richness = rule 2b)')
-        if low: fails.append(f'critic scores below 7: {low}')
+        if low: fails.append(f'critic scores below 6: {low}')
 
     out = {'pass': not fails, 'fails': fails, 'info': info,
            'history_entry': {'reel': story.get('content_id', ''), 'date': story.get('date', ''), 'prompt': pid, 'engine': eng,

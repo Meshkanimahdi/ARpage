@@ -17,7 +17,7 @@ import argparse, json, subprocess, sys
 from pathlib import Path
 
 NEED = ('cover_stop_power', 'headline_clarity', 'hook', 'motion_richness')  # richness: RUNBOOK §4.0 rule 2b, judged on out/sheet*.jpg
-BAR = 7  # 2026-10-27: 8 failed every reel (REEL-014/015 stuck at 7); equal to the final gate, so a pass here still means no late cover/hook failure
+BAR = 6  # 2026-11-01 (Mahdi: «فعلاً نیاز به بازبینی و سختگیری زیاد نیست تا کمی پیج جون بگیره»); was 7
 TS = ('0.00', '0.50', '1.00', '1.90')
 
 
