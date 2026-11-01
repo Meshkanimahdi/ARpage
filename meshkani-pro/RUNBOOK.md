@@ -105,6 +105,15 @@ routine in Iran — told so that people **send it to someone they care about**.
    - **Mirror topics are always positive about Mirror.** Never a headline or angle that raises doubts about the
      safety of AI/«آینه» sites or chatbots in general when Mirror is the bridge («سایت‌های آینه ChatGPT امن‌اند؟» was
      an anti-ad). The Mirror reel says what Mirror does well (one conversation, it listens, it forgets you after).
+18. **Headlines: no «هوش مصنوعی», controversial not bland (user rule 2026-11-02, «اکیداً ممنوع»).** Mahdi:
+   «به کار بردن کلمه هوش مصنوعی در تیتر اکیداً ممنوع مگر اینکه واقعاً بدون اون مفهومی نداشته باشه، ما تیترهای جنجالی
+   می‌خوایم نه آبکی». This covers covers, first spoken lines, carousel slide 1 and Topic Bank headlines: name the
+   stake, the conflict or the surprise («پس‌اندازت داره آب میره»، «نجارها دیوونه می‌شن»), never «هوش مصنوعی + verb»; the
+   AI part comes in the body. headline_score.py already penalises AI words; the concept gate rejects them.
+19. **Rulebook tab (user rule 2026-11-02):** the sheet tab `Rulebook` mirrors this file. At the start of every run,
+   if the commit in Rulebook!B1 differs from `git rev-parse --short HEAD`, upload RUNBOOK.md to Drive (drive_bridge
+   open_upload/open_update + drive_put.sh; file id kept in config.json → google.rulebook_file_id) and run
+   `meshkani-pro/workbench/rulebook_sync.py` → `rulebook_sync(file_id, commit=<hash>)`.
 15. **Mirror (user rule 2026-11-02):** a main goal of the page is sending people to Mirror (https://mirror-pro.com). Follow `meshkani-pro/MIRROR.md`: an honest Mirror bridge on fitting social topics (about 1 reel in 4, 1 carousel in 3, max one a day, never on news/tragedy/safety), the URL in the caption and the first comment, «لینک در بیو», and none of the claims MIRROR.md forbids.
 14. **Images: one sheet, at most two, then crop (user rule, repeated 2026-11-01).** Every image a post, its
    stories, a reel or its cover needs is generated in ONE storyboard sheet, at most TWO, and cut into panels
