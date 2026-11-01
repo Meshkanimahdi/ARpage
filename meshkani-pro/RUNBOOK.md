@@ -1236,6 +1236,15 @@ narrator talks, nothing attractive in the picture").
 
 ---
 
+### 5.x Refresh the Performance tab after every publish (user rule 2026-11-02)
+Mahdi: «با انتشار هر پست، استوری یا ریلز کل تب آپدیت بشه». At the end of every PUBLISH and REEL_PUBLISH run
+(after the post/reel and its stories are verified, after §2.6 / §5 finish), run the **light refresh** of §6:
+re-read the insights of every post, reel and story of the last 30 days (stories only while under 24 h old),
+add the item just published, and rewrite the whole `Performance` tab (same columns as §6, plus shares/1k and
+saves/1k reach) with a `Last refreshed (Tehran)` cell. Also record followers_count in `_automation/followers.json`.
+Read-only on Instagram; no Insights/insights.json rewrite (that stays in the 06:00 ANALYTICS). A failed refresh is
+logged and never blocks or delays publishing.
+
 ## 6. ANALYTICS phase — daily performance review (06:00 Tehran, before the day's first prepare; Fridays also weekly)
 
 **North-star metrics (user rule 2026-11-01, §00 point 8):** for every post and reel also compute shares per 1k
