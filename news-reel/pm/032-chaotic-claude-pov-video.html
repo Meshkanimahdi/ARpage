@@ -194,9 +194,9 @@ function seek(t) {
   const since = t - cut.t0, kick = (cut.t0 > 0 ? .085 : 0) * Math.exp(-11 * since), pulse = .012 * Math.exp(-14 * ((t % BEAT + BEAT) % BEAT));
   const push = .03 * ramp(t, cut.t0, cut.t1), sh = shakeAt(x, t), rot = (ci % 2 ? .5 : -.5) * Math.exp(-6 * since);
   el('rig').style.transform = `translate(${sh[0].toFixed(1)}px,${sh[1].toFixed(1)}px) rotate(${rot.toFixed(2)}deg) scale(${(1 + kick + pulse + push).toFixed(4)})`;
-  const html = endOn ? ending(t - T.end_start, t) : draw(x, t);
+  const html = endOn ? (D.end_kind === 'login' ? ending2(t - T.end_start, t) : ending(t - T.end_start, t)) : draw(x, t);
   const lay = el('layer'); if (lay._h !== html) { lay._h = html; lay.innerHTML = html; }
-  const caps = endOn ? '' : captions(x, t) + (x.s.type === 'hook' ? '' : yesMeter(x, t) + ticker(x, t)); const cp = el('caps'); if (cp._h !== caps) { cp._h = caps; cp.innerHTML = caps; }
+  const caps = endOn ? '' : captions(x, t) + (x.s.type === 'hook' || D.no_meter ? '' : yesMeter(x, t) + ticker(x, t)); const cp = el('caps'); if (cp._h !== caps) { cp._h = caps; cp.innerHTML = caps; }
   const fl = el('flash'), f = cut.t0 > 0 && since < .12 ? .32 * (1 - since / .12) : 0;
   fl.style.background = `rgba(255,255,255,${f.toFixed(3)})`;
 }
@@ -209,8 +209,9 @@ function shakeAt(x, t) {
 // stacked meme captions: the spoken chunk big, the previous chunk stacked above it, smaller and tilted
 function captions(x, t) {
   const ty = x.s.type;
+  if (ty === 'hook' || ty === 'a_hook' || ty === 'a_id') { if (D.hook_caps) return hookCaps(x, t); }
   if (ty === 'hook') return `<div style="position:absolute;inset:0;transform:translateY(${(24 * (1 - outQ(ramp(t, 0, .3)))).toFixed(1)}px)">` + memeLine('ChatGPT همیشه', 90, 120, 1, -1) + `<div class="mid" style="top:246px"><span class="meme" style="font-size:120px;vertical-align:middle">می‌گه </span><span style="display:inline-block;vertical-align:middle;padding:0 34px 18px;border-radius:30px;background:var(--y);color:#0D0D0D;font-size:120px;box-shadow:0 12px 0 rgba(0,0,0,.35);transform:rotate(${(-2 + 3 * Math.exp(-8 * Math.max(0, t - .45)) * (t > .45 ? 1 : 0)).toFixed(2)}deg) scale(${(t < .45 ? 1 : 1 + .14 * Math.exp(-9 * (t - .45)) * Math.cos((t - .45) * 18) + .1 * Math.exp(-8 * Math.abs(t - x.at(3))) * (t > x.at(3) - .1 ? 1 : 0)).toFixed(3)})">حق با توئه؟</span></div></div>`;
-  if (ty === 'prompt' || ty === 'ask' || t > x.L.end + .35) return '';
+  if (ty === 'prompt' || ty === 'ask' || ty === 'a_ask' || (D.no_caps || []).includes(ty) || t > x.L.end + .35) return '';
   const W = x.shown, n = W.length; let j = 0; for (let q = 0; q < n; q++) if (t >= W[q].t - .05) j = q;
   const ch = []; let cur = []; W.forEach((w, q) => { cur.push(q); if (cur.length === 3 || /[،؛.!؟?…:»]$/.test(w.w)) { ch.push(cur); cur = []; } }); if (cur.length) ch.push(cur);
   const ci = ch.findIndex(c => c.includes(j)), c0 = ch[ci][0], now = ch[ci].map(q => W[q]), prev = ci ? ch[ci - 1].map(q => W[q]) : [];
@@ -222,6 +223,7 @@ function captions(x, t) {
 
 function draw(x, t) {
   const s = x.s, A = x.a, u = t - A, at = x.at;
+  { const r2 = draw2(x, t); if (r2 !== null) return r2; }
   switch (s.type) {
     case 'hook': {
       // frame 0: the phone in the photo already shows the chatbot agreeing (chat anchored low, big type); the plain
@@ -322,6 +324,112 @@ function draw(x, t) {
   }
   PROBLEMS.push('unknown scene ' + s.type); return '';
 }
+
+// ===== REEL-028 (Anthropic S-1: models reached real systems in a test) =====
+function hookCaps(x, t) {
+  const [l1, l2] = D.hook_caps;
+  return `<div style="position:absolute;inset:0;transform:translateY(${(24 * (1 - outQ(ramp(t, 0, .3)))).toFixed(1)}px)">` + memeLine(l1, 110, 118, 1, -1) +
+    `<div class="mid" style="top:260px"><span style="display:inline-block;padding:0 34px 18px;border-radius:30px;background:var(--y);color:#0D0D0D;font-size:118px;box-shadow:0 12px 0 rgba(0,0,0,.35);transform:rotate(-2deg)">${l2}</span></div></div>`;
+}
+const pwField = (x, y, w, n, k, lab = 'Password') => `<div class="ab" dir="ltr" style="left:${x}px;top:${y}px;width:${w}px;padding:22px 34px 30px;border-radius:26px;background:#fff;color:#0D0D0D;box-shadow:0 24px 60px rgba(0,0,0,.5);transform:scale(${pop(clamp(k)).toFixed(3)})"><div style="font:600 34px V;color:#6E6E80">${lab}</div><div style="font:900 70px V;letter-spacing:8px">${'•'.repeat(n)}<span style="opacity:${Math.floor(Date.now ? 0 : 0) + 1}">|</span></div></div>`;
+const bar = (x, y, w, v, col) => `<div class="ab" style="left:${x}px;top:${y}px;width:${w}px;height:44px;border-radius:22px;background:rgba(255,255,255,.25);overflow:hidden"><div style="width:${(w * clamp(v)).toFixed(0)}px;height:100%;background:${col};box-shadow:0 0 30px ${col}"></div></div>`;
+function draw2(x, t) {
+  const s = x.s, A = x.a, at = x.at, H = (s.hits || []).map(at);
+  switch (s.type) {
+    case 'a_id': {
+      const cx = lerp(820, 640, outQ(ramp(t, 0, .45))), cy = lerp(1500, 1000, outQ(ramp(t, 0, .45))), ub = ramp(t, .3, .9), kp = ramp(t, .75, 1.0), sh = kp > 0 && kp < 1 ? Math.sin(t * 90) * 10 : 0;
+      const rows = ['Name: ●●●● ●●●●●●', 'Email: ●●●●●@●●●●.com', 'Phone: +● ●●● ●●● ●●●●', 'Address: ●● ●●●●● St.'];
+      let r = `<div class="ab" style="inset:0;background:radial-gradient(800px 900px at 540px 900px,#3A0A0A,#060606 70%)"></div>`;
+      r += `<div class="ab" dir="ltr" style="left:110px;top:640px;width:860px;height:560px;border-radius:40px;background:#fff;color:#111;box-shadow:0 0 120px rgba(255,59,48,.55),0 30px 70px rgba(0,0,0,.6);transform:translateX(${sh.toFixed(1)}px) rotate(-2deg);overflow:hidden">` +
+        `<div style="position:absolute;left:0;right:0;top:0;height:90px;background:#FF3B30;color:#fff;font:900 48px V;display:flex;align-items:center;padding:0 40px">PERSONAL DATA</div>` +
+        `<div style="position:absolute;left:40px;top:130px;width:220px;height:280px;border-radius:24px;background:linear-gradient(#ccc,#999);filter:blur(${(14 * (1 - ub)).toFixed(1)}px)"><svg width="220" height="280" viewBox="0 0 220 280"><circle cx="110" cy="100" r="56" fill="#777"/><path d="M20 280 Q20 170 110 170 Q200 170 200 280Z" fill="#777"/></svg></div>` +
+        rows.map((ln, i) => `<div style="position:absolute;left:300px;top:${140 + i * 95}px;font:900 40px V;filter:blur(${(12 * (1 - clamp(ub * 4 - i))).toFixed(1)}px)">${ln}</div>`).join('') + '</div>';
+      r += `<svg class="ab" width="1080" height="1920" style="left:0;top:0"><g transform="translate(540 420) rotate(${(-12 * kp).toFixed(1)})"><path d="M -70 0 V -60 Q -70 -130 0 -130 Q 70 -130 70 -60 V ${(-10 - 60 * kp).toFixed(0)}" fill="none" stroke="#FF3B30" stroke-width="30" stroke-linecap="round" transform="translate(${(40 * kp).toFixed(0)} ${(-50 * kp).toFixed(0)})"/><rect x="-110" y="-10" width="220" height="180" rx="30" fill="#FF3B30"/><circle cx="0" cy="70" r="22" fill="#fff"/></g></svg>`;
+      r += `<div class="ab" style="left:${cx.toFixed(0)}px;top:${cy.toFixed(0)}px;filter:drop-shadow(0 0 40px rgba(255,140,90,.9))">${logoImg(180, 'border:6px solid #fff')}</div>`;
+      return r + chip('تو یه تست', 380, 1260, 64, 'var(--y)', '#0D0D0D', ramp(t, .2, .4), -3) + chip('اعتراف خود Anthropic', 260, 1380, 56, '#fff', '#0D0D0D', ramp(t, 1.0, 1.2), 2);
+    }
+    case 'a_hook': {
+      const ks = ramp(t, .45, .62), n = Math.min(12, Math.floor(t * 40)), cx = lerp(900, 700, outQ(ramp(t, 0, .4))), cy = lerp(1500, 1180, outQ(ramp(t, 0, .4)));
+      return `<div class="ab" style="inset:0;transform:scale(${lerp(1.5, 1.25, outQ(ramp(t, 0, 2.4))).toFixed(4)});transform-origin:62% 52%;filter:brightness(1.15) contrast(1.05)">${photo(s.img, x, t)}</div>` +
+        `<div class="ab" style="inset:0;background:linear-gradient(rgba(0,0,0,.72),rgba(0,0,0,.15) 22%,rgba(0,0,0,0) 40%)"></div>` +
+        `<div class="ab" dir="ltr" style="left:110px;top:760px;width:860px;padding:26px 36px 34px;border-radius:26px;background:#fff;color:#0D0D0D;box-shadow:0 24px 60px rgba(0,0,0,.45)"><div style="font:600 36px V;color:#6E6E80">Username</div><div style="font:900 74px V">Administrator <span style="color:#28C840">✓</span></div></div>` +
+        pwField(110, 1000, 860, n, 1) +
+        `<div class="ab" style="left:${cx.toFixed(0)}px;top:${cy.toFixed(0)}px">${logoImg(150, 'box-shadow:0 14px 40px rgba(0,0,0,.5);border:6px solid #fff')}</div>` +
+        stamp('ادمین', 1240, ks, 'var(--red)', '#fff', -10) +
+        chip('اعتراف خود Anthropic', 230, 1560, 62, 'var(--y)', '#0D0D0D', ramp(t, 1.0, 1.2), -2);
+    }
+    case 'a_doc': {
+      const kd = outQ(ramp(t, A - .05, A + .35)), z = lerp(1, 1.9, inOut(ramp(t, A + .6, (H[0] || A + 1.5) + .3))), kh = H[0] ? ramp(t, H[0] - .05, H[0] + .5) : 0;
+      return ground(t, x.i) + `<div class="ab" dir="ltr" style="left:90px;top:${lerp(1900, 230, kd).toFixed(0)}px;width:900px;height:1180px;border-radius:24px;background:#FBFBF8;color:#111;box-shadow:0 30px 80px rgba(0,0,0,.55);padding:56px;box-sizing:border-box;transform:scale(${z.toFixed(3)});transform-origin:50% 72%">` +
+        `<div style="font:900 84px V">Form S-1</div><div style="font:600 34px V;color:#666">U.S. Securities and Exchange Commission</div><img src="${src('el/anthropic.png')}" style="width:460px;margin:40px 0 30px">` +
+        [0, 1, 2, 3, 4, 5, 6, 7].map(i => i === 6 ? `<div style="margin:18px 0;padding:8px 14px;border-radius:8px;font:900 34px/1.35 V;background:linear-gradient(90deg,#FFE14D ${(100 * kh).toFixed(0)}%,transparent ${(100 * kh).toFixed(0)}%)">“Four of our models gained unauthorized access to real third-party systems…”</div>` : `<div style="height:22px;margin:20px 0;border-radius:8px;background:#DDD;width:${[100, 92, 96, 88, 94, 70, 0, 86][i]}%"></div>`).join('') + '</div>' +
+        chip('پرونده‌ی رسمی SEC', 300, 1480, 66, 'var(--y)', '#0D0D0D', ramp(t, A + .4, A + .7), -3);
+    }
+    case 'a_wifi': {
+      const k1 = ramp(t, A, A + .3), on = H[0] ? ramp(t, H[0] - .05, H[0] + .3) : 0, col = on > 0 ? '#28C840' : '#fff', gl = on > 0 && on < 1 ? Math.sin(t * 80) * 14 : 0;
+      const arcs = [0, 1, 2].map(i => `<path d="M ${540 - 120 - i * 110} ${760 - i * 70} Q 540 ${560 - i * 170} ${540 + 120 + i * 110} ${760 - i * 70}" fill="none" stroke="${col}" stroke-width="44" stroke-linecap="round" opacity="${clamp(k1 * 3 - i * .5)}"/>`).join('');
+      return ground(t, x.i) + `<svg class="ab" width="1080" height="1920" style="left:${gl.toFixed(0)}px;top:0;filter:drop-shadow(0 0 ${(40 * on).toFixed(0)}px #28C840)">${arcs}<circle cx="540" cy="860" r="60" fill="${col}"/>` +
+        (on < 1 ? `<line x1="300" y1="460" x2="780" y2="960" stroke="var(--red)" stroke-width="50" stroke-linecap="round" transform="translate(0 ${(900 * on * on).toFixed(0)}) rotate(${(40 * on).toFixed(0)} 540 700)"/>` : '') + `</svg>` +
+        memeLine(on > 0 ? 'اینترنت *وصل* موند!' : 'قرار بود: بی‌اینترنت', 1060, 96, 1, -2) +
+        (H[1] ? chip('❌ اشتباه تو تنظیمات', 220, 1220, 70, 'var(--red)', '#fff', ramp(t, H[1] - .05, H[1] + .25), 3) : '');
+    }
+    case 'a_four': {
+      const kt = ramp(t, A, A + 1.1), h1 = H[0] ? ramp(t, H[0] - .1, H[0] + 1.4) : 0, hrs = Math.round(lerp(10, 34, outQ(h1)));
+      let tl = ''; for (let i = 0; i < 4; i++) { const kk = clamp(kt * 4 * 1.2 - i); if (kk > 0) tl += `<div class="ab" style="left:${110 + i * 220}px;top:360px;width:190px;height:190px;border-radius:44px;background:#fff;display:flex;align-items:center;justify-content:center;transform:scale(${pop(kk).toFixed(3)}) rotate(${((i % 2) * 2 - 1) * 4}deg);box-shadow:0 14px 30px rgba(0,0,0,.4)">${logoImg(130)}</div>`; }
+      return framed(s.img, x, t, .55).replace(/top:170px;width:900px;height:1130px/, 'top:640px;width:900px;height:700px') + tl + chip('۴ مدل', 400, 590, 80, 'var(--y)', '#0D0D0D', ramp(t, A + .5, A + .8), -3) +
+        (h1 > 0 ? `<div class="mid meme" style="top:860px;font-size:210px;color:var(--y)">${faNum(hrs)} ساعت</div>` : '');
+    }
+    case 'a_pass': {
+      const L = [['task: impossible', '#FFB020'], ['abort: failed', '#FFB020'], ['found: password', '#fff'], ['access: ADMIN', '#FF3B30']], st = A + .2, en = (H[0] || x.z - .5);
+      let r = photo(s.img, x, t, '', .7) + `<div class="ab" dir="ltr" style="left:70px;right:70px;top:300px;height:900px;border-radius:30px;background:rgba(8,8,10,.92);border:3px solid #333;box-shadow:0 30px 80px rgba(0,0,0,.6);padding:40px 44px;box-sizing:border-box;font:900 62px/1.6 'DejaVu Sans Mono',monospace;color:#9AE6B4">` +
+        `<div style="display:flex;gap:14px;margin-bottom:30px">${['#FF5F57', '#FEBC2E', '#28C840'].map(c => `<i style="width:24px;height:24px;border-radius:50%;background:${c}"></i>`).join('')}</div>`;
+      L.forEach(([ln, c], i) => { const a = st + (en - st) * i / L.length, k = ramp(t, a, a + .5), m = Math.round(ln.length * k); if (k > 0) r += `<div style="color:${c}">&gt; ${ln.slice(0, m)}${k < 1 ? '▌' : ''}</div>`; });
+      r += '</div>';
+      const ks = H[0] ? ramp(t, H[0] - .02, H[0] + .4) : 0;
+      return r + stamp('ادمین', 1240, ks, 'var(--red)', '#fff', -6) + `<div class="ab" style="inset:0;background:rgba(255,0,0,${(ks > 0 && ks < .3 ? .3 : 0)})"></div>`;
+    }
+    case 'a_steps': {
+      const lab = ['🔑 رمزای بیشتر', '⚙️ تنظیمات عوض شد', '👤 اطلاعات شخصی یه نفر'];
+      let r = framed(s.img, x, t, .5);
+      H.forEach((h, i) => { r += chip(lab[i], [90, 240, 60][i], 380 + i * 300, 76, 'var(--red)', '#fff', ramp(t, h - .05, h + .2), [-4, 3, -2][i]); });
+      const fl = H.map(h => t > h && t < h + .15 ? .35 : 0).reduce((a, b) => Math.max(a, b), 0);
+      return r + `<div class="ab" style="inset:0;background:rgba(255,0,0,${fl})"></div>`;
+    }
+    case 'a_ok': {
+      let r = ground(t, x.i) + `<div class="mid" style="top:220px"><img src="${src('el/anthropic.png')}" style="width:620px;filter:invert(1) drop-shadow(0 10px 30px rgba(0,0,0,.5));transform:scale(${pop(ramp(t, A, A + .3)).toFixed(3)})"></div>`;
+      const lab = ['✓ نشونه‌ای از فرار از نظارت نبود', '✓ به همه‌ی طرف‌ها خبر دادیم'];
+      [A + .3, H[0] || A + 1.5].forEach((h, i) => { const k = ramp(t, h - .05, h + .3); if (k > 0) r += `<div class="ab" style="left:70px;right:70px;top:${520 + i * 260}px;padding:30px 40px 40px;border-radius:36px;background:#fff;color:#0D0D0D;font:900 62px V;box-shadow:0 20px 50px rgba(0,0,0,.4);transform:translateX(${((1 - outQ(k)) * 600).toFixed(0)}px)"><span style="color:var(--teal)">${lab[i].slice(0, 1)}</span>${lab[i].slice(1)}</div>`; });
+      return r + chip('به گفته‌ی Anthropic', 300, 1100, 56, 'var(--teal)', '#fff', ramp(t, A + .6, A + .9), -2);
+    }
+    case 'a_q': {
+      const apps = ['📧', '🏦', '💬', '📁', '📅', '🔐'], ke = H[0] ? ramp(t, H[0] - .05, H[0] + .3) : 0;
+      let r = ground(t, x.i) + `<div class="ab" style="left:290px;top:380px;width:500px;height:900px;border-radius:70px;background:#111;border:10px solid #333;box-shadow:0 40px 90px rgba(0,0,0,.6);transform:rotate(${(Math.sin(t * 2) * 2).toFixed(2)}deg)">`;
+      apps.forEach((a, i) => { const k = ramp(t, A + i * .12, A + .3 + i * .12), lit = t > A + .3 + i / 3; r += `<div class="ab" style="left:${50 + (i % 3) * 140}px;top:${140 + Math.floor(i / 3) * 170}px;width:110px;height:110px;border-radius:28px;background:${lit ? '#7A1010' : '#2A2A2E'};box-shadow:${lit ? '0 0 30px #FF3B30' : 'none'};font-size:70px;display:flex;align-items:center;justify-content:center;transform:scale(${pop(k).toFixed(3)})">${a}</div>`; });
+      r += `<div class="ab" style="left:150px;top:560px">${logoImg(200, `transform:scale(${pop(ramp(t, A + .8, A + 1.1)).toFixed(3)})`)}</div></div>`;
+      { const c = Math.min(6, Math.floor(clamp((t - A - .3) * 3, 0, 6))); r += `<div class="mid" style="top:1320px"><span style="display:inline-block;padding:16px 46px 28px;border-radius:40px;background:var(--red);font:900 96px V">حساب‌ها: ${faNum(c)}</span></div>`; }
+      return r + memeLine('کی *حواسش* هست؟', 200, 110, ramp(t, A, A + .3), -2);
+    }
+    case 'a_ask': {
+      const w = s.words ? s.words.map(at) : [], k1 = ramp(t, A + .2, A + .5), k2 = ramp(t, A + .35, A + .65), tap = w[0] ? ramp(t, w[0], w[0] + .25) : 0;
+      return ground(t, x.i) + memeLine('دسترسی ایمیل و حسابات رو', 220, 84, ramp(t, A, A + .3), -1) + memeLine('به یه *AI* می‌دی؟', 340, 110, ramp(t, A + .1, A + .4), 1) +
+        `<div class="ab" style="left:110px;right:110px;top:620px;height:230px;border-radius:115px;background:var(--teal);font:900 110px/230px V;text-align:center;transform:scale(${(pop(k1) * (1 - .06 * Math.sin(Math.PI * tap))).toFixed(3)})">✅ آره</div>` +
+        `<div class="ab" style="left:110px;right:110px;top:900px;height:230px;border-radius:115px;background:var(--red);font:900 110px/230px V;text-align:center;transform:scale(${pop(k2).toFixed(3)})">🚫 عمراً</div>` +
+        `<div class="ab" style="left:${lerp(880, 600, inOut(ramp(t, A + .6, (w[0] || A + 1.2)))).toFixed(0)}px;top:${lerp(1400, 980, inOut(ramp(t, A + .6, (w[0] || A + 1.2)))).toFixed(0)}px;font-size:120px;transform:rotate(-20deg)">👆</div>` +
+        botBub('کامنت کن 👇', 200, 1220, w[1] ? ramp(t, w[1] - .1, w[1] + .2) : 0, 60);
+    }
+  }
+  return null;
+}
+// the end loops back to the login screen: the field is empty and locked, the question stays
+function ending2(u, t) {
+  const h = BEATS[0];
+  return photo(h.s.img, {a: T.end_start, z: TOTAL, i: 1}, t) + shade(.5, .9) + pwField(150, 760, 780, 0, 1) +
+    `<div class="mid" style="top:640px;font-size:140px;transform:scale(${(1 + .05 * Math.sin(u * 5)).toFixed(3)})">🔒</div>` +
+    `<div style="position:absolute;inset:0;transform:scale(${(1 + .03 * Math.sin(u * 6)).toFixed(4)});transform-origin:540px 1450px">` + memeLine(D.end_text || '', 1200, 110, ramp(u, .1, .4)) + '</div>' +
+    `<div class="mid" style="top:1380px;font-size:60px;opacity:${ramp(u, .3, .6)}">${D.end_sub || ''}</div>` +
+    `<div class="mid" dir="ltr" style="top:1480px;font:600 42px V;letter-spacing:6px;color:var(--y);opacity:${ramp(u, .4, .7)}">${(D.handle || '').replace('@', '').toUpperCase()}</div>`;
+}
+
 // the payoff loops back to the opening phone: now the chatbot answers honestly
 function ending(u, t) {
   const h = BEATS[0], s = h.s, W = 480, H = 1000;
