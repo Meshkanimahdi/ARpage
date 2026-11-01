@@ -56,6 +56,33 @@ routine in Iran — told so that people **send it to someone they care about**.
    follower change on its day, and feeds `insights.json → life_topics` (the topic families that won) to every
    prepare. Likes are secondary.
 9. **Publish first (§4.0a):** bars 6, at most 3 rounds, never an empty slot.
+10. **Our audience is Iranian, living in today's Iran (user rule 2026-11-01, «از همه مهمتر»).** Every topic,
+   example, number and tip is checked against the real situation in Iran now: income in rials and inflation,
+   the dollar rate, sanctions (many foreign services and payments do not work for Iranians), internet cuts and
+   filtering, the risk of war and emergencies, jobs and small businesses, school and university pressure,
+   family life. A tip that needs a foreign card, a blocked service or an unaffordable product is useless to
+   them: say so, or offer what works in Iran. Prices in toman, Iranian examples and places. Never encourage
+   anything illegal or unsafe for the viewer.
+11. **Series (user rule 2026-11-01):** a topic that can carry more than one reel is made a series: the cover and
+   first line carry «قسمت ۱»، the end card says «قسمت ۲ فردا همین ساعت — فالو کن که از دستت نره», and part 2 opens
+   with «قسمت ۲» and a one-line recap. Plan series of 2–4 parts; at least one series running every week.
+12. **Research before writing life topics (user rule 2026-11-01).** Practical advice (safety, health, money,
+   law, tech in Iran) needs a research dossier first: `work/story/research.md` with at least 3 reputable sources
+   (Red Crescent/IFRC, WHO, official bodies, established outlets, the service's own documentation), each tip
+   checked to work in Iran today, and what NOT to do. The independent critic gets the dossier with the concept;
+   a tip without a source is dropped.
+13. **Weekly topic bank (user rule 2026-11-01).** Every Friday 10:00 Tehran the publisher runs a research team
+   (parallel subagents: trend radar, Iranian news and economy, jobs, family/education, money/dollar income,
+   tech-in-life) and writes **at least 3 topics per reel slot of the next week** (21 reels → ≥ 63 topics) to the
+   sheet tab `Topic Bank`: week, id, headline (angle H/G), one-paragraph explanation, why Iranians care, life
+   impact, series potential, sources, suggested format, and an empty `Approved` checkbox. Mahdi ticks; REEL_PREPARE
+   takes the next ticked, unused topic (oldest first) and marks it `Used`; when none is ticked it falls back to
+   §4.2 research. Seed topics from Mahdi (2026-11-01) are in `meshkani-pro/TOPIC_SEED.md`.
+14. **Images: one sheet, at most two, then crop (user rule, repeated 2026-11-01).** Every image a post, its
+   stories, a reel or its cover needs is generated in ONE storyboard sheet, at most TWO, and cut into panels
+   (`storyboard_cut.py`); the cover background is a panel of that sheet. `gen_image.py` keeps a per-package
+   ledger and refuses a third call unless `--override-reason` (logged). Real photos and logos cost nothing:
+   prefer them.
 
 ## 0. Ground rules (both phases)
 

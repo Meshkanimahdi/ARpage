@@ -51,11 +51,24 @@ def main():
     ap.add_argument("--ref", action="append", default=[], help="reference/edit-source image")
     ap.add_argument("--model", default=IMG["primary_model"])
     ap.add_argument("--quality", default=IMG["quality"])
+    # image budget (user rule 2026-11-01, repeated): every image a post/story/reel needs comes from ONE sheet, at most
+    # TWO, then cropped. The ledger counts calls per package; a third call is refused unless --override-reason.
+    ap.add_argument("--ledger", default=os.environ.get("IMG_LEDGER", "work/image_ledger.jsonl"))
+    ap.add_argument("--max-calls", type=int, default=2)
+    ap.add_argument("--override-reason", default="")
     args = ap.parse_args()
 
     if not os.environ.get("OPENROUTER_API_KEY"):
         print("OPENROUTER_API_KEY is not set in this environment.", file=sys.stderr)
         return 5
+
+    ledger = Path(args.ledger)
+    used_calls = len(ledger.read_text().splitlines()) if ledger.exists() else 0
+    if used_calls >= args.max_calls and not args.override_reason:
+        print(f"image budget: {used_calls} generation calls already in {ledger} (max {args.max_calls}). Put every "
+              "image of this package in one sheet (--kind board/postboard/storyboard3) and crop it; pass "
+              "--override-reason only for a logged exception.", file=sys.stderr)
+        return 7
 
     prompt = Path(args.prompt_file).read_text()
     spec = IMG[args.kind]
@@ -114,6 +127,9 @@ def main():
         "created": resp.get("created"),
     }
     Path(str(out) + ".json").write_text(json.dumps(meta, ensure_ascii=False, indent=1))
+    ledger.parent.mkdir(parents=True, exist_ok=True)
+    with ledger.open("a") as fh:
+        fh.write(json.dumps({"out": str(out), "kind": args.kind, "cost_usd": meta["cost_usd"], "override": args.override_reason}, ensure_ascii=False) + "\n")
     print(json.dumps(meta, ensure_ascii=False))
     return 0
 
