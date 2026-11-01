@@ -1036,6 +1036,7 @@ narrator talks, nothing attractive in the picture").
      voices for serious news; bright female voices for everyday/beauty/lifestyle.
    - **Music and sound effects:** choose from the library; generate a new one only when nothing fits, at most one
      new file a day. Rotate music tracks: not the track of the last 3 reels.
+3d. **Mix and master (user rule 2026-11-02):** follow `.claude/skills/reel-audio-mix/SKILL.md` — expressive delivery (audio tags on most beats, stability ≈ 0.38) and the voice/music/SFX/master chain in reel_assemble.py (−14 LUFS for Instagram). No ready mixing skill exists in the catalog; this is ours.
 3c. **Scene soundscape with ElevenLabs SFX v3 (user rule 2026-11-02).** ElevenLabs released SFX v3: one text
    request can describe several sounds in order (e.g. a crowd cheers, a ball drops, a few seconds later the crowd
    boos), and music, voices and tonal hits (gong, bell, whistle) come out cleaner. So when the library (step 3b)

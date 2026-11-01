@@ -103,9 +103,19 @@ def main():
         fx.append(add(SFX / f'{name}.mp3', at, vol))
     sfx_counts = {}
     for _, name, _ in kept: sfx_counts[name] = sfx_counts.get(name, 0) + 1
-    f.append(f"{''.join(voice)}amix=inputs={len(voice)}:normalize=0,apad=whole_dur={END},asplit=2[voice][key]")
-    f.append(f"{mus}[key]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=350[duck]")
-    f.append(f"[voice][duck]{''.join(fx)}amix=inputs={2 + len(fx)}:normalize=0,atrim=0:{END},loudnorm=I=-12:TP=-1.5:LRA=8[out]")
+    # mix & master (user rule 2026-11-02: «صداهای تولید شده خیلی خشک و بی‌روحه… میکس و مسترینگ صدا خیلی مهمه»).
+    # Voice bus: clean lows, cut mud, presence and air, de-ess, gentle compression, a short room so it is not dry.
+    VOICE_FX = ("highpass=f=80,lowpass=f=15000,equalizer=f=250:t=q:w=1.2:g=-2.5,equalizer=f=3200:t=q:w=1.4:g=3,"
+                "equalizer=f=9000:t=h:w=3000:g=2,deesser=i=0.35,"
+                "acompressor=threshold=-20dB:ratio=3:attack=6:release=140:makeup=3,"
+                "aecho=0.85:0.6:23|41:0.07|0.04")
+    f.append(f"{''.join(voice)}amix=inputs={len(voice)}:normalize=0,{VOICE_FX},apad=whole_dur={END},asplit=2[voice][key]")
+    # Music bus: carve room for the voice (2–4 kHz), keep the lows warm, duck smoothly under speech.
+    f.append(f"{mus}highpass=f=35,equalizer=f=2800:t=q:w=1.3:g=-4[mbus]")
+    f.append("[mbus][key]sidechaincompress=threshold=0.04:ratio=6:attack=25:release=450[duck]")
+    # Master: glue compression, then loudness for Instagram (≈ -14 LUFS, true peak -1.5).
+    f.append(f"[voice][duck]{''.join(fx)}amix=inputs={2 + len(fx)}:normalize=0,atrim=0:{END},"
+             f"acompressor=threshold=-14dB:ratio=2:attack=20:release=250,loudnorm=I=-14:TP=-1.5:LRA=9[out]")
     run('ffmpeg', '-y', '-loglevel', 'error', *ins, '-filter_complex', ';'.join(f), '-map', '[out]', '-ar', '48000', str(out / 'mix.wav'))
     run('ffmpeg', '-y', '-loglevel', 'error', '-i', str(out / 'video.mp4'), '-i', str(out / 'mix.wav'), '-c:v', 'copy',
         '-af', 'alimiter=limit=0.8:level=false', '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-shortest', '-movflags', '+faststart', str(d / 'reel.mp4'))
