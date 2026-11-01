@@ -146,10 +146,10 @@ function scene2(b, t, s, A, k0, K, z) {
     case 'ms_hook': {
       r += bgP(s.img, 18, .75) + `<div class="card" style="left:30px;top:470px;width:1020px;height:765px;border-radius:30px;box-shadow:0 30px 70px rgba(0,0,0,.5)"><img src="${IMG(s.img)}" style="transform:scale(${mix(1.25, 1.0, io(pr(t, 0, b.b))).toFixed(3)});transform-origin:40% 40%;filter:brightness(1.32) saturate(1.3) sepia(.12) contrast(1.05)"></div>` + darkTop(520);
       r += big(['Microsoft به ۶۰هزار کارمندش:'], 150, 70, 1, '#fff') + big(['*پول بگیر برو*'], 245, 140, 1, '#fff');
-      const ke = .55 + .45 * pr(t, 0, .35), kn = pr(t, .1, .35), cnt = Math.round(mix(40000, 60000, 1 - Math.pow(1 - pr(t, 0, 1.3), 3)) / 100) * 100;
+      const ke = .55 + .45 * pr(t, 0, .35), kn = b.i === 0 ? 1 : pr(t, .1, .35), cnt = Math.round(mix(40000, 60000, 1 - Math.pow(1 - pr(t, 0, 1.3), 3)) / 100) * 100;
       r += env(130, 1230, 820, ke, 0, '', pr(t, .3, 1.4));
       r += chip(60, 1150, 'داوطلبانه', 'var(--green)', '#fff', 60, pr(t, .2, .5));
-      if (kn > 0) r += `<div class="t" dir="ltr" style="top:${1300 - 30 * (1 - back(kn))}px;font-size:${(180 * back(kn)).toFixed(0)}px;color:#fff;text-shadow:0 10px 0 var(--red),0 20px 50px rgba(0,0,0,.6)">${fa(cnt.toLocaleString('en-US'))}</div>`;
+      if (kn > 0) r += `<div class="t" dir="ltr" style="top:${1300 - 30 * (1 - back(kn))}px;font-size:${(180 * back(kn)).toFixed(0)}px;color:#fff;text-shadow:0 10px 0 var(--red),0 20px 50px rgba(0,0,0,.6)">${fa(cnt.toLocaleString('en-US'))}<span style="font-size:.42em"> نفر</span></div>`;
       return r;
     }
     case 'ms_people': {
