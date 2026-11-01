@@ -131,6 +131,7 @@ function env(x, y, w, k, open = 0, label = '') {
     ${label ? `<div style="position:absolute;left:0;right:0;top:${h * .22}px;text-align:center;font:900 ${w * .16}px V;color:#1a1a1a">${label}</div>` : ''}</div>`;
 }
 const person = (x, y, s, col) => `<g transform="translate(${x} ${y}) scale(${s})"><circle cx="0" cy="-70" r="42" fill="${col}"/><path d="M -70 60 Q -70 -20 0 -20 Q 70 -20 70 60 Z" fill="${col}"/></g>`;
+const bgP = (n, bl, br) => `<div style="position:absolute;inset:-40px;background:url('${IMG(n)}') center/cover;filter:blur(${bl}px) brightness(${br})"></div>`;
 const darkTop = h => `<div style="position:absolute;left:0;right:0;top:0;height:${h}px;background:linear-gradient(180deg,rgba(0,0,0,.78),rgba(0,0,0,0))"></div>`;
 function endLogo(u) {
   const q = (S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--acc)">$1</span>'), lw = 620 * mix(1.15, 1, ex(pr(u, 0, .6)));
@@ -143,11 +144,12 @@ function scene2(b, t, s, A, k0, K, z) {
   let r = '';
   switch (s.type) {
     case 'ms_hook': {
-      r += `<div class="card" style="left:0;top:0;width:1080px;height:1920px;border-radius:0"><img src="${IMG(s.img)}" style="transform:scale(${mix(1.3, 1.02, io(pr(t, 0, b.b))).toFixed(3)});transform-origin:45% 30%;filter:brightness(1.08) saturate(1.1)"></div>` + darkTop(700);
-      r += big(['Microsoft به ۶۰هزار کارمندش:'], 170, 76, 1, '#fff') + big(['*پول بگیر برو*'], 275, 124, 1, '#fff');
-      const ke = pr(t, 0, .4), kn = pr(t, .5, .8);
-      r += env(190, 1010, 700, b.i === 0 ? Math.max(ke, .02) : ke);
-      if (kn > 0) r += `<div class="t" dir="ltr" style="top:${1060 - 30 * (1 - back(kn))}px;font-size:${(170 * back(kn)).toFixed(0)}px;color:#fff;text-shadow:0 10px 0 var(--red),0 20px 50px rgba(0,0,0,.6)">${fa('60,000')}</div>`;
+      r += bgP(s.img, 18, .75) + `<div class="card" style="left:30px;top:470px;width:1020px;height:765px;border-radius:30px;box-shadow:0 30px 70px rgba(0,0,0,.5)"><img src="${IMG(s.img)}" style="transform:scale(${mix(1.25, 1.0, io(pr(t, 0, b.b))).toFixed(3)});transform-origin:40% 40%;filter:brightness(1.15) saturate(1.2) sepia(.15)"></div>` + darkTop(520);
+      r += big(['Microsoft به ۶۰هزار کارمندش:'], 150, 70, 1, '#fff') + big(['*پول بگیر برو*'], 245, 140, 1, '#fff');
+      const ke = .55 + .45 * pr(t, 0, .35), kn = pr(t, .3, .6);
+      r += env(170, 1130, 740, ke);
+      r += chip(60, 1060, 'داوطلبانه', 'var(--green)', '#fff', 60, pr(t, .2, .5));
+      if (kn > 0) r += `<div class="t" dir="ltr" style="top:${1180 - 30 * (1 - back(kn))}px;font-size:${(170 * back(kn)).toFixed(0)}px;color:#fff;text-shadow:0 10px 0 var(--red),0 20px 50px rgba(0,0,0,.6)">${fa('60,000')}</div>`;
       return r;
     }
     case 'ms_people': {
@@ -170,11 +172,11 @@ function scene2(b, t, s, A, k0, K, z) {
     }
     case 'ms_scale': {
       const k = K(0, 1.2), a = -14 * io(k) + 2 * Math.sin(t * 3) * (1 - k);
-      r += big(['*آدما* ↔ AI'], 160, 120, pr(t, A, A + .5));
+      r += bgP('campus.jpg', 10, .45) + big(['*آدما* ↔ AI'], 160, 120, pr(t, A, A + .5), '#fff');
       r += `<div style="position:absolute;left:140px;top:560px;width:800px;transform:rotate(${a.toFixed(2)}deg);transform-origin:400px 40px">
         <div style="position:absolute;left:0;right:0;top:30px;height:22px;border-radius:11px;background:var(--ink)"></div>
-        <div class="card" style="left:-60px;top:80px;width:340px;height:300px;transform:rotate(${(-a).toFixed(2)}deg)"><img src="${IMG('office.jpg')}"></div>
-        <div class="card" style="left:520px;top:80px;width:340px;height:300px;transform:rotate(${(-a).toFixed(2)}deg)"><img src="${IMG('dc.jpg')}"></div></div>
+        <div class="card" style="left:-90px;top:80px;width:420px;height:380px;transform:rotate(${(-a).toFixed(2)}deg)"><img src="${IMG('office.jpg')}"></div>
+        <div class="card" style="left:470px;top:80px;width:420px;height:380px;transform:rotate(${(-a).toFixed(2)}deg)"><img src="${IMG('dc.jpg')}"></div></div>
         <div style="position:absolute;left:510px;top:590px;width:60px;height:700px;background:var(--ink);border-radius:20px"></div>`;
       r += chip(150, 1070 - 120 * io(k), 'آدما', '#fff', 'var(--ink)', 80, pr(t, A + .2, A + .5)) + chip(730, 1070 + 120 * io(k), 'AI', 'var(--acc)', '#fff', 80, pr(t, A + .3, A + .6), true);
       return r;
@@ -189,7 +191,7 @@ function scene2(b, t, s, A, k0, K, z) {
     }
     case 'ms_amount': {
       const k = K(0);
-      r += big(['چقدر *پول*؟'], 180, 130, pr(t, A, A + .5));
+      r += bgP('hq.jpg', 8, .5) + big(['چقدر *پول*؟'], 180, 130, pr(t, A, A + .5), '#fff');
       r += env(190, 760, 700, pr(t, A - .1, A + .4), io(pr(t, A + .5, A + 1.1)));
       const q = pr(t, A + .9, A + 1.5); r += `<div class="t" style="top:${(760 - 260 * ex(q)).toFixed(0)}px;font-size:${(260 * back(q)).toFixed(0)}px;color:var(--acc);opacity:${q}">؟</div>`;
       if (k > 0) r += `<div style="position:absolute;left:170px;top:1180px;padding:16px 50px 30px;border:12px solid var(--red);border-radius:30px;color:var(--red);font:900 110px V;transform:rotate(-8deg) scale(${(2 - back(k)).toFixed(3)});opacity:${k}">اعلام نشده</div>`;
@@ -223,7 +225,7 @@ function scene2(b, t, s, A, k0, K, z) {
       return r + big(['همین ماه:'], 160, 110, pr(t, A, A + .4));
     }
     case 'ms_poll': {
-      r += big(['تو بودی…'], 200, 130, pr(t, A, A + .4));
+      r += bgP('office.jpg', 12, .4) + big(['تو بودی…'], 200, 130, pr(t, A, A + .4), '#fff');
       const w = (s.words || []).map(j => b.wt(j)), k1 = pr(t, A + .2, A + .6), k2 = pr(t, A + .35, A + .75), tap = w[0] ? pr(t, w[0], w[0] + .25) : 0;
       r += `<div style="position:absolute;left:90px;right:90px;top:560px;height:240px;border-radius:120px;background:var(--acc);color:#fff;font:900 110px/240px V;text-align:center;transform:scale(${(back(k1) * (1 - .06 * Math.sin(Math.PI * tap))).toFixed(3)})">💰 می‌گرفتم</div>`;
       r += `<div style="position:absolute;left:90px;right:90px;top:860px;height:240px;border-radius:120px;background:var(--ink);color:#fff;font:900 110px/240px V;text-align:center;transform:scale(${back(k2).toFixed(3)})">🏢 می‌موندم</div>`;
