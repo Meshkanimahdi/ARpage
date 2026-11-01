@@ -121,10 +121,10 @@ function caption(b, t, endOn) {
 
 // ===== REEL-027 (Microsoft voluntary exit offer) =====
 // a kraft cash envelope with the real logo stamped on it; open = flap angle 0..1
-function env(x, y, w, k, open = 0, label = '') {
+function env(x, y, w, k, open = 0, label = '', fan = 0) {
   const e = back(cl(k)), h = w * .62, lw = w * .5;
   return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:translateY(${((1 - e) * 900).toFixed(0)}px) rotate(${((1 - e) * 10 - 3).toFixed(1)}deg);filter:drop-shadow(0 30px 50px rgba(0,0,0,.45))">
-    ${[0, 1, 2].map(i => `<div style="position:absolute;left:${w * (.14 + i * .22)}px;top:${-h * .28 + i * 10}px;width:${w * .42}px;height:${h * .5}px;border-radius:10px;background:linear-gradient(135deg,#7FBF7A,#3E8E4A);border:4px solid #2F6E38;transform:rotate(${(i - 1) * 8}deg)"><div style="margin:14% auto;width:34%;height:52%;border-radius:50%;border:4px solid rgba(255,255,255,.55)"></div></div>`).join('')}
+    ${[0, 1, 2].map(i => `<div style="position:absolute;left:${w * (.14 + i * .22)}px;top:${-h * .28 + i * 10}px;width:${w * .42}px;height:${h * .5}px;border-radius:10px;background:linear-gradient(135deg,#7FBF7A,#3E8E4A);border:4px solid #2F6E38;transform:translateY(${(-fan * 120 * (1 + (i === 1))).toFixed(0)}px) rotate(${((i - 1) * (8 + 22 * fan)).toFixed(1)}deg)"><div style="margin:14% auto;width:34%;height:52%;border-radius:50%;border:4px solid rgba(255,255,255,.55)"></div></div>`).join('')}
     <div style="position:absolute;inset:0;border-radius:18px;background:linear-gradient(160deg,#E9D3A6,#CFAF74)"></div>
     <svg width="${w}" height="${h}" style="position:absolute;left:0;top:0;overflow:visible"><path d="M0 0 L${w / 2} ${h * .5 * (1 - 2 * open)} L${w} 0" fill="#D9BC86" stroke="#B8955A" stroke-width="4" transform-origin="${w / 2} 0"/></svg>
     <img src="${U('el/microsoft.png')}" style="position:absolute;left:${(w - lw) / 2}px;top:${h * .58}px;width:${lw}px;opacity:.95;mix-blend-mode:multiply">
@@ -144,12 +144,12 @@ function scene2(b, t, s, A, k0, K, z) {
   let r = '';
   switch (s.type) {
     case 'ms_hook': {
-      r += bgP(s.img, 18, .75) + `<div class="card" style="left:30px;top:470px;width:1020px;height:765px;border-radius:30px;box-shadow:0 30px 70px rgba(0,0,0,.5)"><img src="${IMG(s.img)}" style="transform:scale(${mix(1.25, 1.0, io(pr(t, 0, b.b))).toFixed(3)});transform-origin:40% 40%;filter:brightness(1.15) saturate(1.2) sepia(.15)"></div>` + darkTop(520);
+      r += bgP(s.img, 18, .75) + `<div class="card" style="left:30px;top:470px;width:1020px;height:765px;border-radius:30px;box-shadow:0 30px 70px rgba(0,0,0,.5)"><img src="${IMG(s.img)}" style="transform:scale(${mix(1.25, 1.0, io(pr(t, 0, b.b))).toFixed(3)});transform-origin:40% 40%;filter:brightness(1.32) saturate(1.3) sepia(.12) contrast(1.05)"></div>` + darkTop(520);
       r += big(['Microsoft به ۶۰هزار کارمندش:'], 150, 70, 1, '#fff') + big(['*پول بگیر برو*'], 245, 140, 1, '#fff');
-      const ke = .55 + .45 * pr(t, 0, .35), kn = pr(t, .3, .6);
-      r += env(170, 1130, 740, ke);
-      r += chip(60, 1060, 'داوطلبانه', 'var(--green)', '#fff', 60, pr(t, .2, .5));
-      if (kn > 0) r += `<div class="t" dir="ltr" style="top:${1180 - 30 * (1 - back(kn))}px;font-size:${(170 * back(kn)).toFixed(0)}px;color:#fff;text-shadow:0 10px 0 var(--red),0 20px 50px rgba(0,0,0,.6)">${fa('60,000')}</div>`;
+      const ke = .55 + .45 * pr(t, 0, .35), kn = pr(t, .1, .35), cnt = Math.round(mix(40000, 60000, 1 - Math.pow(1 - pr(t, 0, 1.3), 3)) / 100) * 100;
+      r += env(130, 1230, 820, ke, 0, '', pr(t, .3, 1.4));
+      r += chip(60, 1150, 'داوطلبانه', 'var(--green)', '#fff', 60, pr(t, .2, .5));
+      if (kn > 0) r += `<div class="t" dir="ltr" style="top:${1300 - 30 * (1 - back(kn))}px;font-size:${(180 * back(kn)).toFixed(0)}px;color:#fff;text-shadow:0 10px 0 var(--red),0 20px 50px rgba(0,0,0,.6)">${fa(cnt.toLocaleString('en-US'))}</div>`;
       return r;
     }
     case 'ms_people': {
@@ -175,8 +175,8 @@ function scene2(b, t, s, A, k0, K, z) {
       r += bgP('campus.jpg', 10, .45) + big(['*آدما* ↔ AI'], 160, 120, pr(t, A, A + .5), '#fff');
       r += `<div style="position:absolute;left:140px;top:560px;width:800px;transform:rotate(${a.toFixed(2)}deg);transform-origin:400px 40px">
         <div style="position:absolute;left:0;right:0;top:30px;height:22px;border-radius:11px;background:var(--ink)"></div>
-        <div class="card" style="left:-90px;top:80px;width:420px;height:380px;transform:rotate(${(-a).toFixed(2)}deg)"><img src="${IMG('office.jpg')}"></div>
-        <div class="card" style="left:470px;top:80px;width:420px;height:380px;transform:rotate(${(-a).toFixed(2)}deg)"><img src="${IMG('dc.jpg')}"></div></div>
+        <div class="card" style="left:-120px;top:80px;width:500px;height:460px;transform:rotate(${(-a).toFixed(2)}deg)"><img src="${IMG('office.jpg')}"></div>
+        <div class="card" style="left:420px;top:80px;width:500px;height:460px;transform:rotate(${(-a).toFixed(2)}deg)"><img src="${IMG('dc.jpg')}"></div></div>
         <div style="position:absolute;left:510px;top:590px;width:60px;height:700px;background:var(--ink);border-radius:20px"></div>`;
       r += chip(150, 1070 - 120 * io(k), 'آدما', '#fff', 'var(--ink)', 80, pr(t, A + .2, A + .5)) + chip(730, 1070 + 120 * io(k), 'AI', 'var(--acc)', '#fff', 80, pr(t, A + .3, A + .6), true);
       return r;
@@ -202,7 +202,7 @@ function scene2(b, t, s, A, k0, K, z) {
       const k1 = pr(t, A, A + .4); r += `<div style="position:absolute;left:400px;top:430px;width:280px;height:280px;border-radius:50%;background:var(--acc);color:#fff;font:900 220px/280px V;text-align:center;transform:scale(${back(k1).toFixed(3)}) rotate(${((1 - k1) * -60).toFixed(0)}deg)">${fa(2)}</div>`;
       const w = (s.words || []).map(j => b.wt(j));
       if (w[0]) r += chip(300, 800, 'بهار هم یه بار', '#fff', 'var(--ink)', 70, pr(t, w[0] - .1, w[0] + .3));
-      if (w[1]) { const k = pr(t, w[1] - .2, w[1] + 1.0), R = 170, C = 2 * Math.PI * R;
+      { const k = pr(t, A + .3, (w[1] || A + 2) + .4), R = 170, C = 2 * Math.PI * R;
         r += svg(`<circle cx="540" cy="1150" r="${R}" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="40"/><circle cx="540" cy="1150" r="${R}" fill="none" stroke="var(--green)" stroke-width="40" stroke-dasharray="${C}" stroke-dashoffset="${(C * (1 - .3 * ex(k))).toFixed(1)}" transform="rotate(-90 540 1150)"/>`) + `<div class="t" style="top:1090px;font-size:110px;color:#fff;opacity:${k}">${fa('۳۰٪')}</div>`; }
       return r + big(['دومین بارِ *امسال*'], 170, 104, pr(t, A, A + .5));
     }
@@ -210,7 +210,7 @@ function scene2(b, t, s, A, k0, K, z) {
       r += card(s.img, 40, 330, 1000, 1080, k0, z, '50% 40%').replace('<img', '<img style="filter:brightness(.6)"');
       const qt = 'این برای ما تازه‌ست؛ ازش یاد می‌گیریم', n = Math.round(qt.length * pr(t, A + .6, b.b - .6));
       r += `<div style="position:absolute;left:90px;right:90px;top:620px;padding:50px 60px 60px;border-radius:40px;background:#fff;box-shadow:0 30px 70px rgba(0,0,0,.45);font:900 84px/1.35 V;color:var(--ink);direction:rtl;transform:scale(${mix(.9, 1, ex(pr(t, A, A + .5))).toFixed(3)});opacity:${pr(t, A, A + .3)}"><span style="color:var(--acc);font-size:150px;line-height:0">«</span>${qt.slice(0, n)}<span style="opacity:${n < qt.length ? 1 : 0}">|</span></div>`;
-      r += chip(300, 1180, 'Amy Coleman · منابع انسانی Microsoft', 'var(--ink)', '#fff', 46, pr(t, A + .5, A + .9));
+      r += chip(110, 1180, 'Amy Coleman · منابع انسانی Microsoft', 'var(--ink)', '#fff', 44, pr(t, A + .5, A + .9));
       return r + big(['نوشته:'], 170, 110, pr(t, A, A + .4));
     }
     case 'ms_payoff': {
@@ -338,7 +338,7 @@ function scene(b, t, u) {
 function endCard(u) {
   // ends on the real mark: a spin-in, the name, the question
   const q = (S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--acc)">$1</span>');
-  if (S.end_logo) return endLogo(u);
+  if (S.end_logo) return bgP('hq2.jpg', 6, .9).replace('brightness(.9)', 'brightness(1.1) opacity(.35)') + endLogo(u);
   return mark('claude.png', 540, 640, 300 * mix(1.2, 1, ex(pr(u, 0, .6))), pr(u, 0, .4), u * 60) +
     `<div class="t" dir="ltr" style="top:860px;font-size:110px;opacity:${pr(u, .2, .5)}">${S.product}</div>` +
     `<div class="t" dir="ltr" style="top:1000px;font-size:44px;font-weight:600;letter-spacing:6px;opacity:${pr(u, .3, .6)}">BY ${S.brand.toUpperCase()}</div>` +
