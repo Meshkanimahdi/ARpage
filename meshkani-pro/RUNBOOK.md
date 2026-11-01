@@ -1036,6 +1036,16 @@ narrator talks, nothing attractive in the picture").
      voices for serious news; bright female voices for everyday/beauty/lifestyle.
    - **Music and sound effects:** choose from the library; generate a new one only when nothing fits, at most one
      new file a day. Rotate music tracks: not the track of the last 3 reels.
+3c. **Scene soundscape with ElevenLabs SFX v3 (user rule 2026-11-02).** ElevenLabs released SFX v3: one text
+   request can describe several sounds in order (e.g. a crowd cheers, a ball drops, a few seconds later the crowd
+   boos), and music, voices and tonal hits (gong, bell, whistle) come out cleaner. So when the library (step 3b)
+   has nothing that fits, generate **one soundscape per reel, not one file per effect**: write the reel's sound
+   cues in order with rough times from the timeline («0–2 s: phone notification pings twice, 2.5 s: soft camera
+   shutter, 5 s: low cinematic hit…»), make one SFX v3 call (model id from the ElevenLabs docs → env `SFX_MODEL`
+   for `news-reel/sfx/generate.mjs` / the sound-generation endpoint, audio key only), place it as one track
+   under the voice and duck it like the music, and keep reel_assemble's varied cues for anything it misses. Save
+   good results to the library (audio_library.json) for reuse. Still at most one new audio generation a day
+   (step 3b), and the gate's sound rules (no repeated whoosh) apply to the result.
 3a. **English names (user rule 2026-10-29):** `node news-reel/pron_test.mjs --dir=work/story` (STORY_SPEC "English
    names must SOUND English"); commit `news-reel/pron_cache.json`; Read the scores, exit 4 → respell/rephrase.
 3. `node news-reel/story_voice.mjs --dir=work/story --tempo=<tempo>` (eleven_v4; exit 3 → shorten,

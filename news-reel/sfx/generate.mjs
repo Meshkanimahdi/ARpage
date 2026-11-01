@@ -6,7 +6,7 @@ const H = {'xi-api-key': key, 'Content-Type': 'application/json'};
 async function sfx(id, text, dur) {
   const f = path.join(dir, `${id}.mp3`); if (fs.existsSync(f)) return;
   const r = await fetch('https://api.elevenlabs.io/v1/sound-generation?output_format=mp3_44100_192', {method: 'POST', headers: H,
-    body: JSON.stringify({text, duration_seconds: dur, prompt_influence: 0.6})});
+    body: JSON.stringify({text, duration_seconds: dur, prompt_influence: 0.6, ...(process.env.SFX_MODEL ? {model_id: process.env.SFX_MODEL} : {})})});   // SFX_MODEL: the SFX v3 model id (2026-11-02), verified in the ElevenLabs docs
   if (!r.ok) return console.error(id, r.status, (await r.text()).slice(0, 300));
   fs.writeFileSync(f, Buffer.from(await r.arrayBuffer())); console.log('ok', id);
 }
