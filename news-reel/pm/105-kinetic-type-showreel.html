@@ -393,7 +393,7 @@ function seek(t) {
   B.forEach(x => x.sc.style.display = x === b && !inEnd ? 'block' : 'none');
   // light ↔ dark with a soft wipe; the scene enters out of a blur and leaves into one
   const dk = b.dark ? E.io(P(t, b.a - .25, b.a + .15)) : 1 - E.io(P(t, b.a - .25, b.a + .15)) * (B[i - 1] && B[i - 1].dark ? 1 : 0) - (B[i - 1] && B[i - 1].dark ? 0 : 1);
-  $('bgD').style.opacity = clamp(b.dark ? dk : (B[i - 1] && B[i - 1].dark ? 1 - E.io(P(t, b.a - .25, b.a + .15)) : 0)); $('glowl').style.opacity = .35 + .2 * Math.sin(t);
+  $('bgD').style.opacity = clamp(b.dark ? (B[i - 1] && B[i - 1].dark ? 1 : dk) : (B[i - 1] && B[i - 1].dark ? 1 - E.io(P(t, b.a - .25, b.a + .15)) : 0)); $('glowl').style.opacity = .35 + .2 * Math.sin(t);
   $('glowl').style.transform = `translateX(${Math.sin(t * .4) * 120}px)`; document.body.classList.toggle('dkp', b.dark); if (i === 0 && b.dark) $('bgD').style.opacity = 1;
   const outK = P(t, b.b - .22, b.b); b.sc.style.filter = outK > 0 && b.v.type !== 'zoom' && b.v.type !== 'whip' ? `blur(${outK * 16}px)` : ''; b.sc.style.opacity = b.v.type === 'zoom' || b.v.type === 'whip' ? 1 : 1 - outK * .7;
   { const bgs = (b.bt.bgs || []).map(([wi, im]) => [wi ? ((b.shown.filter(w => !w.icon)[wi] || {}).t ?? b.a) - .06 : (b.i === 0 ? -1 : b.a - .2), im]); let cur = null, t0 = b.a;
