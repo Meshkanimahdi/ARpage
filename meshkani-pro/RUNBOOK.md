@@ -78,6 +78,7 @@ routine in Iran — told so that people **send it to someone they care about**.
    impact, series potential, sources, suggested format, and an empty `Approved` checkbox. Mahdi ticks; REEL_PREPARE
    takes the next ticked, unused topic (oldest first) and marks it `Used`; when none is ticked it falls back to
    §4.2 research. Seed topics from Mahdi (2026-11-01) are in `meshkani-pro/TOPIC_SEED.md`.
+15. **Mirror (user rule 2026-11-02):** a main goal of the page is sending people to Mirror (https://mirror-pro.com). Follow `meshkani-pro/MIRROR.md`: an honest Mirror bridge on fitting social topics (about 1 reel in 4, 1 carousel in 3, max one a day, never on news/tragedy/safety), the URL in the caption and the first comment, «لینک در بیو», and none of the claims MIRROR.md forbids.
 14. **Images: one sheet, at most two, then crop (user rule, repeated 2026-11-01).** Every image a post, its
    stories, a reel or its cover needs is generated in ONE storyboard sheet, at most TWO, and cut into panels
    (`storyboard_cut.py`); the cover background is a panel of that sheet. `gen_image.py` keeps a per-package

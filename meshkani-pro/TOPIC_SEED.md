@@ -8,5 +8,5 @@ Put these in the first Topic Bank (week of 2026-11-07) with research, sources an
 | «بچه‌ت واسه چی درس می‌خونه؟» | why kids need skills + AI for a fast-changing future; what parents can do |
 | «شغل‌هایی که از بین خواهند رفت» | jobs most exposed to AI (sourced studies), and the jobs/skills that grow |
 | «تعمیرکار ماشینی؟ این برای توئه» | AI tools for mechanics: diagnosis from sound/codes, manuals, quotes |
-| «هوش مصنوعی‌ای که خودشو پاک می‌کنه» | the Mirror app, which forgets the user after each conversation (privacy). **Link to the Mirror site** in the caption and the first comment, and «لینک در بیو» (URL: ask Mahdi if not in config.json → mirror_url) |
+| «یه هوش مصنوعی که فقط یه بار باهات حرف می‌زنه» (Mahdi's idea «هوش مصنوعی‌ای که خودشو پاک می‌کنه», made true per MIRROR.md) | Mirror: one conversation, one reflection report, no memory of separate sessions, no name asked. Follow meshkani-pro/MIRROR.md (no deletion promises). Link https://mirror-pro.com in the caption and the first comment, plus «لینک در بیو» |
 | «اگه اینترنت قطع شد…» (war-readiness part 2) | what to have on the phone before a cut: offline maps, saved contacts on paper too, offline first-aid guide, downloaded documents, battery radio, cash |
