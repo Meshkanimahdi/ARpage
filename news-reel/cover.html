@@ -69,7 +69,8 @@ window.ready = (async () => {
   // fit: shrink the headline until it is at most 3 lines and stays inside the 4:5 grid crop (y 285–1635)
   const T = $('title'), out = () => { const r = T.getBoundingClientRect(); return POS === 'bottom' ? r.top < 470 : (r.top < 320 || r.bottom > 1600); };
   // big enough to read in the Explore grid (user rule 2026-10-25): start at 150 px, never below 120 px (raised 2026-10-27)
-  let fs = 150; T.style.fontSize = fs + 'px';
+  if (C.title_lr) { T.style.left = T.style.right = C.title_lr + 'px'; }
+  let fs = C.fs0 || 150; T.style.fontSize = fs + 'px';
   while (fs > 120 && (T.offsetHeight > fs * 1.12 * 3 + 4 || out())) { fs -= 2; T.style.fontSize = fs + 'px'; }
   const nWords = C.title.replace(/[*|]/g, ' ').trim().split(/\s+/).filter(w => w.length > 0).length;
   if (T.offsetHeight > fs * 1.12 * 3 + 4 || out()) ISSUES.push(`headline does not fit at ${fs}px (min 120): shorten it (4–7 words read best)`);
