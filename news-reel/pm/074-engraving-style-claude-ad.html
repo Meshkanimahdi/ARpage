@@ -109,7 +109,7 @@ function seek(t) {
 
 function caption(b, t, endOn) {
   const sub = $('sub');
-  if (endOn || t > b.L.end + .3 || (b.i === 0 && t < 2)) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  if (endOn || t > b.L.end + .3 || (b.i === 0 && (t < 2 || S.hook_nocap))) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
   let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
   const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + c0;
   if (sub._k !== key) { sub._k = key; const lat = w => /^[A-Za-z0-9.\-]+[،,.!?؟…؛]*$/.test(w.w); const gs = [];
@@ -338,7 +338,7 @@ function scene(b, t, u) {
 function endCard(u) {
   // ends on the real mark: a spin-in, the name, the question
   const q = (S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--acc)">$1</span>');
-  if (S.end_logo) return bgP('hq2.jpg', 6, .9).replace('brightness(.9)', 'brightness(1.1) opacity(.35)') + endLogo(u);
+  if (S.end_logo) return `<div style="position:absolute;inset:-40px;background:url('${IMG('hq2.jpg')}') center/cover;filter:blur(8px);opacity:.22;transform:scale(${(1.1 - .06 * pr(u, 0, 4)).toFixed(3)})"></div>` + endLogo(u);
   return mark('claude.png', 540, 640, 300 * mix(1.2, 1, ex(pr(u, 0, .6))), pr(u, 0, .4), u * 60) +
     `<div class="t" dir="ltr" style="top:860px;font-size:110px;opacity:${pr(u, .2, .5)}">${S.product}</div>` +
     `<div class="t" dir="ltr" style="top:1000px;font-size:44px;font-weight:600;letter-spacing:6px;opacity:${pr(u, .3, .6)}">BY ${S.brand.toUpperCase()}</div>` +
