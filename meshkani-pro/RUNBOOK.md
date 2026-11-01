@@ -91,6 +91,20 @@ routine in Iran — told so that people **send it to someone they care about**.
    - The ending is a short human line and, on emotional topics, the Mirror bridge (§00.15).
    - Our own scripts, data and visuals; never copy another page's script or numbers without checking the
      source. Make 2–3 a week, as a named series («هوش مصنوعی می‌پرسه» / «از دید هوش مصنوعی»).
+17. **Topic filter from Mahdi's Topic Bank review (user rule 2026-11-02).**
+   - **News alone is not a topic.** «خیلی از لیست فقط در نظر گرفته که خبر باشه و تنها خبر بودن به درد نمی‌خوره». Every
+     topic needs an AI angle the viewer can use or a surprising AI view of their life.
+   - **Statistics and economy topics are told in the AI voice:** «مسئولین تورم رو این‌طوری اعلام کردن، اما من هوش
+     مصنوعی وقتی ریز شدم به یه نتیجه‌ی دیگه رسیدم…» (the format of our 311k petrol reel). The "other result" must be
+     a real calculation from sourced data (e.g. official prices vs the official index), shown step by step, never
+     an invented number or a conspiracy.
+   - **Out:** social warnings and policing («کارتت را اجاره نده، شریک جرم می‌شوی»), pure social or price news with no AI
+     angle («بنزین سه‌نرخی شد؛ ماهانه چقدر می‌سوزانیم؟»).
+   - **In (example Mahdi liked):** practical AI for daily life, «خرج ماهانه‌ات را به هوش مصنوعی بده»: one concrete
+     task the viewer can do with AI today, in Iran, step by step.
+   - **Mirror topics are always positive about Mirror.** Never a headline or angle that raises doubts about the
+     safety of AI/«آینه» sites or chatbots in general when Mirror is the bridge («سایت‌های آینه ChatGPT امن‌اند؟» was
+     an anti-ad). The Mirror reel says what Mirror does well (one conversation, it listens, it forgets you after).
 15. **Mirror (user rule 2026-11-02):** a main goal of the page is sending people to Mirror (https://mirror-pro.com). Follow `meshkani-pro/MIRROR.md`: an honest Mirror bridge on fitting social topics (about 1 reel in 4, 1 carousel in 3, max one a day, never on news/tragedy/safety), the URL in the caption and the first comment, «لینک در بیو», and none of the claims MIRROR.md forbids.
 14. **Images: one sheet, at most two, then crop (user rule, repeated 2026-11-01).** Every image a post, its
    stories, a reel or its cover needs is generated in ONE storyboard sheet, at most TWO, and cut into panels

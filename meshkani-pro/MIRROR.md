@@ -24,6 +24,10 @@ used: «هنوز یکی هست که دوست داره درد و دل‌هاتو 
 forgetting the conversation after the session; do not add stronger claims (no "nothing is ever stored", no
 "100% anonymous", no outcome promises).
 
+## Never an anti-ad (2026-11-02)
+No topic that makes viewers doubt AI chat sites' safety in general, and no use of the word «آینه» (Mirror) in a
+negative or risky context («سایت‌های آینه… امن‌اند؟»). Mirror content is positive and specific.
+
 ## Where the call to action goes
 - **Fit topics** (stress, overthinking, burnout, loneliness, big decisions, career change, «کی هستم؟»،
   relationships, emigration doubts, parenting pressure): about 1 reel in 4 and 1 carousel in 3 end with a Mirror
