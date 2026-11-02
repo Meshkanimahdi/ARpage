@@ -1,0 +1,16 @@
+{
+ "_note": "Persian words the voice misreads → the spoken form with diacritics on the wrong syllable only (user rule 2026-11-02, skill elevenlabs-tts §4.2/§7). Applied to the TTS text only; the screen keeps the normal spelling. Add every word flagged in voice/flags.json after a listen. Homographs: write the diacritic for the meaning in this script. Do NOT add homographs here (کرد، کشتی، مرد، شکر…): their reading depends on meaning, so mark them with diacritics in the script itself.",
+ "words": {
+  "هوش مصنوعی": "هوشِ مَصنوعی",
+  "مصنوعی": "مَصنوعی",
+  "تومن": "تومَن",
+  "درصد": "دَرصَد",
+  "قسط": "قِسط",
+  "اجاره": "اِجاره",
+  "شغل": "شُغل",
+  "شغلت": "شُغلِت",
+  "حقوق": "حُقوق",
+  "مهاجرت": "مُهاجِرَت",
+  "اضطراب": "اِضطِراب"
+ }
+}

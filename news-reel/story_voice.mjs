@@ -27,7 +27,11 @@ const respell = t => { for (const term of latinTerms(t).sort((a, b) => b.length 
 const latinOf = t => latinTerms(latinize(t.replace(/\{([^|}]*)\|([^}]*)\}/g, '$2'), S.lexicon));
 const untested = [...new Set(S.beats.flatMap(b => latinOf(b.text)).filter(x => !PRON_CACHE[x]))];
 if (untested.length) { console.error('run news-reel/pron_test.mjs first; untested English terms: ' + untested.join(', ')); process.exit(5); }
-const ttsText = t => respell(withTags(t));
+// Persian words the voice misreads (news-reel/fa_respell.json, user rule 2026-11-02): diacritics, TTS text only
+const FA_RESPELL = (() => { const f = new URL('./fa_respell.json', import.meta.url); return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')).words : {}; })();
+const faRespell = t => { for (const [w, s] of Object.entries(FA_RESPELL).sort((a, b) => b[0].length - a[0].length)) if (w !== s)
+  t = t.replace(new RegExp(`(?<![\\p{L}\\p{M}])${w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\p{L}\\p{M}])`, 'gu'), s); return t; };
+const ttsText = t => faRespell(respell(withTags(t)));
 const langFor = t => latinOf(t).some(x => PRON_CACHE[x]?.mode === 'B') ? null : 'fa';
 const withTags = t => sq(latinize(t.replace(/\[icon:[^\]]*\]/g, '').replace(/\{([^|}]*)\|([^}]*)\}/g, '$2').replace(/\*/g, '').replace(/\s*\|\s*/g, ' '), S.lexicon));
 const plain = t => sq(withTags(t).replace(/\[[^\]]*\]/g, ''));
@@ -87,6 +91,12 @@ for (const b of S.beats) {
   items.push({id: b.id, f: best.f, s0, d: s1 - s0, words: ws.map(([a, c]) => [a - s0, c - s0]), pause: b.pause || 0});
 }
 fs.writeFileSync(path.join(vdir, 'qc.json'), JSON.stringify(qc, null, 1));
+// word-level flags: written words the speech-to-text did not hear → likely misread; fix in fa_respell.json / PRON
+const flags = qc.map(q => { const heard = ' ' + norm(q.heard) + ' ';
+  const miss = plain(S.beats.find(b => b.id === q.id).text).split(' ').filter(w => norm(w).length > 1 && !heard.includes(norm(w)));
+  return {id: q.id, score: q.score, missed_words: miss}; }).filter(x => x.missed_words.length);
+fs.writeFileSync(path.join(vdir, 'flags.json'), JSON.stringify(flags, null, 1));
+if (flags.length) console.log('possible misread words (voice/flags.json):', flags.map(f => f.id + ': ' + f.missed_words.join('، ')).join(' | '));
 for (const q of qc) if (q.score < 0.8) console.log('!!', q.id, q.score, '|', q.spoken, '\n   ->', q.heard);
 
 const GAP = .16, FIRST = .3, ENDCARD = 2.4, tempo = TEMPO, lines = {};
