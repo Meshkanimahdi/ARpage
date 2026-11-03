@@ -399,8 +399,8 @@ function seek(t) {
   { const bgs = (b.bt.bgs || []).map(([wi, im]) => [wi ? ((b.shown.filter(w => !w.icon)[wi] || {}).t ?? b.a) - .06 : (b.i === 0 ? -1 : b.a - .2), im]); let cur = null, t0 = b.a;
     for (const [tt, im] of bgs) if (t >= tt) { cur = im; t0 = tt; }
     const bi = $('bgimg'), box = $('bgi'); if (cur && !inEnd) { if (bi._s !== cur) { bi._s = cur; bi.src = url(cur); } box.style.display = 'block';
-      const k = P(t, t0, t0 + 3), sp = Math.exp(-7 * Math.max(0, t - t0)) * Math.cos(13 * Math.max(0, t - t0));
-      bi.style.transform = b.v.type === 'hook' && cur === bgs[0][1] ? `scale(${(1.55 - .47 * E.p3(P(t, 0, 1.4))).toFixed(4)})` : `scale(${(1.06 + .07 * k) * (1 + .03 * sp)})`; bi.style.filter = b.v.type === 'stack' || b.v.type === 'kpi' || b.v.type === 'pills' || b.v.type === 'tip' ? 'blur(14px) brightness(.55)' : (b.v.type === 'hook' && b.v.beam ? 'brightness(1.18) saturate(1.12)' : 'brightness(.85)'); }
+      const k = P(t, t0, t0 + (((S.kinetic||{}).cfg||{}).sharp_bg ? 9 : 3)), sp = Math.exp(-7 * Math.max(0, t - t0)) * Math.cos(13 * Math.max(0, t - t0));
+      bi.style.transform = b.v.type === 'hook' && cur === bgs[0][1] ? `scale(${(1.55 - .47 * E.p3(P(t, 0, 1.4))).toFixed(4)})` : `scale(${(1.06 + .07 * k) * (1 + .03 * sp)})`; bi.style.filter = b.v.type === 'stack' || b.v.type === 'kpi' || b.v.type === 'pills' || b.v.type === 'tip' ? (((S.kinetic||{}).cfg||{}).sharp_bg ? 'brightness(.5) saturate(1.1)' : 'blur(14px) brightness(.55)') : (b.v.type === 'hook' && b.v.beam ? 'brightness(1.18) saturate(1.12)' : 'brightness(.85)'); }
     else box.style.display = 'none'; }
   if (b.upd) b.upd(t);
   // caption (the narration) for scenes whose main visual is not the typed sentence
