@@ -116,7 +116,8 @@ routine in Iran — told so that people **send it to someone they care about**.
    - It must reach AI/tech (§00.1): what AI notices, how AI is changing this, or what AI can do for the viewer.
    - The ending is a short human line and, on emotional topics, the Mirror bridge (§00.15).
    - Our own scripts, data and visuals; never copy another page's script or numbers without checking the
-     source. Make 2–3 a week, as a named series («هوش مصنوعی می‌پرسه» / «از دید هوش مصنوعی»).
+     source. Make 2–3 a week. The AI point of view lives in the narration only; it is never a label, a kicker or
+     a series name on the cover (§00.20).
 17. **Topic filter from Mahdi's Topic Bank review (user rule 2026-11-02).**
    - **News alone is not a topic.** «خیلی از لیست فقط در نظر گرفته که خبر باشه و تنها خبر بودن به درد نمی‌خوره». Every
      topic needs an AI angle the viewer can use or a surprising AI view of their life.
@@ -146,6 +147,27 @@ routine in Iran — told so that people **send it to someone they care about**.
    (`storyboard_cut.py`); the cover background is a panel of that sheet. `gen_image.py` keeps a per-package
    ledger and refuses a third call unless `--override-reason` (logged). Real photos and logos cost nothing:
    prefer them.
+20. **Brand standard: an expert's page, not a kids' page (user rule 2026-11-03, overrides any older cover rule).**
+   Mahdi: «کاورها داره مسخره میشه روی همش داره میخوره به عنوان تیتر "از دید هوش مصنوعی"، چرا اینقدر بچه‌گانه و سطحی
+   داری برنامه‌ریزی می‌کنی؟ من خالق کلی سیستم اتوماسیون هوش مصنوعی برای بیزینس‌ها هستم و تو داری آبروی منو می‌بری».
+   meshkani.pro is the page of a consultant who builds AI automation systems for businesses. A business owner who
+   sees the grid must think "this person knows AI and money", not "this is a meme page".
+   - **No labels on the cover.** Never «از دید هوش مصنوعی», «هوش مصنوعی می‌پرسه», «هوش مصنوعی» or any other recurring
+     tag in the kicker, title, sub, twist or logo label. The cover carries one sharp idea in the headline and,
+     at most, a real number or a real name as the kicker. The AI-POV is a narration device inside the reel.
+   - **No repeated cover element.** No kicker, sub or twist text may repeat any of the last 5 reels' covers.
+   - **Grid test.** Before the concept gate, the cover is placed next to the last 8 published covers
+     (`cover_grid.jpg` of each); if it looks like a copy of a neighbour or the row looks like a template, redo it.
+   - **Expert register, not childish.** Headlines state a claim, a number or a consequence the way a sharp
+     consultant would say it to a business owner («۴۰٪ هزینه‌ی یه مغازه رو یه اکسل هوشمند حذف می‌کنه»). Banned:
+     emoji on the cover, baby talk and filler hype («باورت نمی‌شه»، «وای»، «خفن»، «عجیب‌ترین»), cartoon
+     robots, question-only covers with no content, and the word «هوش مصنوعی» (§00.18).
+   - **Credibility in the body.** Every reel shows at least one piece of real expertise: a real number with its
+     source, a real workflow (input → AI step → output), a real tool that works in Iran, or a real cost/time
+     saving. Mahdi's own field (AI automation for shops, clinics, agencies, factories, freelancers) is a
+     standing topic family: at least 2 reels a week show a concrete automation a viewer's business could use.
+   - **Series names are story names** («خاموشی»، «۲۰۰ تومن آخر»), never «از دید…» or anything with «هوش مصنوعی».
+   - Enforced: `cover.html` (cover_render fails), `concept_gate.py` (lint) and `reel_gate.py` (repeats).
 
 ## 0. Ground rules (both phases)
 

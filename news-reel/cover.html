@@ -76,7 +76,10 @@ window.ready = (async () => {
   const nWords = C.title.replace(/[*|]/g, ' ').trim().split(/\s+/).filter(w => w.length > 0).length;
   if (T.offsetHeight > fs * 1.12 * 3 + 4 || out()) ISSUES.push(`headline does not fit at ${fs}px (min 120): shorten it (4–7 words read best)`);
   if (nWords > 9) ISSUES.push(`headline has ${nWords} words (max 9; 4–7 is best)`);
-  window.REPORT = {font_px: fs, pos: POS, words: nWords, lines: Math.round(T.offsetHeight / (fs * 1.12)), title: C.title, kicker: C.kicker || '', logo: C.logo || ''};
+  // user rule 2026-11-03: no «هوش مصنوعی» / «از دید…» label anywhere on the cover (kicker, title, sub, twist, logo label)
+  const ALL = [C.kicker, C.title, C.sub, C.twist, C.logo_label].filter(Boolean).join(' ');
+  if (/هوش[\s\u200c]*مصنوعی|از دید|هوش مصنوعی می/.test(ALL)) ISSUES.push('cover text uses «هوش مصنوعی» or an «از دید…» label: banned on covers (RUNBOOK §00.20)');
+  window.REPORT = {font_px: fs, pos: POS, words: nWords, lines: Math.round(T.offsetHeight / (fs * 1.12)), title: C.title, kicker: C.kicker || '', sub: C.sub || '', twist: C.twist || '', logo: C.logo || ''};
   
   if (POS !== 'bottom' && $('sub')) { const r = T.getBoundingClientRect(); $('sub').style.top = (r.bottom + 24) + 'px'; }
   if ($('twist')) { const r = ($('sub') || T).getBoundingClientRect(); if (POS === 'bottom') { $('twist').style.top = (T.getBoundingClientRect().top - 170) + 'px'; } else $('twist').style.top = (r.bottom + 30) + 'px';

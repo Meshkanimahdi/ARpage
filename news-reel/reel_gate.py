@@ -77,6 +77,11 @@ def main():
         if (rep.get('words') or 99) > 9: fails.append(f"cover headline too long ({rep.get('words')} words > 9)")
         if not cover.exists(): fails.append('cover file missing')
         elif md5(cover) != rep.get('md5'): fails.append('cover file is not the rendered designed cover (md5 mismatch): a frame or an old file')
+        # user rule 2026-11-03 (RUNBOOK §00.20): no label repeated on covers; kicker/sub must differ from the last 5 reels
+        for fk in ('kicker', 'sub', 'twist'):
+            v = (rep.get(fk) or '').strip()
+            if v and v in [(h.get('cover_' + fk) or '').strip() for h in hist[-5:]]:
+                fails.append(f"cover {fk} «{v}» repeats a recent reel's cover (RUNBOOK §00.20)")
         if hist and rep.get('pos') and hist[-1].get('cover_pos') == rep.get('pos'):
             fails.append(f"cover headline position '{rep.get('pos')}' repeats the previous reel's")
     if cover.exists() and reel.exists():
@@ -163,7 +168,8 @@ def main():
 
     out = {'pass': not fails, 'fails': fails, 'info': info,
            'history_entry': {'reel': story.get('content_id', ''), 'date': story.get('date', ''), 'prompt': pid, 'engine': eng,
-                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'life': story.get('life'), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else '')}}
+                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'life': story.get('life'), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else ''),
+                             **({f'cover_{k}': json.loads(rep_p.read_text()).get(k, '') for k in ('kicker', 'sub', 'twist')} if rep_p.exists() else {})}}
     (d / 'gate.json').write_text(json.dumps(out, ensure_ascii=False, indent=1))
     print(json.dumps(out, ensure_ascii=False))
     sys.exit(0 if not fails else 3)

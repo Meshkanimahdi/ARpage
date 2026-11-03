@@ -55,6 +55,12 @@ def lint(d, kind, hist_path):
         if len(prev) == 2 and not any(x.get('life') for x in prev):
             f.append('the last 2 reels were not "life" stories: this one must be (RUNBOOK §00)')
     cv = c.get('cover') or {}
+    # user rule 2026-11-03 (RUNBOOK §00.20): no AI word or «از دید…» label anywhere on the cover, no repeated label
+    cov_txt = ' '.join(str(cv.get(k) or '') for k in ('kicker', 'sub', 'twist', 'logo_label')) + ' ' + h
+    if re.search(r'هوش[\s\u200c]*مصنوعی|از دید', cov_txt): f.append('cover uses «هوش مصنوعی» or an «از دید…» label (banned, RUNBOOK §00.20)')
+    if re.search(r'[\U0001F300-\U0001FAFF]', cov_txt): f.append('no emoji on the cover (RUNBOOK §00.20)')
+    if (c.get('series') or {}).get('name') and re.search(r'هوش[\s\u200c]*مصنوعی|از دید', c['series']['name']):
+        f.append('series.name may not contain «هوش مصنوعی» or «از دید» (RUNBOOK §00.20)')
     if not cv.get('subject'): f.append('cover.subject missing (a real face, product or place)')
     hist = json.loads(Path(hist_path).read_text()) if hist_path and Path(hist_path).exists() else []
     if kind == 'reel':
