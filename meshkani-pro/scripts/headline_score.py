@@ -38,7 +38,7 @@ def main():
     for line in Path(a.cands).read_text().splitlines():
         line = line.strip()
         if not line: continue
-        m = re.match(r'^([A-H])\s*[:|]\s*(.+)$', line); angle, text = (m.group(1), m.group(2)) if m else ('?', line)
+        m = re.match(r'^([A-Z])\s*[:|]\s*(.+)$', line); angle, text = (m.group(1), m.group(2)) if m else ('?', line)
         words = [w for w in re.split(r'\s+', text.replace('|', ' ')) if w]
         n, s, why, fail = len(words), 0.0, [], []
         s += 2 if 2 <= n <= 6 else (0 if n <= 8 else -3); why.append(f'{n} words')
@@ -52,6 +52,10 @@ def main():
         if not has(text, L['you']) and re.search(r'(^|\s)(ن?می[\u200c ]?\S+ی|\S+ت)(؟|\s|$)', text):   # 2nd-person verb or "your …" suffix
             s += 2; why.append('you: 2nd person')
         if '؟' in text or '?' in text: s += 1.5; why.append('question')
+        # angle W (Mahdi 2026-11-03): «اگه بچت پشت تلفن نباشه چی؟» — a what-if that drops the viewer into the danger, open loop
+        if re.search(r'^(اگه|اگر)\s.+\s(چی|چه)\s*[؟?]?$', text.strip()): s += 4; why.append('what-if open loop (W)')
+        # spoiler: the cover tells the twist («صدای بچه‌ات بود، ولی خودش نبود») → no reason to watch
+        if re.search(r'(بود|هست|است)[،,]?\s*(ولی|اما)\s.+(نبود|نیست)', text): s -= 3; why.append('spoiler: tells the twist')
         nums = re.findall(r'\d+(?:[.,/]\d+)?', text.translate(FA))
         if nums:
             s += 1; why.append('number')

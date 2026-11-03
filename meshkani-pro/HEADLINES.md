@@ -87,3 +87,18 @@ Pattern: `<number> <unit of effort/cost> در ازای فقط <number> <unit of 
 More of the same shape: «۱۸ میلیون حقوق = ۱۵۰ دلار»، «یه ماه اجاره = ۴ ماه حقوق»، «۸ ساعت کار ← ۲ لیتر روغن».
 For every reel on money, work, prices or time, at least one of the 12 candidates must be an angle-N headline,
 and it wins whenever its numbers are sourced.
+
+## Angle W — the "what if" that puts the viewer inside the danger (user rule 2026-11-03, Mahdi)
+Mahdi on REEL-034 (cover «صدای بچه‌ات بود، ولی خودش نبود»): «تیترش هم باید اینطوری می‌شد: "اگه بچت پشت تلفن نباشه چی؟" —
+تیترها باید جنجالی و با هوک قوی باشه».
+- **Why the old one was weak:** it is a statement that gives away the twist (the voice was fake). The viewer
+  already knows the end, so there is nothing to watch for. headline_score.py now takes 3 points off this
+  "X بود، ولی Y نبود" spoiler shape.
+- **Why the new one wins:** «اگه … چی؟» drops the viewer into their own worst moment (your child, your money, your
+  phone), opens a question only the reel answers, and is short, spoken Persian (بچت، نباشه).
+- Pattern: `اگه <your person/thing> <the unthinkable> چی؟` — «اگه بچت پشت تلفن نباشه چی؟»، «اگه فردا حسابت خالی
+  باشه چی؟»، «اگه صدای خودت علیه خودت باشه چی؟». +4 in headline_score.py.
+- **Every cover must be controversial with a strong hook** (§00.18, §00.20): it either opens a loop (W), sets two
+  hard numbers against each other (N), or names the viewer's own stake (H). A cover that only describes or
+  summarises the story is rejected at the concept gate, whatever its score.
+- Never reveal the twist, the answer or the ending on the cover; the cover asks, the reel answers.

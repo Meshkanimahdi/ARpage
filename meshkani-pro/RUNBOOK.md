@@ -176,6 +176,11 @@ routine in Iran — told so that people **send it to someone they care about**.
      to the headline's size. `cover.html` always uses this centred layout and ignores `pos`; covers differ by
      background, palette and light key, not by text position. Model cover: REEL-032 v2 (kicker «درآمد یک ایرانی»,
      headline «۳.۶ ساعت کار | در ازای فقط *۱ دلار*»).
+   - **Hook, not summary (Mahdi, 2026-11-03):** REEL-034 should have been «اگه بچت پشت تلفن نباشه چی؟», not «صدای
+     بچه‌ات بود، ولی خودش نبود». Every cover is controversial with a strong hook: a what-if that puts the viewer in
+     the danger (HEADLINES.md angle W), a hard number contrast (angle N) or the viewer's own stake (angle H).
+     Never give away the twist on the cover; the critic scores a summary or spoiler cover below 6 on
+     `cover_stop_power`.
    - **Series names are story names** («خاموشی»، «۲۰۰ تومن آخر»), never «از دید…» or anything with «هوش مصنوعی».
    - Enforced: `cover.html` (cover_render fails), `concept_gate.py` (lint) and `reel_gate.py` (repeats).
 21. **Characters and personas: every voice and every image fits who is speaking (user rule 2026-11-03).** Mahdi:
