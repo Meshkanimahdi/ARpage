@@ -390,5 +390,26 @@
   "score": 1,
   "voice": "ndcUYGFbbd96WXiZVVaQ",
   "date": "2026-11-03"
+ },
+ "urgent": {
+  "mode": "A",
+  "spoken": "urgent",
+  "score": 1,
+  "voice": "4D8rX5FMrycxXbF6iW0I",
+  "date": "2026-11-03"
+ },
+ "relieved": {
+  "mode": "A",
+  "spoken": "relieved",
+  "score": 1,
+  "voice": "4D8rX5FMrycxXbF6iW0I",
+  "date": "2026-11-03"
+ },
+ "McAfee": {
+  "mode": "A",
+  "spoken": "McAfee",
+  "score": 1,
+  "voice": "4D8rX5FMrycxXbF6iW0I",
+  "date": "2026-11-03"
  }
 }

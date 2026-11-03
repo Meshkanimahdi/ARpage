@@ -31,6 +31,7 @@
   .chip { position: absolute; display: flex; align-items: center; gap: 18px; padding: 16px 30px 16px 18px; border-radius: 60px; background: #fff;
           font: 800 46px Vaz; color: #111; direction: ltr; box-shadow: 0 14px 40px rgba(0,0,0,.28); opacity: 0; }
   .chip img { width: 84px; height: 84px; border-radius: 18px; }
+  #bubble.rtl { direction: rtl; border-radius: 40px 40px 10px 40px; left: auto !important; right: 120px; }
   #bubble { position: absolute; left: 120px; top: 330px; padding: 26px 40px; border-radius: 40px 40px 40px 10px; background: #fff; color: #111;
             font: 800 64px Vaz; direction: ltr; letter-spacing: 1px; opacity: 0; box-shadow: 0 16px 50px rgba(0,0,0,.3); white-space: nowrap; }
   #count { position: absolute; left: 0; right: 80px; top: 1345px; text-align: center; font: 800 170px/1 Vaz; color: #fff; opacity: 0;
@@ -114,6 +115,7 @@ window.ready = (async () => {
   for (const b of BEATS) for (const [wi, img, lab, x, y] of (b.bt.chips || [])) { const d = document.createElement('div'); d.className = 'chip'; d.innerHTML = `<img src="${url(img)}"><span>${lab}</span>`;
     d.style.left = x + 'px'; d.style.top = y + 'px'; ch.appendChild(d); (b.chipEls = b.chipEls || []).push({el: d, t: b.wt(wi)}); }
   $('end').innerHTML = `<h1>${(S.end_text || '').replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>')}</h1><p>${S.end_sub || ''}</p>`;
+  if (S.bubble_rtl) $('bubble').classList.add('rtl');
   $('handle').textContent = (S.handle || '').toUpperCase().replace('@', '');
   await document.fonts.ready; await Promise.all(['500', '800'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش MIT')));
   window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
