@@ -168,6 +168,14 @@ routine in Iran — told so that people **send it to someone they care about**.
      standing topic family: at least 2 reels a week show a concrete automation a viewer's business could use.
    - **Model cover (Mahdi, 2026-11-03):** headline «۳.۵ ساعت کار در ازای فقط ۱ دلار», kicker «درآمد یک ایرانی»: two
      real numbers against each other, plain words, no label (HEADLINES.md angle N).
+   - **All cover text in the centre, kicker very big (user rule 2026-11-03, overrides every older «pos»/headline-position
+     rule).** Mahdi: «تمامی نوشتارهای روی کاور ازین به بعد در مرکز کاور باشه نه اطرافش و حاشیه… درآمد یک ایرانی رو هم
+     بزرگترش کن خیلی بزرگ». Kicker, headline, sub, twist, logo and brand sit together as ONE centred stack in the
+     middle of the cover (inside the 4:5 grid crop), never at the top, bottom or edges. The kicker (the 2–3 words
+     naming whose life it is, e.g. «درآمد یک ایرانی») is very big: about 110–130 px (`kicker_px`, default 112), close
+     to the headline's size. `cover.html` always uses this centred layout and ignores `pos`; covers differ by
+     background, palette and light key, not by text position. Model cover: REEL-032 v2 (kicker «درآمد یک ایرانی»,
+     headline «۳.۶ ساعت کار | در ازای فقط *۱ دلار*»).
    - **Series names are story names** («خاموشی»، «۲۰۰ تومن آخر»), never «از دید…» or anything with «هوش مصنوعی».
    - Enforced: `cover.html` (cover_render fails), `concept_gate.py` (lint) and `reel_gate.py` (repeats).
 
@@ -513,7 +521,7 @@ so the page must never look uniform. Before designing a cover or slide 1:
 2. Pick a clearly different look from the last 3 grid items, and different from all of the last 9 in its
    combination of palette and layout type. The look covers palette (dominant hues), light key
    (dark ↔ light), layout type (big photo with a bottom headline, split screen, centred object on flat
-   colour, typographic poster, collage, close-up face…), headline position and type style. Alternate the
+   colour, typographic poster, collage, close-up face…), and type style (the headline is always centred, §00.20). Alternate the
    light key so the grid has rhythm. Record the choice in the slot file as
    `design_fingerprint {palette[hex], key, layout, headline_pos}`.
 3. Check it: `python3 meshkani-pro/scripts/grid_check.py --new <cover.jpg or slide1.jpg> --prev work/grid/*.jpg --crop45`.

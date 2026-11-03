@@ -82,7 +82,7 @@ def main():
             v = (rep.get(fk) or '').strip()
             if v and v in [(h.get('cover_' + fk) or '').strip() for h in hist[-5:]]:
                 fails.append(f"cover {fk} «{v}» repeats a recent reel's cover (RUNBOOK §00.20)")
-        if hist and rep.get('pos') and hist[-1].get('cover_pos') == rep.get('pos'):
+        if hist and rep.get('pos') and rep.get('pos') != 'center' and hist[-1].get('cover_pos') == rep.get('pos'):  # 2026-11-03: every cover is centred (§00.20), so position no longer varies
             fails.append(f"cover headline position '{rep.get('pos')}' repeats the previous reel's")
     if cover.exists() and reel.exists():
         fr, diff = is_frame_of(cover, reel, d / 'qa' / 'gate')
