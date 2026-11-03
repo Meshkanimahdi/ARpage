@@ -15,7 +15,7 @@ concept.json (reel):
    "first_line": "<spoken line 1, must contain the chosen headline>",
    "hook": {"frame0": "<real photo/video of what, how big>", "motion": "push-in|whip|slam|…",
             "overlay": "<on-screen line from frame 0 = chosen headline>", "card": "<optional number/result card>"},
-   "cover": {"subject": "<real face/product/place>", "image": "real|generated", "pos": "top|middle|bottom",
+   "cover": {"subject": "<real face/product/place>", "image": "real|generated", "pos": "(ignored: centred stack, §00.20)",
              "kicker": "", "sub": "", "logo": "<main subject only, or empty>"},
    "motion": {"prompt": "<catalog id>", "category": "", "scenes": [{"say": "", "layers": ["…", "…", "…", "…"]}]}}
 concept.json (post): story, headlines, chosen, "format": "<prompts|checklist|before/after|…>",
@@ -70,8 +70,7 @@ def lint(d, kind, hist_path):
         for k in ('frame0', 'motion', 'overlay'):
             if not hk.get(k): f.append(f'hook.{k} missing')
         if hk.get('overlay') and words(hk['overlay']) > 7: f.append('hook.overlay over 7 words')
-        if cv.get('pos') not in ('top', 'middle', 'bottom'): f.append('cover.pos must be top|middle|bottom')
-        elif hist and hist[-1].get('cover_pos') == cv.get('pos'): f.append(f"cover.pos {cv['pos']} repeats the previous reel")
+        # 2026-11-03 (RUNBOOK §00.20): all cover text in one centred stack; position no longer varies or is checked
         m = c.get('motion') or {}
         pid = (m.get('prompt') or '').split('-')[0]
         if not pid: f.append('motion.prompt missing')
