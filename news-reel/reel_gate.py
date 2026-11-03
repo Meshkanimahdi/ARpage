@@ -162,6 +162,8 @@ def main():
         cr = json.loads(cp.read_text()); sc = cr.get('scores', {}); info['critic'] = sc
         low = {k: v for k, v in sc.items() if (v or 0) < 6}
         need = ('cover_stop_power', 'headline_clarity', 'hook', 'visual_match', 'style_distinct', 'motion_richness')
+        if story.get('cast') and any(b.get('speaker') not in (None, 'narrator') for b in story.get('beats', [])):
+            need = need + ('casting',)   # RUNBOOK §00.21: every character line in the right gender/age voice
         miss = [k for k in need if k not in sc]
         if miss: fails.append(f'critic.json is missing scores {miss} (RUNBOOK §4.4 step 5; motion_richness = rule 2b)')
         if low: fails.append(f'critic scores below 6: {low}')

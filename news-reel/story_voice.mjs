@@ -27,6 +27,27 @@ const respell = t => { for (const term of latinTerms(t).sort((a, b) => b.length 
 const latinOf = t => latinTerms(latinize(t.replace(/\{([^|}]*)\|([^}]*)\}/g, '$2'), S.lexicon));
 const untested = [...new Set(S.beats.flatMap(b => latinOf(b.text)).filter(x => !PRON_CACHE[x]))];
 if (untested.length) { console.error('run news-reel/pron_test.mjs first; untested English terms: ' + untested.join(', ')); process.exit(5); }
+// character casting (user rule 2026-11-03, RUNBOOK §00.21): a beat with `speaker` is spoken by that character's own voice.
+// story.json cast: {"<speaker>": {"gender": "female|male", "age": "child|teen|young|middle_aged|old", "role": "…", "voice": "<id>"}}
+// The voice must exist in audio_library.json and match the character's gender; a child or teen needs a voice whose
+// library age/note says child/teen/kid/girl/boy. No such voice → write the line as the narrator's indirect speech.
+const LIB = (() => { const f = new URL('./audio_library.json', import.meta.url); return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')).voices : []; })();
+const CAST = S.cast || {};
+const castErr = [];
+for (const b of S.beats.filter(b => b.speaker && b.speaker !== 'narrator')) {
+  const c = CAST[b.speaker];
+  if (!c) { castErr.push(`beat ${b.id}: speaker «${b.speaker}» is not in story.json cast`); continue; }
+  if (!c.voice || !c.gender || !c.age) { castErr.push(`cast «${b.speaker}» needs gender, age and voice`); continue; }
+  const v = LIB.find(x => x.id === c.voice);
+  if (!v) { castErr.push(`cast «${b.speaker}»: voice ${c.voice} is not in audio_library.json`); continue; }
+  if (v.gender && v.gender !== 'neutral' && v.gender !== c.gender) castErr.push(`cast «${b.speaker}» is ${c.gender} but voice «${v.name}» is ${v.gender}`);
+  const young = /child|kid|girl|boy|teen|children/i.test(`${v.age} ${v.name} ${v.note}`);
+  if (['child', 'teen'].includes(c.age) && !young) castErr.push(`cast «${b.speaker}» is a ${c.age} but voice «${v.name}» is not a child/teen voice: pick one, or make the line the narrator's indirect speech`);
+  if (!['child', 'teen'].includes(c.age) && v.age && c.age !== v.age && !(c.age === 'young' && v.age === 'middle_aged')) castErr.push(`cast «${b.speaker}» is ${c.age} but voice «${v.name}» is ${v.age}`);
+  if (c.voice === S.voice) castErr.push(`cast «${b.speaker}» uses the narrator's voice: a character needs its own voice`);
+}
+if (castErr.length) { console.error('casting (RUNBOOK §00.21):\n  ' + castErr.join('\n  ')); process.exit(6); }
+const voiceOf = b => (b.speaker && b.speaker !== 'narrator' && CAST[b.speaker]?.voice) || S.voice;
 // Persian words the voice misreads (news-reel/fa_respell.json, user rule 2026-11-02): diacritics, TTS text only
 const FA_RESPELL = (() => { const f = new URL('./fa_respell.json', import.meta.url); return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')).words : {}; })();
 const faRespell = t => { for (const [w, s] of Object.entries(FA_RESPELL).sort((a, b) => b[0].length - a[0].length)) if (w !== s)
@@ -43,10 +64,10 @@ function sim(a, b) { a = norm(a); b = norm(b); const m = a.length, n = b.length;
   return 1 - p[n] / Math.max(m, n); }
 async function retry(fn, what) { for (let i = 0; i < 3; i++) { try { return await fn(); } catch (e) { console.error(what, String(e).slice(0, 200)); await new Promise(z => setTimeout(z, 2500 * (i + 1))); } } throw new Error(what + ' failed'); }
 
-async function tts(text, seed, out, lang = 'fa') {
+async function tts(text, seed, out, lang = 'fa', voice = S.voice) {
   if (fs.existsSync(out)) return;
   await retry(async () => {
-    const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${S.voice}?output_format=mp3_44100_192`, {method: 'POST',
+    const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice}?output_format=mp3_44100_192`, {method: 'POST',
       headers: {'xi-api-key': key, 'Content-Type': 'application/json'},
       body: JSON.stringify({text, model_id: MODEL, ...(lang ? {language_code: lang} : {}), seed,
         voice_settings: {stability: S.stability ?? 0.38, similarity_boost: 0.85, use_speaker_boost: true}})});
@@ -71,10 +92,10 @@ async function align(f, text) {
 const items = [], qc = [];
 for (const b of S.beats) {
   const spoken = ttsText(b.text), lang = langFor(b.text), ptxt = plain(b.text), pw = ptxt.split(' ');
-  const hsh = crypto.createHash('sha256').update(S.voice + '|' + MODEL + '|' + lang + '|' + spoken).digest('hex').slice(0, 10);
+  const hsh = crypto.createHash('sha256').update(voiceOf(b) + '|' + MODEL + '|' + lang + '|' + spoken).digest('hex').slice(0, 10);
   let best = null;
   for (let take = 0; take < 3; take++) {        // up to 3 takes, keep the clearest
-    const f = path.join(vdir, `${b.id}-${hsh}-${take}.mp3`); await tts(spoken, 7 + take * 101, f, lang);
+    const f = path.join(vdir, `${b.id}-${hsh}-${take}.mp3`); await tts(spoken, 7 + take * 101, f, lang, voiceOf(b));
     const heard = await stt(f), score = Math.max(sim(ptxt, heard), sim(ptxt, latinize(heard, S.lexicon)), sim(shownText(b.text), heard));   // STT may write Latin names in Persian
     if (!best || score > best.score) best = {f, heard, score};
     if (score >= 0.9) break;

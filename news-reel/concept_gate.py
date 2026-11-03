@@ -83,6 +83,12 @@ def lint(d, kind, hist_path):
         if len(sc) < 6: f.append('plan at least 6 scenes')
         thin = [i + 1 for i, s in enumerate(sc) if len(s.get('layers') or []) < 4]
         if thin: f.append(f'scenes {thin} have fewer than 4 animated layers (RUNBOOK §4.0 rule 2b)')
+        # character casting (RUNBOOK §00.21, 2026-11-03): who speaks or is shown, with gender and age
+        cast = c.get('cast') or {}
+        if not cast: f.append('cast missing: list every character who speaks or is shown (gender, age, role, voice) — RUNBOOK §00.21')
+        for nm, cc in cast.items():
+            miss = [k for k in ('gender', 'age', 'role') if not cc.get(k)]
+            if miss: f.append(f'cast «{nm}» missing {miss}')
         # series decision cliffhanger (RUNBOOK §00.11a, 2026-11-03): every part but the last ends on a two-option vote
         se = c.get('series')
         if se:

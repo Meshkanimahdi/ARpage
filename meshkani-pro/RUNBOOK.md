@@ -178,6 +178,30 @@ routine in Iran — told so that people **send it to someone they care about**.
      headline «۳.۶ ساعت کار | در ازای فقط *۱ دلار*»).
    - **Series names are story names** («خاموشی»، «۲۰۰ تومن آخر»), never «از دید…» or anything with «هوش مصنوعی».
    - Enforced: `cover.html` (cover_render fails), `concept_gate.py` (lint) and `reel_gate.py` (repeats).
+21. **Characters and personas: every voice and every image fits who is speaking (user rule 2026-11-03).** Mahdi:
+   «تو ریلز آخر یه گندی زدی، جایی که گفتی بچه پشت تلفن می‌گه… به جای صدای یه دختر بچه از صدای یه مرد استفاده کردی،
+   باید کاراکترشناسی و پرسونا رو هم در سناریوهات برای تولید صدا یا تصویر مد نظر قرار بدی».
+   - **Cast list first.** Before the script, `story.json` gets a `cast`: one entry per character who speaks or
+     is shown (the narrator, the AI assistant, the child, the father…), each with `gender`, `age`
+     (child|teen|young|middle_aged|old), `role` (who they are, one line), the way they talk (speed, mood,
+     register) and, for speakers, a `voice` id from `audio_library.json`.
+   - **Quoted words use the speaker's own voice.** Any beat that quotes a character («بچه پشت تلفن می‌گه: …»)
+     is a separate beat with `speaker: "<name>"`, voiced by that character's cast voice, never by the narrator.
+     Gender must match; a child or teen needs a child/teen voice (library age, name or note says so); an old
+     man sounds old. The AI assistant gets its own clearly different, calm voice.
+   - **No fitting voice → no fake.** If the library has no voice of the right gender and age, rewrite the line
+     as the narrator's indirect speech («دخترش با گریه پرسید بابا کی میای») or search the ElevenLabs library
+     for one and add it to `audio_library.json` first. A man's voice for a girl, or a woman's for a man, is a
+     failure, not a compromise.
+   - **Delivery fits the persona:** ElevenLabs v4 tags per character (a scared child `[whispers]`/`[trembling]`,
+     a tired father `[tired]`, the AI `[calm]`), per the ElevenLabs skill §4.3.
+   - **Images match the cast too:** the same character keeps the same age, gender, face, clothes and setting
+     across every frame and on the cover; a child in the story is a child on screen; no generated likeness of
+     a real private person.
+   - **The critic checks casting:** the concept critic gets the cast list; the final critic listens to every
+     character line and scores `casting` (≥ 6) — wrong gender or age on any line fails it.
+   - Enforced: `story_voice.mjs` refuses a speaking character without a cast entry, a voice of the wrong gender
+     or age, or the narrator's voice reused for a character (exit 6); `concept_gate.py` requires `cast`.
 
 ## 0. Ground rules (both phases)
 
