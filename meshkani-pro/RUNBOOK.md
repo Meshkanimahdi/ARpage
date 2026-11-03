@@ -166,6 +166,8 @@ routine in Iran — told so that people **send it to someone they care about**.
      source, a real workflow (input → AI step → output), a real tool that works in Iran, or a real cost/time
      saving. Mahdi's own field (AI automation for shops, clinics, agencies, factories, freelancers) is a
      standing topic family: at least 2 reels a week show a concrete automation a viewer's business could use.
+   - **Model cover (Mahdi, 2026-11-03):** headline «۳.۵ ساعت کار در ازای فقط ۱ دلار», kicker «درآمد یک ایرانی»: two
+     real numbers against each other, plain words, no label (HEADLINES.md angle N).
    - **Series names are story names** («خاموشی»، «۲۰۰ تومن آخر»), never «از دید…» or anything with «هوش مصنوعی».
    - Enforced: `cover.html` (cover_render fails), `concept_gate.py` (lint) and `reel_gate.py` (repeats).
 

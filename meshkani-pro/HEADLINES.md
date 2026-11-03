@@ -72,3 +72,18 @@ Speak to the viewer's own money, job, safety, health or family, as a question or
 «اگه می‌خوای شغلت امن بمونه… لوله‌کش شو؟» (116k views), «خودتو برای جنگ آماده کردی؟» (59k in 14 h),
 «همه می‌دونن…» (311k). Score +4 in headline_score.py when the headline names the viewer («تو»، «شغلت»، «پولت»،
 «خانواده‌ت») and a concrete life stake.
+
+## Angle N — the hard number contrast (user rule 2026-11-03, Mahdi's own example, top priority for money/work/data topics)
+Mahdi on the last reel's cover: «کاور همین ریلز اخر میتونست خیلی جذاب‌تر باشه: "۳.۵ ساعت کار در ازای فقط ۱ دلار" —
+"درآمد یک ایرانی"». What makes it work:
+- **Two concrete numbers in one line, set against each other** (effort vs reward, before vs after, them vs us):
+  «۳.۵ ساعت کار ← ۱ دلار». The viewer does the maths in half a second and feels it.
+- **The word «فقط»** (or «همه‌ش»، «کمتر از») turns a fact into an injustice.
+- **The kicker names whose life it is, in 2–3 plain words:** «درآمد یک ایرانی». No label, no AI word, no «از دید…».
+- Numbers are real and sourced (allowed_claims): official wage ÷ free-market dollar rate, with the date.
+- The reel's first spoken line says the same contrast; the AI angle comes inside the reel (what AI changes for
+  that hour of work, or how to earn in dollars), never on the cover.
+Pattern: `<number> <unit of effort/cost> در ازای فقط <number> <unit of reward>` + kicker `<whose life>`.
+More of the same shape: «۱۸ میلیون حقوق = ۱۵۰ دلار»، «یه ماه اجاره = ۴ ماه حقوق»، «۸ ساعت کار ← ۲ لیتر روغن».
+For every reel on money, work, prices or time, at least one of the 12 candidates must be an angle-N headline,
+and it wins whenever its numbers are sourced.
