@@ -369,5 +369,19 @@
   "score": 1,
   "voice": "IsLN9xDFXCtAgmdMDUEQ",
   "date": "2026-11-02"
+ },
+ "soft": {
+  "mode": "A",
+  "spoken": "soft",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-11-02"
+ },
+ "Mirror": {
+  "mode": "A",
+  "spoken": "Mirror",
+  "score": 1,
+  "voice": "RBEKbcQ62sKk2tsmPsAU",
+  "date": "2026-11-02"
  }
 }
