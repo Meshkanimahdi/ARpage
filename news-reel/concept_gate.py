@@ -78,6 +78,18 @@ def lint(d, kind, hist_path):
         if len(sc) < 6: f.append('plan at least 6 scenes')
         thin = [i + 1 for i, s in enumerate(sc) if len(s.get('layers') or []) < 4]
         if thin: f.append(f'scenes {thin} have fewer than 4 animated layers (RUNBOOK §4.0 rule 2b)')
+        # series decision cliffhanger (RUNBOOK §00.11a, 2026-11-03): every part but the last ends on a two-option vote
+        se = c.get('series')
+        if se:
+            for k in ('name', 'part', 'of'):
+                if not se.get(k): f.append(f'series.{k} missing')
+            if se.get('part') and se.get('of') and se['part'] < se['of']:
+                ch = se.get('choice') or {}
+                if not ch.get('question') or len(ch.get('options') or []) != 2:
+                    f.append('series.choice needs a question and exactly 2 options (decision cliffhanger, RUNBOOK §00.11a)')
+                if not ch.get('ai_pick'): f.append('series.choice.ai_pick missing: what the AI recommends and why')
+            if se.get('part', 1) > 1 and not se.get('vote'):
+                f.append('series.vote missing: the real comment count of the previous part ({"1": n, "2": n}), RUNBOOK §00.11a')
         if hist and (c.get('story') or {}).get('field') in [x.get('field') for x in hist[-4:]]:
             f.append('story.field repeats one of the last 4 reels')
     else:

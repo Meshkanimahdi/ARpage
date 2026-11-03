@@ -68,6 +68,32 @@ routine in Iran — told so that people **send it to someone they care about**.
 11. **Series (user rule 2026-11-01):** a topic that can carry more than one reel is made a series: the cover and
    first line carry «قسمت ۱»، the end card says «قسمت ۲ فردا همین ساعت — فالو کن که از دستت نره», and part 2 opens
    with «قسمت ۲» and a one-line recap. Plan series of 2–4 parts; at least one series running every week.
+   **11a. Decision cliffhanger ending (user rule 2026-11-03).** Mahdi: «اخرش با کال تو اکشن عالی تموم میشه، باید
+   سریالی‌هامون اینطوری باشه». The evidence is @pelake_sefr «۲۰۰ روز تا یخبندان | قسمت اول»: 131 s, 103k plays and
+   1,557 comments in about 17 h (≈ 15 comments per 1k plays; ours are under 1). Its ending, which every part of our
+   series except the last now copies in structure (never its story, script or visuals):
+   - **A concrete dilemma with real stakes and no right answer.** The story builds a situation (a budget, a
+     countdown, a family), then stops at the moment of choice: two numbered options, both defensible, both with
+     a cost («۱️⃣ در رو باز می‌کنم. ۲️⃣ در رو بسته نگه می‌دارم.»). No quiz with one correct answer, no "what do you
+     think?" in general.
+   - **The viewer decides part 2.** The last spoken line and the end card: «۱ یا ۲؟ تو کامنت بنویس — قسمت بعد با
+     انتخاب شما ساخته می‌شه». The caption opens with the same line, restates the dilemma in 2–4 short lines, the
+     two numbered options, then «اسم سریال | قسمت N» and the hashtags.
+   - **AI/tech link (§00.1):** the AI is a character in the dilemma, e.g. it recommends one option with its
+     reason and the viewer may overrule it («هوش مصنوعی می‌گه ۲. تو چی؟»), or the dilemma is about trusting an AI,
+     a phone, the internet or an app. The AI's recommendation is argued fairly, never as the obvious winner.
+   - **Part N+1 honours the vote, with the real count.** Before writing it, the publisher reads the comments of
+     part N (Instagram comments via Composio), counts «۱»/«۲» (Persian and Latin digits, and clear words), and
+     opens with the true result («۶۳٪ شما گفتید در رو باز کن — پس…»), then follows the majority. Never an
+     invented percentage; if fewer than 30 votes, say «بیشتر شما گفتید…» without a number.
+   - **Series name on everything:** a short series title on the cover, in the first second and in the caption
+     («اسم سریال | قسمت ۱»), the same look across parts so a returning viewer recognises it in the feed.
+   - **The last part** resolves the story, says what the choices taught (one practical takeaway about life or AI),
+     and ends with the share ask (§00.3) and the next series' name.
+   - Same calm-tone and Iran rules (§00.7, §00.10); no gore, no war predictions; survival themes are told as
+     "what would you do / how to be ready".
+   - `concept.json` for a series part carries `series: {name, part, of, choice: {question, options:[a, b],
+     ai_pick}}`; `concept_gate.py` checks it.
 12. **Research before writing life topics (user rule 2026-11-01).** Practical advice (safety, health, money,
    law, tech in Iran) needs a research dossier first: `work/story/research.md` with at least 3 reputable sources
    (Red Crescent/IFRC, WHO, official bodies, established outlets, the service's own documentation), each tip
