@@ -188,7 +188,7 @@ def main():
     out = {'pass': not fails, 'fails': fails, 'hard_fails': hard_fails, 'score_fails': score_fails,
            'low_score_publish_allowed': not hard_fails, 'info': info,
            'history_entry': {'reel': story.get('content_id', ''), 'date': story.get('date', ''), 'prompt': pid, 'engine': eng,
-                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'voice_gender': vg, 'sfx': sorted(sx_now), 'life': story.get('life'), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else ''),
+                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'voice_gender': vg, 'series': (story.get('series') or {}).get('name', ''), 'series_part': (story.get('series') or {}).get('part'), 'sfx': sorted(sx_now), 'life': story.get('life'), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else ''),
                              **({f'cover_{k}': json.loads(rep_p.read_text()).get(k, '') for k in ('kicker', 'sub', 'twist')} if rep_p.exists() else {})}}
     (d / 'gate.json').write_text(json.dumps(out, ensure_ascii=False, indent=1))
     print(json.dumps(out, ensure_ascii=False))

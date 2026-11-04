@@ -46,8 +46,8 @@ routine in Iran — told so that people **send it to someone they care about**.
    reel and carousel ends with one share ask that fits the topic («برای خانواده‌ت بفرست»، «برای اون دوستت که… بفرست»),
    and gives one concrete thing to do or keep (a checklist, a step, a number, a prompt).
 4. **Follow trigger:** the end card promises the next useful thing («هر روز یه نکته که زندگیتو راحت‌تر می‌کنه —
-   فالو کن»). A reel that passes 20k views in 24 h gets a **part 2** within 48 h (same topic, the next useful
-   step), announced in the caption of part 1 («قسمت دوم فردا»).
+   فالو کن»). A reel that passes 20k views in 24 h gets a **part 2** exactly one week later, same weekday and
+   hour (same topic, the next useful step), announced in the caption of part 1 («قسمت دوم هفتهٔ بعد همین روز»; §00.11b).
 5. **Real people and real stakes:** real faces of famous people when the story has them (§4.2 step 00); for life
    topics, real-looking everyday Iranian scenes, prices in toman, Iranian places — never generic stock tech.
 6. **Clear beats fancy:** for life topics, clarity of the message and the checklist wins over motion
@@ -66,7 +66,7 @@ routine in Iran — told so that people **send it to someone they care about**.
    them: say so, or offer what works in Iran. Prices in toman, Iranian examples and places. Never encourage
    anything illegal or unsafe for the viewer.
 11. **Series (user rule 2026-11-01):** a topic that can carry more than one reel is made a series: the cover and
-   first line carry «قسمت ۱»، the end card says «قسمت ۲ فردا همین ساعت — فالو کن که از دستت نره», and part 2 opens
+   first line carry «قسمت ۱»، the end card says «قسمت ۲ هفتهٔ بعد، همین روز و همین ساعت — فالو کن که از دستت نره», and part 2 opens
    with «قسمت ۲» and a one-line recap. Plan series of 2–4 parts; at least one series running every week.
    **11a. Decision cliffhanger ending (user rule 2026-11-03).** Mahdi: «اخرش با کال تو اکشن عالی تموم میشه، باید
    سریالی‌هامون اینطوری باشه». The evidence is @pelake_sefr «۲۰۰ روز تا یخبندان | قسمت اول»: 131 s, 103k plays and
@@ -92,6 +92,13 @@ routine in Iran — told so that people **send it to someone they care about**.
      and ends with the share ask (§00.3) and the next series' name.
    - Same calm-tone and Iran rules (§00.7, §00.10); no gore, no war predictions; survival themes are told as
      "what would you do / how to be ready".
+   **11b. One week between parts (user rule 2026-11-04).** Mahdi: «قسمت بعد هر سریال رو یک هفته بعد بساز که پست اول
+   کمی کامنت بگیره». Part N+1 of any series goes out **7 days after part N, same weekday and same slot** (part 1
+   Tuesday 15:00 → part 2 the next Tuesday 15:00), never sooner, so part N has a full week to gather comments and
+   votes. The vote count is read on the morning of part N+1's prepare. Part 1's end card and caption name the day
+   («قسمت ۲: سه‌شنبهٔ بعد، ساعت ۱۵»). In between, other series and standalone reels fill the slots; a week can
+   run several series side by side, each on its own weekday and slot. `concept_gate.py` fails a part dated less
+   than 7 days after the previous part in the history.
    - `concept.json` for a series part carries `series: {name, part, of, choice: {question, options:[a, b],
      ai_pick}}`; `concept_gate.py` checks it.
 12. **Research before writing life topics (user rule 2026-11-01).** Practical advice (safety, health, money,

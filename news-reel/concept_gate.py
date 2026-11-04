@@ -102,6 +102,16 @@ def lint(d, kind, hist_path):
                 if not ch.get('question') or len(ch.get('options') or []) != 2:
                     f.append('series.choice needs a question and exactly 2 options (decision cliffhanger, RUNBOOK §00.11a)')
                 if not ch.get('ai_pick'): f.append('series.choice.ai_pick missing: what the AI recommends and why')
+            # one week between parts (RUNBOOK §00.11b, 2026-11-04)
+            if se.get('part', 1) > 1 and se.get('name'):
+                import datetime as _dt
+                prev = [x for x in hist if x.get('series') == se['name'] and x.get('series_part') == se['part'] - 1]
+                d0 = (c.get('story') or {}).get('date', '')
+                if prev and d0:
+                    try:
+                        gap = (_dt.date.fromisoformat(d0[:10]) - _dt.date.fromisoformat(prev[-1]['date'][:10])).days
+                        if gap < 7: f.append(f"series part {se['part']} is {gap} days after part {se['part'] - 1}: wait 7 days, same weekday and slot (RUNBOOK §00.11b)")
+                    except ValueError: pass
             if se.get('part', 1) > 1 and not se.get('vote'):
                 f.append('series.vote missing: the real comment count of the previous part ({"1": n, "2": n}), RUNBOOK §00.11a')
         if hist and (c.get('story') or {}).get('field') in [x.get('field') for x in hist[-4:]]:
