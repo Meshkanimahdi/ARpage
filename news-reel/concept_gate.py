@@ -62,6 +62,8 @@ def lint(d, kind, hist_path):
     if (c.get('series') or {}).get('name') and re.search(r'هوش[\s\u200c]*مصنوعی|از دید', c['series']['name']):
         f.append('series.name may not contain «هوش مصنوعی» or «از دید» (RUNBOOK §00.20)')
     if not cv.get('subject'): f.append('cover.subject missing (a real face, product or place)')
+    if kind == 'reel' and not (hist_path and Path(hist_path).exists()):
+        f.append('--history motion_history.json is required for a reel (the prompt-family, category, field and voice blocks need it)')
     hist = json.loads(Path(hist_path).read_text()) if hist_path and Path(hist_path).exists() else []
     if kind == 'reel':
         if h and h.replace('*', '').replace('|', ' ').split()[0] not in (c.get('first_line') or ''):
@@ -79,6 +81,7 @@ def lint(d, kind, hist_path):
             mine = fam.get(pid, pid)
             used = [fam.get(x.get('prompt', '').split('-')[0], x.get('prompt', '').split('-')[0]) for x in hist[-10:]]
             if mine in used: f.append(f'motion prompt {pid} (family {mine}) was used in the last 10 reels')
+            if hist and (m.get('category') or '') == hist[-1].get('category'): f.append(f"motion.category {m.get('category')} repeats the previous reel")
         sc = m.get('scenes') or []
         if len(sc) < 6: f.append('plan at least 6 scenes')
         thin = [i + 1 for i, s in enumerate(sc) if len(s.get('layers') or []) < 4]

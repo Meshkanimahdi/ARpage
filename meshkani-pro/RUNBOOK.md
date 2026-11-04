@@ -207,6 +207,30 @@ routine in Iran — told so that people **send it to someone they care about**.
      character line and scores `casting` (≥ 6) — wrong gender or age on any line fails it.
    - Enforced: `story_voice.mjs` refuses a speaking character without a cast entry, a voice of the wrong gender
      or age, or the narrator's voice reused for a character (exit 6); `concept_gate.py` requires `cast`.
+22. **Variety is a hard rule, not a score (user rule 2026-11-04).** Mahdi: «واقعاً داری بدترین نمونهٔ خودت رو اجرا
+   می‌کنی، ریلزهات داره شبیه هم می‌شه هم از افکت‌هاش و هم نوع موشن‌هاش، صداها تکراری، تیتر اسلاید یک پست آخر اینقدر
+   بالاست که نمی‌دونم دلیلش چیه و پایین کاور خالیه بدون هیچ دلیلی». The record agrees: REEL-030, 031, 032 and 035
+   (four of the last six reels) all ran on engine 105 (kinetic type), although the gate blocks an engine for 10
+   reels; they went out under the §4.0a "publish first" wording. POST-031 slide 1 had its headline in the top
+   quarter with the lower 70 % of the frame empty.
+   - **§4.0a covers critic scores only.** A reel may ride a `low_score` note only when `gate.json →
+     hard_fails` is empty. Prompt family, engine, category, field, voice, voice gender, sound-effect set, cover
+     md5/frame, concept gate, preflight: all hard. A hard fail is never published; fix it or take the next
+     prompt from the rotation list (§4.0 rule 9). The slot is still never empty: the backlog or a re-engine on the
+     next prompt fills it.
+   - **Narrator gender alternates** with the previous reel (male → female → male…), on top of the 12-reel id
+     rotation; the voice note in `audio_library.json` must differ in character too (age, energy, register).
+   - **Sound-effect set differs** from each of the last 3 reels (Jaccard < 0.75 on the effect names in
+     `reel.json → sfx`); whooshes stay ≤ 2 (§4.3 3c). The cue list is written per scene from the motion
+     (counter ticks for numbers, glass pings for cards, bass drop for the reveal), never pasted from the last reel.
+   - **Motion engine per reel:** the engine is the next unused prompt in the rotation list, with that prompt's
+     own moves and transitions; `reel_gate.py` already rejects an engine that is > 60 % the code of a recent one.
+   - **Carousel slide 1 is a cover:** one centred text stack like the reel cover (§00.20), `pos: center` in
+     `slides.json`; `slide.html` refuses `top` on a hook slide. No slide leaves more than half the frame empty of
+     purpose: either the photo's subject fills it, or a number/kicker/label sits there.
+   - Enforced: `reel_gate.py` (`hard_fails`, voice gender, SFX set, history entry now carries `voice_gender` and
+     `sfx`), `concept_gate.py` (`--history` mandatory for reels; category differs from the previous reel),
+     `slide.html` (hook = center).
 
 ## 0. Ground rules (both phases)
 
@@ -871,7 +895,8 @@ Mahdi: «اینی که میگی یه ریلز ۸ بار اصلاح شده… ف�
 اگه ریلزهایی تولید شده از قبل و انتشار نیافته بزار تو صف انتشار بدون بازبینی». Standing approval from Mahdi:
 - **Bars are 6** (concept gate, preflight, final critic). **At most 3 rounds** of fixes at any stage; after the
   third, take the best version and continue. Never spend more than one full re-render on a reel.
-- **A slot is never left empty.** A reel that misses a bar but passes the technical checks (reel_qa, length,
+- **A slot is never left empty.** A reel that misses a critic bar (and only that: `gate.json → hard_fails` must be
+  empty, §00.22) but passes the technical checks (reel_qa, length,
   loudness, no clipped text, facts true to the source, real names spelled right) is published as it is, with a
   `low_score` note in the Reels row; no human approval is needed for it. Only a factual error, a broken file or
   a policy risk (copyright, a fake quote, a generated likeness of a real person) stops a reel.

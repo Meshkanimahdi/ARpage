@@ -146,8 +146,21 @@ def main():
 
     # 4b4. voice rotation (user rule 2026-10-31): not the narrator of any of the last 12 reels
     vc = story.get('voice', '')
+    lib = {v['id']: v for v in json.loads((HERE / 'audio_library.json').read_text()).get('voices', [])} if (HERE / 'audio_library.json').exists() else {}
+    vg = (lib.get(vc) or {}).get('gender', '')
     if not vc: fails.append('story.json must name voice')
     elif vc in [h.get('voice') for h in hist[-12:]]: fails.append(f'voice {vc} was used in the last 12 reels: pick another from audio_library.json')
+    # user rule 2026-11-04 («صداها تکراری»): the narrator's gender alternates with the previous reel, so two reels in a
+    # row never sound like the same person; the id rotation alone still gave four similar male narrators in a row
+    if vg and hist and (hist[-1].get('voice_gender') or (lib.get(hist[-1].get('voice', '')) or {}).get('gender')) == vg:
+        fails.append(f'narrator is {vg} like the previous reel ({hist[-1].get("reel")}): alternate the narrator gender (RUNBOOK §00.22)')
+    # 4b5. sound-effect set variety (user rule 2026-11-04, «افکت‌هاش شبیه هم»): the set of effects differs from the last 3 reels
+    sx_now = set((json.loads(rj.read_text()).get('sfx') or {}).keys()) if rj.exists() else set()
+    for h in hist[-3:]:
+        prev = set(h.get('sfx') or [])
+        if sx_now and prev:
+            jac = len(sx_now & prev) / len(sx_now | prev)
+            if jac >= 0.75: fails.append(f'sound effects {sorted(sx_now)} are {jac:.0%} the same set as {h.get("reel")}: pick other effects from news-reel/sfx (RUNBOOK §00.22)')
 
     # 4c. preflight (user rule 2026-10-27): cover, headline and hook were judged on stills before the full render
     pf = d / 'preflight.json'
@@ -168,9 +181,14 @@ def main():
         if miss: fails.append(f'critic.json is missing scores {miss} (RUNBOOK §4.4 step 5; motion_richness = rule 2b)')
         if low: fails.append(f'critic scores below 6: {low}')
 
-    out = {'pass': not fails, 'fails': fails, 'info': info,
+    # user rule 2026-11-04: §4.0a "publish first" covers critic SCORES only. Everything else here is a hard fail and
+    # is never published with a low_score note (REEL-030/031/032/035 all ran on engine 105 under that loophole).
+    score_fails = [f for f in fails if f.startswith('critic scores below')]
+    hard_fails = [f for f in fails if f not in score_fails]
+    out = {'pass': not fails, 'fails': fails, 'hard_fails': hard_fails, 'score_fails': score_fails,
+           'low_score_publish_allowed': not hard_fails, 'info': info,
            'history_entry': {'reel': story.get('content_id', ''), 'date': story.get('date', ''), 'prompt': pid, 'engine': eng,
-                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'life': story.get('life'), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else ''),
+                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'voice_gender': vg, 'sfx': sorted(sx_now), 'life': story.get('life'), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else ''),
                              **({f'cover_{k}': json.loads(rep_p.read_text()).get(k, '') for k in ('kicker', 'sub', 'twist')} if rep_p.exists() else {})}}
     (d / 'gate.json').write_text(json.dumps(out, ensure_ascii=False, indent=1))
     print(json.dumps(out, ensure_ascii=False))
