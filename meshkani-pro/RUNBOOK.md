@@ -147,6 +147,11 @@ routine in Iran — told so that people **send it to someone they care about**.
    (`storyboard_cut.py`); the cover background is a panel of that sheet. `gen_image.py` keeps a per-package
    ledger and refuses a third call unless `--override-reason` (logged). Real photos and logos cost nothing:
    prefer them.
+   **Fresh cover every reel (Mahdi, 2026-11-04, after credits were recharged): «اعتبار رو شارژ کردم، از ریل بعدی کاور جدید بساز».**
+   Every reel's cover background is a new panel made for that reel (from its own sheet, or the one allowed extra cover
+   call); never reuse a plate or cover background from an earlier reel, including earlier parts of a series. Reusing
+   old plates was only a stop-gap while OpenRouter returned 402; if credits run out again, say so in the Log and to
+   setup before falling back.
 20. **Brand standard: an expert's page, not a kids' page (user rule 2026-11-03, overrides any older cover rule).**
    Mahdi: «کاورها داره مسخره میشه روی همش داره میخوره به عنوان تیتر "از دید هوش مصنوعی"، چرا اینقدر بچه‌گانه و سطحی
    داری برنامه‌ریزی می‌کنی؟ من خالق کلی سیستم اتوماسیون هوش مصنوعی برای بیزینس‌ها هستم و تو داری آبروی منو می‌بری».
