@@ -79,7 +79,7 @@ window.ready = (async () => {
   const cuts = [];
   for (const x of BEATS) {
     const pts = [x.a, ...x.keys];
-    pts.forEach((p, j) => cuts.push({t0: +p.toFixed(2), t1: +(j + 1 < pts.length ? pts[j + 1] : x.z).toFixed(2), type: x.s.type, bg: x.b.id + (j ? '.' + j : ''), sfx: [[p, j ? 'hit' : 'whoosh', j ? .35 : .3]]}));
+    pts.forEach((p, j) => cuts.push({t0: +p.toFixed(2), t1: +(j + 1 < pts.length ? pts[j + 1] : x.z).toFixed(2), type: x.s.type, bg: x.b.id + (j ? '.' + j : ''), sfx: [[p, j ? ['hit', 'tick', 'sweep_soft', 'tick'][(j + x.i) % 4] : (x.i % 2 ? 'sweep_soft' : 'whoosh'), j ? .35 : .3]]}));
   }
   cuts.push({t0: T.end_start, t1: TOTAL, type: 'end', bg: 'end', sfx: [[T.end_start + .1, 'hit', .5]]});
   window.SCENES = cuts; window.START = 0; window.DURATION = TOTAL; window.ISSUES = ISSUES;
