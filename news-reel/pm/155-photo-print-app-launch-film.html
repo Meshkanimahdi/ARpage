@@ -35,7 +35,7 @@
   #ring { position: absolute; width: 120px; height: 120px; border-radius: 50%; border: 6px solid var(--acc); z-index: 8; opacity: 0; }
   #sub { position: absolute; left: 60px; right: 60px; top: 1610px; text-align: center; z-index: 7; }
   #sub span.pill { display: inline-block; background: var(--ink); color: #fff; padding: 14px 40px 22px; border-radius: 36px; font: 900 58px/1.35 V; }
-  #sub .w { display: inline-block; margin: 0 .12em; } #sub .k { color: var(--acc); }
+  #sub .w { display: inline-block; margin: 0 .12em; } #sub .who { display: table; margin: 0 auto 14px; color: #fff; padding: 6px 30px 12px; border-radius: 24px; font: 900 40px/1.3 V; } #sub .k { color: var(--acc); }
   #tag { position: absolute; top: 120px; left: 0; right: 0; margin: auto; width: max-content; background: var(--ink); color: #fff; font: 900 46px V; padding: 10px 36px 18px; border-radius: 40px; z-index: 7; }
   #end { position: absolute; inset: 0; display: grid; place-items: center; z-index: 6; pointer-events: none; }
 </style>
@@ -54,18 +54,22 @@ const spr = u => u <= 0 ? 0 : 1 - Math.exp(-6.5 * u) * Math.cos(11 * u);
 const fa = s => String(s).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
 const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
 const h = (cls, css, html) => { const e = document.createElement('div'); if (cls) e.className = cls; if (css) e.style.cssText = css; if (html !== undefined) e.innerHTML = html; return e; };
-let S, TL, PARTS = [], BEATS = [], END = 60; const ISSUES = []; const PLATES = ['A1', 'B1', 'A3', 'B3', 'A2', 'B2'];
+let S, TL, PARTS = [], BEATS = [], END = 60; const ISSUES = []; const WHO = {shopkeeper: 'صاحب مغازه', assistant: 'دستیار گوشی'}; const PLATES = ['A1', 'B1', 'A3', 'B3', 'A2', 'B2'];
 
 // ---- part builders: each returns {el, cur: [[dt, x, y, click]], draw(u)} with u = seconds since the part began ----
 const B = {};
 B.photo = p => { const el = h('part'), img = h('a', `left:0;top:0;width:1080px;height:1920px;background:url(${U('raw/' + p.img + '.png')}) center/cover`);
   const iris = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); iris.setAttribute('viewBox', '0 0 1080 1920'); iris.style.cssText = 'position:absolute;inset:0';
-  el.append(img, iris); const lab = h('a mask', `left:60px;right:60px;top:${p.first ? 330 : 1330}px;text-align:center`, `<span class="t9" style="font-size:${p.first ? 108 : 80}px;line-height:1.3;color:#fff;${p.first ? 'background:rgba(14,14,16,.82);padding:14px 40px 30px;border-radius:40px;' : ''}text-shadow:0 8px 30px rgba(0,0,0,.6);display:inline-block;max-width:900px">${esc(p.label || '')}</span>`); el.append(lab);
+  el.append(img, iris); const lab = h('a mask', `left:60px;right:60px;top:${p.first ? 330 : 1330}px;text-align:center`, `<span class="t9" style="font-size:${p.first ? 108 : 80}px;line-height:1.3;color:#fff;${p.first ? 'background:rgba(14,14,16,.82);padding:14px 40px 30px;border-radius:40px;' : ''}text-shadow:0 8px 30px rgba(0,0,0,.6);display:inline-block;max-width:900px">${esc(p.label || '')}</span>`); el.append(lab); let clk = null; if (p.first) { clk = h('a', 'left:0;right:0;top:1200px;text-align:center', `<span class="t9" style="font-size:150px;color:#fff;background:var(--acc);padding:6px 46px 26px;border-radius:44px;display:inline-block;direction:ltr"></span>`); el.append(clk); }
   return {el, cur: p.first ? [[0, 860, 1450, 1], [.6, 900, 1520, 0]] : [[0, 760, 1300, 0], [.5, 880, 1560, 1]], draw(u) {
     const k = p.first ? Math.max(.8, eo(P(u, 0, .35))) : eo(P(u, .45, .95)), R = mix(0, 1400, k), rot = mix(-60, 0, k);   // the hook opens at once   // six blades open from the click
     let d = 'M0 0 H1080 V1920 H0 Z '; for (let i = 0; i < 6; i++) { const a = (rot + i * 60) * Math.PI / 180; d += (i ? 'L' : 'M') + (540 + R * Math.cos(a)).toFixed(1) + ' ' + (960 + R * Math.sin(a)).toFixed(1) + ' '; } d += 'Z';
     iris.innerHTML = `<path d="${d}" fill="#0E0E10" fill-rule="evenodd"/>`;
     img.style.transform = `scale(${(1.14 - .08 * eo(P(u, .5, 4))).toFixed(4)})`;
+    if (clk) { const off = u < .5 ? 1 : u < .62 ? .3 : u < .72 ? .9 : u < .82 ? .25 : u < .9 ? .7 : .38;   // the power cuts out: flicker, then dark
+      img.style.filter = `brightness(${off})`; const sec = Math.max(0, 7200 - Math.floor(clamp((u - .9) / 5.5) * 7200)), hh = Math.floor(sec / 3600), mm = Math.floor(sec % 3600 / 60), ss = sec % 60;
+      clk.firstChild.textContent = fa(String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0'));
+      clk.style.opacity = P(u, .85, 1.0); clk.style.transform = `scale(${Math.min(1.08, spr(u - .85)).toFixed(3)})`; }
     const kl = spr(u - (p.first ? .15 : 1.0)); lab.firstChild.style.transform = `translateY(${(1 - Math.min(1, kl)) * 140}px)`; } };
 };
 B.quote = p => { const el = h('part'), img = h('a', `left:90px;top:300px;width:900px;height:900px;border-radius:60px;background:url(${U('raw/' + p.img + '.png')}) center/cover;box-shadow:0 30px 80px rgba(0,0,0,.25)`);
@@ -199,15 +203,15 @@ function seek(t) {
   const rg = $('ring'); rg.style.opacity = (c.click * .9).toFixed(3); rg.style.transform = `translate(${c.x - 50}px, ${c.y - 50}px) scale(${.6 + .8 * (1 - c.click)})`;
   // black flood: grows from the cursor before the next part, covers, then contracts into the new scene (no cuts, no fades)
   const fl = $('flood'), nx = PARTS[i + 1]; let r = 0, fx = c.x, fy = c.y;
-  if (nx && t > nx.t0 - .3) { r = eio(P(t, nx.t0 - .3, nx.t0)) * 2400; }
-  else if (i > 0 && u < .35) { r = (1 - eio(P(u, 0, .35))) * 2400; const pc = cursorAt(o, 0); fx = 540; fy = 960; }
+  if (nx && t > nx.t0 - .2) { r = eio(P(t, nx.t0 - .2, nx.t0)) * 2400; }
+  else if (i > 0 && u < .22) { r = (1 - eio(P(u, 0, .22))) * 2400; const pc = cursorAt(o, 0); fx = 540; fy = 960; }
   fl.style.transform = `translate(${fx - 5}px, ${fy - 5}px) scale(${(r / 5).toFixed(2)})`; fl.style.display = r > 1 ? 'block' : 'none';
   // subtitle: up to 4 words of the current line
   let b = BEATS[0]; for (const x of BEATS) if (t >= x.a - .1) b = x;
   const sub = $('sub'), lineOn = t >= b.a - .05 && t <= b.L.end + .3 && t < TL.end_start;
   if (lineOn) { let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
     const c0 = Math.floor(j / 4) * 4, key = b.bt.id + ':' + c0;
-    if (sub._k !== key) { sub._k = key; sub.innerHTML = `<span class="pill">${b.words.slice(c0, c0 + 4).map((w, q) => `<span class="w${w.k ? ' k' : ''}" data-i="${q}">${esc(w.w)}</span>`).join(' ')}</span>`; }
+    if (sub._k !== key) { sub._k = key; sub.innerHTML = (WHO[b.bt.speaker] ? `<div class="who" style="background:${b.bt.speaker === 'assistant' ? '#2E6BFF' : 'var(--acc)'}">${esc(WHO[b.bt.speaker])}</div>` : '') + `<span class="pill">${b.words.slice(c0, c0 + 4).map((w, q) => `<span class="w${w.k ? ' k' : ''}" data-i="${q}">${esc(w.w)}</span>`).join(' ')}</span>`; }
     [...sub.querySelectorAll('.w')].forEach(el => { const tw = b.wt(c0 + +el.dataset.i), k = eo(P(t, tw - .04, tw + .14)); el.style.opacity = k; el.style.transform = `translateY(${(1 - k) * 14}px)`; });
   } else { sub.innerHTML = ''; sub._k = null; }
   const tg = $('tag'); if (tg) tg.style.transform = `translateY(${(1 - Math.min(1, spr(t - .2))) * -200}px)`;
