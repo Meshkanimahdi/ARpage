@@ -418,5 +418,33 @@
   "score": 1,
   "voice": "8Ebkg5uUcbSbeqGucAoR",
   "date": "2026-11-04"
+ },
+ "Fiverr": {
+  "mode": "B",
+  "spoken": "Fiverr",
+  "score": 1,
+  "voice": "Mn0jJ3FC9Ijz7lQe8ELI",
+  "date": "2026-11-04"
+ },
+ "agent": {
+  "mode": "C",
+  "spoken": "اِیجِنْت",
+  "score": 1,
+  "voice": "Mn0jJ3FC9Ijz7lQe8ELI",
+  "date": "2026-11-04"
+ },
+ "confident": {
+  "mode": "A",
+  "spoken": "confident",
+  "score": 1,
+  "voice": "Mn0jJ3FC9Ijz7lQe8ELI",
+  "date": "2026-11-04"
+ },
+ "Upwork": {
+  "mode": "A",
+  "spoken": "Upwork",
+  "score": 1,
+  "voice": "Mn0jJ3FC9Ijz7lQe8ELI",
+  "date": "2026-11-04"
  }
 }
