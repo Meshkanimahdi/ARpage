@@ -54,7 +54,7 @@ const spr = u => u <= 0 ? 0 : 1 - Math.exp(-6.5 * u) * Math.cos(11 * u);
 const fa = s => String(s).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
 const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
 const h = (cls, css, html) => { const e = document.createElement('div'); if (cls) e.className = cls; if (css) e.style.cssText = css; if (html !== undefined) e.innerHTML = html; return e; };
-let S, TL, PARTS = [], BEATS = [], END = 60; const ISSUES = [];
+let S, TL, PARTS = [], BEATS = [], END = 60; const ISSUES = []; const PLATES = ['A1', 'B1', 'A3', 'B3', 'A2', 'B2'];
 
 // ---- part builders: each returns {el, cur: [[dt, x, y, click]], draw(u)} with u = seconds since the part began ----
 const B = {};
@@ -105,7 +105,7 @@ B.phone = p => { const el = h('part'), ph = h('blk', 'left:190px;top:240px;width
     rows.forEach((e, i) => { const k = eo(P(u, .35 + i * .22, .7 + i * .22)); e.style.transform = `translateX(${(1 - k) * -700}px)`; });
     if (rows[hi]) { const d = eo(P(u, 1.8, 2.6)); rows[hi].style.transform = `translate(${d * -40}px, ${d * 120}px) scale(${1 + .06 * d})`; } } };
 };
-B.reminders = p => { const el = h('part'); el.append(h('a mask', 'left:0;right:0;top:250px;text-align:center', `<span class="t9" style="font-size:70px">${esc(p.title || '')}</span>`));
+B.reminders = p => { const el = h('part'); el.append(h('a mask', 'left:0;right:0;top:250px;text-align:center', `<span class="t9" style="font-size:70px;color:#fff">${esc(p.title || '')}</span>`));
   const cs = (p.items || []).map((it, i) => { const c = h('card', `left:90px;top:${470 + i * 340}px;width:900px;height:280px`);
     const ic = h('a', `right:50px;top:60px;width:160px;height:160px;border-radius:50%;background:${i === 0 ? 'var(--acc)' : 'var(--ink)'};display:grid;place-items:center`, `<span class="t9" style="font-size:52px;color:#fff">${fa(i + 1)}</span>`);
     const tm = h('a', 'right:250px;top:46px', `<span class="t9" style="font-size:64px">${esc(it[0])}</span>`), tx = h('a', 'right:250px;top:150px', `<span class="t6" style="font-size:42px;color:var(--mu)"></span>`);
@@ -115,7 +115,7 @@ B.reminders = p => { const el = h('part'); el.append(h('a mask', 'left:0;right:0
     cs.forEach(o => { const a = .4 + o.i * .8, s = spr(u - a); o.c.style.transform = `scale(${(.3 + .7 * Math.min(1.04, s)).toFixed(4)})`; o.c.style.opacity = s > 0 ? 1 : 0;
       o.ic.style.transform = `scale(${Math.min(1.1, spr(u - a - .15)).toFixed(3)})`; const n = Math.round(clamp((u - a - .15) / .35) * o.txt.length); o.tx.firstChild.textContent = o.txt.slice(0, n); }); } };
 };
-B.grid = p => { const el = h('part'); el.append(h('a mask', 'left:0;right:0;top:300px;text-align:center', `<span class="t9" style="font-size:76px">${esc(p.title || '')}</span>`));
+B.grid = p => { const el = h('part'); el.append(h('a mask', 'left:0;right:0;top:300px;text-align:center', `<span class="t9" style="font-size:76px;color:#fff">${esc(p.title || '')}</span>`));
   const cells = []; for (let r = 0; r < 5; r++) for (let c = 0; c < 7; c++) { const e = h('a', `left:${100 + c * 128}px;top:${520 + r * 150}px;width:108px;height:120px;border-radius:24px;background:#E6E1D7`); el.append(e); cells.push(e); }
   return {el, cur: [[0, 540, 1500, 0], [.8, 200, 600, 1], [2.8, 880, 1150, 0]], draw(u) {
     el.firstChild.firstChild.style.transform = `translateY(${(1 - Math.min(1, spr(u))) * 130}px)`;
@@ -142,14 +142,14 @@ B.chat = p => { const el = h('part'), ph = h('card', 'left:120px;top:220px;width
     a.style.transform = `scale(${Math.min(1.05, spr(u - 1.0)).toFixed(3)})`; a.firstChild.textContent = p.a.slice(0, Math.round(clamp((u - 1.1) / 1.6) * p.a.length));
     doc.style.opacity = u > 2.6 ? 1 : 0; lines.forEach((l, i) => l.style.width = (520 * [1, .8, .6][i] * eo(P(u, 2.7 + i * .25, 3.1 + i * .25))).toFixed(1) + 'px'); } };
 };
-B.cta = p => { const el = h('part'); el.append(h('a mask', 'left:0;right:0;top:280px;text-align:center', `<span class="t9" style="font-size:96px">${esc(p.title || '')}</span>`));
+B.cta = p => { const el = h('part'); el.append(h('a mask', 'left:0;right:0;top:280px;text-align:center', `<span class="t9" style="font-size:96px;color:#fff">${esc(p.title || '')}</span>`));
   const bs = [1, 2].map((n, i) => { const b = h(n === 1 ? 'blk' : 'card', `left:${i ? 110 : 570}px;top:560px;width:400px;height:520px;display:grid;place-items:center`, `<span class="t9" style="font-size:300px;${n === 2 ? 'color:var(--acc)' : 'color:#fff'}">${fa(n)}</span>`);
     el.append(b); return b; });
-  el.append(h('a', 'left:80px;right:80px;top:1200px;text-align:center', `<span class="t6" style="font-size:50px;color:var(--mu)">${esc(p.sub || '')}</span>`));
-  el.append(h('a', 'left:0;right:0;top:1450px;text-align:center', `<span class="t9" style="font-size:40px;letter-spacing:4px;direction:ltr;display:inline-block">MESHKANI.PRO</span>`));
-  return {el, cur: [[0, 540, 1500, 0], [.8, 770, 820, 1], [1.8, 310, 820, 1]], draw(u) {
+  el.append(h('a', 'left:80px;right:80px;top:1200px;text-align:center', `<span class="t6" style="font-size:50px;color:#eee">${esc(p.sub || '')}</span>`));
+  el.append(h('a', 'left:0;right:0;top:1450px;text-align:center', `<span class="t9" style="font-size:40px;letter-spacing:4px;direction:ltr;display:inline-block;color:#fff">MESHKANI.PRO</span>`));
+  return {el, cur: [[0, 540, 1500, 0], [.8, 770, 820, 1], [1.8, 310, 820, 1], [3.2, 770, 820, 1], [3.8, 310, 820, 1]], draw(u) {
     el.firstChild.firstChild.style.transform = `translateY(${(1 - Math.min(1, spr(u))) * 160}px)`;
-    bs.forEach((b, i) => { const s = spr(u - .3 - i * .25), tap = Math.exp(-((u - .9 - i) ** 2) / .01); b.style.transform = `scale(${(Math.min(1.04, s) * (1 - .08 * tap)).toFixed(4)})`; }); } };
+    bs.forEach((b, i) => { const s = spr(u - .3 - i * .25), tap = Math.exp(-((u - .9 - i) ** 2) / .01) + Math.exp(-((u - 3.2 - i * .6) ** 2) / .01), bob = Math.sin((u - i) * 2.4) * 18 * P(u, 2.2, 2.8); b.style.transform = `translateY(${bob.toFixed(1)}px) scale(${(Math.min(1.04, s) * (1 - .08 * tap)).toFixed(4)})`; }); } };
 };
 
 window.ready = (async () => {
@@ -165,11 +165,14 @@ window.ready = (async () => {
   BEATS.forEach((b, i) => { b.a = b.L.start; b.b = i + 1 < BEATS.length ? BEATS[i + 1].L.start : TL.end_start; });
   const cam = $('cam');
   for (const b of BEATS) for (const p of b.bt.parts) { const f = B[p.type]; if (!f) { ISSUES.push('unknown part ' + p.type); continue; }
-    const o = f(p); o.t0 = p.at ? b.wt(p.at) - .05 : (b === BEATS[0] ? 0 : b.a - .1); o.p = p; cam.append(o.el); PARTS.push(o); }
+    const o = f(p);
+    if (p.type !== 'photo' && p.type !== 'quote') {   // prompt: UI over the photos — a dimmed plate behind every UI scene
+      const pl = p.bg || PLATES[PARTS.length % PLATES.length]; const bgd = h('a', `left:-40px;top:-40px;width:1160px;height:2000px;background:url(${U('raw/' + pl + '.png')}) center/cover;filter:brightness(.42) saturate(.85);z-index:-1`); o.el.append(bgd); o.el.style.zIndex = 0; o.bgd = bgd; }
+    o.t0 = p.at ? b.wt(p.at) - .05 : (b === BEATS[0] ? 0 : b.a - .1); o.p = p; cam.append(o.el); PARTS.push(o); }
   PARTS.sort((x, y) => x.t0 - y.t0); PARTS[0].t0 = 0;
   PARTS.forEach((o, i) => { o.t1 = i + 1 < PARTS.length ? PARTS[i + 1].t0 : END; if (o.t1 - o.t0 > 4 && i < PARTS.length - 1) ISSUES.push(`part ${o.p.type} lasts ${(o.t1 - o.t0).toFixed(1)}s (> 4 s)`); });
   await document.fonts.ready; await Promise.all(['600', '900'].map(w => document.fonts.load(`${w} 40px V`, 'آزمایش AI')));
-  await Promise.all([...new Set(S.beats.flatMap(b => b.parts.map(q => q.img).filter(Boolean)))].map(id => new Promise(res => { const im = new Image(); im.onload = () => im.decode().then(res, res); im.onerror = () => { ISSUES.push('missing plate ' + id); res(); }; im.src = U('raw/' + id + '.png'); })));
+  await Promise.all([...new Set(S.beats.flatMap(b => b.parts.map(q => q.img).filter(Boolean)).concat(PLATES))].map(id => new Promise(res => { const im = new Image(); im.onload = () => im.decode().then(res, res); im.onerror = () => { ISSUES.push('missing plate ' + id); res(); }; im.src = U('raw/' + id + '.png'); })));
   window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
   // sound cues written from the motion (§00.22): flood = low swell, iris = shutter tick, click = tap, card spring = pop, bar draw = tick run, typing = keys
   const SFX = {photo: [[.45, 'click', .5]], vote: [[1.2, 'tap', .45], [2.2, 'tap', .45]], stats: [[.15, 'pop', .4], [.85, 'pop', .4]], phone: [[1.0, 'tap', .45], [1.8, 'glass_ping', .35]],
@@ -188,6 +191,7 @@ function seek(t) {
   let i = 0; for (let k = 0; k < PARTS.length; k++) if (t >= PARTS[k].t0) i = k;
   const o = PARTS[i], u = t - o.t0;
   PARTS.forEach((q, k) => q.el.style.display = k === i ? 'block' : 'none'); o.draw(u);
+  if (o.bgd) o.bgd.style.transform = `scale(${(1.02 + .05 * P(u, 0, 6)).toFixed(4)}) translateY(${(-30 * P(u, 0, 6)).toFixed(1)}px)`;
   // camera: screen-studio push on each part
   $('cam').style.transform = `scale(${(1 + .05 * eio(P(u, .2, Math.max(1, o.t1 - o.t0)))).toFixed(4)})`;
   // cursor drives every change
