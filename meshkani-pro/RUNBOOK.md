@@ -236,6 +236,20 @@ routine in Iran — told so that people **send it to someone they care about**.
    - Enforced: `reel_gate.py` (`hard_fails`, voice gender, SFX set, history entry now carries `voice_gender` and
      `sfx`), `concept_gate.py` (`--history` mandatory for reels; category differs from the previous reel),
      `slide.html` (hook = center).
+23. **Eight cover candidates in one frame (user rule 2026-11-04).** Mahdi: «وقتی کاور می‌زنی ۸ تا تو یه قاب تصویر بزن
+   و هر ۸ تا متفاوت باشه تا بهترین نمره بیاره». Every reel cover and every carousel slide 1 starts from **8
+   different background candidates**, not one:
+   - **Two board calls** (`gen_image.py --kind board`, 3840×2160), each prompted as **four vertical panels side
+     by side with black gutters, every panel a different scene, subject, palette, light and composition**, no
+     text in the image. That is the package's whole image budget (§00.14: two calls), so the panels are also
+     the plates for the reel when they fit the story.
+   - Crop each panel to 9:16 (`meshkani-pro/scripts/cover_candidates.py`), render the same headline on all 8
+     with `cover_render.mjs`, and lay them out as one contact sheet `cover_candidates.jpg` (4×2).
+   - The independent critic scores all 8 on `cover_stop_power` and `headline_clarity` in one pass; the best
+     becomes the cover, the sheet and the scores go in the slot JSON. When Mahdi asks, the sheet is sent to him
+     and he picks; his pick wins over the score.
+   - Eight near-copies (same scene, slightly different angle) do not count: the critic rejects a sheet whose
+     panels are not clearly different, and the prompt is rewritten.
 
 ## 0. Ground rules (both phases)
 
