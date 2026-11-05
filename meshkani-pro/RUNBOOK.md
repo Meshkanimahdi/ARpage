@@ -257,6 +257,19 @@ routine in Iran — told so that people **send it to someone they care about**.
      and he picks; his pick wins over the score.
    - Eight near-copies (same scene, slightly different angle) do not count: the critic rejects a sheet whose
      panels are not clearly different, and the prompt is rewritten.
+   - **The wording varies too (user rule 2026-11-05).** Mahdi on REEL-039: «بعد از این همه تذکر و قوانین این ریلز آخر
+     چرا کاورش اینقدر باید جمله‌بندیش افتضاح باشه». Its 8 candidates all carried one weak line («بچه‌ت فقط حفظ
+     می‌کنه؟», a vague question with no stake) and a kicker whose number had no meaning («تا ۲۰۳۰: ۳۹٪») and broke
+     over two lines. So `cover.json` carries **`headlines`: 4 different {title, kicker}**, one per angle: W
+     (what-if, «اگه درس بچه‌ت باطل بشه چی؟»), N (number contrast, «۱۲ سال درس، برای شغلی که نمی‌مونه»), H (the
+     viewer's stake, «بچه‌ت برای دیروز درس می‌خونه») and one controversial claim («حفظ کردن دیگه شغل نمیاره»);
+     each headline is rendered on 2 backgrounds. The critic picks among wordings, not only pictures.
+   - **Stranger test on the wording:** the critic writes, in one line, what a stranger understands from the cover
+     in one second; if it does not name the stake (whose money/job/child, what happens), the headline fails.
+   - **Kicker = one line**, a number always with its noun and time («۳۹٪ مهارت‌ها تا ۲۰۳۰ عوض می‌شه», never «تا
+     ۲۰۳۰: ۳۹٪»). `cover.html` keeps it on one line and fails it below 56 px.
+   - **No real faces in generated plates:** the critic checks every panel for portraits, posters or banknotes of
+     real people (the image model adds them to Iranian classrooms and money); such a panel is dropped.
 
 ## 0. Ground rules (both phases)
 

@@ -2,8 +2,8 @@
 """Eight cover candidates from two 4-panel boards (RUNBOOK §00.23, user rule 2026-11-04).
 
   python3 meshkani-pro/scripts/cover_candidates.py --boards b1.png b2.png --out work/cover_x --cover-json cover.json
-Crops every board into its 4 vertical panels (9:16 from the centre), renders news-reel/cover.html with the same
-cover.json on each (bg swapped), and writes <out>/cover_candidates.jpg (4x2 contact sheet) plus <out>/cand_N/cover.jpg.
+Crops every board into its 4 vertical panels (9:16 from the centre), renders news-reel/cover.html on each with
+one of 4 headlines from cover.json "headlines" (2 backgrounds per headline), and writes <out>/cover_candidates.jpg (4x2 contact sheet) plus <out>/cand_N/cover.jpg.
 """
 import argparse, json, subprocess, sys
 from pathlib import Path
@@ -31,11 +31,16 @@ def main():
     ap.add_argument('--boards', nargs='+', required=True); ap.add_argument('--out', required=True); ap.add_argument('--cover-json', required=True)
     a = ap.parse_args(); out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
     cj = json.loads(Path(a.cover_json).read_text()); covers = []
+    # user rule 2026-11-05 (REEL-039): the 8 candidates vary the WORDING as well as the background. cover.json carries
+    # "headlines": [{"title", "kicker"}, ×4] (one per angle W / N / H / controversial); candidate k gets headline (k-1)//2.
+    heads = cj.get('headlines') or []
+    if len(heads) < 4: sys.exit('cover.json needs "headlines": 4 different {title, kicker} (angles W, N, H, controversial) — RUNBOOK §00.23')
     k = 0
     for b in a.boards:
         for p in panels(b):
             k += 1; d = out / f'cand_{k}'; d.mkdir(exist_ok=True)
-            p.save(d / 'bg.jpg', quality=92); c = dict(cj); c['bg'] = 'bg.jpg'
+            p.save(d / 'bg.jpg', quality=92); c = {x: y for x, y in cj.items() if x != 'headlines'}; c['bg'] = 'bg.jpg'
+            c.update(heads[min((k - 1) // 2, len(heads) - 1)])
             (d / 'cover.json').write_text(json.dumps(c, ensure_ascii=False))
             r = subprocess.run(['node', str(HERE / 'news-reel' / 'cover_render.mjs'), f'--dir={d}'], capture_output=True, text=True)
             if r.returncode != 0: print(f'cand_{k}:', (r.stdout + r.stderr)[-300:], file=sys.stderr)

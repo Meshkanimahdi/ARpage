@@ -48,7 +48,7 @@
      (logo, kicker, headline, sub, twist, brand) sits in ONE stack in the middle of the cover; the kicker is very big */
   #stack { position: absolute; left: 50px; right: 50px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 34px; direction: rtl; text-align: center; }
   #stack > * { position: static !important; transform: none; margin: 0; left: auto; right: auto; top: auto; bottom: auto; }
-  #stack #kicker { font-size: var(--kpx, 112px); padding: 6px 48px 26px; border-radius: 30px; transform: rotate(-2deg); line-height: 1.25; }
+  #stack #kicker { font-size: var(--kpx, 112px); padding: 6px 48px 26px; border-radius: 30px; transform: rotate(-2deg); line-height: 1.25; white-space: nowrap; }
   #stack #title { width: 100%; }
   #stack #twist { transform: rotate(-2deg) !important; }
   #stack #brand { font-size: 30px; }
@@ -92,7 +92,13 @@ window.ready = (async () => {
   // user rule 2026-11-03: no «هوش مصنوعی» / «از دید…» label anywhere on the cover (kicker, title, sub, twist, logo label)
   const ALL = [C.kicker, C.title, C.sub, C.twist, C.logo_label].filter(Boolean).join(' ');
   if (/هوش[\s\u200c]*مصنوعی|از دید|هوش مصنوعی می/.test(ALL)) ISSUES.push('cover text uses «هوش مصنوعی» or an «از دید…» label: banned on covers (RUNBOOK §00.20)');
-  window.REPORT = {font_px: fs, pos: POS, words: nWords, lines: Math.round(T.offsetHeight / (fs * 1.12)), title: C.title, kicker: C.kicker || '', sub: C.sub || '', twist: C.twist || '', logo: C.logo || ''};
+  // user rule 2026-11-05 (REEL-039: kicker «۳۹٪ مهارت‌ها عوض | می‌شه» broke over two lines): the kicker is one line;
+  // shrink it to fit 980 px, and refuse below 56 px (shorten the kicker instead)
+  const K = $('kicker'); let kpx = 0;
+  if (K && K.textContent.trim()) { kpx = parseFloat(getComputedStyle(K).fontSize);
+    while (K.getBoundingClientRect().width > 980 && kpx > 56) { kpx -= 4; K.style.fontSize = kpx + 'px'; }
+    if (K.getBoundingClientRect().width > 980) ISSUES.push(`kicker «${C.kicker}» does not fit on one line even at 56 px: shorten it (2–5 words)`); }
+  window.REPORT = {kicker_px: kpx, font_px: fs, pos: POS, words: nWords, lines: Math.round(T.offsetHeight / (fs * 1.12)), title: C.title, kicker: C.kicker || '', sub: C.sub || '', twist: C.twist || '', logo: C.logo || ''};
   
   { const q = $('stack').getBoundingClientRect(); if (q.bottom > 1635 || q.top < 285) ISSUES.push('cover text stack falls outside the 4:5 grid crop: shorten the headline or drop the sub'); }
 })();
