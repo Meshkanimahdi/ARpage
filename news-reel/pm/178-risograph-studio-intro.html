@@ -108,9 +108,9 @@ window.ready = (async () => {
     const pz = [...new Set(pts.map(x => +x.toFixed(2)))].sort((p, q) => p - q), fill = [];
     [...pz, b.b].forEach((q, i, arr) => { if (!i) return; const g = q - arr[i - 1], n = Math.ceil(g / 2.7) - 1; for (let j = 1; j <= n; j++) fill.push(+(arr[i - 1] + g * j / (n + 1)).toFixed(2)); });
     const ps = [...pz, ...fill].sort((p, q) => p - q);
-    ps.forEach((p, i) => SC.push({t0: p, t1: i + 1 < ps.length ? ps[i + 1] : b.b, type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: i ? [[p, ['pop', 'tap', 'tick', 'click', 'counter_tick'][(i + b.i) % 5], .3]] : (SFX[b.sc.type] || (() => [[p, 'pop', .3]]))(b, p)}));
+    ps.forEach((p, i) => SC.push({t0: p, t1: i + 1 < ps.length ? ps[i + 1] : b.b, type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: i ? [[p, ['tap', 'notify', 'glass_ping', 'hit'][(i + b.i) % 4], .3]] : (SFX[b.sc.type] || (() => [[p, 'tap', .3]]))(b, p)}));
   }
-  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .2, 'shimmer', .45]]});
+  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .2, 'glass_ping', .45]]});
   SC.forEach(c => c.sfx = c.sfx.filter(x => x[0] < c.t1 + .5));
   window.SCENES = SC;
   for (const s of SC) if (s.t1 - s.t0 > 3.2) ISSUES.push(`idea ${s.bg} holds ${(s.t1 - s.t0).toFixed(1)} s (> 3): add a hit`);
@@ -119,15 +119,15 @@ window.ready = (async () => {
 // motion-matched sound cues per scene (STORY_SPEC "Sound design"): typing for the prompt box, taps for keys and buttons,
 // a shimmer when a world is revealed, ticks for counters, a hit for the ×2 stamp; never a whoosh on every cut
 const SFX = {
-  hook: (b, p) => [[.5, 'hit', .45], [.9, 'pop', .35], [1.3, 'pop', .3]],
-  tech: (b, p) => [[p + .05, 'sweep_soft', .3]],
-  human: (b, p) => [[p + .05, 'pop', .3]],
-  versus: (b, p) => [[p + .05, 'tick', .3]],
-  do1: (b, p) => [[p + .05, 'hit', .4]],
-  do2: (b, p) => [[p + .05, 'hit', .4]],
-  do3: (b, p) => [[p + .05, 'hit', .4]],
-  age: (b, p) => [[p + .05, 'glass_ping', .35]],
-  ask: (b, p) => [[p + .05, 'typing', .3]],
+  hook: (b, p) => [[.3, 'bass_drop', .35], [.6, 'tap', .35], [.9, 'notify', .3]],
+  tech: (b, p) => [[p + .05, 'whoosh', .25]],
+  human: (b, p) => [[p + .05, 'glass_ping', .3]],
+  versus: (b, p) => [[p + .05, 'tap', .35]],
+  do1: (b, p) => [[p + .05, 'hit', .35]],
+  do2: (b, p) => [[p + .05, 'notify', .35]],
+  do3: (b, p) => [[p + .05, 'hit', .35]],
+  age: (b, p) => [[p + .05, 'riser', .3]],
+  ask: (b, p) => [[p + .05, 'notify', .3]],
 };
 function seek(t) {
   if (!B.length) return;
