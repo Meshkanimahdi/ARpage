@@ -61,30 +61,31 @@ function words(b) {
 }
 // re-framings (a new shot) inside a beat, and the sound matched to each motion
 const KEYS = {
-  hook: x => [x.at('دلار'), x.at('درس')], who: x => [x.at('AI'), x.at('Mercor')], before: x => [x.at('برچسب')], now: x => [x.at('وکیل'), x.at('مهندس')],
-  steps: x => [x.at('بررسی'), x.at('درستش')], proof: x => [x.at('حقوق'), x.at('فیزیک'), x.at('برنامه‌نویس')], avg: x => [x.at('۱۱۰')], cap: x => [x.at('سقف')],
-  twist: x => [x.at('درس'), x.at('جاشونو')], ask: x => [x.at('کامنت')]
+  hook: x => [x.at('حداقل'), x.at('پونزده')], wage: x => [x.at('یک'), x.at('امسال')], rate: x => [x.at('آخر'), x.at('روزها')],
+  dollars: x => [x.at('هشتاد'), x.at('امروز')], pct: x => [x.at('بیست'), x.at('شصت')], split: x => [x.at('اجاره'), x.at('گوشی')],
+  prompt: x => [x.at('جمله'), x.at('منبع')], ask: x => [x.at('کامنت')]
 };
 const CUES = {
-  hook: x => [[.05, 'notify', .3], [.35, 'hit', .5], [1.0, 'counter_tick', .25]],
-  who: x => [[x.a + .1, 'sweep_soft', .25], [x.at('Mercor'), 'pop', .35]],
-  before: x => [[x.a + .1, 'click', .3], [x.at('ارزون'), 'counter_tick', .25]],
-  now: x => [[x.at('دکتر'), 'pop', .3], [x.at('وکیل'), 'pop', .3], [x.at('مهندس'), 'pop', .3]],
-  steps: x => [[x.a + .1, 'typing', .25], [x.at('بررسی'), 'tap', .35], [x.at('درستش'), 'glass_ping', .3]],
-  proof: x => [[x.a + .2, 'counter_tick', .3], [x.at('فیزیک'), 'tap', .3], [x.at('برنامه‌نویس'), 'tap', .3]],
-  avg: x => [[x.at('۱۱۰'), 'glass_ping', .35]],
-  cap: x => [[x.at('سقف'), 'hit', .45]],
-  twist: x => [[x.a + .1, 'sweep_soft', .25], [x.at('جاشونو'), 'bass_drop', .35]],
-  ask: x => [[x.a + .1, 'tap', .3], [x.at('کامنت'), 'click', .35]]
+  hook: x => [[.05, 'counter_tick', .3], [.55, 'hit', .45], [x.at('حداقل'), 'sweep_soft', .25]],
+  wage: x => [[x.a + .2, 'counter_tick', .3], [x.at('امسال'), 'pop', .35]],
+  rate: x => [[x.a + .1, 'tick', .3], [x.at('آخر'), 'pop', .3], [x.at('روزها'), 'hit', .4]],
+  dollars: x => [[x.a + .3, 'pop', .3], [x.at('هشتاد'), 'tick', .3], [x.at('امروز'), 'glass_ping', .35]],
+  pct: x => [[x.a + .3, 'sweep_soft', .25], [x.at('شصت'), 'hit', .4]],
+  split: x => [[x.at('اجاره'), 'pop', .3], [x.at('گوشی'), 'pop', .3]],
+  prompt: x => [[x.at('جمله') + .2, 'typing', .25], [x.at('منبع'), 'glass_ping', .3]],
+  ask: x => [[x.a + .4, 'typing', .25], [x.at('کامنت'), 'tap', .35]]
 };
 window.ready = (async () => {
   S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json();
   DUR = TL.total; BB = S.beats.map(words).filter(Boolean);
   BB.forEach((x, i) => { x.a = i ? x.Lw.start - .1 : 0; x.z = i + 1 < BB.length ? BB[i + 1].Lw.start - .1 : TL.end_start; });
-  const pics = ['s00', 's01', 's02', 's03', 's04', 's05', 's06', 's07', 's08', 's10'].map(n => U('raw/' + n + '.png')).concat([U('el/' + LG())]);
+  const pics = ['h', 'c', 'g', 't', 'b', 'd', 'm', 'k'].map(n => U('raw/' + n + '.png'));
   await Promise.all(pics.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = u; })));
-  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'دلار Mercor')));
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'دلار تومن')));
   BB.forEach(x => { x.keys = (KEYS[x.s.type] || (() => []))(x).filter(v => v > x.a + .6 && v < x.z - .6).sort((p, q) => p - q); });
+  BB.forEach(x => { const pts = [x.a, ...x.keys, x.z], add = [];
+    for (let i = 0; i + 1 < pts.length; i++) { const g = pts[i + 1] - pts[i], n = Math.ceil(g / 2.7) - 1; for (let j = 1; j <= n; j++) add.push(pts[i] + g * j / (n + 1)); }
+    x.keys = [...x.keys, ...add].sort((p, q) => p - q); });
   const sc = [];
   for (const x of BB) { const pts = [x.a, ...x.keys], cu = (CUES[x.s.type] || (() => []))(x).filter(c => c[0] >= x.a - .05 && c[0] < x.z);
     pts.forEach((p, j) => { const t1 = j + 1 < pts.length ? pts[j + 1] : x.z;
@@ -148,7 +149,7 @@ function money(x0, y0, w, k) { // ticker strip of hourly earnings
 
 // ---------- captions: spoken words in chunks of ≤ 4, cream pill with ink type, accent in green ----------
 function cap(x, t) {
-  if (x.s.type === 'hook' && t < x.at('درس') + .3) return '';
+  if (x.s.type === 'hook' && t < x.at('حداقل') - .1) return '';
   if (t > x.Lw.end + .3) return '';
   const W = x.W; let j = 0; for (let q = 0; q < W.length; q++) if (t >= W[q].t - .05) j = q;
   const ch = []; let c = []; W.forEach((w, q) => { c.push(q); if (c.length === 4 || (c.length >= 2 && /[،؛.!؟?…:»]$/.test(w.w))) { ch.push(c); c = []; } }); if (c.length) ch.push(c);
@@ -159,108 +160,89 @@ function cap(x, t) {
 
 function scene(x, t) {
   const s = x.s, A = x.a, at = x.at;
+  const comma = v => fa(Math.round(v).toLocaleString('en-US'));
+  const card = (x0, y0, w, h, inner, k, bg = '#fff') => k <= 0 ? '' : `<div class="a" style="left:${x0}px;top:${y0}px;width:${w}px;height:${h}px;border-radius:44px;background:${bg};box-shadow:0 24px 60px rgba(0,0,0,.12);transform:scale(${K(k, 0, 1.06).toFixed(3)});overflow:hidden">${inner}</div>`;
+  const bar = (x0, base, w, h, k, col) => `<div class="a" style="left:${x0}px;top:${(base - h * ex(k)).toFixed(0)}px;width:${w}px;height:${(h * ex(k)).toFixed(0)}px;border-radius:18px 18px 0 0;background:${col}"></div>`;
   switch (s.type) {
     case 'hook': {
-      // frame 0: the lawyer photo full-bleed (face fully in frame), pushing in; the headline with the subject from frame 0;
-      // the rate card counts $0 → $400 in 0.8 s and slams; at 0.6 s the twist chip; at 0.3 s the earnings ticker runs
-      const z = L(1.18, 1.0, ex(T(t, 0, 1.2))), kr = T(t, 0, .8), slam = t > .35 && t < .6 ? 1 + .25 * (1 - T(t, .35, .6)) : 1;
-      return `<div class="a" style="inset:0;transform:scale(${z.toFixed(4)});transform-origin:520px 400px;filter:none"><img src="${U('raw/s00.png')}" style="position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover;object-position:50% 0%"></div>` +
-        `<div class="a" style="left:0;right:0;top:920px;height:1000px;background:linear-gradient(rgba(246,241,231,0),rgba(246,241,231,.95) 20%,var(--cr))"></div>` +
-        `<div class="a" style="left:30px;right:30px;top:1080px;text-align:center;font-size:104px;line-height:1.2"><div>شرکت‌های AI به وکیل‌ها</div><div>ساعتی تا <span style="display:inline-block;padding:0 24px 12px;border-radius:24px;background:var(--g);color:#fff;transform:scale(${slam.toFixed(3)})">${fa(400)} دلار</span> می‌دن</div></div>` +
-        `<div class="a" style="left:0;right:0;top:1360px;text-align:center"><span style="display:inline-block;padding:8px 34px 18px;border-radius:24px;background:var(--ink);color:#fff;font:900 52px V">برای درس دادن به AI</span></div>` +
-        (t > .3 ? money(90, 1480, 900, T(t, .3, .7)) : '') +
-        tag(90, 220, 60, 'همون AI که شاید یه روز جاشونو بگیره؟', t, -1, 'var(--rd)', '#fff');
+      // frame 0: the pay-envelope photo already pushing in, the headline from frame 0; ×15 counts up in green while
+      // the dollar card slams in red ($200 → $62) at 0.6 s
+      const z = L(1.16, 1.0, ex(T(t, 0, 1.4))), kx = T(t, .05, .9), kd = pp(t, .55), kv = T(t, .7, 1.4);
+      const tm = Math.max(1, Math.round(15 * ex(kx))), dl = Math.round(L(200, 62, ex(kv)));
+      return `<div class="a" style="left:0;top:0;width:1080px;height:1100px;overflow:hidden"><img src="${U('raw/' + s.img + '.png')}" style="width:1080px;height:1920px;object-fit:cover;object-position:50% 30%;transform:scale(${z.toFixed(4)});transform-origin:540px 400px"></div>` +
+        `<div class="a" style="left:0;right:0;top:700px;height:1220px;background:linear-gradient(rgba(246,241,231,0),var(--cr) 30%)"></div>` +
+        `<div class="a" style="left:30px;right:30px;top:860px;text-align:center;font-size:112px;line-height:1.2"><div>اگه حقوقت رو</div><div><span style="display:inline-block;padding:0 30px 16px;border-radius:26px;background:var(--g);color:#fff">به دلار</span> ببینی چی؟</div></div>` +
+        card(80, 1210, 440, 300, `<div style="margin-top:34px;text-align:center;font:900 44px V;color:var(--mu)">به تومن</div><div style="text-align:center;font:900 150px/1.1 V;color:var(--g);direction:ltr">×${fa(tm)}</div>`, pp(t, .05)) +
+        (t > .3 ? money(90, 1560, 900, T(t, .3, .7)) : '') + card(560, 1210, 440, 300, `<div style="margin-top:34px;text-align:center;font:900 40px V;color:var(--mu)">به دلار · ۹۷ → امروز</div><div style="text-align:center;font:900 150px/1.1 V;color:var(--rd);direction:ltr">$${fa(dl)}</div>`, kd);
     }
-    case 'who': {
-      const k1 = pp(t, A + .05), km = pp(t, at('Mercor') - .05), kc = T(t, A + .3, at('Mercor'));
-      const card = (x0, y0, h, k) => k <= 0 ? '' : `<div class="a" style="left:${x0}px;top:${y0}px;width:820px;padding:44px;border-radius:44px;background:#fff;box-shadow:0 24px 60px rgba(0,0,0,.12);transform:scale(${k.toFixed(3)});box-sizing:border-box">${h}</div>`;
-      return ground() + card(130, 260, `<div style="font:900 44px V;color:var(--mu)">پرداخت‌کننده</div><div style="font:900 90px V;margin-top:10px">شرکت‌های AI</div><div style="margin-top:22px;height:22px;width:${(100 * ex(kc)).toFixed(0)}%;border-radius:11px;background:var(--g)"></div>`, k1) +
-        `<svg class="a" style="left:0;top:0;overflow:visible" width="1080" height="1920"><path d="M540 610 L540 ${L(610, 820, ex(T(t, A + .4, at('Mercor')))).toFixed(0)}" stroke="var(--ink)" stroke-width="10" stroke-dasharray="20 14" fill="none"/></svg>` +
-        card(130, 840, `<div class="row" style="gap:30px;direction:ltr">${logo(130)}<span style="font:900 100px V">Mercor</span></div><div style="margin-top:24px;font:600 42px V;color:var(--mu)">سایت استخدام متخصص برای آموزش AI</div>`, km) +
-        (km > 0 ? `<div class="a row" style="left:130px;top:1260px;gap:18px">${['وکیل', 'دکتر', 'مهندس', 'فیزیک‌دان'].map((r, i) => { const k = pp(t, at('Mercor') + .2 + i * BEAT / 2); return `<span style="display:inline-block;padding:6px 30px 16px;border-radius:20px;background:${i ? '#fff' : 'var(--g)'};color:${i ? 'var(--ink)' : '#fff'};font:900 50px V;transform:scale(${k.toFixed(3)});box-shadow:0 8px 20px rgba(0,0,0,.08)">${r}</span>`; }).join('')}</div>` : '') +
-        cur(t, [[A, 900, 1500], [at('Mercor') - .2, 600, 1000, 1], [x.z, 600, 1000]]);
+    case 'wage': {
+      const k1 = T(t, A + .2, at('یک') + .9), k2 = T(t, at('امسال') - .1, at('امسال') + 1.2), kb = pp(t, at('امسال') - .1);
+      return ground() + pic('g', 120, 200, 840, 520, pp(t, A), t, A, '50% 40%') +
+        card(80, 780, 440, 560, `<div style="margin:30px 0 0;text-align:center;font:900 64px V">۱۳۹۷</div><div style="text-align:center;font:900 54px V;color:var(--ink);direction:ltr">${comma(1114000 * ex(k1))}</div><div style="text-align:center;font:600 36px V;color:var(--mu)">تومن در ماه</div>` + bar(170, 530, 100, 40, k1, 'var(--mu)'), pp(t, A + .1)) +
+        card(560, 780, 440, 560, `<div style="margin:30px 0 0;text-align:center;font:900 64px V">۱۴۰۵</div><div style="text-align:center;font:900 54px V;color:var(--g);direction:ltr">${comma(16625550 * ex(k2))}</div><div style="text-align:center;font:600 36px V;color:var(--mu)">تومن در ماه</div>` + bar(170, 530, 100, 300, k2, 'var(--g)'), kb) +
+        tag(380, 90, 64, '×۱۵ به تومن', t, at('امسال') + .9);
     }
-    case 'before': {
-      const k = T(t, A, A + .4), kb = T(t, at('برچسب') - .1, at('برچسب') + .5), n = Math.floor(K((t - A - .2) / (BEAT / 2), 0, 12));
-      const thumbs = Array.from({length: 12}, (_, i) => `<div class="a" style="left:${120 + (i % 4) * 215}px;top:${880 + Math.floor(i / 4) * 170}px;width:195px;height:150px;border-radius:20px;background:${i < n ? '#E8E2D6' : '#fff'};border:4px solid ${i < n ? 'var(--g)' : '#E2DCCF'};text-align:center;font:900 70px/140px V;color:var(--g)">${i < n ? '✓' : ''}</div>`).join('');
-      return ground() + pic('s02', 120, 230, 520, 560, k, t, A, '50% 30%') +
-        `<div class="a" style="left:680px;top:330px;width:300px;text-align:center"><div style="font:900 44px V;color:var(--mu)">دستمزد</div><div style="font:900 100px V;color:var(--rd);transform:scale(${pp(t, at('ارزون') - .05).toFixed(3)})">ارزون</div><div style="font:900 40px V;color:var(--mu)">کار ساده، قدیم</div></div>` +
-        thumbs + `<div class="a" style="left:120px;top:1330px;font:900 54px V">${up('برچسب زدن عکس و متن', kb, 54)}</div>` +
-        cur(t, [[A, 300, 1500], ...Array.from({length: 6}, (_, i) => [A + .3 + i * BEAT / 2 * 2, 200 + (i % 4) * 215, 940 + Math.floor(i / 4) * 170, 1]), [x.z, 600, 1200]]);
+    case 'rate': {
+      // three real points only (no invented curve between them): start of 97, end of 97, Aban 1405; log-scaled height
+      const P3 = [[at('نود') , 5500, 'فروردین ۹۷'], [at('آخر'), 13300, 'اسفند ۹۷'], [at('روزها'), 270000, 'آبان ۱۴۰۵']];
+      const y = v => 1300 - (Math.log10(v) - 3.5) / (5.6 - 3.5) * 760, X = [220, 540, 860];
+      const pts = P3.map((p, i) => ({x: X[i], y: y(p[1]), k: pp(t, p[0] - .05), p}));
+      const line = pts.slice(1).map((q, i) => { const a = pts[i], k = ex(T(t, q.p[0] - .2, q.p[0] + .3)); return k <= 0 ? '' : `<line x1="${a.x}" y1="${a.y.toFixed(0)}" x2="${L(a.x, q.x, k).toFixed(0)}" y2="${L(a.y, q.y, k).toFixed(0)}" stroke="var(--rd)" stroke-width="12" stroke-linecap="round" stroke-dasharray="2 22"/>`; }).join('');
+      return ground() + `<div class="a" style="left:0;right:0;top:200px;text-align:center">${up('دلار آزاد، به تومن', T(t, A, A + .4), 88)}</div>` +
+        `<svg class="a" style="left:0;top:0;overflow:visible" width="1080" height="1920">${line}</svg>` +
+        pts.map(q => q.k <= 0 ? '' : `<div class="a" style="left:${q.x - 150}px;top:${(q.y - 210).toFixed(0)}px;width:300px;text-align:center;transform:scale(${K(q.k, 0, 1.06).toFixed(3)})"><div style="display:inline-block;padding:8px 26px 18px;border-radius:26px;background:var(--ink);color:#fff;font:900 62px V;direction:ltr">${comma(q.p[1])}</div><div style="margin-top:8px;font:900 40px V;color:var(--mu)">${q.p[2]}</div><div style="margin:14px auto 0;width:40px;height:40px;border-radius:50%;background:var(--rd)"></div></div>`).join('') +
+        tag(250, 1360, 46, 'نرخ بازار آزاد · مقیاس لگاریتمی', t, A + .5, 'var(--ink)');
     }
-    case 'now': {
-      const ks = [at('دکتر'), at('وکیل'), at('مهندس')], im = ['s03', 's05', 's04'], lb = ['دکتر', 'وکیل', 'مهندس'];
-      return ground() + `<div class="a" style="left:0;right:0;top:200px;text-align:center">${up('حالا متخصص می‌خوان', T(t, A, A + .4), 92)}</div>` +
-        ks.map((k0, i) => { const k = pp(t, k0 - .1); if (k <= 0) return '';
-          return `<div class="a" style="left:${70 + i * 320}px;top:${430 + (i % 2) * 120}px;width:300px;transform:scale(${k.toFixed(3)})">` + pic(im[i], 0, 0, 300, 520, 1, t, k0, '50% 30%', 34).replace('class="a"', 'style="position:relative"') +
-            `<div style="margin-top:20px;text-align:center"><span style="display:inline-block;padding:6px 30px 16px;border-radius:22px;background:${i === 1 ? 'var(--g)' : 'var(--ink)'};color:#fff;font:900 56px V">${lb[i]}</span></div></div>`; }).join('') +
-        `<div class="a" style="left:120px;top:1300px;width:840px;height:40px;border-radius:20px;background:#E2DCCF"><div style="width:${(100 * ex(T(t, A + .2, x.z))).toFixed(0)}%;height:100%;border-radius:20px;background:var(--g)"></div></div>` +
-        `<div class="a" style="left:120px;top:1360px;font:900 44px V;color:var(--mu)">تخصص لازم ↑</div>`;
+    case 'dollars': {
+      const ks = [A + .3, at('هشتاد'), at('امروز')], V = [200, 84, 62], C = ['var(--mu)', '#B9B2A4', 'var(--rd)'], lb = ['۹۷ · اول سال', '۹۷ · آخر سال', '۱۴۰۵'];
+      return ground() + pic(s.img, 120, 190, 840, 420, pp(t, A), t, A, '50% 60%') +
+        `<div class="a" style="left:110px;right:110px;top:1380px;height:6px;background:var(--ink)"></div>` +
+        V.map((v, i) => { const k = T(t, ks[i] - .1, ks[i] + .8); if (k <= 0) return '';
+          return bar(150 + i * 290, 1380, 200, 640 * v / 200, k, C[i]) + `<div class="a" style="left:${110 + i * 290}px;top:${(1380 - 640 * v / 200 * ex(k) - 110).toFixed(0)}px;width:280px;text-align:center;font:900 78px V;color:${C[i] === 'var(--rd)' ? 'var(--rd)' : 'var(--ink)'};direction:ltr">$${fa(Math.round(v * ex(k)))}</div>` +
+            `<div class="a" style="left:${110 + i * 290}px;top:1400px;width:280px;text-align:center;font:900 38px V;color:var(--mu)">${lb[i]}</div>`; }).join('') +
+        tag(330, 90, 56, 'حقوق پایهٔ ماهانه به دلار', t, A + .4, 'var(--ink)');
     }
-    case 'steps': {
-      const st = t < at('بررسی') ? 0 : t < at('درستش') ? 1 : 2, kk = [A + .1, at('بررسی'), at('درستش')];
-      const lab = ['سؤال سخت', 'نمره به جواب AI', 'جواب درست'];
-      const stepper = `<div class="a row" style="left:120px;right:120px;top:230px;justify-content:space-between">${lab.map((l, i) => `<div style="text-align:center;width:250px"><div style="margin:0 auto;width:120px;height:120px;border-radius:50%;background:${i <= st ? 'var(--g)' : '#fff'};color:${i <= st ? '#fff' : 'var(--mu)'};font:900 66px/115px V;border:6px solid ${i <= st ? 'var(--g)' : '#E2DCCF'};transform:scale(${(i === st ? 1 + .1 * Math.exp(-6 * (t - kk[i])) : 1).toFixed(3)})">${fa(i + 1)}</div><div style="margin-top:16px;font:900 40px V">${l}</div></div>`).join('')}</div>`;
-      const q = 'اگه موجر قرارداد رو زودتر فسخ کنه، مستأجر چه حقی داره؟', nq = Math.round(q.length * ex(T(t, A + .1, A + 1.6)));
-      const grade = K(L(3, 9, io(T(t, at('بررسی'), at('بررسی') + .8))), 3, 9);
-      const card = `<div class="a" style="left:110px;top:560px;width:860px;padding:40px;border-radius:40px;background:#fff;box-shadow:0 24px 60px rgba(0,0,0,.12);box-sizing:border-box">` +
-        `<div style="font:600 44px/1.5 V">❓ ${q.slice(0, nq)}<span style="opacity:${t * 2 % 1 < .5 ? 1 : 0}">|</span></div>` +
-        `<div style="margin-top:30px;padding:26px;border-radius:26px;background:#F1EDE4;font:600 40px/1.5 V;color:${st >= 2 ? 'var(--g)' : 'var(--rd)'}">🤖 ${st >= 2 ? 'جواب اصلاح‌شده، با استناد به قانون ✓' : 'جواب کلی و ناقص ✗'}</div>` +
-        `<div style="margin-top:34px;font:900 40px V;color:var(--mu)">نمره</div><div style="margin-top:12px;height:30px;border-radius:15px;background:#E2DCCF;position:relative"><div style="width:${(grade * 10).toFixed(0)}%;height:100%;border-radius:15px;background:var(--g)"></div><div style="position:absolute;left:${(grade * 10 - 3).toFixed(0)}%;top:-14px;width:58px;height:58px;border-radius:50%;background:#fff;border:6px solid var(--ink)"></div></div>` +
-        `<div style="margin-top:14px;font:900 64px V;direction:ltr;text-align:left">${fa(Math.round(grade))}/${fa(10)}</div></div>`;
-      return ground() + stepper + card + money(90, 1430, 900, T(t, A, A + .4)) + cur(t, [[A, 900, 1500], [at('بررسی'), 300 + grade * 50, 1180, 1], [at('درستش'), 700, 900, 1], [x.z, 700, 900]]);
+    case 'pct': {
+      const k1 = pp(t, at('بیست') - .05), k2 = pp(t, at('شصت') - .05), ks = ex(T(t, A + .3, A + .7));
+      return ground() + `<div class="a" style="inset:0;opacity:.35"><img src="${U('raw/' + s.img + '.png')}" style="width:1080px;height:1920px;object-fit:cover"></div>` +
+        `<div class="a" style="left:0;right:0;top:380px;text-align:center"><span style="position:relative;display:inline-block;font:900 120px V;color:var(--g)">×۱۵ به تومن<span style="position:absolute;left:0;top:52%;height:12px;width:${(100 * ks).toFixed(0)}%;background:var(--ink)"></span></span></div>` +
+        card(90, 640, 900, 520, `<div style="margin-top:40px;text-align:center;font:900 54px V;color:var(--mu)">به دلار</div>` +
+          `<div style="text-align:center;font:900 150px/1.2 V;color:var(--rd);white-space:nowrap">${fa(Math.round(26 * ex(T(t, A + .2, at('بیست') + .3))))}${k2 > 0 ? ' تا ' + fa(Math.round(26 + 43 * ex(T(t, at('شصت') - .05, at('شصت') + .6)))) : ''}٪</div><div style="text-align:center;font:900 60px V">کمتر</div>`, pp(t, A + .1)) +
+        tag(260, 1200, 52, 'بسته به دلار اول یا آخر ۹۷', t, at('شصت') + .4, 'var(--ink)');
     }
-    case 'proof': {
-      const D2 = [['وکیل حقوق مدنی', 400, A + .1, 'var(--g)'], ['متخصص فیزیک', 170, at('فیزیک') - .1, 'var(--ink)'], ['برنامه‌نویس', 120, at('برنامه‌نویس') - .1, 'var(--vi)']];
-      return ground() + `<div class="a" style="left:0;right:0;top:200px;text-align:center">${up('<span dir="ltr">Bloomberg</span> · سقف ساعتی آگهی‌ها', T(t, A, A + .4), 64)}</div>` +
-        D2.map(([l, v, t0, col], i) => { const k = T(t, t0, t0 + .9), w = 820 * v / 400 * ex(k); if (k <= 0) return `<div class="a" style="left:130px;top:${420 + i * 300}px;font:900 50px V;color:#C9C2B4">${l}</div><div class="a" style="left:130px;top:${490 + i * 300}px;width:820px;height:120px;border-radius:24px;border:5px dashed #D6CFC1;box-sizing:border-box"></div>`;
-          return `<div class="a" style="left:130px;top:${420 + i * 300}px;font:900 50px V">${l}</div>` +
-            `<div class="a" style="left:130px;top:${490 + i * 300}px;width:${w.toFixed(0)}px;height:120px;border-radius:24px;background:${col}"></div>` +
-            (w > 520 ? `<div class="a" style="left:${(130 + w - 330).toFixed(0)}px;top:${500 + i * 300}px;width:300px;text-align:right;font:900 90px V;color:#fff;direction:ltr">$${num(v, k)}</div>` : `<div class="a" style="left:${(150 + Math.max(w, 10)).toFixed(0)}px;top:${495 + i * 300}px;font:900 96px V;color:${col};direction:ltr">$${num(v, k)}</div>`); }).join('') +
-        `<div class="a" style="left:130px;top:1340px;font:900 40px V;color:var(--mu)">در ساعت · ${fa(16)} اکتبر ${fa(2026)}</div>`;
+    case 'split': {
+      const ka = pp(t, at('اجاره') - .05), kg = pp(t, at('گوشی') - .05);
+      const col = (x0, head, items, k0, bg, fg) => card(x0, 330, 440, 900, `<div style="margin:40px 0 20px;text-align:center;font:900 64px V;color:${fg}">${head}</div>` +
+        items.map((it, i) => `<div style="margin:22px 34px;padding:24px;border-radius:30px;background:rgba(255,255,255,.75);font:900 56px V;color:var(--ink);transform:scale(${K(pp(t, k0 + i * .35), 0, 1.06).toFixed(3)})">${it}</div>`).join(''), pp(t, k0 - .2), bg);
+      return ground() + col(80, 'به تومن', ['🏠 اجاره', '🍞 نون'], at('اجاره'), 'var(--gl)', 'var(--g)') +
+        col(560, 'به دلار', ['📱 گوشی', '💊 دارو', '💻 لپ‌تاپ'], at('گوشی'), '#FBE3E0', 'var(--rd)') +
+        tag(330, 1260, 56, 'وارداتی‌ها → عدد دلاری', t, at('گوشی') + .8, 'var(--ink)');
     }
-    case 'avg': {
-      const k = T(t, A + .1, at('۱۱۰') + .3), ang = L(-120, L(-120, 120, 110 / 400), ex(k));
-      return ground() + `<div class="a row" style="left:0;right:0;top:220px;justify-content:center;gap:24px;direction:ltr">${logo(110)}${up('Mercor', T(t, A, A + .4), 90)}</div>` +
-        `<svg class="a" style="left:190px;top:470px;overflow:visible" width="700" height="420"><path d="M60 380 A290 290 0 0 1 640 380" fill="none" stroke="#E2DCCF" stroke-width="54" stroke-linecap="round"/>` +
-        `<path d="M60 380 A290 290 0 0 1 640 380" fill="none" stroke="var(--g)" stroke-width="54" stroke-linecap="round" stroke-dasharray="912" stroke-dashoffset="${(912 * (1 - 110 / 400 * ex(k))).toFixed(0)}"/>` +
-        `<line x1="350" y1="380" x2="${(350 + 250 * Math.sin(ang * Math.PI / 180)).toFixed(0)}" y2="${(380 - 250 * Math.cos(ang * Math.PI / 180)).toFixed(0)}" stroke="var(--ink)" stroke-width="16" stroke-linecap="round"/><circle cx="350" cy="380" r="26" fill="var(--ink)"/></svg>` +
-        `<div class="a" style="left:0;right:0;top:930px;text-align:center;font:900 170px V;color:var(--g);direction:ltr">$${num(110, k)}</div>` +
-        `<div class="a" style="left:0;right:0;top:1150px;text-align:center;font:900 52px V">میانگین ساعتی</div>` +
-        `<div class="a" style="left:0;right:0;top:1260px;text-align:center;font:600 42px V;color:var(--mu)">به گفتهٔ خود Mercor</div>`;
-    }
-    case 'cap': {
-      const ks = T(t, at('سقف') - .05, at('سقف') + .25), k = pp(t, A + .05);
-      const ad = `<div class="a" style="left:130px;top:330px;width:820px;padding:50px;border-radius:44px;background:#fff;box-shadow:0 24px 60px rgba(0,0,0,.12);box-sizing:border-box;transform:scale(${k.toFixed(3)})">` +
-        `<div style="font:900 40px V;color:var(--mu)">آگهی شغلی</div><div style="font:900 70px V;margin-top:10px">وکیل حقوق مدنی</div><div style="font:900 120px V;color:var(--g);direction:ltr;margin-top:20px">≤ $${fa(400)}/h</div>` +
-        `<div style="margin-top:20px;height:22px;border-radius:11px;background:#E2DCCF;width:100%"><div style="width:${(30 + 70 * ex(T(t, A + .2, A + 1.4))).toFixed(0)}%;height:100%;border-radius:11px;background:var(--ink)"></div></div><div style="font:600 36px V;color:var(--mu);margin-top:12px">بازهٔ واقعی: کمتر تا این سقف</div></div>`;
-      return ground() + ad + (ks > 0 ? `<div class="a" style="left:230px;top:960px;padding:16px 50px 30px;border:12px solid var(--rd);border-radius:26px;color:var(--rd);font:900 100px V;background:rgba(246,241,231,.94);transform:rotate(-7deg) scale(${L(1.8, 1, ex(ks)).toFixed(3)})">فقط سقف آگهی</div>` : '') +
-        `<div class="a" style="left:130px;top:1260px;font:900 48px V">${up('نه درآمد تضمینی', T(t, at('همیشگی') - .05, at('همیشگی') + .3), 60, 'var(--ink)')}</div>`;
-    }
-    case 'twist': {
-      const k = T(t, A, A + .5), kf = T(t, at('درس') - .1, x.z), kj = T(t, at('جاشونو') - .1, at('جاشونو') + .7);
-      const dots = Array.from({length: 7}, (_, i) => { const u = ((NOW * 1.4 + i / 7) % 1); return `<div class="a" style="left:${L(520, 640, u).toFixed(0)}px;top:${(700 - 40 * Math.sin(u * Math.PI)).toFixed(0)}px;width:26px;height:26px;border-radius:50%;background:var(--g);opacity:${(kf > 0 ? 1 : 0)}"></div>`; }).join('');
-      return ground() + pic('s10', 80, 300, 440, 700, k, t, A, '45% 30%') +
-        `<div class="a" style="left:660px;top:470px;width:340px;height:440px;border-radius:40px;background:var(--ink);color:#fff;text-align:center;transform:scale(${pp(t, A + .2).toFixed(3)})"><div style="font:900 150px/300px V;direction:ltr">AI</div><div style="font:900 40px V">مهارت</div><div style="margin:20px 40px 0;height:22px;border-radius:11px;background:#333"><div style="width:${(20 + 75 * ex(kf)).toFixed(0)}%;height:100%;border-radius:11px;background:#7CF0A9"></div></div></div>` +
-        dots + `<div class="a" style="left:80px;top:1060px;width:900px">${up('متخصص ← دانش ← AI', T(t, at('درس') - .05, at('درس') + .4), 64)}</div>` +
-        tag(560, 1130, 56, 'شاید؟', t, at('شاید') - .05, 'var(--rd)', '#fff');
+    case 'prompt': {
+      const kt = T(t, at('جمله') + .2, at('جمله') + 3.2), kf = pp(t, at('منبع') - .3), msg = 'حقوق سال اولم و امسالم رو با دلار همون روزها مقایسه کن';
+      return ground() + card(90, 220, 900, 980, `<div style="padding:34px 44px;border-bottom:3px solid #EEE7DA;font:900 50px V">💬 چت‌بات</div>` +
+          (kt > 0 ? `<div style="margin:40px 40px 0;padding:30px 36px;border-radius:36px;background:var(--ink);color:#fff;font:900 52px/1.45 V">${msg.slice(0, Math.max(1, Math.round(msg.length * K(kt))))}${kt < 1 ? '▌' : ''}</div>` : `<div style="margin:40px;font:900 46px V;color:var(--mu)">یه جمله بنویس…▌</div>`) +
+          (kf > 0 ? `<div style="margin:36px 40px 0;padding:30px 36px;border-radius:36px;background:var(--gl);font:900 50px/1.5 V;transform:scale(${K(kf, 0, 1.04).toFixed(3)})">حقوق ÷ نرخ دلار همون روز<br>= <span style="color:var(--g)">حقوقت به دلار</span></div>` : ''), pp(t, A + .05)) +
+        tag(250, 1240, 56, '✓ نرخ‌ها رو خودت بده', t, at('منبع') + .1) +
+        cur(t, [[A, 900, 1500], [at('جمله'), 820, 560, 1], [at('منبع'), 600, 900, 1], [x.z, 600, 1000]]);
     }
     case 'ask': {
-      const k = T(t, A, A + .4), q = 'تو حاضری به AI درس بدی؟', nq = Math.round(q.length * ex(T(t, A + .1, A + 1.2)));
-      return ground() + `<div class="a" style="left:120px;top:380px;width:840px;padding:50px;border-radius:44px;background:#fff;box-shadow:0 24px 60px rgba(0,0,0,.12);box-sizing:border-box;transform:scale(${L(.8, 1, ex(k)).toFixed(3)})"><div style="font:900 74px/1.4 V">${q.slice(0, nq)}<span style="opacity:${t * 2 % 1 < .5 ? 1 : 0}">|</span></div></div>` +
-        ['آره، چرا نه', 'نه، جاشونو می‌گیره', 'بستگی داره'].map((c, i) => tag(160 + (i % 2) * 330, 760 + i * 170, 60, c, t, A + .6 + i * BEAT / 2, i ? '#fff' : 'var(--g)', i ? 'var(--ink)' : '#fff')).join('') +
-        `<div class="a" style="left:120px;top:1300px;width:840px;height:120px;border-radius:30px;background:var(--ink);color:#fff;text-align:center;font:900 60px/110px V;transform:scale(${pp(t, at('کامنت')).toFixed(3)})">💬 کامنت کن</div>` +
-        `<div class="a" style="left:640px;top:250px;font:900 80px V;color:var(--g);direction:ltr">$${num(L(400, 110, ex(T(t, A + .2, A + 1.2))), 1)}</div>` +
-        cur(t, [[A, 900, 1500], [at('کامنت'), 540, 1360, 1], [x.z, 540, 1360]]);
+      const kt = T(t, A + .4, at('کامنت') + .2), kc = pp(t, at('کامنت') - .05), msg = 'حقوق من الان: … دلار';
+      return ground() + `<div class="a" style="inset:0;opacity:.5"><img src="${U('raw/' + s.img + '.png')}" style="width:1080px;height:1920px;object-fit:cover;transform:scale(${L(1.05, 1.15, T(t, A, x.z)).toFixed(4)})"></div>` +
+        card(90, 520, 900, 520, `<div style="padding:34px 44px;font:900 50px V;color:var(--mu)">کامنت‌ها</div><div style="margin:0 40px;padding:34px;border-radius:30px;background:#F3EEE4;font:900 60px V">${msg.slice(0, Math.round(msg.length * K(kt)))}${kt < 1 ? '▌' : ''}</div>` +
+          `<div style="margin:30px 40px;text-align:left"><span style="display:inline-block;padding:14px 44px 24px;border-radius:26px;background:var(--g);color:#fff;font:900 52px V;transform:scale(${(kc > 0 ? 1 + .15 * Math.exp(-((t - at('کامنت')) ** 2) / .02) : 1).toFixed(3)})">ارسال</span></div>`, pp(t, A + .05)) +
+        tag(230, 1120, 60, 'بفرست برای همکارت ↗', t, at('همکارت') - .1, 'var(--ink)') +
+        cur(t, [[A, 900, 1500], [at('کامنت'), 230, 960, 1], [x.z, 300, 1000]]);
     }
   }
   return ground();
 }
+
 // end title: the green card from the hook comes back as the end card (final frame echoes the first idea)
 function endCard(u) {
   const w = L(200, 860, ex(T(u, 0, .5)));
   return ground() + `<div class="a" style="left:${540 - w / 2}px;top:560px;width:${w}px;height:260px;border-radius:60px;background:var(--g)"></div>` +
-    `<div class="a" style="left:0;right:0;top:600px;text-align:center;color:#fff">${up(`تا ${fa(400)} دلار در ساعت`, T(u, .3, .7), 96, '#fff')}</div>` +
+    `<div class="a" style="left:0;right:0;top:600px;text-align:center;color:#fff">${up(`<span dir="ltr">$${fa(200)} → $${fa(62)}</span>`, T(u, .3, .7), 110, '#fff')}</div>` +
     `<div class="a" style="left:0;right:0;top:920px;text-align:center">${up((S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--g)">$1</span>'), T(u, .5, .9), 92)}</div>` +
     `<div class="a" style="left:0;right:0;top:1100px;text-align:center;font:600 56px V;color:var(--mu);opacity:${T(u, .8, 1.1).toFixed(2)}">${S.end_sub || ''} · ${S.handle || ''}</div>`;
 }
