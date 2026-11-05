@@ -60,7 +60,7 @@ def main():
     else: run('ffmpeg', '-y', '-loglevel', 'error', '-i', str(LOGO), '-i', str(out / 'news.mp4'), '-filter_complex',
         f"[0:v]fps=30,trim=0:{START + 0.3},setpts=PTS-STARTPTS[a];[1:v]fps=30,setpts=PTS-STARTPTS[b];"
         f"[a][b]xfade=transition=fade:duration=0.3:offset={START}[v]",
-        '-map', '[v]', '-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-pix_fmt', 'yuv420p', str(out / 'video.mp4'))
+        '-map', '[v]', '-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-maxrate', '12M', '-bufsize', '24M', '-pix_fmt', 'yuv420p', str(out / 'video.mp4'))
     # audio
     ins, f, voice, fx = [], [], [], []
 
