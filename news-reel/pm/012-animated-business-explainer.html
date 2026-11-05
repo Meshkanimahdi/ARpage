@@ -145,7 +145,7 @@ function cur(t, path) { let i = 0; for (let j = 0; j < path.length; j++) if (t >
   const p = path[i], q = path[Math.min(i + 1, path.length - 1)], m = q === p ? 0 : io(T(t, p[0] + .1, q[0]));
   let pr = 0; for (const c of path) if (c[3]) pr = Math.max(pr, Math.exp(-((t - c[0]) ** 2) / .006)); return curs(L(p[1], q[1], m), L(p[2], q[2], m), pr); }
 function money(x0, y0, w, k) { // ticker strip of hourly earnings
-  return `<div class="a" style="left:${x0}px;top:${y0}px;width:${w}px;height:90px;border-radius:45px;background:var(--ink);overflow:hidden;opacity:${K(k * 3).toFixed(2)}"><div class="a" style="left:${(-(NOW * 220) % 600).toFixed(0)}px;top:14px;white-space:nowrap;font:900 52px V;color:#7CF0A9;direction:ltr">MAX $400 · $170 · $120 · AVG $110 · MAX $400 · $170 · $120 · AVG $110</div></div>`; }
+  return `<div class="a" style="left:${x0}px;top:${y0}px;width:${w}px;height:90px;border-radius:45px;background:var(--ink);overflow:hidden;opacity:${K(k * 3).toFixed(2)}"><div class="a" style="left:${(-(NOW * 220) % 600).toFixed(0)}px;top:14px;white-space:nowrap;font:900 52px V;color:#7CF0A9;direction:ltr">97: $200 · $84 → 1405: $62 · ×15 TOMAN · $1 = 5,500 → 270,000 · 97: $200 · $84 → 1405: $62 · ×15 TOMAN · $1 = 5,500 → 270,000</div></div>`; }
 
 // ---------- captions: spoken words in chunks of ≤ 4, cream pill with ink type, accent in green ----------
 function cap(x, t) {
@@ -173,14 +173,14 @@ function scene(x, t) {
         `<div class="a" style="left:0;right:0;top:700px;height:1220px;background:linear-gradient(rgba(246,241,231,0),var(--cr) 30%)"></div>` +
         `<div class="a" style="left:30px;right:30px;top:860px;text-align:center;font-size:112px;line-height:1.2"><div>اگه حقوقت رو</div><div><span style="display:inline-block;padding:0 30px 16px;border-radius:26px;background:var(--g);color:#fff">به دلار</span> ببینی چی؟</div></div>` +
         card(80, 1210, 440, 300, `<div style="margin-top:34px;text-align:center;font:900 44px V;color:var(--mu)">به تومن</div><div style="text-align:center;font:900 150px/1.1 V;color:var(--g);direction:ltr">×${fa(tm)}</div>`, pp(t, .05)) +
-        (t > .3 ? money(90, 1560, 900, T(t, .3, .7)) : '') + card(560, 1210, 440, 300, `<div style="margin-top:34px;text-align:center;font:900 40px V;color:var(--mu)">به دلار · ۹۷ → امروز</div><div style="text-align:center;font:900 150px/1.1 V;color:var(--rd);direction:ltr">$${fa(dl)}</div>`, kd);
+        (t > .3 && t < x.at('حداقل') - .1 ? money(90, 1560, 900, T(t, .3, .7)) : '') + card(560, 1210, 440, 300, `<div style="margin-top:34px;text-align:center;font:900 40px V;color:var(--mu)">به دلار · ۹۷ → امروز</div><div style="text-align:center;font:900 150px/1.1 V;color:var(--rd);direction:ltr">$${fa(dl)}</div>`, kd);
     }
     case 'wage': {
       const k1 = T(t, A + .2, at('یک') + .9), k2 = T(t, at('امسال') - .1, at('امسال') + 1.2), kb = pp(t, at('امسال') - .1);
       return ground() + pic('g', 120, 200, 840, 520, pp(t, A), t, A, '50% 40%') +
-        card(80, 780, 440, 560, `<div style="margin:30px 0 0;text-align:center;font:900 64px V">۱۳۹۷</div><div style="text-align:center;font:900 54px V;color:var(--ink);direction:ltr">${comma(1114000 * ex(k1))}</div><div style="text-align:center;font:600 36px V;color:var(--mu)">تومن در ماه</div>` + bar(170, 530, 100, 40, k1, 'var(--mu)'), pp(t, A + .1)) +
-        card(560, 780, 440, 560, `<div style="margin:30px 0 0;text-align:center;font:900 64px V">۱۴۰۵</div><div style="text-align:center;font:900 54px V;color:var(--g);direction:ltr">${comma(16625550 * ex(k2))}</div><div style="text-align:center;font:600 36px V;color:var(--mu)">تومن در ماه</div>` + bar(170, 530, 100, 300, k2, 'var(--g)'), kb) +
-        tag(380, 90, 64, '×۱۵ به تومن', t, at('امسال') + .9);
+        card(80, 780, 440, 560, `<div style="margin:30px 0 0;text-align:center;font:900 64px V">۱۳۹۷</div><div style="text-align:center;font:900 54px V;color:var(--ink);direction:ltr">${comma(1114000 * ex(k1))}</div><div style="text-align:center;font:600 36px V;color:var(--mu)">تومن در ماه</div>` + bar(170, 545, 100, 14, k1, 'var(--mu)'), pp(t, A + .1)) +
+        card(560, 780, 440, 560, `<div style="margin:30px 0 0;text-align:center;font:900 64px V">۱۴۰۵</div><div style="text-align:center;font:900 54px V;color:var(--g);direction:ltr">${comma(16625550 * ex(k2))}</div><div style="text-align:center;font:600 36px V;color:var(--mu)">تومن در ماه</div>` + bar(170, 545, 100, 190, k2, 'var(--g)'), kb) +
+        tag(380, 150, 64, '×۱۵ به تومن', t, at('امسال') + .9);
     }
     case 'rate': {
       // three real points only (no invented curve between them): start of 97, end of 97, Aban 1405; log-scaled height
@@ -200,14 +200,14 @@ function scene(x, t) {
         V.map((v, i) => { const k = T(t, ks[i] - .1, ks[i] + .8); if (k <= 0) return '';
           return bar(150 + i * 290, 1380, 200, 640 * v / 200, k, C[i]) + `<div class="a" style="left:${110 + i * 290}px;top:${(1380 - 640 * v / 200 * ex(k) - 110).toFixed(0)}px;width:280px;text-align:center;font:900 78px V;color:${C[i] === 'var(--rd)' ? 'var(--rd)' : 'var(--ink)'};direction:ltr">$${fa(Math.round(v * ex(k)))}</div>` +
             `<div class="a" style="left:${110 + i * 290}px;top:1400px;width:280px;text-align:center;font:900 38px V;color:var(--mu)">${lb[i]}</div>`; }).join('') +
-        tag(330, 90, 56, 'حقوق پایهٔ ماهانه به دلار', t, A + .4, 'var(--ink)');
+        tag(330, 120, 56, 'حقوق پایهٔ ماهانه به دلار', t, A + .4, 'var(--ink)');
     }
     case 'pct': {
       const k1 = pp(t, at('بیست') - .05), k2 = pp(t, at('شصت') - .05), ks = ex(T(t, A + .3, A + .7));
       return ground() + `<div class="a" style="inset:0;opacity:.35"><img src="${U('raw/' + s.img + '.png')}" style="width:1080px;height:1920px;object-fit:cover"></div>` +
         `<div class="a" style="left:0;right:0;top:380px;text-align:center"><span style="position:relative;display:inline-block;font:900 120px V;color:var(--g)">×۱۵ به تومن<span style="position:absolute;left:0;top:52%;height:12px;width:${(100 * ks).toFixed(0)}%;background:var(--ink)"></span></span></div>` +
         card(90, 640, 900, 520, `<div style="margin-top:40px;text-align:center;font:900 54px V;color:var(--mu)">به دلار</div>` +
-          `<div style="text-align:center;font:900 150px/1.2 V;color:var(--rd);white-space:nowrap">${fa(Math.round(26 * ex(T(t, A + .2, at('بیست') + .3))))}${k2 > 0 ? ' تا ' + fa(Math.round(26 + 43 * ex(T(t, at('شصت') - .05, at('شصت') + .6)))) : ''}٪</div><div style="text-align:center;font:900 60px V">کمتر</div>`, pp(t, A + .1)) +
+          `<div style="text-align:center;font:900 150px/1.2 V;color:var(--rd);white-space:nowrap">${fa(Math.round(26 * ex(T(t, A + .2, A + .5))))}${k2 > 0 ? ' تا ' + fa(Math.round(26 + 43 * ex(T(t, at('شصت') - .05, at('شصت') + .3)))) : ''}٪</div><div style="text-align:center;font:900 60px V">کمتر</div>`, pp(t, A + .1)) +
         tag(260, 1200, 52, 'بسته به دلار اول یا آخر ۹۷', t, at('شصت') + .4, 'var(--ink)');
     }
     case 'split': {
