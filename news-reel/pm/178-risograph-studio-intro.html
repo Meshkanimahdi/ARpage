@@ -99,16 +99,18 @@ window.ready = (async () => {
   }
   B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
   await Promise.all([S.logo || 'pinterest.png', ...(S.preload || []), ...S.beats.map(b => (b.scene || {}).photo).filter(Boolean)].map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + f); })));
-  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'دنیای بازی Genie')));
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'بچه حفظ مهارت')));
   window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
   const SC = [];
   for (const b of B) {
     const pts = [b.a, ...b.kt.filter(h => h > b.a + .9 && h < b.b - .9)];
     if (b.sc.extra_hits) b.sc.extra_hits.forEach(j => { const h = b.wt(j); if (h > b.a + .9 && h < b.b - .9) pts.push(h); });
-    const ps = [...new Set(pts.map(x => +x.toFixed(2)))].sort((p, q) => p - q);
-    ps.forEach((p, i) => SC.push({t0: p, t1: i + 1 < ps.length ? ps[i + 1] : b.b, type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: i ? [[p, 'pop', .3]] : (SFX[b.sc.type] || (() => [[p, 'pop', .3]]))(b, p)}));
+    const pz = [...new Set(pts.map(x => +x.toFixed(2)))].sort((p, q) => p - q), fill = [];
+    [...pz, b.b].forEach((q, i, arr) => { if (!i) return; const g = q - arr[i - 1], n = Math.ceil(g / 2.7) - 1; for (let j = 1; j <= n; j++) fill.push(+(arr[i - 1] + g * j / (n + 1)).toFixed(2)); });
+    const ps = [...pz, ...fill].sort((p, q) => p - q);
+    ps.forEach((p, i) => SC.push({t0: p, t1: i + 1 < ps.length ? ps[i + 1] : b.b, type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: i ? [[p, ['tap', 'notify', 'glass_ping', 'hit'][(i + b.i) % 4], .3]] : (SFX[b.sc.type] || (() => [[p, 'tap', .3]]))(b, p)}));
   }
-  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .2, 'shimmer', .45]]});
+  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .2, 'glass_ping', .45]]});
   SC.forEach(c => c.sfx = c.sfx.filter(x => x[0] < c.t1 + .5));
   window.SCENES = SC;
   for (const s of SC) if (s.t1 - s.t0 > 3.2) ISSUES.push(`idea ${s.bg} holds ${(s.t1 - s.t0).toFixed(1)} s (> 3): add a hit`);
@@ -117,20 +119,15 @@ window.ready = (async () => {
 // motion-matched sound cues per scene (STORY_SPEC "Sound design"): typing for the prompt box, taps for keys and buttons,
 // a shimmer when a world is revealed, ticks for counters, a hit for the ×2 stamp; never a whoosh on every cut
 const SFX = {
-  hook: (b, p) => [[.05, 'typing', .35], [.6, 'tap', .4], [1.0, 'shimmer', .35], [1.1, 'tap', .4]],
-  type: (b, p) => [[p + .05, 'pop', .3], [W(b, 'پیست') - .2, 'typing', .4], [Math.min(b.b - .5, W(b, 'پیست') + 1.1), 'click', .45]],
-  reveal: (b, p) => [[p + .02, 'glass_ping', .4], [W(b, 'واقعی'), 'pop', .3]],
-  walk: (b, p) => [[p + .05, 'tap', .4], [W(b, 'راه'), 'tap', .4], [W(b, 'دوربین'), 'sweep_soft', .3]],
-  steer: (b, p) => [[W(b, 'بارون') - .3, 'typing', .4], [W(b, 'بارون') + .4, 'sweep_soft', .3]],
-  steer2: (b, p) => [[p + .05, 'pop', .3], [W(b, 'زاویه'), 'click', .35], [W(b, 'آدم'), 'pop', .35]],
-  sound: (b, p) => [[W(b, 'صدا'), 'shimmer', .35], [W(b, 'دیالوگ'), 'notify', .35]],
-  minutes: (b, p) => [[p + .1, 'counter_tick', .35], [W(b, 'برابر'), 'hit', .45]],
-  director: (b, p) => [[p + .05, 'glass_ping', .35], [W(b, 'قدم'), 'tap', .35], [W(b, 'فریم'), 'sweep_soft', .3]],
-  uses: (b, p) => [[W(b, 'بازی'), 'pop', .35], [W(b, 'آموزش'), 'pop', .3], [W(b, 'ربات'), 'pop', .35]],
-  film: (b, p) => [[W(b, 'طرح'), 'click', .45], [p + .4, 'tap', .3]],
-  limits: (b, p) => [[W(b, 'کامل'), 'bass_drop', .4], [W(b, 'جزئیات'), 'hit', .4]],
-  access: (b, p) => [[p + 1.1, 'click', .45], [W(b, 'مشترک'), 'shimmer', .35]],
-  ask: (b, p) => [[p + .05, 'typing', .3], [W(b, 'کامنت'), 'notify', .4]],
+  hook: (b, p) => [[.3, 'bass_drop', .35], [.6, 'tap', .35], [.9, 'notify', .3]],
+  tech: (b, p) => [[p + .05, 'whoosh', .25]],
+  human: (b, p) => [[p + .05, 'glass_ping', .3]],
+  versus: (b, p) => [[p + .05, 'tap', .35]],
+  do1: (b, p) => [[p + .05, 'hit', .35]],
+  do2: (b, p) => [[p + .05, 'notify', .35]],
+  do3: (b, p) => [[p + .05, 'hit', .35]],
+  age: (b, p) => [[p + .05, 'riser', .3]],
+  ask: (b, p) => [[p + .05, 'notify', .3]],
 };
 function seek(t) {
   if (!B.length) return;
@@ -147,7 +144,7 @@ function seek(t) {
 }
 function caption(b, t, endOn) {
   const sub = $('sub');
-  if (endOn || t > b.L.end + .3 || (b.sc.type === 'hook' && t < b.wt(6) - .05)) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  if (endOn || t > b.L.end + .3 || (b.sc.type === 'hook' && t < b.wt(4) - .05)) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
   let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
   const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + c0;
   if (sub._k !== key) { sub._k = key; const lat = w => /^[«]?[A-Za-z0-9.\-]+[،,.!?؟…؛»]*$/.test(w.w); const gs = [];
@@ -225,184 +222,99 @@ const bigT = (txt, y, size, col, k, sh = INK.pink) => `<div class="t" style="top
 function scene(b, t, u, si, off) {
   const s = b.sc, kt = b.kt, A = b.a, B1 = b.b;
   let r = blocks(si, pr(t, (window.SCENES[si] || {}).t0 || 0, ((window.SCENES[si] || {}).t0 || 0) + .5), t);
+  const K = j => kt[Math.min(j, kt.length - 1)] || A;                 // time of the j-th highlighted phrase
+  const big = (txt, x, y, size, bg, fg, k, rot = -4) => { const e = spring(k); return k <= 0 ? '' : `<div style="position:absolute;left:${x}px;top:${y}px;padding:0 ${size * .28}px ${size * .12}px;border-radius:${size * .2}px;background:${bg};color:${fg};font:900 ${size}px/1.2 V;transform:rotate(${rot}deg) scale(${e.toFixed(3)});box-shadow:14px 14px 0 ${INK.ink}">${txt}</div>`; };
+  const card = (x, y, w, h, bg, html, k, rot = 0) => { const e = spring(k); return k <= 0 ? '' : `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${bg};border:8px solid ${INK.ink};border-radius:34px;box-shadow:14px 14px 0 ${INK.ink};transform:rotate(${rot}deg) scale(${e.toFixed(3)});display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font:900 64px/1.25 V;color:${INK.ink}">${html}</div>`; };
   switch (s.type) {
     case 'hook': {
-      // frame 0: the official neon-city world full-bleed and already rendering out of the prompt (a sharp colour pass grows
-      // from the cursor), the headline huge from frame 0, arrow keys driving the camera; at 1.4 s the next prompt
-      // «A backyard race track.» grows a second official world out of the box (circle mask), and the keys drive through it
-      const tap1 = .5, tap2 = 1.0, nud = (t >= tap1 ? 30 * ex(pr(t, tap1, tap1 + .4)) : 0) - (t >= tap2 ? 50 * ex(pr(t, tap2, tap2 + .4)) : 0);
-      const z = 1.0 + .16 * io(pr(t, 0, 1.6)), rv = ex(pr(t, .1, .7)), sw = 1.4, k2 = ex(pr(t, sw, sw + .5));
-      r = bleed(s.photo, z, `${50 + nud / 8}% 50%`, 'filter:blur(3px) grayscale(.3) brightness(1.2)');
-      r += `<div style="position:absolute;inset:0;clip-path:circle(${(60 + 1900 * rv).toFixed(0)}px at 430px 1250px)">${bleed(s.photo, z, `${50 + nud / 8}% 50%`)}</div>`;
-      if (t >= sw) { const z2 = 1.12 + .14 * io(pr(t, sw, B1)), px = mix(14, 22, io(pr(t, sw + .4, B1)));
-        r += `<div style="position:absolute;inset:0;clip-path:circle(${(40 + 1500 * k2).toFixed(0)}px at 540px 1260px)">${photoCard('g5.jpg', 50, 590, 980, 980, -2, z2 - .1, `50% ${mix(50, 62, io(pr(t, sw, B1)))}%`)}</div>`; }
-      r += `<div style="position:absolute;left:0;right:0;top:0;height:640px;background:linear-gradient(rgba(29,26,47,.8),rgba(29,26,47,.4) 65%,rgba(29,26,47,0))"></div>`;
-      r += `<div class="t" style="top:250px;font-size:124px;color:#fff;mix-blend-mode:normal;text-shadow:7px 7px 0 ${INK.pink}"><span dir="ltr">Google</span> با یه جمله</div>`;
-      r += `<div class="t" style="top:405px;font-size:124px;color:#fff;mix-blend-mode:normal;text-shadow:7px 7px 0 ${INK.blue}"><span style="background:${INK.yel};color:${INK.ink};padding:0 .16em .06em;border-radius:.14em;text-shadow:none">دنیای بازی</span> می‌سازه</div>`;
-      const second = t >= sw - .5, txt = second ? 'A backyard race track.' : 'A neon city at night', kb = second ? cl(.15 + (t - (sw - .5)) * 1.4) : cl(.45 + u * 1.1);
-      if (t < sw + .35) r += promptBox(110, 1170, 860, 'Describe a world', txt, kb, t);
-      const act = t >= tap2 && t < tap2 + .25 ? 'left' : t >= tap1 && t < tap1 + .25 ? 'up' : t > sw + .6 && Math.floor(t * 3) % 2 === 0 ? 'up' : '';
-      const mv = ex(pr(t, sw, sw + .4));
-      r += keys(mix(760, 790, mv), mix(960, 1290, mv), 1.4, act, t);
-      r += logoChip(mix(90, 70, mv), mix(1000, 560, mv), 96, 'genie.png', pr(t, .8, 1.2), 'Genie 4');
-      if (t >= sw + .3) r += chip(700, 560, `دنیا ${fa(2)}`, INK.yel, INK.ink, 64, pr(t, sw + .3, sw + .6), 4);
+      // frame 0: the workbook photo printed full-bleed, the headline from frame 0; the 39% stamp slams on its word,
+      // the WEF chip and «تا ۲۰۳۰» chip land on beats; riso passes misregister on every cut
+      const z = 1.0 + .14 * io(pr(t, 0, 2.2));
+      r = bleed(s.photo, z, '50% 45%');
+      r += `<div style="position:absolute;left:0;right:0;top:0;height:760px;background:linear-gradient(rgba(29,26,47,.82),rgba(29,26,47,.5) 70%,rgba(29,26,47,0))"></div>`;
+      r += `<div class="t" style="top:230px;font-size:132px;color:#fff;mix-blend-mode:normal;text-shadow:8px 8px 0 ${INK.blue};transform:scale(${mix(1.12, 1, ex(pr(t, 0, .25))).toFixed(3)})">بچه‌ت فقط</div>`;
+      r += `<div class="t" style="top:400px;font-size:132px;color:#fff;mix-blend-mode:normal;text-shadow:8px 8px 0 ${INK.pink}"><span style="display:inline-block;background:${INK.yel};color:${INK.ink};padding:0 .16em .06em;border-radius:.14em;text-shadow:none;transform:rotate(${(-6 * (1 - ex(pr(t, .1, .4)))).toFixed(2)}deg) scale(${mix(1.3, 1, ex(pr(t, .1, .4))).toFixed(3)})">حفظ</span> می‌کنه؟</div>`;
+      r += big(`${fa(39)}٪`, 110, 930, 220, INK.pink, '#fff', pr(t, .3, .7), -6);
+      r += chip(560, 980, 'تا ۲۰۳۰', INK.yel, INK.ink, 80, pr(t, .6, .9), 4);
+      r += chip(250, 1120, 'مهارت‌های اصلی عوض می‌شه', '#fff', INK.ink, 58, pr(t, .9, 1.2), -2);
+      r += logoChip(110, 1240, 96, 'wef.png', pr(t, Math.max(1.8, b.wt(5) - .1), Math.max(2.1, b.wt(5) + .2)), 'World Economic Forum');
       return r;
     }
-    case 'type': {
-      // rebuilt Project Genie input card: Environment field types «A backyard race track.», mode chips light, cursor clicks Create
-      const t1 = W(b, 'پیست'), tc = Math.min(B1 - .5, t1 + 1.1);
-      r += bigT('یه جمله تایپ کن', 250, 112, INK.ink, pr(t, A, A + .4), INK.yel);
-      r += promptBox(90, 560, 900, 'Environment', 'A backyard race track.', pr(t, t1 - .3, t1 + .9), t);
-      r += promptBox(90, 860, 900, 'Character', 'A blue sports car', pr(t, A + .3, A + 1.2), t, false);
-      ['Third person', 'Real-time', 'Audio on'].forEach((c, i) => { const tq = A + .9 + i * .25; if (t >= tq) r += chip(90 + i * 310, 1160, c, [INK.yel, INK.pink, INK.green][i], INK.ink, 46, pr(t, tq, tq + .3), 0, true); });
-      const bx = 700, by = 1290, press = t >= tc ? Math.exp(-10 * (t - tc)) : 0;
-      r += `<div dir="ltr" style="position:absolute;left:${bx}px;top:${by}px;padding:16px 46px 22px;border-radius:50px;background:${INK.red};color:#fff;font:900 56px V;box-shadow:10px 10px 0 ${INK.ink};transform:scale(${1 - .12 * press})">Create ↵</div>`;
-      r += cursor(mix(560, bx + 150, ex(pr(t, tc - .8, tc))), mix(1500, by + 40, ex(pr(t, tc - .8, tc))), t, tc);
+    case 'tech': {
+      const L3 = [['هوش مصنوعی و داده', INK.pink], ['امنیت سایبری', INK.blue], ['سواد فناوری', INK.green]];
+      r += type('سریع‌ترین رشد', 230, 120, INK.ink, INK.yel, pr(t, A, A + .5), off);
+      L3.forEach((l, i) => { r += card(110 + (i % 2) * 40, 470 + i * 300, 860, 240, l[1], `<span style="color:#fff;font-size:76px">${l[0]}</span>`, pr(t, K(i) - .1, K(i) + .3), i % 2 ? 2 : -2); });
+      r += logoChip(330, 1290, 80, 'wef.png', pr(t, A + .3, A + .6), 'Future of Jobs 2025');
       return r;
     }
-    case 'reveal': {
-      // the world grows out of the Create point as an expanding mask (nothing appears from nothing), then a push-in;
-      // the official race-track still is shown whole (its own real Project Genie UI) in a big card
-      const k = ex(pr(t, A, A + .7)), rad = mix(30, 1300, k), z = 1.0 + .08 * io(pr(t, A, B1)), tw = W(b, 'واقعی');
-      r += `<div style="position:absolute;inset:0;clip-path:circle(${rad.toFixed(0)}px at 820px 1000px)">${photoCard(s.photo, 30, 640, 1020, 574, -1.5, z, '50% 50%')}</div>`;
-      r += bigT('همون لحظه', 250, 120, INK.ink, pr(t, A + .3, A + .7), INK.yel);
-      if (t >= tw - .05) r += chip(330, 430, 'واقعی‌نما', INK.pink, INK.ink, 90, pr(t, tw - .05, tw + .3), -3);
-      r += logoChip(90, 1270, 80, 'genie.png', pr(t, A + .4, A + .8), 'Genie 4');
-      r += keys(780, 1250, 1, Math.floor(t * 2.5) % 4 === 0 ? 'up' : '', t);
+    case 'human': {
+      const L3 = ['تفکر خلاق', 'تاب‌آوری', 'کنجکاوی'];
+      r += photoCard(s.photo, 560, 220, 440, 560, 4, 1.05 + .06 * pr(t, A, B1), '50% 40%', pr(t, A, A + .5));
+      L3.forEach((l, i) => { r += chip(90, 260 + i * 170, l, [INK.yel, INK.green, INK.blue][i], i ? '#fff' : INK.ink, 72, pr(t, K(i) - .05, K(i) + .25), i % 2 ? 3 : -3); });
+      r += card(110, 860, 860, 420, '#fff', `<div style="font-size:60px">تفکر تحلیلی</div><div style="font-size:170px;color:${INK.red};line-height:1.1">≈${fa(Math.round(70 * ex(pr(t, K(4) - .1, K(4) + .7))))}٪</div><div style="font:600 44px V">کارفرماها می‌گن ضروریه</div>`, pr(t, K(3) - .1, K(3) + .3));
       return r;
     }
-    case 'walk': {
-      // the official grid of worlds; each arrow-key press moves the camera to another world; a visited counter counts up
-      const kt1 = W(b, 'راه'), kt2 = W(b, 'دوربین'), steps = [A, kt1, (kt1 + kt2) / 2, kt2], pos = [[50, 50], [30, 45], [62, 40], [55, 70]];
-      let st = 0; steps.forEach((p, i) => { if (t >= p) st = i; });
-      const kk = ex(pr(t, steps[st], steps[st] + .5)), p0 = pos[Math.max(0, st - 1)], p1 = pos[st];
-      const px = mix(p0[0], p1[0], kk), py = mix(p0[1], p1[1], kk), z = 1.35 + .1 * io(pr(t, A, B1));
-      r += photoCard(s.photo, 60, 300, 960, 880, -1.5, z, `${px}% ${py}%`, pr(t, A, A + .4));
-      r += keys(700, 1220, 1.25, ['up', 'left', 'right', 'down'][st] , t);
-      r += chip(90, 1240, `دنیا: ${fa(st + 1)}`, INK.yel, INK.ink, 64, pr(t, A + .2, A + .5), -3);
-      r += bigT('با کیبورد', 160, 100, INK.ink, pr(t, A, A + .35), INK.green);
+    case 'versus': {
+      const k1 = pr(t, A + .3, A + .7), k2 = pr(t, A + .7, A + 1.1), tilt = -8 * ex(pr(t, K(1), K(1) + .6));
+      r += photoCard(s.photo, 140, 200, 800, 460, -2, 1.04 + .08 * pr(t, A, B1), '50% 50%', pr(t, A, A + .5));
+      r += `<div style="position:absolute;left:540px;top:760px;width:10px;height:560px;background:${INK.ink};transform:translateX(-50%)"></div>`;
+      r += `<div style="position:absolute;left:140px;top:760px;width:800px;height:16px;background:${INK.ink};transform:rotate(${tilt}deg);transform-origin:50% 50%"></div>`;
+      r += card(90, 820, 400, 330, INK.yel, `<div>حفظ کردن</div><div>جواب</div>`, k1, -tilt / 2);
+      r += card(590, 820, 400, 330, INK.green, `<div style="color:#fff">پرسیدن</div><div style="color:#fff">سؤال</div>`, k2, -tilt / 2);
       return r;
     }
-    case 'steer': {
-      // mid-simulation prompt «بارون بیاد» typed under the live race track; rain is drawn in riso blue and builds up
-      const tp = W(b, 'بارون'), rk = pr(t, tp, tp + 1.2), z = 1.06 + .1 * io(pr(t, A, B1));
-      r += `<div style="position:absolute;left:30px;top:430px;width:1020px;height:640px;box-shadow:16px 16px 0 ${INK.ink};border:10px solid #FFFDF8;border-radius:28px;overflow:hidden;background:#000;transform:rotate(1deg)"><img src="${elimg(s.photo)}" style="width:100%;height:100%;object-fit:cover;object-position:50% 75%;transform:scale(${z.toFixed(3)});filter:saturate(${mix(1, .55, rk)}) brightness(${mix(1, .75, rk)})"></div>`;
-      let rain = ''; for (let i = 0; i < 60 * rk; i++) { const x = 40 + (i * 157) % 1000, y0 = 440 + ((i * 263) % 640 + t * 900) % 640; rain += `<line x1="${x}" y1="${y0}" x2="${x - 18}" y2="${Math.min(1070, y0 + 80)}" stroke="${INK.blue}" stroke-width="7" stroke-linecap="round" opacity=".9"/>`; }
-      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${rain}</svg>`;
-      r += bigT('وسط کار', 230, 120, INK.ink, pr(t, A, A + .35), INK.pink);
-      r += promptBox(110, 1130, 860, 'Steer the world', 'بارون بیاد', pr(t, tp - .35, tp + .5), t, true, false);
-      r += chip(90, 470, 'LIVE ●', INK.red, '#fff', 54, pr(t, A + .1, A + .4), 0, true);
+    case 'do1': {
+      const q = 'خودت چی فکر می‌کنی؟', kq = pr(t, A + .6, K(1) + .6);
+      r += big(fa(1), 110, 210, 260, INK.pink, '#fff', pr(t, K(0) - .1, K(0) + .3), -6);
+      r += photoCard(s.photo, 470, 240, 520, 620, 3, 1.04 + .08 * pr(t, A, B1), '50% 60%', pr(t, A + .1, A + .6));
+      r += card(100, 960, 880, 300, '#fff', `<div style="font-size:72px">«${q.slice(0, Math.round(q.length * cl(kq)))}${kq < 1 ? '▌' : ''}»</div>`, pr(t, A + .4, A + .8), -1);
       return r;
     }
-    case 'steer2': {
-      // three changes, each lit on its own word: weather · camera angle · a new person; the neon still swings angle
-      const w1 = A + .05, w2 = W(b, 'زاویه'), w3 = W(b, 'آدم');
-      const ang = t >= w2 ? ex(pr(t, w2, w2 + .5)) : 0, z = 1.05 + .25 * ang;
-      const z2 = 1.05 + .55 * ang;
-      r += photoCard(s.photo, 80, 260, 920, 1000, mix(-2, 6, ang), z2, `${mix(50, 72, ang)}% ${mix(55, 30, ang)}%`, pr(t, A, A + .35));
-      if (t < w2 + .3) { const rk = ex(pr(t, w1, w1 + .6)) * (1 - pr(t, w2, w2 + .3)); let rn = ''; for (let i = 0; i < 46 * rk; i++) { const x = 100 + (i * 157) % 880, y0 = 280 + ((i * 263) % 960 + t * 1100) % 960; rn += `<line x1="${x}" y1="${y0}" x2="${x - 18}" y2="${Math.min(1250, y0 + 90)}" stroke="${INK.blue}" stroke-width="8" stroke-linecap="round" opacity=".9"/>`; } r += svg2(rn); }
-      if (t >= w2 - .05 && t < w3) r += svg2(`<g transform="translate(540 760)" opacity="${(1 - pr(t, w2 + .6, w3)).toFixed(2)}"><rect x="-200" y="-150" width="400" height="300" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="40 300"/><circle r="14" fill="${INK.red}"/></g>`);
-      [['☔ هوا', w1, INK.blue, '#fff'], ['🎥 زاویه', w2, INK.yel, INK.ink], ['🧍 آدم جدید', w3, INK.pink, INK.ink]].forEach(([c, tq, bg, fg], i) => { if (t >= tq - .05) r += chip(90 + i * 320, 1330, c, bg, fg, 58, pr(t, tq - .05, tq + .3), [-3, 2, -2][i]); });
-      if (t >= w3 - .05) { const e = spring(pr(t, w3 - .05, w3 + .45)); r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(760 1000) scale(${e.toFixed(3)})"><circle cx="0" cy="-120" r="56" fill="${INK.pink}" stroke="${INK.ink}" stroke-width="8"/><path d="M-80 60 Q-80 -50 0 -50 Q80 -50 80 60 Z" fill="${INK.pink}" stroke="${INK.ink}" stroke-width="8"/><circle cx="70" cy="-150" r="34" fill="${INK.green}" stroke="${INK.ink}" stroke-width="6"/><path d="M56 -150 h28 M70 -164 v28" stroke="${INK.ink}" stroke-width="8"/></g></svg>`; }
+    case 'do2': {
+      const kc = pr(t, K(2) - .1, K(2) + .4); r += chip(600, 860, 'برای بزرگ‌ترها', INK.ink, '#fff', 50, pr(t, A + .3, A + .6), -2);
+      r += big(fa(2), 110, 200, 260, INK.blue, '#fff', pr(t, K(0) - .1, K(0) + .3), -6);
+      r += photoCard(s.photo, 520, 230, 460, 520, -3, 1.04 + .08 * pr(t, A, B1), '50% 50%', pr(t, A + .1, A + .6));
+      const inner = (kc > 0 ? `<g transform="translate(240 560) scale(${spring(kc).toFixed(3)})"><circle r="80" fill="${INK.green}"/><path d="M -36 0 L -10 26 L 40 -28" stroke="#fff" stroke-width="18" fill="none" stroke-linecap="round"/></g>` : '');
+      r += phone(120, 800, 460, inner, pr(t, A + .3, A + .8));
+      const kb = pr(t, A + .7, A + 1.0), ka = pr(t, A + 1.3, A + 1.6);
+      if (kb > 0) r += `<div style="position:absolute;left:170px;top:930px;width:360px;padding:18px 24px;border-radius:28px;background:${INK.ink};color:#fff;font:900 40px/1.35 V;text-align:right;opacity:${cl(kb * 4)}">چرا آسمون آبیه؟</div>`;
+      if (ka > 0) r += `<div style="position:absolute;left:150px;top:1060px;width:380px;padding:18px 24px;border-radius:28px;background:${INK.yel};color:${INK.ink};font:900 36px/1.4 V;text-align:right;opacity:${cl(ka * 4)}">نور آبی بیشتر پخش می‌شه…</div>`;
+      r += chip(620, 1000, 'با هم', INK.pink, '#fff', 80, pr(t, K(1) - .05, K(1) + .25), 3);
+      r += chip(620, 1180, 'چک کنید ✓', INK.green, '#fff', 66, kc, -2);
+      r += chip(380, 1330, 'مهارت اصلی: چک کردن', INK.yel, INK.ink, 54, pr(t, K(3) - .05, K(3) + .25), 2);
       return r;
     }
-    case 'sound': {
-      // three audio tracks draw on (music · ambience · dialogue), level meters move with the voice, a speech bubble grows
-      const ts = W(b, 'صدا'), t1 = W(b, 'موسیقی'), t2 = W(b, 'محیط'), t3 = W(b, 'دیالوگ');
-      r += photoCard(s.photo, 60, 230, 960, 620, -2, 1.05 + .08 * io(pr(t, A, B1)), '55% 50%', pr(t, A, A + .3)) + chip(600, 260, 'صدای خودِ صحنه', INK.pink, INK.ink, 50, pr(t, A + .3, A + .6), 4);
-      r += bigT('صدا هم داره!', 880, 120, INK.ink, pr(t, ts - .05, ts + .35), INK.yel);
-      if (t >= ts - .05) for (let i = 0; i < 3; i++) { const ph = ((t - ts) * 1.2 + i / 3) % 1; r += svg2(`<g transform="translate(220 700)"><path d="M-30 -30 h30 l40 -40 v140 l-40 -40 h-30z" fill="${INK.ink}"/><path d="M ${30 + 60 * ph} -60 q ${40 + 40 * ph} 60 0 120" fill="none" stroke="${INK.pink}" stroke-width="12" stroke-linecap="round" opacity="${(1 - ph).toFixed(2)}"/></g>`); }
-      let q = ''; [[t1, INK.pink, 'موسیقی'], [t2, INK.blue, 'محیط'], [t3, INK.green, 'دیالوگ']].forEach(([tq, c, lb], i) => { if (t >= tq - .1) { const y = 1110 + i * 110; q += `<rect x="90" y="${y - 46}" width="900" height="92" rx="46" fill="#FFFDF8" stroke="${INK.ink}" stroke-width="6"/>` + wave(110, y, 600, 70, c, pr(t, tq - .1, tq + .6), t, i * 3); r += `<div style="position:absolute;right:110px;top:${y - 40}px;font:900 56px V;color:${INK.ink}">${lb}</div>`; } });
-      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${q}</svg>`;
-      if (t >= t3) { const e = spring(pr(t, t3, t3 + .4)); r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(860 300) scale(${e.toFixed(3)})"><path d="M-110 -70 h220 a30 30 0 0 1 30 30 v90 a30 30 0 0 1 -30 30 h-120 l-50 50 v-50 h-50 a30 30 0 0 1 -30 -30 v-90 a30 30 0 0 1 30 -30z" fill="${INK.yel}" stroke="${INK.ink}" stroke-width="8"/><text x="0" y="22" text-anchor="middle" font-family="V" font-weight="900" font-size="56" fill="${INK.ink}">Hi!</text></g></svg>`; }
+    case 'do3': {
+      const L3 = [['🗺', 'نقشه'], ['💰', 'بودجه'], ['📖', 'داستان']];
+      r += big(fa(3), 110, 200, 260, INK.green, '#fff', pr(t, K(0) - .1, K(0) + .3), -6);
+      r += photoCard(s.photo, 470, 220, 520, 560, 3, 1.04 + .08 * pr(t, A, B1), '50% 50%', pr(t, A + .1, A + .6));
+      L3.forEach((l, i) => { r += card(80 + i * 320, 880, 280, 300, [INK.yel, INK.pink, INK.blue][i], `<div style="font-size:110px">${l[0]}</div><div style="${i ? 'color:#fff' : ''}">${l[1]}</div>`, pr(t, K(i + 2) - .1, K(i + 2) + .3), i % 2 ? 3 : -3); });
       return r;
     }
-    case 'minutes': {
-      // Genie 3 vs Genie 4: two bars fill to 1 and 2 minutes, a counter rolls to ۲, the ×۲ stamp lands on «دو برابر»
-      const tm = W(b, 'دقیقه'), t2 = W(b, 'برابر'), k3 = ex(pr(t, A + .1, A + .9)), k4 = ex(pr(t, A + .3, tm + .4));
-      r += bigT(`تا ${fa(2)} دقیقه`, 230, 140, INK.ink, pr(t, tm - .3, tm + .1), INK.yel);
-      let q = '';
-      for (let i = 0; i <= 4; i++) q += `<line x1="${140 + i * 200}" y1="760" x2="${140 + i * 200}" y2="1260" stroke="${INK.ink}" stroke-width="4" stroke-dasharray="10 12" opacity="${ex(pr(t, A + i * .08, A + .3 + i * .08))}"/><text x="${140 + i * 200}" y="1320" text-anchor="middle" font-family="V" font-weight="900" font-size="44" fill="${INK.ink}">${fa(i * .5)}</text>`;
-      q += `<rect x="140" y="830" width="${400 * k3}" height="140" rx="20" fill="${INK.blue}"/><rect x="140" y="1050" width="${800 * k4}" height="140" rx="20" fill="${INK.pink}"/>`;
-      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${q}</svg>`;
-      r += `<div dir="ltr" style="position:absolute;left:160px;top:860px;font:900 64px V;color:#fff">Genie 3 · ${fa((1 * k3).toFixed(1))}</div><div dir="ltr" style="position:absolute;left:160px;top:1080px;font:900 64px V;color:${INK.ink}">Genie 4 · ${fa((2 * k4).toFixed(1))}</div>`;
-      r += `<div class="t" style="top:1360px;font-size:56px;color:${INK.ink};mix-blend-mode:normal;opacity:${cl((t - A) * 3)}">دقیقه</div>`;
-      if (t >= t2 - .05) { const k = pr(t, t2 - .05, t2 + .35); r += `<div style="position:absolute;left:720px;top:520px;width:250px;height:250px;border-radius:50%;background:${INK.red};color:#fff;font:900 120px/250px V;text-align:center;box-shadow:10px 10px 0 ${INK.ink};transform:rotate(-12deg) scale(${(2.2 - 1.2 * ex(k)).toFixed(3)});opacity:${cl(k * 4)}">×${fa(2)}</div>`; }
-      return r;
-    }
-    case 'director': {
-      // Gemini as the director: the real Gemini mark, a 3-step plan ticking on its words, a film strip scanned frame by frame
-      const tg = A + .05, tq = W(b, 'قدم'), tf = W(b, 'فریم');
-      r += logoChip(330, 230, 110, 'gemini.png', pr(t, tg, tg + .4), 'Gemini');
-      r += chip(380, 430, '🎬 کارگردان', INK.yel, INK.ink, 70, pr(t, W(b, 'کارگردان') - .05, W(b, 'کارگردان') + .3), -3);
-      let q = '', lbl = ''; ['۱  محیط', '۲  حرکت', '۳  اتفاق بعدی'].forEach((s2, i) => { const ti = tq + i * .3, k = ex(pr(t, ti - .1, ti + .3)); if (t >= ti - .1) { q += `<rect x="${980 - 520 * k}" y="${620 + i * 120}" width="${520 * k}" height="96" rx="20" fill="#FFFDF8" stroke="${INK.ink}" stroke-width="6"/><path d="M ${1010 - 520} ${668 + i * 120} l 20 20 l 36 -44" stroke="${INK.green}" stroke-width="14" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - ex(pr(t, ti + .2, ti + .5))).toFixed(3)}"/>`; lbl += `<div style="position:absolute;right:130px;top:${630 + i * 120}px;font:900 54px V;color:${INK.ink};opacity:${k}">${s2}</div>`; } });
-      // film strip of the official stills, a scan bar runs across, each frame gets a check as it passes
-      const sk = ex(pr(t, A + .2, A + .7)), scan = pr(t, tf, B1 - .1);
-      q += `<rect x="40" y="1050" width="1000" height="300" fill="${INK.ink}" opacity="${sk}"/>`;
-      for (let i = 0; i < 18; i++) q += `<rect x="${60 + i * 56}" y="1062" width="30" height="20" rx="4" fill="#FFFDF8" opacity="${sk}"/><rect x="${60 + i * 56}" y="1318" width="30" height="20" rx="4" fill="#FFFDF8" opacity="${sk}"/>`;
-      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${q}</svg>` + lbl;
-      ['g3.jpg', 'g5.jpg', 'g2.jpg'].forEach((f, i) => { r += `<div style="position:absolute;left:${70 + i * 320}px;top:1095px;width:300px;height:210px;overflow:hidden;opacity:${sk}"><img src="${elimg(f)}" style="width:100%;height:100%;object-fit:cover"></div>`; if (scan > (i + .8) / 3) r += `<div style="position:absolute;left:${300 + i * 320}px;top:1110px;width:56px;height:56px;border-radius:50%;background:${INK.green};color:#fff;font:900 40px/56px V;text-align:center">✓</div>`; });
-      if (t >= tf) r += `<div style="position:absolute;left:${70 + scan * 960}px;top:1040px;width:10px;height:320px;background:${INK.red}"></div>`;
-      return r;
-    }
-    case 'uses': {
-      // what it is for: three cards (games · learning · robot practice), each springs in and lights up on its word
-      const tq = W(b, 'درد'), ws = [W(b, 'بازی'), W(b, 'آموزش'), W(b, 'ربات')];
-      r += bigT('به چه درد می‌خوره؟', 230, 104, INK.ink, pr(t, A, A + .35), INK.yel);
-      const C = [['🎮', 'بازی', INK.pink], ['🎓', 'آموزش', INK.yel], ['🤖', 'تمرین ربات', INK.green]];
-      let q = '';
-      C.forEach(([ic, lb, c], i) => { const ti0 = Math.min(ws[i] - .15, A + .15 + i * .2), ti = ws[i], k = pr(t, ti0, ti0 + .5), on = t >= ti - .05, y = 520 + i * 330;
-        if (t >= ti0) { r += `<div style="position:absolute;left:120px;top:${y}px;width:840px;height:280px;border-radius:36px;background:${on ? c : '#FFFDF8'};border:8px solid ${INK.ink};box-shadow:14px 14px 0 ${INK.ink};transform:translateX(${(1 - ex(k)) * 400}px) rotate(${[-2, 1.5, -1][i]}deg);opacity:${cl(k * 4)};display:flex;align-items:center;justify-content:space-between;padding:0 60px;box-sizing:border-box"><span style="font:900 96px V;color:${INK.ink}">${lb}</span><span style="font-size:130px">${ic}</span></div>`;
-          r += `<div style="position:absolute;left:30px;top:${y + 90}px;width:96px;height:96px;border-radius:50%;background:${INK.ink};color:#fff;font:900 56px/96px V;text-align:center;transform:scale(${spring(k).toFixed(3)})">${fa(i + 1)}</div>`; } });
-      return r;
-    }
-    case 'film': {
-      // testers: storyboard frames for a film — the official stills drop into a 3-panel board under a clapperboard
-      const tf = W(b, 'طرح');
-      const cl1 = spring(pr(t, A, A + .4)), clap = t >= tf ? -24 * (1 - ex(pr(t, tf, tf + .25))) : -24;
-      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(540 380) scale(${cl1.toFixed(3)})"><rect x="-220" y="-40" width="440" height="230" rx="14" fill="${INK.ink}"/><g transform="translate(-220 -40) rotate(${clap})">${[0, 1, 2, 3, 4].map(i => `<rect x="${i * 88}" y="-64" width="88" height="64" fill="${i % 2 ? '#FFFDF8' : INK.ink}" stroke="${INK.ink}" stroke-width="6"/>`).join('')}</g><text x="0" y="110" text-anchor="middle" font-family="V" font-weight="900" font-size="72" fill="#fff">طرح فیلم</text></g></svg>`;
-      ['g3.jpg', 'g4.jpg', 'g5.jpg'].forEach((f, i) => { const ti = A + .4 + i * .35; if (t >= ti) r += photoCard(f, 70 + i * 320, 720 + [0, 60, 10][i], 300, 520, [-4, 3, -2][i], 1.15, '50% 50%', pr(t, ti, ti + .4)); r += `<div style="position:absolute;left:${90 + i * 320}px;top:${1300 + [0, 60, 10][i]}px;font:900 52px V;color:${INK.ink};opacity:${cl((t - ti) * 3)}">شات ${fa(i + 1)}</div>`; });
-      r += chip(560, 560, 'تسترها می‌گن', INK.yel, INK.ink, 56, pr(t, A + .1, A + .4), 3);
-      return r;
-    }
-    case 'limits': {
-      // not finished: the neon world drifts — misregistration and a slow warp grow with a run-time bar; the warning stamp lands
-      const tn = W(b, 'کامل'), tl = W(b, 'جزئیات'), d = .25 * pr(t, A + .3, tl) + .75 * pr(t, tl - .2, B1), wob = Math.sin(t * 7) * 6 * d;
-      r += `<div style="position:absolute;left:80px;top:420px;width:920px;height:820px;border:10px solid #FFFDF8;border-radius:28px;box-shadow:16px 16px 0 ${INK.ink};overflow:hidden"><img src="${elimg(s.photo)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(${(6 * d).toFixed(1)}px) hue-rotate(${(60 * d).toFixed(0)}deg);transform:scale(${(1.08 + .1 * d).toFixed(3)}) skewX(${(wob * .6).toFixed(2)}deg)"><img src="${elimg(s.photo)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;mix-blend-mode:screen;opacity:${(.6 * d).toFixed(2)};transform:translate(${(28 * d).toFixed(1)}px,${(-18 * d).toFixed(1)}px) scale(1.1)"></div>`;
-      const run = pr(t, A, B1); r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><rect x="80" y="1300" width="920" height="60" rx="30" fill="#FFFDF8" stroke="${INK.ink}" stroke-width="6"/><rect x="86" y="1306" width="${908 * run}" height="48" rx="24" fill="${run > .6 ? INK.red : INK.yel}"/></svg><div style="position:absolute;left:100px;top:1370px;font:900 50px V;color:${INK.ink}">زمان اجرا ⟵</div>`;
-      r += bigT('هنوز کامل نیست', 230, 118, INK.ink, pr(t, tn - .3, tn + .1), INK.yel);
-      if (t >= tl) r += `<div style="position:absolute;left:560px;top:1120px;padding:10px 30px 18px;border:10px solid ${INK.red};border-radius:20px;color:${INK.red};font:900 80px V;background:#FFFDF8;transform:rotate(-8deg) scale(${(2 - ex(pr(t, tl, tl + .35))).toFixed(3)});opacity:${cl((t - tl) * 4)}">به‌هم می‌ریزه</div>`;
-      return r;
-    }
-    case 'access': {
-      // who gets it: a rebuilt waitlist card, the cursor clicks Join, the timeline pill runs now → coming weeks, Ultra chip lands
-      const tt = W(b, 'تستر'), tu = W(b, 'Ultra') > A ? W(b, 'Ultra') : W(b, 'مشترک'), tc = A + 1.1;
-      r += `<div style="position:absolute;left:110px;top:300px;width:860px;height:520px;border-radius:40px;background:#FFFDF8;border:8px solid ${INK.ink};box-shadow:16px 16px 0 ${INK.blue};transform:scale(${spring(pr(t, A, A + .4)).toFixed(3)})"></div>`;
-      r += logoChip(160, 350, 90, 'genie.png', pr(t, A + .1, A + .45), 'Project Genie');
-      const press = t >= tc ? Math.exp(-10 * (t - tc)) : 0, joined = t >= tc;
-      r += `<div dir="ltr" style="position:absolute;left:300px;top:620px;padding:18px 50px 24px;border-radius:60px;background:${joined ? INK.green : INK.red};color:#fff;font:900 60px V;box-shadow:10px 10px 0 ${INK.ink};transform:scale(${1 - .12 * press})">${joined ? 'On the waitlist ✓' : 'Join waitlist'}</div>`;
-      r += cursor(mix(980, 640, ex(pr(t, A + .4, tc))), mix(1100, 680, ex(pr(t, A + .4, tc))), t, tc);
-      let q = `<line x1="150" y1="1100" x2="930" y2="1100" stroke="${INK.ink}" stroke-width="10" stroke-linecap="round"/><line x1="150" y1="1100" x2="${150 + 780 * ex(pr(t, tt, tu + .3))}" y2="1100" stroke="${INK.pink}" stroke-width="22" stroke-linecap="round"/>`;
-      q += `<circle cx="930" cy="1100" r="34" fill="${INK.yel}" stroke="${INK.ink}" stroke-width="8"/><circle cx="150" cy="1100" r="34" fill="${INK.pink}" stroke="${INK.ink}" stroke-width="8"/>`;
-      r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${q}</svg>`;
-      r += chip(640, 1170, 'الان: تسترها', INK.pink, INK.ink, 54, pr(t, tt - .1, tt + .3), 2) + chip(90, 1170, 'چند هفته بعد', INK.yel, INK.ink, 54, pr(t, tu - .6, tu - .3), -2);
-      if (t >= tu - .1) r += logoChip(230, 1330, 90, 'google.png', pr(t, tu - .1, tu + .3), 'Google AI Ultra');
+    case 'age': {
+      const k13 = pr(t, K(0) - .1, K(0) + .35), ks = pr(t, K(1) - .1, K(1) + .35);
+      r += logoChip(260, 230, 120, 'unesco.svg', pr(t, A, A + .4), 'UNESCO · 2023');
+      r += big(`${fa(13)}+ سال`, 230, 470, 170, INK.red, '#fff', k13, -5);
+      r += card(130, 860, 820, 260, '#fff', `<div style="font-size:56px">پیشنهاد: «در نظر بگیرید»</div><div style="font:600 44px V">سن ۱۳ سال برای استفاده در کلاس</div>`, pr(t, A + .5, A + .9), 1);
+      r += chip(320, 1190, '🛡 حریم خصوصی', INK.green, '#fff', 72, ks, -3);
       return r;
     }
     case 'ask': {
-      // the empty prompt box with the blinking cursor; ghost prompts cycle; the comment bubble grows
-      const tq = W(b, 'چیه'), tcm = W(b, 'کامنت'), ghosts = ['A castle in the clouds', 'My childhood street', 'A city on Mars'], gi = Math.floor((t - A) / .9) % 3;
-      r += bigT('اولین دنیات؟', 250, 140, INK.ink, pr(t, tq - .4, tq), INK.pink);
-      r += promptBox(110, 700, 860, 'Describe a world', ghosts[gi], .65 + .35 * cl(((t - A) % .9) / .5), t);
-      if (t >= tcm - .1) { const e = spring(pr(t, tcm - .1, tcm + .4)); r += `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal"><g transform="translate(540 1180) scale(${e.toFixed(3)})"><path d="M-300 -110 h600 a40 40 0 0 1 40 40 v140 a40 40 0 0 1 -40 40 h-460 l-70 70 v-70 h-70 a40 40 0 0 1 -40 -40 v-140 a40 40 0 0 1 40 -40z" fill="${INK.yel}" stroke="${INK.ink}" stroke-width="10"/></g></svg><div class="t" style="top:1110px;font-size:84px;color:${INK.ink};mix-blend-mode:normal;transform:scale(${e.toFixed(3)})">کامنت کن 👇</div>`; }
+      const kq = pr(t, A + .4, K(1) + .2), msg = 'امسال یاد گرفت…';
+      r += bleed(s.photo, 1.05 + .1 * pr(t, A, B1), '50% 50%', 'filter:brightness(.75)');
+      const inner = '';
+      r += phone(310, 380, 460, inner, pr(t, A + .1, A + .5));
+      if (t > A + .4) r += `<div style="position:absolute;left:350px;top:500px;width:380px;text-align:right;font:900 40px V;color:${INK.ink}">کامنت‌ها</div>` +
+        `<div style="position:absolute;left:345px;top:570px;width:340px;padding:22px 26px;border-radius:26px;background:#EEE8DC;color:${INK.ink};font:900 40px/1.35 V;text-align:right">${msg.slice(0, Math.round(msg.length * cl(kq)))}${kq < 1 ? '▌' : ''}</div>` +
+        `<div style="position:absolute;left:345px;top:720px;padding:14px 34px 22px;border-radius:24px;background:${INK.pink};color:#fff;font:900 40px V">ارسال</div>`;
       return r;
     }
   }
-  ISSUES.push('unknown scene ' + s.type); return r;
+  return r;
 }
+
 const logo = (x, y, d, o) => `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal;opacity:${o}"><circle cx="${x}" cy="${y}" r="${d / 2 + 14}" fill="#fff"/><image href="${U('el/' + (S.logo || 'pinterest.png'))}" x="${x - d / 2}" y="${y - d / 2}" width="${d}" height="${d}"/></svg>`;
 const svg2 = inner => `<svg class="L" viewBox="0 0 1080 1920" style="mix-blend-mode:normal">${inner}</svg>`;
-const ez2 = k => io(cl(k));
 function endCard(u, t, off) {
   // the through-line dot becomes the real logo, the name prints in passes, then the question
   const g = spring(.4 + pr(u, 0, .4)), q = (S.end_text || '').replace(/\*([^*]+)\*/g, `<span style="color:${INK.red}">$1</span>`);
