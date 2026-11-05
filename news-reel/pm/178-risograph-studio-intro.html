@@ -232,8 +232,8 @@ function scene(b, t, u, si, off) {
       const z = 1.0 + .14 * io(pr(t, 0, 2.2));
       r = bleed(s.photo, z, '50% 45%');
       r += `<div style="position:absolute;left:0;right:0;top:0;height:760px;background:linear-gradient(rgba(29,26,47,.82),rgba(29,26,47,.5) 70%,rgba(29,26,47,0))"></div>`;
-      r += `<div class="t" style="top:230px;font-size:132px;color:#fff;mix-blend-mode:normal;text-shadow:8px 8px 0 ${INK.blue};transform:scale(${mix(1.5, 1, ex(pr(t, 0, .25))).toFixed(3)})">بچه‌ت فقط</div>`;
-      r += `<div class="t" style="top:400px;font-size:132px;color:#fff;mix-blend-mode:normal;text-shadow:8px 8px 0 ${INK.pink}"><span style="display:inline-block;background:${INK.yel};color:${INK.ink};padding:0 .16em .06em;border-radius:.14em;text-shadow:none;transform:rotate(${(-6 * (1 - ex(pr(t, .1, .4)))).toFixed(2)}deg) scale(${mix(1.8, 1, ex(pr(t, .1, .4))).toFixed(3)})">حفظ</span> می‌کنه؟</div>`;
+      r += `<div class="t" style="top:230px;font-size:132px;color:#fff;mix-blend-mode:normal;text-shadow:8px 8px 0 ${INK.blue};transform:scale(${mix(1.12, 1, ex(pr(t, 0, .25))).toFixed(3)})">بچه‌ت فقط</div>`;
+      r += `<div class="t" style="top:400px;font-size:132px;color:#fff;mix-blend-mode:normal;text-shadow:8px 8px 0 ${INK.pink}"><span style="display:inline-block;background:${INK.yel};color:${INK.ink};padding:0 .16em .06em;border-radius:.14em;text-shadow:none;transform:rotate(${(-6 * (1 - ex(pr(t, .1, .4)))).toFixed(2)}deg) scale(${mix(1.3, 1, ex(pr(t, .1, .4))).toFixed(3)})">حفظ</span> می‌کنه؟</div>`;
       r += big(`${fa(39)}٪`, 110, 930, 220, INK.pink, '#fff', pr(t, .3, .7), -6);
       r += chip(560, 980, 'تا ۲۰۳۰', INK.yel, INK.ink, 80, pr(t, .6, .9), 4);
       r += chip(250, 1120, 'مهارت‌های اصلی عوض می‌شه', '#fff', INK.ink, 58, pr(t, .9, 1.2), -2);
@@ -241,10 +241,10 @@ function scene(b, t, u, si, off) {
       return r;
     }
     case 'tech': {
-      const L3 = [['هوش مصنوعی و داده', INK.pink], ['امنیت شبکه', INK.blue], ['سواد فناوری', INK.green]];
+      const L3 = [['هوش مصنوعی و داده', INK.pink], ['امنیت سایبری', INK.blue], ['سواد فناوری', INK.green]];
       r += type('سریع‌ترین رشد', 230, 120, INK.ink, INK.yel, pr(t, A, A + .5), off);
       L3.forEach((l, i) => { r += card(110 + (i % 2) * 40, 470 + i * 300, 860, 240, l[1], `<span style="color:#fff;font-size:76px">${l[0]}</span>`, pr(t, K(i) - .1, K(i) + .3), i % 2 ? 2 : -2); });
-      r += logoChip(330, 1420, 80, 'wef.png', pr(t, A + .3, A + .6), 'Future of Jobs 2025');
+      r += logoChip(330, 1290, 80, 'wef.png', pr(t, A + .3, A + .6), 'Future of Jobs 2025');
       return r;
     }
     case 'human': {
@@ -294,7 +294,7 @@ function scene(b, t, u, si, off) {
     case 'age': {
       const k13 = pr(t, K(0) - .1, K(0) + .35), ks = pr(t, K(1) - .1, K(1) + .35);
       r += logoChip(260, 230, 120, 'unesco.svg', pr(t, A, A + .4), 'UNESCO · 2023');
-      r += big(`${fa(13)}+ سال`, 200, 480, 220, INK.red, '#fff', k13, -5);
+      r += big(`${fa(13)}+ سال`, 230, 470, 170, INK.red, '#fff', k13, -5);
       r += card(130, 860, 820, 260, '#fff', `<div style="font-size:56px">پیشنهاد: «در نظر بگیرید»</div><div style="font:600 44px V">سن ۱۳ سال برای استفاده در کلاس</div>`, pr(t, A + .5, A + .9), 1);
       r += chip(320, 1190, '🛡 حریم خصوصی', INK.green, '#fff', 72, ks, -3);
       return r;
@@ -307,7 +307,6 @@ function scene(b, t, u, si, off) {
       if (t > A + .4) r += `<div style="position:absolute;left:350px;top:500px;width:380px;text-align:right;font:900 40px V;color:${INK.ink}">کامنت‌ها</div>` +
         `<div style="position:absolute;left:345px;top:570px;width:340px;padding:22px 26px;border-radius:26px;background:#EEE8DC;color:${INK.ink};font:900 40px/1.35 V;text-align:right">${msg.slice(0, Math.round(msg.length * cl(kq)))}${kq < 1 ? '▌' : ''}</div>` +
         `<div style="position:absolute;left:345px;top:720px;padding:14px 34px 22px;border-radius:24px;background:${INK.pink};color:#fff;font:900 40px V">ارسال</div>`;
-      r += chip(150, 1330, 'بفرست برای پدر و مادرها ↗', INK.yel, INK.ink, 60, pr(t, K(2) - .05, K(2) + .25), -2);
       return r;
     }
   }
