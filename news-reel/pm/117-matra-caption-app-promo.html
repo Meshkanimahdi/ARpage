@@ -235,11 +235,15 @@ function seek(t) {
   const b = B[bi], endOn = t >= TL.end_start;
   // camera: 1.0 → 1.04 across a scene, starting at the zoom the last one ended on; small kick on every idea
   let si = 0, sc = (window.SCENES || [])[0] || {t0: 0, t1: 1}; (window.SCENES || []).forEach((x, i) => { if (t >= x.t0) { si = i; sc = x; } });
-  const z = (b.sc.type === 'hook' ? 1 : 1.1) + .04 * pr(t, b.a, b.b) + Math.exp(-10 * (t - sc.t0)) * .025;
+  // camera keys: every idea (scene moment) is its own shot — a hard punch to a new zoom and framing (cuts on the beat)
+  const PZ = [0, .07, .03, .1], OX = [540, 480, 600, 540], OY = [800, 720, 880, 680], k4 = si % 4;
+  const z = (b.sc.type === 'hook' ? 1 : 1.06) + PZ[k4] + .03 * pr(t, sc.t0, sc.t1) + Math.exp(-10 * (t - sc.t0)) * .025;
+  $('cam').style.transformOrigin = `${OX[k4]}px ${OY[k4]}px`;
+  $('root').style.background = ['#F3EEE7', '#E8DCCD', '#DDE7E4', '#EFE3E0'][k4];
   $('cam').style.transform = `scale(${z.toFixed(4)})`;
   // scene entry: the next scene is revealed by a circular mask growing from the through-line circle (never a crossfade)
   let h = endOn ? endCard(t - TL.end_start) : scene(b, t);
-  if (!endOn && b.i > 0 && t < b.a + .45) { const k = ex(pr(t, b.a, b.a + .45)); h = scene(B[b.i - 1], t) + `<div class="a" style="left:0;top:0;width:1080px;height:1920px;background:var(--page);clip-path:circle(${(30 + 1300 * k).toFixed(0)}px at 540px 760px)">${h}</div>`; }
+  if (!endOn && b.i > 0 && t < b.a + .45) { const k = ex(pr(t, b.a, b.a + .45)); h = scene(B[b.i - 1], t) + `<div class="a" style="left:0;top:0;width:1080px;height:1920px;background:${['#F3EEE7', '#E8DCCD', '#DDE7E4', '#EFE3E0'][si % 4]};clip-path:circle(${(30 + 1300 * k).toFixed(0)}px at 540px 760px)">${h}</div>`; }
   const st = $('stage'); if (st._h !== h) { st._h = h; st.innerHTML = h; }
   caption(b, t, endOn);
 }
