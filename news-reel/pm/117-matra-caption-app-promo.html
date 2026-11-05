@@ -104,7 +104,7 @@ const ring = (cx, cy, r, fill = INK, inner = '', stroke = ACC) => `<svg class="a
 const photoRing = (img, cx, cy, r, z = 1, pos = '50% 50%', st = '') => `<div class="a" style="left:${cx - r}px;top:${cy - r}px;width:${2 * r}px;height:${2 * r}px;border-radius:50%;overflow:hidden;border:10px solid ${ACC};box-sizing:border-box;box-shadow:0 20px 50px rgba(30,42,63,.25);${st}"><img src="${U('el/' + img)}" style="width:100%;height:100%;object-fit:cover;object-position:${pos};transform:scale(${z.toFixed(3)})"></div>`;
 const toggle = (x, y, on, label) => `<div class="a" style="left:${x}px;top:${y}px;display:flex;align-items:center;gap:26px;flex-direction:row-reverse"><div style="font:900 50px V;color:${INK}">${label}</div><div style="width:150px;height:84px;border-radius:42px;background:${on > .5 ? ACC : '#D9D3CA'};position:relative"><div style="position:absolute;top:8px;left:${8 + 66 * on}px;width:68px;height:68px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.2)"></div></div></div>`;
 const head = (s, k, y = 250, size = 92) => mask(k, C(y, s, size, INK, 'line-height:1.15'));
-const counter = (v, k) => Math.round(v * ex(k));
+const counter = (v, k) => k >= 1 ? v : Math.round(v * ex(k) / .999);
 const people = (x, y, n, lit, k, size = 64) => { let s = ''; for (let i = 0; i < n; i++) { const on = i < lit && k > (i + 1) / (lit + 1); s += `<div class="a" style="left:${x + (i % 3) * (size + 26)}px;top:${y + Math.floor(i / 3) * (size * 1.5)}px;font-size:${size}px;filter:${on ? 'none' : 'grayscale(1) opacity(.35)'};transform:scale(${on ? 1.12 : 1})">🧳</div>`; } return s; };
 function scene(b, t) {
   const s = b.sc, A = b.a, Bb = b.b, u = t - A;
@@ -122,22 +122,22 @@ function scene(b, t) {
       r += `<div class="a" style="left:0;top:0;width:1080px;height:700px;background:linear-gradient(#F3EEE7 0%,#F3EEE7 70%,rgba(243,238,231,0))"></div>`;
       r += `<div class="a" style="left:0;right:0;top:170px;text-align:center;font-size:116px;color:${INK}">زندگیت</div><div class="a" style="left:0;right:0;top:320px;text-align:center;font-size:116px;color:${INK}">منتظر <span style="display:inline-block;background:${ACC};color:#fff;padding:0 .2em .1em;border-radius:.18em">مهاجرته</span>؟</div>`;
       [['💼 کار', tr], ['🏠 خونه', W(b, 'خونه،')], ['❤️ رابطه', W(b, 'رابطه،')]].forEach(([c, tq], i) => { r += chip(600, 900 + i * 120, c + (t > tm ? ' · بعداً' : ''), '#fff', INK, 52, pr(t, tq - .1, tq + .25)); });
-      r += chip(560, 1660, 'بعد از رفتن؟', INK, '#fff', 64, pr(t, tm + .2, tm + .5)) + `<div class="a" style="left:80px;top:${(1720 - 20 * ex(pr(t, 0, .8))).toFixed(0)}px;padding:6px 30px 18px;border-radius:30px;background:${INK};color:#fff;font:900 96px V">${fa(Math.round(33 * ex(pr(t, 0, .9))))}٪</div><div class="a" style="left:80px;top:1650px;font:900 34px V;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6)">نظرسنجی ۲۰۲۱: اگه بتونن می‌رن</div>` + chip(300, 470, 'نظرسنجی تلفنی ۲۰۲۱ · ۱۳۰۰ نفر', '#fff', '#7A8494', 40, 1);
+      r += chip(560, 1660, 'بعد از رفتن؟', INK, '#fff', 64, pr(t, tm + .2, tm + .5)) + `<div class="a" style="left:80px;top:1700px;transform:scale(${(1 + .06 * Math.sin(t * 5)).toFixed(3)});transform-origin:0 50%;padding:6px 30px 18px;border-radius:30px;background:${INK};color:#fff;font:900 96px V">${fa(33)}٪</div><div class="a" style="left:80px;top:1650px;font:900 34px V;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6)">نظرسنجی ۲۰۲۱: اگه بتونن می‌رن</div>` + chip(300, 470, 'نظرسنجی تلفنی ۲۰۲۱ · ۱۳۰۰ نفر', '#fff', '#7A8494', 40, 1);
       return r;
     }
     case 'poll': {
       // a phone-call card: the circle is the call button; the question types in; the 1300 counter climbs; source chip
-      const tn = W(b, '۱۳۰۰'), tq = W(b, 'اگه'), tmh = W(b, 'مهاجرت'), n = counter(1300, pr(t, tn - .3, tn + .9));
+      const tn = W(b, '۱۳۰۰'), tq = W(b, 'اگه'), tmh = W(b, 'مهاجرت'), n = counter(1300, pr(t, A + .3, Math.max(A + 1.5, tn + .4)));
       r += card(110, 420, 860, 760, '', `transform:scale(${sp(pr(t, A, A + .5)).toFixed(3)});transform-origin:540px 800px`);
       let pul = ''; for (let i = 0; i < 3; i++) { const ph = ((t * .8 + i / 3) % 1); pul += `<circle cx="540" cy="620" r="${80 + 110 * ph}" fill="none" stroke="${ACC}" stroke-width="${6 * (1 - ph) + 1}" opacity="${(1 - ph).toFixed(2)}"/>`; }
       r += `<svg class="a" style="left:0;top:0" width="1080" height="1920">${pul}</svg>` + ring(540, 620, 80, ACC, `<text x="540" y="652" text-anchor="middle" font-size="86">📞</text>`);
       r += T(170, 470, '۰۰:' + String(Math.min(59, Math.floor(u * 4))).padStart(2, '0'), 44, '#7A8494', 'direction:ltr');
-      const q = 'اگه بتونی، مهاجرت می‌کنی؟', kq = pr(t, tq - .1, tmh + .6);
+      const q = 'اگه بتونی، مهاجرت می‌کنی؟', kq = pr(t, A + .4, Math.max(A + 2, tmh + .4));
       r += `<div class="a" style="left:170px;top:780px;width:740px;padding:24px 34px 34px;border-radius:36px;border-bottom-left-radius:10px;background:#EFE9E0;font:900 58px/1.35 V;color:${INK};white-space:normal">${q.slice(0, Math.round(q.length * cl(kq)))}${kq < 1 ? '▌' : ''}</div>`;
       r += T(170, 1010, fa(n), 120, ACC) + T(470, 1050, 'نفر، تلفنی', 52, '#7A8494');
       r += chip(150, 1230, 'Keyou Analytics · 2021', INK, '#fff', 48, pr(t, A + .6, A + .9), true);
       r += head('یه نظرسنجی تلفنی', pr(t, A, A + .4), 230);
-      if (t > tmh) r += chip(640, 1230, 'آره / نه', ACC, '#fff', 52, pr(t, tmh, tmh + .3)) + cursor(mix(980, 760, ex(pr(t, tmh, tmh + .5))), mix(1500, 1270, ex(pr(t, tmh, tmh + .5))), t, tmh + .5);
+      if (t > tmh) r += chip(660, 1330, 'آره / نه', ACC, '#fff', 52, pr(t, tmh, tmh + .3)) + cursor(mix(980, 760, ex(pr(t, tmh, tmh + .5))), mix(1500, 1370, ex(pr(t, tmh, tmh + .5))), t, tmh + .5);
       return r;
     }
     case 'bars': {
@@ -149,13 +149,13 @@ function scene(b, t) {
       r += T(250, 1215, '۲۰۱۶', 52, '#7A8494') + T(650, 1215, '۲۰۲۱', 52, INK);
       if (k0 > 0) r += T(215, base - h16 - 110, fa((29.8 * ex(k0)).toFixed(1)).replace('.', '٫') + '٪', 76, '#7A8494');
       if (k1 > 0) r += T(615, base - h21 - 110, fa((33.3 * ex(k1)).toFixed(1)).replace('.', '٫') + '٪', 76, ACC);
-      r += chip(560, 300, 'دو نظرسنجی جدا', '#fff', '#7A8494', 42, pr(t, t0 - .1, t0 + .2)) + people(330, 1340, 3, 1, pr(t, t3, t3 + .8), 70) + T(620, 1350, '= یک از سه', 56, INK, `opacity:${pr(t, t3 + .5, t3 + .9)}`);
+      r += chip(130, 410, 'دو نظرسنجی جدا', '#F3EEE7', '#7A8494', 40, pr(t, t0 - .1, t0 + .2)) + people(560, 410, 3, 1, pr(t, t3, t3 + .8), 54) + T(780, 420, '= یک از سه', 44, INK, `opacity:${pr(t, t3 + .5, t3 + .9)}`);
       r += head('اگه بتونن، می‌رن', pr(t, A, A + .4), 230);
       return r;
     }
     case 'gap': {
       // the circle scans the two numbers; «خواستن» bar is long, «رفتن» bar stays short; a bracket labels the gap
-      const tg = W(b, 'خواستنه'), tw = W(b, 'زیاد،'), tr = W(b, 'شانس'), kw = ex(pr(t, tw - .2, tw + .6)), kr = ex(pr(t, tr - .2, tr + .6));
+      const tg = W(b, 'خواستنه'), tw = W(b, 'زیاد،'), tr = W(b, 'شانس'), kw = ex(pr(t, A + .2, Math.max(A + 1, tw))), kr = ex(pr(t, A + .6, Math.max(A + 1.4, tr)));
       const sx = mix(160, 900, (Math.sin(u * 1.6) + 1) / 2);
       r += ring(sx, 560, 70, 'rgba(30,42,63,.06)', '', ACC);
       r += T(800, 760, 'خواستن', 58, INK) + `<div class="a" style="left:120px;top:850px;width:${(840 * kw).toFixed(0)}px;height:90px;border-radius:45px;background:${ACC}"></div>`;
@@ -169,8 +169,8 @@ function scene(b, t) {
       const tc = A + .2, t71 = W(b, '۷۱'), t200 = W(b, '۲۰۰'), ta = W(b, 'آستانه');
       r += card(90, 300, 900, 420, `<div class="a" dir="ltr" style="left:60px;top:60px;font:900 70px V;color:${INK}">Homo Emigraturus</div><div class="a" dir="ltr" style="left:60px;top:170px;font:600 40px V;color:#7A8494">PhD thesis · University of Calgary · 2024</div><div class="a" style="left:60px;top:250px;width:${(780 * ex(pr(t, A + .3, A + 1.4))).toFixed(0)}px;height:14px;border-radius:7px;background:#EFE9E0"></div><div class="a" style="left:60px;top:290px;width:${(600 * ex(pr(t, A + .5, A + 1.6))).toFixed(0)}px;height:14px;border-radius:7px;background:#EFE9E0"></div>`, `transform:scale(${sp(pr(t, A, A + .5)).toFixed(3)});transform-origin:540px 500px`);
       r += chip(620, 230, '🎓 Calgary', ACC, '#fff', 48, pr(t, tc - .1, tc + .25), true);
-      r += card(90, 780, 420, 300, `<div class="a" style="left:0;right:0;top:40px;text-align:center;font:900 130px V;color:${ACC}">${fa(counter(71, pr(t, t71 - .2, t71 + .6)))}</div><div class="a" style="left:0;right:0;top:210px;text-align:center;font:900 46px V">مصاحبه</div>`);
-      r += card(570, 780, 420, 300, `<div class="a" style="left:0;right:0;top:40px;text-align:center;font:900 110px V;color:${INK}">${fa(counter(200, pr(t, t200 - .2, t200 + .6)))}k+</div><div class="a" style="left:0;right:0;top:210px;text-align:center;font:900 46px V">توییت فارسی</div>`);
+      r += card(90, 780, 420, 300, `<div class="a" style="left:0;right:0;top:40px;text-align:center;font:900 130px V;color:${ACC}">${fa(counter(71, pr(t, A + .1, t71 + .4)))}</div><div class="a" style="left:0;right:0;top:210px;text-align:center;font:900 46px V">مصاحبه</div>`);
+      r += card(570, 780, 420, 300, `<div class="a" style="left:0;right:0;top:40px;text-align:center;font:900 110px V;color:${INK}">${fa(counter(200, pr(t, A + .4, t200 + .4)))}k+</div><div class="a" style="left:0;right:0;top:210px;text-align:center;font:900 46px V">توییت فارسی</div>`);
       for (let i = 0; i < 4; i++) { const ph = ((u * .35 + i / 4) % 1); if (t > t200 - .3) r += `<div class="a" style="left:${600 + (i % 2) * 120}px;top:${(1260 - 160 * ph).toFixed(0)}px;width:300px;height:56px;border-radius:28px;background:#fff;opacity:${(1 - ph).toFixed(2)};box-shadow:0 6px 16px rgba(30,42,63,.1)"><div style="margin:20px 26px;height:14px;width:${120 + 60 * (i % 3)}px;border-radius:7px;background:#D9D3CA"></div></div>`; }
       r += chip(110, 1200, '«در آستانه‌ی رفتن»', INK, '#fff', 60, pr(t, ta - .2, ta + .2));
       return r;
@@ -209,12 +209,12 @@ function scene(b, t) {
     case 'ask': {
       // three answer chips land on «یک / دو / سه»; the circle pulses; the comment bubble and the URL
       const t1 = W(b, 'یک:'), t2 = W(b, 'دو:'), t3 = W(b, 'سه:'), tc = W(b, 'کامنت'), k = ex(pr(t, A, A + .6));
-      let pul = ''; for (let i = 0; i < 3; i++) { const ph = ((u * .7 + i / 3) % 1); pul += `<circle cx="540" cy="520" r="${120 + 180 * ph}" fill="none" stroke="${ACC}" stroke-width="${8 * (1 - ph) + 1}" opacity="${(1 - ph).toFixed(2)}"/>`; }
-      r += `<svg class="a" style="left:0;top:0" width="1080" height="1920">${pul}</svg>` + ring(540, 520, mix(260, 120, k), INK, `<text x="540" y="560" text-anchor="middle" font-family="V" font-weight="900" font-size="110" fill="#fff">؟</text>`, ACC);
-      [['۱  رفتم ✈', t1], ['۲  موندم 🏠', t2], ['۳  هنوز نیمه‌رفته‌ام 🧳', t3]].forEach(([c, tq], i) => { r += chip(150, 760 + i * 150, c, i === 2 ? ACC : '#fff', i === 2 ? '#fff' : INK, 64, pr(t, tq - .15, tq + .2)); });
+      let pul = ''; for (let i = 0; i < 3; i++) { const ph = ((u * .7 + i / 3) % 1); pul += `<circle cx="540" cy="470" r="${120 + 180 * ph}" fill="none" stroke="${ACC}" stroke-width="${8 * (1 - ph) + 1}" opacity="${(1 - ph).toFixed(2)}"/>`; }
+      r += `<svg class="a" style="left:0;top:0" width="1080" height="1920">${pul}</svg>` + ring(540, 470, mix(240, 110, k), INK, `<text x="540" y="505" text-anchor="middle" font-family="V" font-weight="900" font-size="100" fill="#fff">؟</text>`, ACC);
+      [['۱  رفتم ✈', t1], ['۲  موندم 🏠', t2], ['۳  هنوز نیمه‌رفته‌ام 🧳', t3]].forEach(([c, tq], i) => { r += chip(150, 640 + i * 130, c, i === 2 ? ACC : '#fff', i === 2 ? '#fff' : INK, 64, pr(t, tq - .15, tq + .2)); });
       const kt = pr(t, tc - .6, tc + .2), ksh = pr(t, tc + .5, tc + 1.1);
-      r += card(110, 1220, 860, 120, `<div class="a" style="right:40px;top:28px;font:900 52px V;color:${INK}">${kt >= .3 ? '۳ 🧳' : ''}${kt > 0 && kt < 1 ? '▌' : ''}</div><div class="a" style="left:24px;top:18px;padding:10px 26px 18px;border-radius:30px;background:${kt >= 1 ? ACC : '#D9D3CA'};color:#fff;font:900 44px V">ارسال</div>`);
-      if (ksh > 0) r += chip(70, 1360, 'بفرست برای اونی که می‌گه «یه روز می‌رم» ↗', '#fff', INK, 44, ksh) + cursor(mix(980, 200, ex(pr(t, tc - .5, tc))), mix(1700, 1270, ex(pr(t, tc - .5, tc))), t, tc);
+      r += card(110, 1040, 860, 120, `<div class="a" style="right:40px;top:28px;font:900 52px V;color:${INK}">${kt >= .3 ? '۳ 🧳' : ''}${kt > 0 && kt < 1 ? '▌' : ''}</div><div class="a" style="left:24px;top:18px;padding:10px 26px 18px;border-radius:30px;background:${kt >= 1 ? ACC : '#D9D3CA'};color:#fff;font:900 44px V">ارسال</div>`);
+      if (ksh > 0) r += chip(70, 1200, 'بفرست برای اونی که می‌گه «یه روز می‌رم» ↗', '#fff', INK, 44, ksh) + cursor(mix(980, 200, ex(pr(t, tc - .5, tc))), mix(1600, 1090, ex(pr(t, tc - .5, tc))), t, tc);
       r += head('تو کدومی؟', pr(t, A, A + .4), 210);
       return r;
     }
