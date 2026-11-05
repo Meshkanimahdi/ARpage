@@ -120,9 +120,9 @@ function scene(b, t) {
       let rings = ''; for (let i = 0; i < 3; i++) { const ph = ((t * .5 + i / 3) % 1); rings += `<circle cx="300" cy="1350" r="${230 + 260 * ph}" fill="none" stroke="#fff" stroke-width="${10 * (1 - ph) + 2}" opacity="${(.85 * (1 - ph)).toFixed(2)}"/>`; }
       r += `<svg class="a" style="left:0;top:0" width="1080" height="1920"><circle cx="300" cy="1350" r="230" fill="none" stroke="${ACC}" stroke-width="12"/>${rings}</svg>`;
       r += `<div class="a" style="left:0;top:0;width:1080px;height:700px;background:linear-gradient(#F3EEE7 0%,#F3EEE7 70%,rgba(243,238,231,0))"></div>`;
-      r += `<div class="a" style="left:0;right:0;top:170px;text-align:center;font-size:110px;color:${INK}">زندگیت موکول شده</div><div class="a" style="left:0;right:0;top:320px;text-align:center;font-size:110px;color:${INK}">به <span style="display:inline-block;background:${ACC};color:#fff;padding:0 .2em .1em;border-radius:.18em">مهاجرت</span>؟</div>`;
+      r += `<div class="a" style="left:0;right:0;top:170px;text-align:center;font-size:116px;color:${INK}">زندگیت</div><div class="a" style="left:0;right:0;top:320px;text-align:center;font-size:116px;color:${INK}">منتظر <span style="display:inline-block;background:${ACC};color:#fff;padding:0 .2em .1em;border-radius:.18em">مهاجرته</span>؟</div>`;
       [['💼 کار', tr], ['🏠 خونه', W(b, 'خونه،')], ['❤️ رابطه', W(b, 'رابطه،')]].forEach(([c, tq], i) => { r += chip(600, 900 + i * 120, c + (t > tm ? ' · بعداً' : ''), '#fff', INK, 52, pr(t, tq - .1, tq + .25)); });
-      r += chip(560, 1660, 'بعد از رفتن؟', INK, '#fff', 64, pr(t, tm + .2, tm + .5)) + chip(300, 470, 'نظرسنجی تلفنی ۲۰۲۱ · ۱۳۰۰ نفر', '#fff', '#7A8494', 40, 1);
+      r += chip(560, 1660, 'بعد از رفتن؟', INK, '#fff', 64, pr(t, tm + .2, tm + .5)) + `<div class="a" style="left:80px;top:${(1720 - 20 * ex(pr(t, 0, .8))).toFixed(0)}px;padding:6px 30px 18px;border-radius:30px;background:${INK};color:#fff;font:900 96px V">${fa(Math.round(33 * ex(pr(t, 0, .9))))}٪</div><div class="a" style="left:80px;top:1650px;font:900 34px V;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6)">نظرسنجی ۲۰۲۱: اگه بتونن می‌رن</div>` + chip(300, 470, 'نظرسنجی تلفنی ۲۰۲۱ · ۱۳۰۰ نفر', '#fff', '#7A8494', 40, 1);
       return r;
     }
     case 'poll': {
