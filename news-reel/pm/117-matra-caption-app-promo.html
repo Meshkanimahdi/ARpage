@@ -78,7 +78,7 @@ const W = (b, s) => { const i = b.words.findIndex(w => w.w.includes(s)); return 
 // opening sound of each scene, matched to its motion (never a whoosh)
 const OPEN = {hook: 'riser', poll: 'notify', bars: 'sweep_soft', gap: 'click', study: 'typing', limbo: 'sweep_soft', mirror: 'shimmer', report: 'typing', ask: 'notify'};
 const MOM = {
-  hook: b => [[W(b, 'معلقه'), 'tap'], [W(b, 'نیمه‌بسته'), 'tap']],
+  hook: b => [[W(b, 'کار،'), 'tap'], [W(b, 'رابطه،'), 'tap'], [W(b, 'رفتن'), 'click']],
   poll: b => [[W(b, '۱۳۰۰'), 'counter_tick'], [W(b, 'مهاجرت'), 'click']],
   bars: b => [[W(b, '۳۳'), 'counter_tick'], [W(b, '۲۰۱۶'), 'click'], [W(b, '۲۹.۸'), 'counter_tick']],
   gap: b => [[W(b, 'Calgary'), 'sweep_soft'], [W(b, 'زیاد،'), 'tap'], [W(b, 'شانس'), 'click']],
@@ -115,14 +115,14 @@ function scene(b, t) {
     case 'hook': {
       // frame 0: the half-packed suitcase plate big and bright with a slow push-in; headline at the top from frame 0;
       // the through-line circle frames the suitcase like a porthole and pulses; «رفتی» / «موندی» chips tick on their words
-      const z = 1 + .16 * pr(t, 0, Bb), tr = W(b, 'معلقه'), tm = W(b, 'نیمه‌بسته');
+      const z = 1 + .16 * pr(t, 0, Bb), tr = W(b, 'کار،'), tm = W(b, 'رفتن');
       r += `<div class="a" style="left:0;top:560px;width:1080px;height:1360px;overflow:hidden"><img src="${U('el/h1.jpg')}" style="position:absolute;left:0;top:-260px;width:1080px;transform:scale(${z.toFixed(3)});transform-origin:300px 1100px"></div>`;
       let rings = ''; for (let i = 0; i < 3; i++) { const ph = ((t * .5 + i / 3) % 1); rings += `<circle cx="300" cy="1350" r="${230 + 260 * ph}" fill="none" stroke="#fff" stroke-width="${10 * (1 - ph) + 2}" opacity="${(.85 * (1 - ph)).toFixed(2)}"/>`; }
       r += `<svg class="a" style="left:0;top:0" width="1080" height="1920"><circle cx="300" cy="1350" r="230" fill="none" stroke="${ACC}" stroke-width="12"/>${rings}</svg>`;
       r += `<div class="a" style="left:0;top:0;width:1080px;height:700px;background:linear-gradient(#F3EEE7 0%,#F3EEE7 70%,rgba(243,238,231,0))"></div>`;
-      r += `<div class="a" style="left:0;right:0;top:170px;text-align:center;font-size:96px;color:${INK}">سال‌هاست می‌گی <span style="display:inline-block;background:${ACC};color:#fff;padding:0 .2em .1em;border-radius:.18em">مهاجرت</span> می‌کنم؛</div><div class="a" style="left:0;right:0;top:320px;text-align:center;font-size:104px;color:${INK}">زندگیت معلقه؟</div>`;
-      r += chip(560, 1100, '⏸ معلق', '#fff', INK, 60, pr(t, tr - .1, tr + .25));
-      r += chip(560, 1660, 'نیمه‌بسته؟', INK, '#fff', 64, pr(t, tm + .2, tm + .5)) + chip(300, 470, 'نظرسنجی تلفنی ۲۰۲۱ · ۱۳۰۰ نفر', '#fff', '#7A8494', 40, 1);
+      r += `<div class="a" style="left:0;right:0;top:170px;text-align:center;font-size:110px;color:${INK}">زندگیت موکول شده</div><div class="a" style="left:0;right:0;top:320px;text-align:center;font-size:110px;color:${INK}">به <span style="display:inline-block;background:${ACC};color:#fff;padding:0 .2em .1em;border-radius:.18em">مهاجرت</span>؟</div>`;
+      [['💼 کار', tr], ['🏠 خونه', W(b, 'خونه،')], ['❤️ رابطه', W(b, 'رابطه،')]].forEach(([c, tq], i) => { r += chip(600, 900 + i * 120, c + (t > tm ? ' · بعداً' : ''), '#fff', INK, 52, pr(t, tq - .1, tq + .25)); });
+      r += chip(560, 1660, 'بعد از رفتن؟', INK, '#fff', 64, pr(t, tm + .2, tm + .5)) + chip(300, 470, 'نظرسنجی تلفنی ۲۰۲۱ · ۱۳۰۰ نفر', '#fff', '#7A8494', 40, 1);
       return r;
     }
     case 'poll': {
