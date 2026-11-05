@@ -144,7 +144,7 @@ function seek(t) {
 }
 function caption(b, t, endOn) {
   const sub = $('sub');
-  if (endOn || t > b.L.end + .3 || (b.sc.type === 'hook' && t < b.wt(3) - .05)) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  if (endOn || t > b.L.end + .3 || (b.sc.type === 'hook' && t < b.wt(4) - .05)) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
   let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
   const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + c0;
   if (sub._k !== key) { sub._k = key; const lat = w => /^[«]?[A-Za-z0-9.\-]+[،,.!?؟…؛»]*$/.test(w.w); const gs = [];
@@ -232,11 +232,11 @@ function scene(b, t, u, si, off) {
       const z = 1.0 + .14 * io(pr(t, 0, 2.2));
       r = bleed(s.photo, z, '50% 45%');
       r += `<div style="position:absolute;left:0;right:0;top:0;height:760px;background:linear-gradient(rgba(29,26,47,.82),rgba(29,26,47,.5) 70%,rgba(29,26,47,0))"></div>`;
-      r += `<div class="t" style="top:230px;font-size:132px;color:#fff;mix-blend-mode:normal;text-shadow:8px 8px 0 ${INK.blue}">بچه‌ت فقط</div>`;
-      r += `<div class="t" style="top:400px;font-size:132px;color:#fff;mix-blend-mode:normal;text-shadow:8px 8px 0 ${INK.pink}"><span style="background:${INK.yel};color:${INK.ink};padding:0 .16em .06em;border-radius:.14em;text-shadow:none">حفظ</span> می‌کنه؟</div>`;
-      r += big(`${fa(39)}٪`, 110, 930, 220, INK.pink, '#fff', pr(t, .5, .9), -6);
-      r += chip(560, 980, 'تا ۲۰۳۰', INK.yel, INK.ink, 80, pr(t, .9, 1.2), 4);
-      r += chip(520, 1120, 'انتظار کارفرماها', '#fff', INK.ink, 58, pr(t, 1.3, 1.6), -2);
+      r += `<div class="t" style="top:230px;font-size:132px;color:#fff;mix-blend-mode:normal;text-shadow:8px 8px 0 ${INK.blue};transform:scale(${mix(1.5, 1, ex(pr(t, 0, .25))).toFixed(3)})">بچه‌ت فقط</div>`;
+      r += `<div class="t" style="top:400px;font-size:132px;color:#fff;mix-blend-mode:normal;text-shadow:8px 8px 0 ${INK.pink}"><span style="display:inline-block;background:${INK.yel};color:${INK.ink};padding:0 .16em .06em;border-radius:.14em;text-shadow:none;transform:rotate(${(-6 * (1 - ex(pr(t, .1, .4)))).toFixed(2)}deg) scale(${mix(1.8, 1, ex(pr(t, .1, .4))).toFixed(3)})">حفظ</span> می‌کنه؟</div>`;
+      r += big(`${fa(39)}٪`, 110, 930, 220, INK.pink, '#fff', pr(t, .3, .7), -6);
+      r += chip(560, 980, 'تا ۲۰۳۰', INK.yel, INK.ink, 80, pr(t, .6, .9), 4);
+      r += chip(250, 1120, 'مهارت‌های اصلی عوض می‌شه', '#fff', INK.ink, 58, pr(t, .9, 1.2), -2);
       r += logoChip(110, 1240, 96, 'wef.png', pr(t, Math.max(1.8, b.wt(5) - .1), Math.max(2.1, b.wt(5) + .2)), 'World Economic Forum');
       return r;
     }
@@ -251,7 +251,7 @@ function scene(b, t, u, si, off) {
       const L3 = ['تفکر خلاق', 'تاب‌آوری', 'کنجکاوی'];
       r += photoCard(s.photo, 560, 220, 440, 560, 4, 1.05 + .06 * pr(t, A, B1), '50% 40%', pr(t, A, A + .5));
       L3.forEach((l, i) => { r += chip(90, 260 + i * 170, l, [INK.yel, INK.green, INK.blue][i], i ? '#fff' : INK.ink, 72, pr(t, K(i) - .05, K(i) + .25), i % 2 ? 3 : -3); });
-      r += card(110, 860, 860, 420, '#fff', `<div style="font-size:60px">تحلیل کردن</div><div style="font-size:170px;color:${INK.red};line-height:1.1">${fa(Math.round(70 * ex(pr(t, K(4) - .1, K(4) + .7))))}٪</div><div style="font:600 44px V">کارفرماها: ضروریه</div>`, pr(t, K(3) - .1, K(3) + .3));
+      r += card(110, 860, 860, 420, '#fff', `<div style="font-size:60px">تفکر تحلیلی</div><div style="font-size:170px;color:${INK.red};line-height:1.1">≈${fa(Math.round(70 * ex(pr(t, K(4) - .1, K(4) + .7))))}٪</div><div style="font:600 44px V">کارفرماها می‌گن ضروریه</div>`, pr(t, K(3) - .1, K(3) + .3));
       return r;
     }
     case 'versus': {
@@ -261,7 +261,6 @@ function scene(b, t, u, si, off) {
       r += `<div style="position:absolute;left:140px;top:760px;width:800px;height:16px;background:${INK.ink};transform:rotate(${tilt}deg);transform-origin:50% 50%"></div>`;
       r += card(90, 820, 400, 330, INK.yel, `<div>حفظ کردن</div><div>جواب</div>`, k1, -tilt / 2);
       r += card(590, 820, 400, 330, INK.green, `<div style="color:#fff">پرسیدن</div><div style="color:#fff">سؤال</div>`, k2, -tilt / 2);
-      r += cursor(mix(330, 790, ex(pr(t, K(1) - .4, K(1)))), 1080, t, K(1) + .1);
       return r;
     }
     case 'do1': {
@@ -269,20 +268,20 @@ function scene(b, t, u, si, off) {
       r += big(fa(1), 110, 210, 260, INK.pink, '#fff', pr(t, K(0) - .1, K(0) + .3), -6);
       r += photoCard(s.photo, 470, 240, 520, 620, 3, 1.04 + .08 * pr(t, A, B1), '50% 60%', pr(t, A + .1, A + .6));
       r += card(100, 960, 880, 300, '#fff', `<div style="font-size:72px">«${q.slice(0, Math.round(q.length * cl(kq)))}${kq < 1 ? '▌' : ''}»</div>`, pr(t, A + .4, A + .8), -1);
-      r += chip(300, 1300, 'جای جواب دادن', INK.yel, INK.ink, 58, pr(t, A + .8, A + 1.1), 2);
       return r;
     }
     case 'do2': {
       const kc = pr(t, K(2) - .1, K(2) + .4); r += chip(600, 860, 'برای بزرگ‌ترها', INK.ink, '#fff', 50, pr(t, A + .3, A + .6), -2);
       r += big(fa(2), 110, 200, 260, INK.blue, '#fff', pr(t, K(0) - .1, K(0) + .3), -6);
       r += photoCard(s.photo, 520, 230, 460, 520, -3, 1.04 + .08 * pr(t, A, B1), '50% 50%', pr(t, A + .1, A + .6));
-      const inner = `<rect x="30" y="120" width="380" height="110" rx="34" fill="${INK.ink}"/><text x="390" y="190" text-anchor="start" direction="rtl" font-family="V" font-weight="900" font-size="40" fill="#fff">چرا آسمون آبیه؟</text>` +
-        `<rect x="60" y="260" width="380" height="150" rx="34" fill="${INK.yel}"/><text x="420" y="330" text-anchor="start" direction="rtl" font-family="V" font-weight="900" font-size="36" fill="${INK.ink}">جواب چت‌بات…</text>` +
-        (kc > 0 ? `<g transform="translate(240 520) scale(${spring(kc).toFixed(3)})"><circle r="80" fill="${INK.green}"/><path d="M -36 0 L -10 26 L 40 -28" stroke="#fff" stroke-width="18" fill="none" stroke-linecap="round"/></g>` : '');
+      const inner = (kc > 0 ? `<g transform="translate(240 560) scale(${spring(kc).toFixed(3)})"><circle r="80" fill="${INK.green}"/><path d="M -36 0 L -10 26 L 40 -28" stroke="#fff" stroke-width="18" fill="none" stroke-linecap="round"/></g>` : '');
       r += phone(120, 800, 460, inner, pr(t, A + .3, A + .8));
+      const kb = pr(t, A + .7, A + 1.0), ka = pr(t, A + 1.3, A + 1.6);
+      if (kb > 0) r += `<div style="position:absolute;left:170px;top:930px;width:360px;padding:18px 24px;border-radius:28px;background:${INK.ink};color:#fff;font:900 40px/1.35 V;text-align:right;opacity:${cl(kb * 4)}">چرا آسمون آبیه؟</div>`;
+      if (ka > 0) r += `<div style="position:absolute;left:150px;top:1060px;width:380px;padding:18px 24px;border-radius:28px;background:${INK.yel};color:${INK.ink};font:900 36px/1.4 V;text-align:right;opacity:${cl(ka * 4)}">نور آبی بیشتر پخش می‌شه…</div>`;
       r += chip(620, 1000, 'با هم', INK.pink, '#fff', 80, pr(t, K(1) - .05, K(1) + .25), 3);
-      r += chip(600, 1200, 'چک کنید ✓', INK.green, '#fff', 66, kc, -2);
-      r += chip(560, 1380, 'مهارت اصلی: چک کردن', INK.yel, INK.ink, 54, pr(t, K(3) - .05, K(3) + .25), 2);
+      r += chip(620, 1180, 'چک کنید ✓', INK.green, '#fff', 66, kc, -2);
+      r += chip(380, 1330, 'مهارت اصلی: چک کردن', INK.yel, INK.ink, 54, pr(t, K(3) - .05, K(3) + .25), 2);
       return r;
     }
     case 'do3': {
@@ -290,26 +289,25 @@ function scene(b, t, u, si, off) {
       r += big(fa(3), 110, 200, 260, INK.green, '#fff', pr(t, K(0) - .1, K(0) + .3), -6);
       r += photoCard(s.photo, 470, 220, 520, 560, 3, 1.04 + .08 * pr(t, A, B1), '50% 50%', pr(t, A + .1, A + .6));
       L3.forEach((l, i) => { r += card(80 + i * 320, 880, 280, 300, [INK.yel, INK.pink, INK.blue][i], `<div style="font-size:110px">${l[0]}</div><div style="${i ? 'color:#fff' : ''}">${l[1]}</div>`, pr(t, K(i + 2) - .1, K(i + 2) + .3), i % 2 ? 3 : -3); });
-      r += chip(260, 1260, 'فکر می‌سازه', INK.ink, '#fff', 70, pr(t, K(5) - .05, K(5) + .25), -2);
       return r;
     }
     case 'age': {
       const k13 = pr(t, K(0) - .1, K(0) + .35), ks = pr(t, K(1) - .1, K(1) + .35);
       r += logoChip(260, 230, 120, 'unesco.svg', pr(t, A, A + .4), 'UNESCO · 2023');
-      r += big(`${fa(13)}+ سال`, 290, 520, 300, INK.red, '#fff', k13, -5);
-      r += card(130, 1000, 820, 260, '#fff', `<div style="font-size:60px">پیشنهاد یونسکو: در نظر بگیرید</div><div style="font:600 46px V">برای استفاده در کلاس</div>`, pr(t, A + .5, A + .9), 1);
-      r += chip(320, 1300, '🛡 حریم خصوصی', INK.green, '#fff', 72, ks, -3);
+      r += big(`${fa(13)}+ سال`, 200, 480, 220, INK.red, '#fff', k13, -5);
+      r += card(130, 860, 820, 260, '#fff', `<div style="font-size:56px">پیشنهاد: «در نظر بگیرید»</div><div style="font:600 44px V">سن ۱۳ سال برای استفاده در کلاس</div>`, pr(t, A + .5, A + .9), 1);
+      r += chip(320, 1190, '🛡 حریم خصوصی', INK.green, '#fff', 72, ks, -3);
       return r;
     }
     case 'ask': {
       const kq = pr(t, A + .4, K(1) + .2), msg = 'امسال یاد گرفت…';
       r += bleed(s.photo, 1.05 + .1 * pr(t, A, B1), '50% 50%', 'filter:brightness(.75)');
-      const inner = `<text x="420" y="130" text-anchor="start" direction="rtl" font-family="V" font-weight="900" font-size="40" fill="${INK.ink}">کامنت‌ها</text>` +
-        `<rect x="30" y="170" width="400" height="120" rx="30" fill="#EEE8DC"/><text x="410" y="245" text-anchor="start" direction="rtl" font-family="V" font-weight="900" font-size="40" fill="${INK.ink}">${msg.slice(0, Math.round(msg.length * cl(kq)))}</text>` +
-        `<rect x="30" y="320" width="180" height="90" rx="30" fill="${INK.pink}"/><text x="120" y="378" text-anchor="middle" font-family="V" font-weight="900" font-size="38" fill="#fff">ارسال</text>`;
+      const inner = '';
       r += phone(310, 380, 460, inner, pr(t, A + .1, A + .5));
+      if (t > A + .4) r += `<div style="position:absolute;left:350px;top:500px;width:380px;text-align:right;font:900 40px V;color:${INK.ink}">کامنت‌ها</div>` +
+        `<div style="position:absolute;left:345px;top:570px;width:340px;padding:22px 26px;border-radius:26px;background:#EEE8DC;color:${INK.ink};font:900 40px/1.35 V;text-align:right">${msg.slice(0, Math.round(msg.length * cl(kq)))}${kq < 1 ? '▌' : ''}</div>` +
+        `<div style="position:absolute;left:345px;top:720px;padding:14px 34px 22px;border-radius:24px;background:${INK.pink};color:#fff;font:900 40px V">ارسال</div>`;
       r += chip(150, 1330, 'بفرست برای پدر و مادرها ↗', INK.yel, INK.ink, 60, pr(t, K(2) - .05, K(2) + .25), -2);
-      r += cursor(mix(820, 420, ex(pr(t, K(1) - .4, K(1)))), 1150, t, K(1) + .1);
       return r;
     }
   }
