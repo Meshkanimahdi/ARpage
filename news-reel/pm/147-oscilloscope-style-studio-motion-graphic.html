@@ -62,7 +62,7 @@ function parse(b) {
 
 // key moments (camera re-frames) and the sound that matches each motion (never a whoosh per cut)
 const HITS = {
-  hook: x => [], stake: x => [x.at('چت‌بات'), x.at('صدای')], paper: x => [x.at('سه'), x.at('ایمنی')], quote: x => [x.at('بهتر'), x.at('کاذب')],
+  hook: x => [x.at('ChatGPT'), x.at('شمعه'), x.at('استفاده')], stake: x => [x.at('چت‌بات'), x.at('صدای')], paper: x => [x.at('سه'), x.at('ایمنی')], quote: x => [x.at('بهتر'), x.at('کاذب')],
   mit: x => [x.at('MIT'), x.at('عمداً'), x.at('نود')], step1: x => [x.at('نشونم'), x.at('نصف')], step2: x => [x.at('دیاگ'), x.at('تأیید')],
   step3: x => [x.at('قیمت'), x.at('مکتوب'), x.at('اعتماد')], ask: x => [x.at('کامنت'), x.at('راننده‌ها'), x.at('مکانیکت')]
 };
@@ -86,6 +86,7 @@ window.ready = (async () => {
   await Promise.all(imgs.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = u; })));
   await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'مکانیک ChatGPT')));
   B.forEach(x => { x.keys = (HITS[x.s.type] || (() => []))(x).filter(v => v > x.a + .6 && v < x.z - .6).sort((p, q) => p - q); });
+  B.forEach(x => { const pz = [x.a, ...x.keys, x.z], fill = []; for (let i = 1; i < pz.length; i++) { const g = pz[i] - pz[i - 1], n = Math.ceil(g / 2.7) - 1; for (let j = 1; j <= n; j++) fill.push(pz[i - 1] + g * j / (n + 1)); } x.keys = [...x.keys, ...fill].sort((p, q) => p - q); });
   const sc = [];
   for (const x of B) { const pts = [x.a, ...x.keys]; const cues = (SFX[x.s.type] || (() => []))(x).filter(c => c[0] >= x.a - .05 && c[0] < x.z);
     pts.forEach((p, j) => { const t1 = j + 1 < pts.length ? pts[j + 1] : x.z;
@@ -194,7 +195,7 @@ function scene(x, t) {
       const jolt = t > 1.0 && t < 1.25 ? Math.sin((t - 1.0) * 80) * 10 * (1 - lin(t, 1.0, 1.25)) : 0;
       return `<div class="a" style="inset:0;transform:translate(${jolt.toFixed(1)}px,0) scale(${z.toFixed(4)});transform-origin:520px 1150px"><img src="${url('el/h1.jpg')}" style="position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover;object-position:50% 50%;filter:brightness(1.12)"></div>` +
         `<div class="a" style="left:0;right:0;top:0;height:720px;background:linear-gradient(rgba(4,16,10,.94),rgba(4,16,10,.85) 75%,rgba(4,16,10,0))"></div>` +
-        `<div class="a" style="left:40px;right:40px;top:110px;text-align:center;font-size:112px;line-height:1.22"><div>مکانیک‌ها، مشتری</div><div>با جواب <span dir="ltr" style="display:inline-block;padding:0 24px 12px;border-radius:22px;background:var(--ph);color:#04100A">ChatGPT</span> میاد</div></div>` +
+        `<div class="a" style="left:40px;right:40px;top:110px;text-align:center;font-size:104px;line-height:1.22"><div>مکانیک‌ها، مشتری</div><div style="font-size:92px;white-space:nowrap">با جواب <span dir="ltr" style="display:inline-block;padding:0 24px 12px;border-radius:22px;background:var(--ph);color:#04100A">ChatGPT</span> میاد</div></div>` +
         (kq > 0 ? `<div class="a" style="left:120px;top:600px;padding:20px 34px 30px;border-radius:30px;border-bottom-right-radius:8px;background:#fff;color:#0B1A12;font:900 52px V;opacity:${cl(kq * 4).toFixed(2)}">${typed('«گفته از شمعه!»', kq)}</div>` : '') +
         chip('بحث؟ یا استفاده؟', 520, 740, 66, 'var(--ph)', '#04100A', t, 1.0) +
         ecg(0, 1360, 1080, 120, lin(t, 0, 1.6), 'var(--ph)', 9, 4) +
@@ -228,13 +229,13 @@ function scene(x, t) {
         `<div class="a" style="left:${(120 + 840 * .72).toFixed(0)}px;top:1170px;width:6px;height:86px;background:#fff"></div>`;
     }
     case 'mit': {
-      const k = lin(t, A, A + .5), tm = at('MIT'), tn = at('نود'), kb = lin(t, tn - .3, tn + .6);
+      const k = lin(t, A, A + .5), tm = at('MIT'), tn = at('نود'), kb = lin(t, A + .5, Math.max(A + 1.5, tn + .3));
       const axis = (y0, col, ph) => { let d = ''; for (let i = 0; i <= 80; i++) { const xx = 560 + i * 5.5, yy = y0 + Math.sin(i * .5 + t * 9 + ph) * 22 * (1 + .6 * Math.sin(i * .13 + t * 2)); d += (i ? 'L' : 'M') + xx.toFixed(1) + ' ' + yy.toFixed(1); } return `<path d="${d}" fill="none" stroke="${col}" stroke-width="5"/>`; };
       return grat() + scope('h6', 90, 280, 440, 760, k, t, A, '50% 50%') + ecg(90, 1150, 440, 80, (t * .5) % 1, 'var(--ph)', 6, 5) +
         `<svg class="a" style="left:0;top:0;overflow:visible" width="1080" height="1920">${axis(400, '#3DFF8E', 0)}${axis(520, '#FFD23F', 1.7)}${axis(640, '#7FD4FF', 3.1)}</svg>` +
         `<div class="a" style="left:1010px;top:380px;font:900 34px V;color:var(--mute)">x</div><div class="a" style="left:1010px;top:500px;font:900 34px V;color:var(--mute)">y</div><div class="a" style="left:1010px;top:620px;font:900 34px V;color:var(--mute)">z</div>` +
         `<div class="a" style="left:560px;top:720px;font:900 40px V;color:var(--mute)">میکروفون + لرزش‌سنج</div>` + chip('عیب‌های عمداً ایجادشده', 560, 1220, 44, '#0A2416', 'var(--ph)', t, at('عمداً')) +
-        `<div class="a" style="left:560px;top:800px;width:440px;text-align:center;font:900 150px V;color:var(--ph)">+${count(90, kb)}٪</div><div class="a" style="left:560px;top:990px;width:440px;text-align:center;font:900 40px V">دقت در آزمایش‌ها</div>` +
+        `<div class="a" style="left:560px;top:800px;width:440px;text-align:center;font:900 150px V;color:var(--ph);direction:ltr">+${count(90, kb)}٪</div><div class="a" style="left:560px;top:990px;width:440px;text-align:center;font:900 40px V">دقت در آزمایش‌ها</div>` +
         chip('<span dir="ltr">MIT</span>', 760, 1120, 70, '#fff', '#111', t, tm, 'ltr');
     }
     case 'step1': {
@@ -265,7 +266,7 @@ function scene(x, t) {
     case 'ask': {
       const k = lin(t, A, A + .5), tc = at('کامنت'), td = at('راننده‌ها'), tm = at('مکانیکت');
       return grat() + `<div class="a" style="left:0;right:0;top:260px;text-align:center">${rise('مشتری‌هاتون چی میارن؟', k, 86)}</div>` +
-        chip('🔧 مکانیک‌ها: کامنت', 140, 480, 60, 'var(--ph)', '#04100A', t, A + .4) + chip('🚗 راننده‌ها: بفرست', 560, 600, 60, '#fff', '#111', t, td) +
+        chip('🔧 مکانیک‌ها: کامنت', 140, 480, 60, 'var(--ph)', '#04100A', t, A + .4) + chip('🚗 راننده‌ها: بفرست', 420, 600, 58, '#fff', '#111', t, td) +
         (t > tc - .1 ? `<div class="a" style="left:120px;top:780px;width:840px;padding:26px 36px 36px;border-radius:34px;background:#0A2416;border:4px solid var(--ph);font:900 48px V">💬 ${typed('کد خطا، عکس داشبورد، صدای موتور…', lin(t, tc - .1, tc + 1.4))}</div>` : '') +
         chip('↗ برای مکانیکت بفرست', 250, 1060, 62, '#fff', '#111', t, tm) +
         ecg(0, 1330, 1080, 90, lin(t, A, x.z), 'var(--ph)', 7, 4) + cur(t, [[A, 900, 1500], [tm + .2, 520, 1090, 1], [x.z, 520, 1090]]);
@@ -277,7 +278,7 @@ function scene(x, t) {
 function endCard(u) {
   return grat() + ecg(0, 760, 1080, 140, lin(u, 0, .8)) +
     `<div class="a" style="left:0;right:0;top:960px;text-align:center">${rise((S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--ph)">$1</span>'), lin(u, .4, .8), 84)}</div>` +
-    `<div class="a" style="left:0;right:0;top:1180px;text-align:center;font:600 56px V;color:var(--mute);opacity:${lin(u, .8, 1.1).toFixed(2)}">${S.end_sub || ''} · ${S.handle || ''}</div>`;
+    `<div class="a" style="left:0;right:0;top:1180px;text-align:center;font:600 56px V;color:var(--mute);opacity:${lin(u, .8, 1.1).toFixed(2)}">${S.end_sub || ''} · <span dir="ltr">${S.handle || ''}</span></div>`;
 }
 window.seek = seek;
 </script>
