@@ -184,7 +184,7 @@ function caption(x, t) {
 
 function scene(x, t) {
   const s = x.s, A = x.a, at = x.at;
-  const big = (n, k) => `<div class="a" style="left:70px;top:230px;font:900 300px/1 V;color:var(--ph);text-shadow:0 0 40px rgba(61,255,142,.6);transform:scale(${mix(1.6, 1, eo(k)).toFixed(3)});opacity:${cl(k * 3).toFixed(2)}">${fa(n)}</div>`;
+  const big = (n, k) => `<div class="a" style="left:96px;top:230px;font:900 300px/1 V;color:var(--ph);text-shadow:0 0 40px rgba(61,255,142,.6);transform:scale(${mix(1.6, 1, eo(k)).toFixed(3)});opacity:${cl(k * 3).toFixed(2)}">${fa(n)}</div>`;
   const bubble = (txt, x0, y0, w, k, me = false) => k <= 0 ? '' : `<div class="a" style="left:${x0}px;top:${y0}px;width:${w}px;padding:20px 30px 28px;border-radius:30px;${me ? 'border-bottom-left-radius:8px;background:#0E301D;border:3px solid var(--ph)' : 'border-bottom-right-radius:8px;background:#fff;color:#0B1A12'};font:900 44px/1.35 V;transform:scale(${pop(0, -1) && cl(k * 1.2).toFixed(3)});opacity:${cl(k * 3).toFixed(2)}">${txt}</div>`;
   const typed = (s0, k) => s0.slice(0, Math.round(s0.length * cl(k))) + (k > 0 && k < 1 ? '▌' : '');
   switch (s.type) {
@@ -205,7 +205,7 @@ function scene(x, t) {
       const k = lin(t, A, A + .5), tg = at('چت‌بات'), ts = at('صدای'), kr = lin(t, ts - .1, x.z);
       const phone = `<div class="a" style="left:80px;top:${(280 + (1 - eo(k)) * 200).toFixed(0)}px;width:520px;height:1000px;border-radius:60px;background:#020805;border:7px solid var(--ph);box-shadow:0 0 40px rgba(61,255,142,.35)"></div>`;
       return grat() + phone +
-        bubble('کد خطای <span dir="ltr">P0300</span>', 130, 380, 420, lin(t, A + .2, A + .6)) +
+        bubble('کد خطای <span dir="ltr">P0300</span>', 130, 380, 420, lin(t, A, A + .3)) + (t < tg - .1 ? `<div class="a" style="left:400px;top:${(560 + 6 * Math.sin(t * 8)).toFixed(0)}px;padding:14px 26px 22px;border-radius:26px;background:#0E301D;border:3px solid var(--ph);font:900 50px V;color:var(--ph)">${'•'.repeat(1 + Math.floor(t * 4) % 3)}</div>` : '') +
         bubble('چت‌بات: احتمالاً شمع یا کوئل…', 130, 560, 420, lin(t, tg - .1, tg + .4), true) +
         (t > ts - .1 ? ecg(120, 1050, 440, 70, kr, 'var(--ph)', 6, 6) + chip(`🎙 ${fa('0:' + String(Math.min(12, Math.floor((t - ts) * 4))).padStart(2, '0'))}`, 150, 1150, 46, '#fff', '#0B1A12', t, ts) : '') +
         scope('h3', 640, 300, 360, 640, lin(t, A + .2, A + .7), t, A, '50% 60%') +
@@ -217,8 +217,8 @@ function scene(x, t) {
         `<div style="font:900 74px/1 Georgia,serif;direction:ltr;text-align:left">Auto Express</div><div style="font:600 34px V;color:#4A6656;margin-top:10px;direction:ltr;text-align:left">27 Oct 2025 · rated by a workshop manager</div><div style="height:5px;background:#0B1A12;margin:24px 0 30px"></div>` +
         bots.map((b, i) => `<div style="height:96px;display:flex;align-items:center;gap:20px;border-bottom:3px solid #C9D6CF;opacity:${cl((t - A - .4 - i * .35) * 3).toFixed(2)};direction:ltr"><span style="font:900 40px V;color:#139C4E">◉</span><span style="font:900 48px V">${b}</span></div>`).join('') +
         `<div style="margin-top:40px;font:900 40px V;color:#4A6656">معیارهای نمره:</div><div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:20px">` +
-        crit.map((c, j) => `<span style="padding:10px 26px 18px;border-radius:30px;background:#0B1A12;color:var(--ph);font:900 42px V;transform:scale(${pop(t, ti - .2 + j * .35).toFixed(3)});display:inline-block">${c}</span>`).join('') + `</div></div>`;
-      return grat() + card + ecg(0, 1320, 1080, 70, lin(t, A, x.z), 'var(--ph)', 6, 4) + chip('سه چت‌بات · خرابی‌های رایج', 220, 1210, 52, 'var(--ph)', '#04100A', t, at('سه'));
+        crit.map((c, j) => `<span style="padding:10px 26px 18px;border-radius:30px;background:#0B1A12;color:var(--ph);font:900 42px V;transform:scale(${pop(t, Math.min(ti - .2, A + 1.4) + j * .3).toFixed(3)});display:inline-block">${c}</span>`).join('') + `</div></div>`;
+      return grat() + card + scope('h4', 90, 1230, 900, 250, lin(t, A + .3, A + .8), t, A, '50% 55%') + chip('سه چت‌بات · خرابی‌های رایج', 220, 1190, 52, 'var(--ph)', '#04100A', t, at('سه'));
     }
     case 'quote': {
       const tb = at('بهتر'), tw = at('کاذب'), kq = lin(t, A + .1, tb + .8), kw = pop(t, tw - .1), conf = mix(40, 140, eo(lin(t, A + .3, tw)));
@@ -226,7 +226,7 @@ function scene(x, t) {
         `<div class="a" style="left:90px;top:860px;width:420px;height:200px;border-radius:26px;background:rgba(61,255,142,.14);border:4px solid var(--ph);text-align:center;font:900 54px/200px V;color:var(--ph);transform:scale(${pop(t, tb).toFixed(3)})">✓ جواب‌های خوب</div>` +
         (kw > 0 ? `<div class="a" style="left:570px;top:860px;width:420px;height:200px;border-radius:26px;background:rgba(255,90,78,.14);border:4px solid var(--red);text-align:center;font:900 50px/200px V;color:var(--red);transform:scale(${kw.toFixed(3)})">⚠ اعتمادبه‌نفس کاذب</div>` : '') +
         `<div class="a" style="left:120px;top:1130px;font:900 40px V;color:var(--mute)">اعتمادبه‌نفس مشتری</div><div class="a" style="left:120px;top:1190px;width:840px;height:46px;border-radius:23px;background:var(--dim)"><div style="width:${Math.min(100, conf / 1.4).toFixed(1)}%;height:100%;border-radius:23px;background:${conf > 100 ? 'var(--red)' : 'var(--ph)'}"></div></div>` +
-        `<div class="a" style="left:${(120 + 840 * .72).toFixed(0)}px;top:1170px;width:6px;height:86px;background:#fff"></div>`;
+        `<div class="a" style="left:${(120 + 840 * .72).toFixed(0)}px;top:1170px;width:6px;height:86px;background:#fff"></div>` + ['«گفته از شمعه»', '«کوئل خرابه»', '«باتری ضعیفه»'].map((c, i) => { const ph = ((t - A) * .25 + i / 3) % 1; return `<div class="a" style="left:${(1080 - 1300 * ph).toFixed(0)}px;top:${1330 + (i % 2) * 90}px;padding:10px 28px 18px;border-radius:26px;background:#fff;color:#0B1A12;font:900 44px V;white-space:nowrap">${c}</div>`; }).join('');
     }
     case 'mit': {
       const k = lin(t, A, A + .5), tm = at('MIT'), tn = at('نود'), kb = lin(t, A + .5, Math.max(A + 1.5, tn + .3));
@@ -236,20 +236,20 @@ function scene(x, t) {
         `<div class="a" style="left:1010px;top:380px;font:900 34px V;color:var(--mute)">x</div><div class="a" style="left:1010px;top:500px;font:900 34px V;color:var(--mute)">y</div><div class="a" style="left:1010px;top:620px;font:900 34px V;color:var(--mute)">z</div>` +
         `<div class="a" style="left:560px;top:720px;font:900 40px V;color:var(--mute)">میکروفون + لرزش‌سنج</div>` + chip('عیب‌های عمداً ایجادشده', 560, 1220, 44, '#0A2416', 'var(--ph)', t, at('عمداً')) +
         `<div class="a" style="left:560px;top:800px;width:440px;text-align:center;font:900 150px V;color:var(--ph);direction:ltr">+${count(90, kb)}٪</div><div class="a" style="left:560px;top:990px;width:440px;text-align:center;font:900 40px V">دقت در آزمایش‌ها</div>` +
-        chip('<span dir="ltr">MIT</span>', 760, 1120, 70, '#fff', '#111', t, tm, 'ltr');
+        chip('<span dir="ltr">MIT · 2017</span>', 700, 1110, 60, '#0A2416', 'var(--ph)', t, tm, 'ltr');
     }
     case 'step1': {
       const k1 = lin(t, A, A + .4), th = at('نصف'), kk = lin(t, A + .6, th);
       const items = ['لرزش موقع روشن شدن', 'چراغ چک روشنه', 'کد P0300'];
       return grat() + big(1, k1) +
-        bubble('از دیروز ماشین موقع روشن شدن می‌لرزه، چراغ چک هم روشنه…', 320, 300, 680, lin(t, A + .2, A + .6)) +
+        bubble('از دیروز ماشین موقع روشن شدن می‌لرزه، چراغ چک هم روشنه…', 330, 300, 600, lin(t, A + .2, A + .6)) +
         items.map((it, i) => { const ki = pop(t, A + .8 + i * ((th - A - .8) / 3)); return ki <= 0 ? '' : `<div class="a row" style="left:120px;top:${700 + i * 130}px;width:840px;height:110px;gap:24px;padding:0 30px;box-sizing:border-box;border-radius:24px;background:#0A2416;border:3px solid var(--ph);font:900 48px V;transform:scale(${ki.toFixed(3)})"><span style="color:var(--ph)">✓</span><span>${it.replace('P0300', '<span dir=ltr>P0300</span>')}</span></div>`; }).join('') +
         `<div class="a" style="left:120px;top:1110px;width:840px;height:40px;border-radius:20px;background:var(--dim)"><div style="width:${(50 * eo(kk)).toFixed(1)}%;height:100%;border-radius:20px;background:var(--ph)"></div></div>` +
         chip('نصف عیب‌یابی ✓', 560, 1180, 58, 'var(--ph)', '#04100A', t, th) + chip('بگو: «چتت رو نشونم بده»', 120, 1290, 56, '#fff', '#0B1A12', t, at('نشونم'));
     }
     case 'step2': {
       const k2 = lin(t, A, A + .4), td = at('دیاگ'), tt = at('تأیید'), ks = lin(t, td - .1, tt + .4), kok = pop(t, tt + .2);
-      return grat() + big(2, k2) + scope('h2', 400, 260, 600, 560, lin(t, A + .1, A + .6), t, A, '50% 70%') + chip('دیاگ', 440, 780, 60, 'var(--ph)', '#04100A', t, td) +
+      return grat() + big(2, k2) + scope('h2', 400, 260, 600, 560, lin(t, A + .1, A + .6), t, A, '50% 70%') + chip('دیاگ', 440, 830, 60, 'var(--ph)', '#04100A', t, td) +
         ['سیلندر ۱', 'سیلندر ۲', 'سیلندر ۳', 'سیلندر ۴'].map((c, i) => { const v = i === 2 ? 92 : 18 + i * 6; return `<div class="a" style="left:120px;top:${900 + i * 80}px;width:200px;font:900 38px V">${c}</div><div class="a" style="left:330px;top:${912 + i * 80}px;width:630px;height:40px;border-radius:20px;background:var(--dim)"><div style="width:${(v * eo(cl(ks * 1.3 - i * .1))).toFixed(1)}%;height:100%;border-radius:20px;background:${i === 2 ? 'var(--red)' : 'var(--ph)'}"></div></div>`; }).join('') +
         (kok > 0 ? `<div class="a" style="left:560px;top:1230px;padding:10px 36px 20px;border:8px solid var(--ph);border-radius:20px;color:var(--ph);font:900 70px V;transform:rotate(-5deg) scale(${mix(1.8, 1, cl(kok)).toFixed(3)})">تأیید شد ✓</div>` : '') +
         `<div class="a" style="left:120px;top:1240px;font:600 34px V;color:var(--mute)">نمونهٔ نمایشی</div>`;
@@ -261,15 +261,16 @@ function scene(x, t) {
         lines.map((l, i) => `<div style="font:900 42px/1.25 V;margin:18px 0;opacity:${cl(kw * 4 - i).toFixed(2)}">${fa(l)}</div>`).join('') + `</div>` +
         (ksend > 0 ? `<div class="a" style="left:560px;top:1050px;padding:16px 50px 26px;border-radius:40px;background:var(--ph);color:#04100A;font:900 56px V;transform:scale(${ksend.toFixed(3)})">ارسال ➤</div>` : '') +
         `<div class="a" style="left:120px;top:1190px;font:900 40px V;color:var(--mute)">اعتماد مشتری</div><div class="a" style="left:120px;top:1250px;width:840px;height:44px;border-radius:22px;background:var(--dim)"><div style="width:${mix(25, 85, eo(ktr)).toFixed(1)}%;height:100%;border-radius:22px;background:var(--ph)"></div></div>` +
-        cur(t, [[A, 900, 1500], [tm + .3, 700, 1080, 1], [x.z, 700, 1080]]);
+        cur(t, [[A, 900, 1500], [tm + .3, 860, 1110, 1], [x.z, 860, 1110]]);
     }
     case 'ask': {
       const k = lin(t, A, A + .5), tc = at('کامنت'), td = at('راننده‌ها'), tm = at('مکانیکت');
       return grat() + `<div class="a" style="left:0;right:0;top:260px;text-align:center">${rise('مشتری‌هاتون چی میارن؟', k, 86)}</div>` +
         chip('🔧 مکانیک‌ها: کامنت', 140, 480, 60, 'var(--ph)', '#04100A', t, A + .4) + chip('🚗 راننده‌ها: بفرست', 420, 600, 58, '#fff', '#111', t, td) +
-        (t > tc - .1 ? `<div class="a" style="left:120px;top:780px;width:840px;padding:26px 36px 36px;border-radius:34px;background:#0A2416;border:4px solid var(--ph);font:900 48px V">💬 ${typed('کد خطا، عکس داشبورد، صدای موتور…', lin(t, tc - .1, tc + 1.4))}</div>` : '') +
+        (t > Math.min(tc, A + 1.5) - .1 ? `<div class="a" style="left:120px;top:780px;width:840px;padding:26px 36px 36px;border-radius:34px;background:#0A2416;border:4px solid var(--ph);font:900 48px V">💬 ${typed('کد خطا، عکس داشبورد، صدای موتور…', lin(t, Math.min(tc, A + 1.5) - .1, Math.min(tc, A + 1.5) + 1.4))}</div>` : '') +
+        ['کد خطا', 'صدای موتور', 'عکس داشبورد'].map((c, i) => chip(c, 100 + i * 310, 1180, 46, '#0A2416', 'var(--ph)', t, A + 1 + i * .3)).join('') +
         chip('↗ برای مکانیکت بفرست', 250, 1060, 62, '#fff', '#111', t, tm) +
-        ecg(0, 1330, 1080, 90, lin(t, A, x.z), 'var(--ph)', 7, 4) + cur(t, [[A, 900, 1500], [tm + .2, 520, 1090, 1], [x.z, 520, 1090]]);
+        ecg(0, 1420, 1080, 80, lin(t, A, x.z), 'var(--ph)', 7, 4) + cur(t, [[A, 900, 1500], [tm + .2, 520, 1090, 1], [x.z, 520, 1090]]);
     }
   }
   return grat();
@@ -277,8 +278,9 @@ function scene(x, t) {
 // end card: the trace draws across, then the question rises
 function endCard(u) {
   return grat() + ecg(0, 760, 1080, 140, lin(u, 0, .8)) +
+    chip('🔧 مکانیک‌ها: کامنت', 120, 380, 54, 'var(--ph)', '#04100A', u + 10, 10.3) + chip('🚗 راننده‌ها: بفرست', 560, 480, 54, '#fff', '#111', u + 10, 10.6) +
     `<div class="a" style="left:0;right:0;top:960px;text-align:center">${rise((S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--ph)">$1</span>'), lin(u, .4, .8), 84)}</div>` +
-    `<div class="a" style="left:0;right:0;top:1180px;text-align:center;font:600 56px V;color:var(--mute);opacity:${lin(u, .8, 1.1).toFixed(2)}">${S.end_sub || ''} · <span dir="ltr">${S.handle || ''}</span></div>`;
+    `<div class="a" style="left:0;right:0;top:1180px;text-align:center;font:900 60px V;color:#fff;opacity:${lin(u, .8, 1.1).toFixed(2)}">↗ ${S.end_sub || ''} · <span dir="ltr">${S.handle || ''}</span></div>`;
 }
 window.seek = seek;
 </script>
