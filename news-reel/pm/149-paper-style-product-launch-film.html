@@ -94,9 +94,9 @@ window.ready = (async () => {
   const SC = [];
   for (const b of B) {
     const hits = hitTimes(b); const pts = [b.a, ...hits.filter(h => h > b.a + .9 && h < b.b - .9)];
-    pts.forEach((p, i) => SC.push({t0: p, t1: i + 1 < pts.length ? pts[i + 1] : b.b, type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: i ? [[p, 'hit', .35]] : [[p, 'whoosh', .3]]}));
+    pts.forEach((p, i) => SC.push({t0: p, t1: i + 1 < pts.length ? pts[i + 1] : b.b, type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: i ? [[p, (S.sfx_hits || ['hit'])[SC.length % (S.sfx_hits || ['hit']).length], .35]] : [[p, (S.sfx_open || ['whoosh'])[B.indexOf(b) % (S.sfx_open || ['whoosh']).length], .3]]}));
   }
-  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .2, 'hit', .5]]});
+  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .2, S.sfx_end || 'hit', .5]]});
   window.SCENES = SC;
   for (const s of SC) if (s.t1 - s.t0 > 3.2) ISSUES.push(`idea ${s.bg} holds ${(s.t1 - s.t0).toFixed(1)} s (> 3): add a hit`);
   seek(0);
@@ -192,8 +192,92 @@ function render(b, t, u, ink, dark) {
   if (s.extra) { const te = b.wt(s.extra[0]) - .05; if (t >= te) ex = handNote(s.extra[1], s.extra[2], s.extra[3], pr(t, te, te + .8), dark ? '#F3EEE4' : 'var(--a2)', -5, 78); }
   return scene(b, t, u, ink, dark) + ex;
 }
+
+// ===== REEL-043 (carpenters: show the cabinet before cutting) =====
+const W = (b, s, i, d) => (s.words && s.words[i] !== undefined) ? b.wt(s.words[i]) : d;
+const tagDrop = (txt, x, t, t0, floor, col = '#fff', ink = 'var(--ink)', rot = 0) => { if (t < t0) return ''; const f = fall(t - t0, -200, floor, .42, 5600), [sx, sy] = squash(f.hit >= 0 ? t - t0 - f.hit : -1);
+  return `<div class="tag" style="left:${x}px;top:${f.y.toFixed(1)}px;background:${col};color:${ink};transform:rotate(${rot}deg) scale(${sx.toFixed(3)},${sy.toFixed(3)})">${txt}</div>`; };
+const stickyAt = (txt, x, y, col, k, rot) => `<div class="sticky" style="left:${x}px;top:${y}px;background:${col};transform:rotate(${rot}deg) scale(${ez.back(cl(k)).toFixed(3)});opacity:${cl(k * 3)}">${txt}</div>`;
+const suMark = (x, y, size, k, spin = 0) => `<img src="${U('el/sketchup.svg')}" style="position:absolute;left:${x - size / 2}px;top:${y - size / 2}px;width:${size}px;height:${size}px;transform:rotate(${((1 - ez.back(cl(k))) * -90 + spin).toFixed(1)}deg) scale(${ez.back(cl(k)).toFixed(3)});opacity:${cl(k * 3)}">`;
+function scene43(b, t, u, ink, dark) {
+  const s = b.sc, A = b.a;
+  switch (s.type) {
+    case 'cp_hook': {
+      const tf = A + 1.25, flip = pr(t, tf, tf + .35);
+      let r = bigWord('مشتری بعد از نصب:', 120, 92, ink, 1) + bigWord('<span style="color:var(--a1)">اینو نمی‌خواستم!</span>', 230, 128, ink, 1);
+      r += print(s.img, 180, 520, 720, -3, 1, mix(1.15, 1.04, pr(t, 0, 2.5)), '50% 55%');
+      if (flip > 0) r += `<div style="position:absolute;left:0;top:0;width:1080px;height:1920px;clip-path:inset(0 0 0 ${((1 - ez.out(flip)) * 100).toFixed(1)}%)">${print(s.img2, 180, 520, 720, 2, 1, 1.06, '50% 45%')}</div>`;
+      r += `<div style="position:absolute;inset:0;opacity:${(1 - flip).toFixed(2)}">` + svg(markerPath('M 280 650 L 800 1350', pr(t, .35, .65), '#E5322D', 24) + markerPath('M 800 650 L 280 1350', pr(t, .55, .85), '#E5322D', 24)) + '</div>';
+      { const k = pr(t, 1.5, 1.8); r += `<div class="tag" style="left:190px;top:395px;background:var(--a2);color:#fff;font-size:66px;transform:rotate(-3deg) scale(${ez.back(k).toFixed(3)});opacity:${cl(k * 3)}">با AI، اول عکسشو ببین</div>`; }
+      return r;
+    }
+    case 'cp_cost': {
+      let r = print(s.img, 210, 330, 660, -5, pr(t, A, A + .4), mix(1.05, 1.18, pr(t, A, b.b)), '50% 60%');
+      ['پول', 'وقت', 'اعصاب'].forEach((w, i) => { r += tagDrop(w, 140 + i * 280, t, W(b, s, i, A + .5 + i * .5), 1180 - i * 30, ['#FFE14D', '#fff', 'var(--a1)'][i], i === 2 ? '#fff' : 'var(--ink)', [-6, 4, -3][i]); });
+      return r + bigWord('دوباره‌کاری', 150, 140, ink, pr(t, A, A + .45));
+    }
+    case 'cp_render': {
+      const tw = W(b, s, 0, A + 1), k = pr(t, tw - .1, tw + .6);
+      let r = print(s.img, 150, 420, 780, -2, pr(t, A, A + .4), 1.05, '50% 45%');
+      r += `<div style="position:absolute;left:0;top:0;width:1080px;height:1920px;clip-path:inset(0 0 0 ${((1 - ez.out(k)) * 100).toFixed(1)}%)">${print(s.img2, 150, 420, 780, -2, 1, 1.05, '50% 45%')}</div>`;
+      if (k > 0 && k < 1) r += `<div style="position:absolute;left:${(150 + 820 * (1 - ez.out(k))).toFixed(0)}px;top:400px;width:12px;height:1000px;background:var(--a1)"></div>`;
+      r += handNote('قبل از برش', 560, 1390, pr(t, tw + .4, tw + 1.2), 'var(--a1)', -4, 84);
+      return r + bigWord('یه عکسِ واقعی‌نما', 150, 120, ink, pr(t, A, A + .45));
+    }
+    case 'cp_logo': {
+      let r = suMark(540, 620, 360, pr(t, A, A + .6), t * 8);
+      r += `<div class="big" dir="ltr" style="top:860px;font-size:150px;color:${ink};opacity:${pr(t, A + .2, A + .5)}">SketchUp</div>`;
+      const tw = W(b, s, 0, A + 1.2); r += tagDrop('<span dir="ltr">AI Render</span>', 330, t, tw - .2, 1100, 'var(--a2)', '#fff', -3);
+            return r + handNote('دسامبر ۲۰۲۵ · Trimble', 160, 1240, pr(t, tw + .5, tw + 1.3), 'var(--a1)', -3, 64);
+    }
+    case 'cp_fan': {
+      let r = print(s.img, 160, 360, 760, 3, pr(t, A, A + .4), mix(1.0, 1.12, pr(t, A, b.b)), '50% 40%');
+      [['گردویی', '#7A4E2D', '#fff'], ['سفید', '#F7F5F0', 'var(--ink)'], ['سبز', '#8FA88A', '#fff']].forEach(([n, c, fc], i) => { const tw = W(b, s, 0, A + .8) + i * .35; r += tagDrop(n, 80 + i * 320, t, tw, 1060 + i * 20, c, fc, [-5, 3, -2][i]); });
+      return r + bigWord('رنگ و چوبِ مختلف', 150, 116, ink, pr(t, A, A + .45));
+    }
+    case 'cp_pick': {
+      const tw = W(b, s, 0, A + .6), k = pr(t, tw - .05, tw + .35);
+      let r = print(s.img, 160, 330, 760, 0, 1, mix(1.25, 1.6, pr(t, A, b.b)), '78% 88%');
+      r += `<div style="position:absolute;left:300px;top:640px;width:480px;height:480px;border-radius:50%;border:26px solid var(--a1);transform:scale(${(2 - ez.back(k)).toFixed(3)}) rotate(-8deg);opacity:${k}"></div>`;
+      if (k > 0) r += svg(markerPath('M 400 880 L 500 980 L 690 760', pr(t, tw + .1, tw + .5), 'var(--a1)', 34));
+      const t2 = W(b, s, 1, A + 2); r += handNote('اول انتخاب، بعد برش', 120, 1300, pr(t, t2 - .1, t2 + .8), 'var(--a2)', -3, 76);
+      return r + bigWord('مشتری انتخاب می‌کنه', 150, 110, ink, pr(t, A, A + .45));
+    }
+    case 'cp_quote': {
+      let r = print(s.img, 90, 330, 560, -6, pr(t, A, A + .4), 1.1, '50% 60%');
+      const kq = pr(t, A + .4, A + .8); r += `<div style="position:absolute;left:520px;top:520px;width:470px;height:700px;background:#fff;border-radius:18px;box-shadow:0 20px 40px rgba(0,0,0,.25);transform:rotate(3deg) scale(${ez.back(kq).toFixed(3)});opacity:${cl(kq * 3)};padding:40px 36px;box-sizing:border-box;font:900 46px V;color:var(--ink);direction:rtl">پیش‌فاکتور` +
+        [0, 1, 2, 3, 4].map(i => `<div style="height:18px;margin-top:${i ? 44 : 50}px;width:${(cl((t - A - .9 - i * .35) / .4) * [92, 70, 84, 60, 76][i]).toFixed(0)}%;background:#D8D2C6;border-radius:9px"></div>`).join('') +
+        `<div style="margin-top:56px;height:8px;width:${(cl((t - A - 2.8) / .5) * 100).toFixed(0)}%;background:var(--a1)"></div></div>`;
+      const tw = W(b, s, 0, A + 1); r += tagDrop('چت‌بات', 600, t, tw - .1, 1250, 'var(--a2)', '#fff', -4);
+      return r + bigWord('لیست → پیش‌فاکتور', 150, 112, ink, pr(t, A, A + .45));
+    }
+    case 'cp_limit': {
+      let r = print(s.img, 190, 360, 700, -3, pr(t, A, A + .4), mix(1.05, 1.2, pr(t, A, b.b)), '50% 50%');
+      const tw = W(b, s, 0, A + .8); r += bigWord('نقشه‌ی اجرایی نیست', 1290, 104, ink, pr(t, tw - .1, tw + .4));
+      r += svg(markerPath('M 150 1360 L 930 1350', pr(t, tw + .4, tw + .8), '#E5322D', 18));
+      const t2 = W(b, s, 1, A + 2); r += handNote('متر با خودته', 560, 230, pr(t, t2 - .1, t2 + .7), 'var(--a1)', -4, 80);
+      return r + bigWord('⚠', 140, 110, ink, pr(t, A, A + .4));
+    }
+    case 'cp_credit': {
+      let r = suMark(540, 560, 240, pr(t, A, A + .5), t * 6);
+      const tw = W(b, s, 0, A + .6); r += tagDrop('اعتباری · پولی', 250, t, tw - .1, 860, '#FFE14D', 'var(--ink)', -4);
+      const t2 = W(b, s, 1, A + 1.6); r += tagDrop('پرداخت از ایران سخت', 170, t, t2 - .1, 1080, 'var(--a1)', '#fff', 3);
+      return r + bigWord('یه نکته‌ی دیگه', 160, 110, ink, pr(t, A, A + .45));
+    }
+    case 'cp_ask': {
+      let r = '';
+      [['رندر', '#FFE14D'], ['انتخاب', '#BFE3C0'], ['پیش‌فاکتور', '#C4D5EE']].forEach(([n, c], i) => { const bo = Math.abs(Math.sin((t - A) * 4 + i)) * 40; r += stickyAt(n, 60 + i * 340, 420 - bo, c, pr(t, A + i * .15, A + .4 + i * .15), [-6, 3, -2][i]); });
+      const tw = W(b, s, 0, A + .8); r += bigWord('بفرست برای نجارت', 900, 120, 'var(--a1)', pr(t, tw - .1, tw + .4));
+      r += svg(markerPath('M 240 1250 C 400 1150, 640 1180, 840 1080', pr(t, tw + .3, tw + .9), ink, 12));
+      return r + suMark(900, 1300, 120, pr(t, A + .4, A + .8), t * 20);
+    }
+  }
+  return null;
+}
+
 function scene(b, t, u, ink, dark) {
   const s = b.sc;
+  { const r43 = scene43(b, t, u, ink, dark); if (r43 !== null) return r43; }
   switch (s.type) {
     case 'hook': {
       const tt = b.wt(s.dark_at), pre = t < tt - .02;
@@ -535,7 +619,7 @@ function endCard(u, ink) {
   const q = (S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--a1)">$1</span>');
   const mk = S.brand ? `<div class="big" dir="ltr" style="top:640px;font-size:220px;letter-spacing:-5px;color:${ink};opacity:${pr(u, .05, .25)};transform:scale(${ez.back(pr(u, .05, .45)).toFixed(3)})">${S.brand}</div><div class="big" dir="ltr" style="top:900px;font-size:44px;font-weight:500;letter-spacing:20px;color:${ink};opacity:${pr(u, .8, 1.2)}">${S.brand_sub || ''}</div>`
     : `<div style="color:${ink}">${blockMark(450, 640, 180, .45, u)}</div>` + wordmark(400, 860, 280, ink, pr(u, .8, 1.2));
-  return ball + ball2 + mk +
+  return ball + ball2 + (S.brand === 'SketchUp' ? suMark(540, 460, 220, pr(u, 0, .4), u * 10) : '') + mk +
     `<div class="big" style="top:1060px;font-size:${Math.min(76, Math.floor(1500 / (S.end_text || 'x').length))}px;color:${ink};opacity:${pr(u, 1.1, 1.5)}">${q}</div>` +
     `<div class="big" style="top:1220px;font-size:52px;font-weight:500;color:${ink};opacity:${pr(u, 1.4, 1.8)}">${S.end_sub || ''}</div>` +
     `<div class="big" style="top:1330px;font-size:40px;font-weight:500;letter-spacing:3px;color:${ink};opacity:${pr(u, 1.6, 2)}" dir="ltr">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;

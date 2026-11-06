@@ -523,5 +523,26 @@
   "score": 0.95,
   "voice": "GSj19hKjOQsPFCZlq1le",
   "date": "2026-11-06"
+ },
+ "frustrated": {
+  "mode": "A",
+  "spoken": "frustrated",
+  "score": 1,
+  "voice": "IsLN9xDFXCtAgmdMDUEQ",
+  "date": "2026-11-06"
+ },
+ "SketchUp": {
+  "mode": "B",
+  "spoken": "SketchUp",
+  "score": 1,
+  "voice": "IsLN9xDFXCtAgmdMDUEQ",
+  "date": "2026-11-06"
+ },
+ "AI Render": {
+  "mode": "A",
+  "spoken": "AI Render",
+  "score": 1,
+  "voice": "IsLN9xDFXCtAgmdMDUEQ",
+  "date": "2026-11-06"
  }
 }
