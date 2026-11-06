@@ -453,5 +453,19 @@
   "score": 1,
   "voice": "N7wuKHXQQ5fKd75noieq",
   "date": "2026-11-05"
+ },
+ "code": {
+  "mode": "A",
+  "spoken": "code",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-11-06"
+ },
+ "MIT": {
+  "mode": "A",
+  "spoken": "MIT",
+  "score": 1,
+  "voice": "PEdcOLzbXYhL8IKOswXB",
+  "date": "2026-11-06"
  }
 }
