@@ -467,5 +467,61 @@
   "score": 1,
   "voice": "PEdcOLzbXYhL8IKOswXB",
   "date": "2026-11-06"
+ },
+ "sighs": {
+  "mode": "A",
+  "spoken": "sighs",
+  "score": 1,
+  "voice": "GSj19hKjOQsPFCZlq1le",
+  "date": "2026-11-06"
+ },
+ "YouCam Makeup": {
+  "mode": "B",
+  "spoken": "YouCam Makeup",
+  "score": 1,
+  "voice": "GSj19hKjOQsPFCZlq1le",
+  "date": "2026-11-06"
+ },
+ "L": {
+  "mode": "A",
+  "spoken": "L",
+  "score": 1,
+  "voice": "GSj19hKjOQsPFCZlq1le",
+  "date": "2026-11-06"
+ },
+ "Or": {
+  "mode": "A",
+  "spoken": "Or",
+  "score": 1,
+  "voice": "GSj19hKjOQsPFCZlq1le",
+  "date": "2026-11-06"
+ },
+ "al Professionnel": {
+  "mode": "A",
+  "spoken": "al Professionnel",
+  "score": 1,
+  "voice": "GSj19hKjOQsPFCZlq1le",
+  "date": "2026-11-06"
+ },
+ "Style My Hair Pro": {
+  "mode": "A",
+  "spoken": "Style My Hair Pro",
+  "score": 1,
+  "voice": "GSj19hKjOQsPFCZlq1le",
+  "date": "2026-11-06"
+ },
+ "upbeat": {
+  "mode": "B",
+  "spoken": "upbeat",
+  "score": 1,
+  "voice": "GSj19hKjOQsPFCZlq1le",
+  "date": "2026-11-06"
+ },
+ "Loreal Professionnel": {
+  "mode": "A",
+  "spoken": "Loreal Professionnel",
+  "score": 0.95,
+  "voice": "GSj19hKjOQsPFCZlq1le",
+  "date": "2026-11-06"
  }
 }
