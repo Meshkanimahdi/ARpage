@@ -81,7 +81,7 @@ def main():
     by_type = {'counter': 'counter_tick', 'stat': 'counter_tick', 'chart': 'sweep_soft', 'bars': 'sweep_soft', 'grid': 'pop',
                'points': 'pop', 'steps': 'pop', 'icon_grid': 'pop', 'ui': 'tap', 'chat': 'notify', 'network': 'glass_ping',
                'logo': 'shimmer', 'divider': 'riser', 'end': 'hit'}
-    palette = ['pop', 'tap', 'glass_ping', 'shimmer', 'click', 'sweep_soft']
+    palette = spec.get('sfx_palette') or ['pop', 'tap', 'glass_ping', 'shimmer', 'click', 'sweep_soft']   # story.json may set its own (SFX-set variety, §00.22)
     cues = []
     for i, s in enumerate(scenes):
         mine = [(at, name, vol) for at, name, vol in s.get('sfx', [])]
@@ -93,7 +93,7 @@ def main():
     kept, last_t, last_name, whooshes = [], -9, None, []
     for at, name, vol in cues:
         if name == 'whoosh':
-            if len(whooshes) >= 2 or (whooshes and at - whooshes[-1] < 6): name = 'sweep_soft'
+            if len(whooshes) >= 2 or (whooshes and at - whooshes[-1] < 6): name = palette[-1]
             else: whooshes.append(at)
         if name == last_name:
             name = next(p for p in palette if p != last_name and p != name)

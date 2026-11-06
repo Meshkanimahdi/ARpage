@@ -67,15 +67,15 @@ const HITS = {
   step3: x => [x.at('قیمت'), x.at('مکتوب'), x.at('اعتماد')], ask: x => [x.at('کامنت'), x.at('راننده‌ها'), x.at('مکانیکت')]
 };
 const SFX = {
-  hook: x => [[.05, 'counter_tick', .25], [.45, 'typing', .25], [1.0, 'hit', .5], [1.6, 'sweep_soft', .22]],
-  stake: x => [[x.a + .2, 'notify', .28], [x.at('چت‌بات'), 'pop', .3], [x.at('صدای'), 'click', .3]],
-  paper: x => [[x.a + .1, 'sweep_soft', .22], [x.at('سه'), 'tick', .28], [x.at('ایمنی'), 'tap', .3]],
-  quote: x => [[x.a + .1, 'typing', .25], [x.at('بهتر'), 'glass_ping', .3], [x.at('کاذب'), 'bass_drop', .3]],
-  mit: x => [[x.a + .1, 'riser', .22], [x.at('MIT'), 'tap', .3], [x.at('نود'), 'counter_tick', .3]],
+  hook: x => [[.05, 'tick', .25], [.45, 'typing', .25], [1.0, 'hit', .5], [1.6, 'riser', .22]],
+  stake: x => [[x.a + .2, 'notify', .28], [x.at('چت‌بات'), 'notify', .3], [x.at('صدای'), 'tick', .3]],
+  paper: x => [[x.a + .1, 'riser', .22], [x.at('سه'), 'tick', .28], [x.at('ایمنی'), 'hit', .3]],
+  quote: x => [[x.a + .1, 'typing', .25], [x.at('بهتر'), 'riser', .3], [x.at('کاذب'), 'bass_drop', .3]],
+  mit: x => [[x.a + .1, 'riser', .22], [x.at('MIT'), 'hit', .3], [x.at('نود'), 'tick', .3]],
   step1: x => [[x.a + .05, 'hit', .35], [x.at('نشونم'), 'notify', .28], [x.at('نصف'), 'tick', .3]],
-  step2: x => [[x.a + .05, 'hit', .35], [x.at('دیاگ'), 'click', .3], [x.at('تأیید'), 'tap', .3]],
-  step3: x => [[x.a + .05, 'hit', .35], [x.at('قیمت'), 'typing', .25], [x.at('مکتوب'), 'pop', .3], [x.at('اعتماد'), 'shimmer', .28]],
-  ask: x => [[x.a + .1, 'tap', .3], [x.at('کامنت'), 'notify', .3], [x.at('راننده‌ها'), 'tap', .3], [x.at('مکانیکت'), 'click', .3]]
+  step2: x => [[x.a + .05, 'hit', .35], [x.at('دیاگ'), 'tick', .3], [x.at('تأیید'), 'hit', .3]],
+  step3: x => [[x.a + .05, 'hit', .35], [x.at('قیمت'), 'typing', .25], [x.at('مکتوب'), 'notify', .3], [x.at('اعتماد'), 'riser', .28]],
+  ask: x => [[x.a + .1, 'hit', .3], [x.at('کامنت'), 'notify', .3], [x.at('راننده‌ها'), 'hit', .3], [x.at('مکانیکت'), 'tick', .3]]
 };
 
 window.ready = (async () => {
@@ -218,7 +218,7 @@ function scene(x, t) {
         bots.map((b, i) => `<div style="height:96px;display:flex;align-items:center;gap:20px;border-bottom:3px solid #C9D6CF;opacity:${cl((t - A - .4 - i * .35) * 3).toFixed(2)};direction:ltr"><span style="font:900 40px V;color:#139C4E">◉</span><span style="font:900 48px V">${b}</span></div>`).join('') +
         `<div style="margin-top:40px;font:900 40px V;color:#4A6656">معیارهای نمره:</div><div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:20px">` +
         crit.map((c, j) => `<span style="padding:10px 26px 18px;border-radius:30px;background:#0B1A12;color:var(--ph);font:900 42px V;transform:scale(${pop(t, Math.min(ti - .2, A + 1.4) + j * .3).toFixed(3)});display:inline-block">${c}</span>`).join('') + `</div></div>`;
-      return grat() + card + scope('h4', 90, 1230, 900, 250, lin(t, A + .3, A + .8), t, A, '50% 55%') + chip('سه چت‌بات · خرابی‌های رایج', 220, 1190, 52, 'var(--ph)', '#04100A', t, at('سه')) + (pop(t, A + 2.6) > 0 ? `<div class="a" style="left:560px;top:1300px;padding:8px 26px 18px;border:7px solid var(--ph);border-radius:16px;background:rgba(4,16,10,.85);color:var(--ph);font:900 50px V;transform:rotate(-4deg) scale(${pop(t, A + 2.6).toFixed(3)})">نتیجه: بهتر از انتظار</div>` : '');
+      return grat() + card + scope('h4', 90, 1230, 900, 250, lin(t, A + .3, A + .8), t, A, '50% 55%') + chip('سه ابزار · خرابی‌های رایج', 220, 1190, 52, 'var(--ph)', '#04100A', t, at('سه')) + (pop(t, A + 2.6) > 0 ? `<div class="a" style="left:560px;top:1300px;padding:8px 26px 18px;border:7px solid var(--ph);border-radius:16px;background:rgba(4,16,10,.85);color:var(--ph);font:900 50px V;transform:rotate(-4deg) scale(${pop(t, A + 2.6).toFixed(3)})">نتیجه: بهتر از انتظار</div>` : '');
     }
     case 'quote': {
       const tb = at('بهتر'), tw = at('کاذب'), kq = lin(t, A + .1, tb + .8), kw = pop(t, tw - .1), conf = mix(40, 140, eo(lin(t, A + .3, tw)));
