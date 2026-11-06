@@ -244,15 +244,18 @@ const swatches = (x, y, d, gap, t0, t, n = 5) => SW.slice(0, n).map((c, i) => { 
 const phone = (n, x, y, w, k, filt = '', rot = 0) => { const h = w * 2.05, e = back(cl(k)); return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;border-radius:${w * .14}px;background:#111;padding:${w * .035}px;box-sizing:border-box;box-shadow:0 30px 70px rgba(0,0,0,.45);transform:translateY(${((1 - e) * 600).toFixed(0)}px) rotate(${rot}deg)"><div style="position:relative;width:100%;height:100%;border-radius:${w * .11}px;overflow:hidden"><img src="${IMG(n)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:${filt}"></div></div>`; };
 const logoChip = (file, x, y, w, k, bg = '#111', pad = 26) => { const e = back(cl(k)); return `<div style="position:absolute;left:${x}px;top:${y}px;padding:${pad}px ${pad * 1.4}px;border-radius:28px;background:${bg};box-shadow:0 18px 40px rgba(0,0,0,.3);transform:scale(${e.toFixed(3)});opacity:${cl(k * 3).toFixed(2)}"><img src="${U('el/' + file)}" style="display:block;width:${w}px"></div>`; };
 const stamp = (txt, x, y, k, col = 'var(--red)', rot = -8, size = 110) => k > 0 ? `<div style="position:absolute;left:${x}px;top:${y}px;padding:12px 44px 26px;border:12px solid ${col};border-radius:30px;color:${col};background:rgba(255,255,255,.92);font:900 ${size}px V;transform:rotate(${rot}deg) scale(${(2 - back(k)).toFixed(3)});opacity:${k}">${txt}</div>` : '';
+const drift = (t, A) => SW.concat(SW).map((c, i) => { const x = ((i * 135 + (t - A) * 160) % 1350) - 135; return `<div style="position:absolute;left:${x.toFixed(0)}px;top:${1660 + 18 * Math.sin(t * 3 + i)}px;width:70px;height:70px;border-radius:50%;background:${c};border:5px solid #fff;opacity:${cl((t - A) * 3).toFixed(2)}"></div>`; }).join('');
 function scene3(b, t, s, A, k0, K, z) {
   let r = ''; const w = (s.words || []).map(j => b.wt(j));
   switch (s.type) {
     case 'hc_hook': {
-      r += `<div class="card" style="left:0;top:0;width:1080px;height:1920px;border-radius:0"><img src="${IMG(s.img)}" style="transform:scale(${mix(1.3, 1.06, io(pr(t, 0, b.b))).toFixed(3)});transform-origin:50% 45%"></div><div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.15) 34%,rgba(0,0,0,0) 60%,rgba(0,0,0,.55) 100%)"></div>`;
-      r += big(['قبل از دکلره، رنگ رو', '*روی گوشی ببین*'], 120, 118, 1, '#fff');
-      r += swatches(205, 1120, 110, 30, .3, t);
-      { const k = pr(t, .9, 1.15); r += chip(300, 1290, 'پیش‌نمایش با AI', 'var(--acc)', '#fff', 78, k); }
-      { const k = w[0] ? pr(t, w[0] - .05, w[0] + .3) : 0; r += stamp('رنگ گرون رو دوباره نکن', 90, 1450, k, '#111', -4, 66); }
+      const zs = mix(1.22, 1.04, io(pr(t, 0, b.b))), hue = t < .25 ? 0 : [0, 330, 40, 290, 15][Math.floor((t - .25) / .45) % 5];
+      r += `<div style="position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden"><div style="position:absolute;left:0;top:-255px;width:1080px;height:2430px;transform:scale(${zs.toFixed(3)});transform-origin:690px 1050px"><img src="${IMG(s.img)}" style="position:absolute;inset:0;width:100%;height:100%;filter:brightness(1.28) contrast(1.05)"><img src="${IMG(s.img)}" style="position:absolute;inset:0;width:100%;height:100%;filter:brightness(1.3) saturate(1.5) hue-rotate(${hue}deg);clip-path:inset(31% 19.5% 45% 54.5% round 30px)"></div></div><div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.1) 30%,rgba(0,0,0,0) 62%,rgba(0,0,0,.45) 100%)"></div>`;
+      const hk = 1 + .05 * Math.sin(Math.PI * pr(t, .9, 1.3));
+      r += `<div style="position:absolute;left:0;right:0;top:0;transform:scale(${hk.toFixed(3)});transform-origin:540px 330px">` + big(['قبل از دکلره، رنگ رو', '*روی گوشی ببین*'], 230, 118, 1, '#fff') + '</div>';
+      r += swatches(205, 1180, 110, 30, .1, t);
+      { const k = pr(t, .6, .85); r += chip(300, 1350, 'پیش‌نمایش با AI', 'var(--acc)', '#fff', 78, k); }
+      { const k = w[0] ? pr(t, w[0] - .05, w[0] + .3) : 0; r += stamp('رنگ گرون رو دوباره نکن', 90, 1500, k, '#111', -4, 66); }
       return r;
     }
     case 'hc_regret': {
@@ -265,6 +268,7 @@ function scene3(b, t, s, A, k0, K, z) {
       return r + big(['مشتری می‌گه:'], 170, 110, pr(t, A, A + .4));
     }
     case 'hc_app': {
+      r += drift(t, A);
       r += card(s.img, 40, 330, 1000, 1100, k0, mix(1.0, 1.25, io(pr(t, A, b.b))), '55% 40%');
       r += logoChip('youcam.png', 70, 360, 150, pr(t, A + .25, A + .65), '#fff', 18);
       r += chip(70, 600, 'YouCam Makeup', '#fff', 'var(--ink)', 54, pr(t, A + .4, A + .75), true);
@@ -282,6 +286,7 @@ function scene3(b, t, s, A, k0, K, z) {
       return r + big(['رنگ و مدل'], 170, 110, pr(t, A, A + .45), 'var(--ink)');
     }
     case 'hc_pro': {
+      r += drift(t, A);
       r += card(s.img, 40, 360, 1000, 1080, k0, z, '50% 45%');
       r += logoChip('loreal_pro.png', 290, 420, 420, pr(t, A + .15, A + .55), '#111', 34);
       r += chip(250, 720, 'Style My Hair Pro', '#fff', 'var(--ink)', 70, pr(t, (w[0] || A + .6) - .05, (w[0] || A + .6) + .3), true);
@@ -290,6 +295,7 @@ function scene3(b, t, s, A, k0, K, z) {
       return r + big(['برای آرایشگرها:'], 170, 104, pr(t, A, A + .45));
     }
     case 'hc_steps': {
+      r += drift(t, A);
       r += bgP(s.img, 16, .5);
       const labs = s.labels || [], n0 = s.n0 || 0;
       r += big(['*سه قدم*'], 150, 130, pr(t, A, A + .4), '#fff');
@@ -300,6 +306,7 @@ function scene3(b, t, s, A, k0, K, z) {
       return r;
     }
     case 'hc_limit': {
+      r += drift(t, A);
       r += card(s.img, 40, 360, 1000, 1080, k0, mix(1.2, 1.0, io(pr(t, A, b.b))), '50% 50%');
       if (w[0]) r += chip(110, 780, 'رنگ پایه', '#fff', 'var(--ink)', 80, pr(t, w[0] - .05, w[0] + .3));
       if (w[1]) r += chip(560, 980, 'سلامت مو', '#fff', 'var(--ink)', 80, pr(t, w[1] - .05, w[1] + .3));
@@ -311,7 +318,7 @@ function scene3(b, t, s, A, k0, K, z) {
       r += `<div class="card" style="left:${(-540 + 580 * sl).toFixed(0)}px;top:340px;width:500px;height:900px"><img src="${IMG(s.img)}" style="object-position:20% 50%;transform:scale(1.6);transform-origin:25% 50%"></div>`;
       r += `<div class="card" style="left:${(1120 - 580 * sl).toFixed(0)}px;top:340px;width:500px;height:900px"><img src="${IMG(s.img2 || s.img)}"></div>`;
       const lab = ['دوباره‌کاری کمتر', 'مشتری راضی‌تر', 'عکس قبل و بعد برای پیجت'], col = ['var(--ink)', 'var(--acc)', 'var(--green)'];
-      lab.forEach((l, i) => { if (w[i] !== undefined) r += chip(90 + (i % 2) * 120, 1290 + i * 120 - (i ? 60 : 0), l, col[i], '#fff', 62, pr(t, w[i] - .05, w[i] + .3)); });
+      lab.forEach((l, i) => { if (w[i] !== undefined) r += chip(70, 880 + i * 120, l, col[i], '#fff', 60, pr(t, w[i] - .05, w[i] + .3)); });
       { const kh = pr(t, (w[1] || A + 1) - .1, (w[1] || A + 1) + 1.2), n = Math.round(1 + 98 * (1 - Math.pow(1 - kh, 3))); if (kh > 0) r += chip(760, 420, '♥ ' + fa(n), '#fff', 'var(--red)', 60, pr(t, (w[1] || A + 1) - .1, (w[1] || A + 1) + .2)); }
       return r + big(['نتیجه؟'], 170, 120, pr(t, A, A + .4));
     }
@@ -319,7 +326,7 @@ function scene3(b, t, s, A, k0, K, z) {
       r += card(s.img, 40, 380, 1000, 1060, k0, z, '50% 40%');
       r += big(['امتحانش کردی؟'], 150, 130, pr(t, A, A + .45));
       const k = w[0] ? pr(t, w[0] - .05, w[0] + .35) : 0;
-      if (k > 0) r += `<div class="t" style="top:860px;font-size:${(150 * back(k)).toFixed(0)}px;color:#fff;text-shadow:0 10px 0 var(--acc),0 20px 50px rgba(0,0,0,.5)">بفرست برای آرایشگرت</div>`;
+      if (k > 0) r += `<div class="t" style="top:760px;font-size:${(130 * back(k)).toFixed(0)}px;line-height:1.15;color:#fff;text-shadow:0 10px 0 var(--acc),0 20px 50px rgba(0,0,0,.5)">بفرست برای<br>آرایشگرت</div>`;
       r += svg(arrow(200, 1350, 820, 1100, pr(t, A + .5, A + 1.2), '#fff'));
       return r + logoChip('youcam.png', 880, 560, 110, pr(t, A + .2, A + .6), '#fff', 14);
     }
