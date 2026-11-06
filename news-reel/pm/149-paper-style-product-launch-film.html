@@ -203,12 +203,12 @@ function scene43(b, t, u, ink, dark) {
   const s = b.sc, A = b.a;
   switch (s.type) {
     case 'cp_hook': {
-      const tf = A + 1.25, flip = pr(t, tf, tf + .35);
+      const tf = A + .95, flip = pr(t, tf, tf + .3);
       let r = bigWord('مشتری بعد از نصب:', 120, 92, ink, 1) + bigWord('<span style="color:var(--a1)">اینو نمی‌خواستم!</span>', 230, 128, ink, 1);
-      r += print(s.img, 180, 520, 720, -3, 1, mix(1.15, 1.04, pr(t, 0, 2.5)), '50% 55%');
-      if (flip > 0) r += `<div style="position:absolute;left:0;top:0;width:1080px;height:1920px;clip-path:inset(0 0 0 ${((1 - ez.out(flip)) * 100).toFixed(1)}%)">${print(s.img2, 180, 520, 720, 2, 1, 1.06, '50% 45%')}</div>`;
-      r += `<div style="position:absolute;inset:0;opacity:${(1 - flip).toFixed(2)}">` + svg(markerPath('M 280 650 L 800 1350', pr(t, .35, .65), '#E5322D', 24) + markerPath('M 800 650 L 280 1350', pr(t, .55, .85), '#E5322D', 24)) + '</div>';
-      { const k = pr(t, 1.5, 1.8); r += `<div class="tag" style="left:190px;top:395px;background:var(--a2);color:#fff;font-size:66px;transform:rotate(-3deg) scale(${ez.back(k).toFixed(3)});opacity:${cl(k * 3)}">با AI، اول عکسشو ببین</div>`; }
+      r += print(s.img, 70, 500, 940, -2, 1, mix(1.2, 1.04, pr(t, 0, 2.5)), '50% 55%');
+      if (flip > 0) r += `<div style="position:absolute;left:0;top:0;width:1080px;height:1920px;clip-path:inset(0 0 0 ${((1 - ez.out(flip)) * 100).toFixed(1)}%)">${print(s.img2, 70, 500, 940, 2, 1, mix(1.0, 1.12, pr(t, tf, tf + 3)), '50% 45%')}</div>`;
+      r += `<div style="position:absolute;inset:0;opacity:${(1 - flip).toFixed(2)}">` + svg(markerPath('M 200 640 L 880 1500', pr(t, .2, .45), '#E5322D', 28) + markerPath('M 880 640 L 200 1500', pr(t, .4, .65), '#E5322D', 28)) + '</div>';
+      { const k = pr(t, 1.2, 1.45); r += `<div class="tag" style="left:190px;top:390px;background:var(--a2);color:#fff;font-size:66px;transform:rotate(-3deg) scale(${ez.back(k).toFixed(3)});opacity:${cl(k * 3)}">با AI، اول عکسشو ببین</div>`; }
       return r;
     }
     case 'cp_cost': {
