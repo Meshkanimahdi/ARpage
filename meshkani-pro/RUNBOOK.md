@@ -17,6 +17,16 @@ Daily schedule (Tehran, user rule **2026-11-10**, replaces the 2026-10-24 table)
 | **21:00** | reel + its story | 18:45, 19:45 |
 | **22:10, every 3 days** | PIVOT_REVIEW (§6b): deep page analysis; no virality → find why and pivot | — |
 
+**Topic rules (Mahdi 2026-11-10, blocking):** «ریلز صدای جعلی قبلا منتشر شده، پس تکراریه… تو تاپیک‌ها مورد دیگر انتخاب کن».
+Every reel and carousel topic comes from the sheet tab `Topic Bank` (ticked first, else a Proposed row), never a topic the
+page already covered (check the Reels and Carousel Posts tabs: same subject = repeat, even with a new angle; e.g. voice-clone
+calls were REEL-034 and POST-031). `Week Plan` rows are drawn from Topic Bank IDs. Mark the row Used after READY.
+**Pronunciation (Mahdi 2026-11-10):** a Persian word the voice may misread goes in `news-reel/fa_respell.json` in Finglish
+(Latin) for the TTS side only, e.g. نجارها → `najjarha` (it was read NEJJARHA). Listen to every job/group name.
+**Covers (Mahdi 2026-11-10):** a realistic photo with a headline on it, not a graphic YouTube-style thumbnail: little
+or no pills/boxes/strokes; when the reel calls out a group (e.g. «نجارها»), the cover shows a real-looking person of that
+group (hands/back/three-quarter, no real person's likeness) and the group's name is in the headline.
+
 Retired 2026-11-10: the 09:00 and 15:00 reels and the every-other-day 12:00 carousel. Caps: 1 carousel + 3 stories
 and 2 reels + 2 reel stories a day. Slots: post `09:00`, reels `12:00` and `21:00` (`config.json`, `tehran.py`).
 Older text below that names 09:00/15:00 reels or a 12:00 carousel is superseded by this table.
