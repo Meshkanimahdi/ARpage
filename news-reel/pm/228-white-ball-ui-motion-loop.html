@@ -52,7 +52,11 @@ const ST = {
   G: [1300, 3000], K: [1300, 4500], F: [0, 4500], R: [-1300, 4500]
 };
 const BEAT_ST = {hook: 'T', found: 'P', cards: 'C', delay: 'D', photos: 'L', slider: 'SL', hotel: 'H', gift: 'G',
-  ask_ai: 'K', answer: 'K', night: 'K', flaw: 'F', tip: 'R', ask: 'T'};
+  ask_ai: 'K', answer: 'K', night: 'K', flaw: 'F', tip: 'R', ask: 'T',
+  // set "vc" (REEL-044, voice-clone family call): same world, new content per station
+  vc_hook: 'T', vc_clone: 'P', vc_call: 'C', vc_secret: 'D', vc_fbi: 'L', vc_three: 'SL', vc_code: 'K', vc_ask: 'H',
+  vc_back: 'G', vc_fake: 'F', vc_rule: 'R', vc_share: 'T'};
+const KIND = {vc_rule: 'tip', vc_share: 'ask', vc_hook: 'hook'};
 const SC_Y = 820;                                           // the screen point the camera centres stations on
 
 window.ready = (async () => {
@@ -66,8 +70,8 @@ window.ready = (async () => {
     const wt = j => { const i = Math.round(cl(j / Math.max(1, words.length - 1)) * (L.words.length - 1)); return (L.words[i] || [L.start])[0]; };
     B.push({bt, sc: bt.scene || {}, L, words, wt});
   }
-  B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; b.st = BEAT_ST[b.sc.type] || 'T'; });
-  await Promise.all(['s00.jpg', 'telegram.png'].map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + f); })));
+  B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; b.st = BEAT_ST[b.sc.type] || 'T'; b.kind = KIND[b.sc.type] || b.sc.type; });
+  await Promise.all((S.set === 'vc' ? [] : ['s00.jpg', 'telegram.png']).map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + f); })));
   await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'ربات Sofia')));
   window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
   // one idea per beat plus extra ideas on the beat's own moments (cards, ring, keys…), each with its matching sound
@@ -86,7 +90,9 @@ window.ready = (async () => {
 const W = (b, s) => { const i = b.words.findIndex(w => w.w.includes(s)); return b.wt(i < 0 ? 0 : i); };
 // sound that opens each beat, matched to its motion (never a whoosh)
 const SFX0 = {hook: 'notify', found: 'tap', cards: 'notify', delay: 'typing', photos: 'tap', slider: 'counter_tick', hotel: 'pop',
-  gift: 'pop', ask_ai: 'typing', answer: 'notify', night: 'notify', flaw: 'notify', tip: 'sweep_soft', ask: 'click'};
+  gift: 'pop', ask_ai: 'typing', answer: 'notify', night: 'notify', flaw: 'notify', tip: 'sweep_soft', ask: 'click',
+  vc_hook: 'notify', vc_clone: 'tap', vc_call: 'notify', vc_secret: 'tick', vc_fbi: 'hit', vc_three: 'counter_tick', vc_code: 'typing',
+  vc_ask: 'notify', vc_back: 'click', vc_fake: 'glass_ping', vc_rule: 'pop', vc_share: 'click'};
 // the moments inside a beat that get their own idea (camera kick) and sound
 const MOM = {
   hook: b => [[1.2, 'click']],
@@ -103,6 +109,18 @@ const MOM = {
   flaw: b => [[W(b, 'ساکت'), 'notify'], [b.a + 1.2, 'notify']],
   tip: b => [[W(b, 'پول'), 'hit']],
   ask: b => [[W(b, 'کامنت'), 'notify']],
+  vc_hook: b => [[1.7, 'pop']],
+  vc_clone: b => [[W(b, 'ثانیه'), 'counter_tick'], [W(b, 'کپی'), 'click']],
+  vc_call: b => [[W(b, 'تصادف'), 'notify'], [W(b, 'پول'), 'counter_tick']],
+  vc_secret: b => [[W(b, 'هیچ'), 'click']],
+  vc_fbi: b => [[W(b, 'FBI'), 'tap'], [W(b, 'هشدار'), 'hit']],
+  vc_three: b => [[W(b, 'سه'), 'pop'], [W(b, 'خانواده'), 'tick']],
+  vc_code: b => [[W(b, 'رمز'), 'tap'], [W(b, 'کلمه'), 'tap'], [W(b, 'می‌دونید'), 'click']],
+  vc_ask: b => [[W(b, 'رمز'), 'notify'], [b.b - 1.0, 'hit']],
+  vc_back: b => [[W(b, 'شماره'), 'pop'], [W(b, 'زنگ'), 'notify']],
+  vc_fake: b => [[W(b, 'جعل'), 'hit']],
+  vc_rule: b => [[W(b, 'عجله'), 'pop'], [W(b, 'نگو'), 'pop'], [W(b, 'خطر'), 'hit']],
+  vc_share: b => [[W(b, 'مامان'), 'pop']],
 };
 
 // ---- camera: station to station through one world, log-space zoom dipping out and back in on each move ----
@@ -110,17 +128,17 @@ function camAt(t) {
   let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
   const b = B[bi], prev = B[Math.max(0, bi - 1)], k = eio(pr(t, b.a, b.a + .75));
   const p0 = ST[prev.st], p1 = ST[b.st];
-  const ZS = 1.12; let z1 = ZS, z0 = prev.sc.type === 'tip' ? .3 : ZS, c1 = p1;
-  if (b.sc.type === 'tip') { c1 = [-1300, 4420]; z1 = 1.12 * (1 + .12 * eio(pr(t, b.a + .3, b.b))); }
-  if (b.sc.type === 'ask') { const kk = eio(pr(t, b.a, b.a + 1.3)); return {x: mix(-1300, 0, kk), y: mix(4420, 0, kk), z: Math.exp(mix(Math.log(1.12), Math.log(1.12), kk) - 1.25 * Math.sin(Math.PI * kk))}; }
+  const ZS = 1.12; let z1 = ZS, z0 = prev.kind === 'tip' ? .3 : ZS, c1 = p1;
+  if (b.kind === 'tip') { c1 = [-1300, 4420]; z1 = 1.12 * (1 + .12 * eio(pr(t, b.a + .3, b.b))); }
+  if (b.kind === 'ask') { const kk = eio(pr(t, b.a, b.a + 1.3)); return {x: mix(-1300, 0, kk), y: mix(4420, 0, kk), z: Math.exp(mix(Math.log(1.12), Math.log(1.12), kk) - 1.25 * Math.sin(Math.PI * kk))}; }
   const dist = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]), dip = dist > 10 ? Math.min(.45, dist / 4200) : 0;
-  z0 = prev.sc.type === 'tip' ? 1.12 : z0;
+  z0 = prev.kind === 'tip' ? 1.12 : z0;
   const lz = mix(Math.log(z0), Math.log(z1), k) - dip * Math.sin(Math.PI * k);
   const drift = .03 * pr(t, b.a + .75, b.b);                      // the camera never sits still
   let x = mix(p0[0], c1[0], k), y = mix(p0[1], c1[1], k), z = Math.exp(lz) * (1 + drift);
   // screen-studio punch: every moment inside a beat alternates a wide and a tight framing on where the ball works,
   // so each idea fills the frame (closed-form ease, ~0.3 s, a move through the same world, never a cut)
-  if (b.sc.type !== 'tip' && b.sc.type !== 'hook' && b.sc.type !== 'night') {
+  if (b.kind !== 'tip' && b.kind !== 'hook' && b.kind !== 'night') {
     const ids = (window.SCENES || []).filter(sc => sc.bg.split('.')[0] === b.bt.id && sc.t0 <= t);
     const i = ids.length - 1, t0 = i >= 0 ? ids[i].t0 : b.a, f = (j) => j % 2 ? 1 : 0;
     const prevF = i > 0 ? f(i - 1) : 0, curF = i >= 0 ? f(i) : 0, kk = eio(pr(t, t0, t0 + .32)), pf = mix(prevF, curF, kk);
@@ -156,10 +174,27 @@ function contact(b, t) {
     case 'flaw': return [s[0], s[1] + 380 - Math.abs(Math.sin((t - b.a) * 4.2)) * 220];
     case 'tip': return [s[0], s[1] + 260];
     case 'ask': return [ST.T[0] - 150, ST.T[1]];
+    case 'vc_hook': return [s[0] + 300, s[1] + 180];
+    case 'vc_clone': return [s[0] + 300 - 600 * vcTog(b, t), s[1] + 330];
+    case 'vc_call': { const n = t < W(b, 'تصادف') - .2 ? 0 : t < W(b, 'پول') - .2 ? 1 : 2; return [s[0] - 330, s[1] - 230 + n * 200]; }
+    case 'vc_secret': return [s[0], s[1] - 20];
+    case 'vc_fbi': return [s[0] + 380, s[1] + 360];
+    case 'vc_three': return [s[0] - 380 + 760 * vcSl(b, t), s[1] - 160];
+    case 'vc_code': { const kp = vcKeyPress(b, t); return kp ? kp : [s[0] + 300, s[1] - 250]; }
+    case 'vc_ask': return t < b.b - 1.0 ? [s[0] - 380, s[1] - 200] : [s[0] + 380, s[1] + 230];
+    case 'vc_back': return t < W(b, 'شماره') - .1 ? [s[0], s[1] + 330] : t < W(b, 'زنگ') - .1 ? [s[0] + 250, s[1] + 20] : [s[0], s[1] + 330];
+    case 'vc_fake': return [s[0] + 380, s[1] + 600];
+    case 'vc_rule': return [s[0] - 380, s[1] - 470];
+    case 'vc_share': return [ST.T[0] - 150, ST.T[1]];
   }
   return s;
 }
 const sliderK = (b, t) => eio(pr(t, b.a + .5, W(b, '۷۰') + .2));
+const vcTog = (b, t) => ex(pr(t, W(b, 'کپی') - .15, W(b, 'کپی') + .15));
+const vcSl = (b, t) => eio(pr(t, b.a + .4, W(b, 'سه') + .25));
+const VTYPED = 'golabi';
+const vcKeyTimes = b => { const t0 = W(b, 'رمز') + .1, t1 = W(b, 'می‌دونید'); return [...VTYPED, '↵'].map((c, i) => [t0 + (t1 - t0) * i / VTYPED.length, c]); };
+function vcKeyPress(b, t) { const ks = vcKeyTimes(b); let last = null; ks.forEach(([tk, c]) => { if (t >= tk - .12) last = keyXY(c); }); return t >= ks[0][0] - .12 ? last : null; }
 // keyboard: the ball strikes each key of "Are you AI?" at a fixed time
 const KEYROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
 function keyXY(ch) {
@@ -191,6 +226,7 @@ const tg = (x, y, d) => `<img class="a" src="${U('el/telegram.png')}" style="lef
 
 // ---- every station draws itself from the time (local progress), wherever the camera is ----
 function stations(t) {
+  if (S.set === 'vc') return stationsVC(t);
   let r = '';
   const bt = type => B.find(b => b.sc.type === type);
   // T: the AI-persona toggle (flips ON in the hook, OFF at the end)
@@ -274,6 +310,120 @@ function stations(t) {
     r += pop(kw, `<div class="a" style="left:-1700px;top:4250px;width:800px;padding:30px 0 40px;border-radius:40px;background:var(--red);font:900 110px V;text-align:center">پول خواست؟</div><div class="a" style="left:-1700px;top:4520px;width:800px;font:900 120px V;text-align:center">⚠️ یعنی خطر</div>`, '-1300px', '4400px'); }
   return r;
 }
+
+// ================= set "vc": the voice-clone family call (REEL-044) =================
+const wave = (x, y, w, h, t, col = '#FF4D5E', n = 28, amp = 1) => { let r = ''; for (let i = 0; i < n; i++) { const v = .25 + .75 * Math.abs(Math.sin(t * 6 + i * .9) * Math.cos(t * 2.3 + i * .37)); const hh = Math.max(8, h * v * amp);
+  r += `<div class="a" style="left:${(x + i * w / n).toFixed(1)}px;top:${(y + (h - hh) / 2).toFixed(1)}px;width:${(w / n * .55).toFixed(1)}px;height:${hh.toFixed(1)}px;border-radius:8px;background:${col}"></div>`; } return r; };
+const chip = (x, y, s, bg = 'var(--ch2)', size = 50, st = '') => `<div class="a" style="left:${x}px;top:${y}px;padding:12px 30px 18px;border-radius:30px;background:${bg};font:900 ${size}px V;${st}">${s}</div>`;
+const roundBtn = (x, y, d, col, icon, k = 1) => `<div class="a" style="left:${x - d / 2}px;top:${y - d / 2}px;width:${d}px;height:${d}px;border-radius:50%;background:${col};font:900 ${d * .42}px/${d}px V;text-align:center;transform:scale(${k.toFixed(3)})">${icon}</div>`;
+const ring = (cx, cy, rr, k, col = '#4ED6A0', w = 14) => { const C = 2 * Math.PI * rr; return `<svg class="a" style="left:${cx - rr - w}px;top:${cy - rr - w}px" width="${2 * rr + 2 * w}" height="${2 * rr + 2 * w}"><circle cx="${rr + w}" cy="${rr + w}" r="${rr}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${(C * (1 - cl(k))).toFixed(1)}" transform="rotate(-90 ${rr + w} ${rr + w})"/></svg>`; };
+const tick = (x, y, d, k) => `<div class="a" style="left:${x}px;top:${y}px;width:${d}px;height:${d}px;border-radius:18px;border:5px solid ${k > 0 ? '#4ED6A0' : 'var(--line)'};background:${k > 0 ? 'rgba(78,214,160,.18)' : 'transparent'};box-sizing:border-box;font:900 ${d * .7}px/${d * .9}px V;text-align:center;color:#4ED6A0;transform:scale(${(k > 0 ? spring(k) : 1).toFixed(3)})">${k > 0 ? '✓' : ''}</div>`;
+const RULES = ['رمز خانوادگی', 'قطع کن، دوباره زنگ بزن', 'عجله + راز = خطر'];
+function stationsVC(t) {
+  let r = '';
+  const bt = type => B.find(b => b.sc.type === type);
+  // T: the call card (mom's phone); returns at the end for the share
+  { const sh = bt('vc_share'), off = sh ? ex(pr(t, W(sh, 'مامان'), W(sh, 'مامان') + .3)) : 0;
+    r += box(-470, -330, 940, 660) + chip(-430, -300, 'گوشی مامان', 'var(--ch2)', 44) + rtxt(-430, -200, 'بچه‌م', 110, '#fff');
+    r += wave(-400, -20, 560, 130, t, off > .5 ? '#3A3C46' : '#FF4D5E') + chip(200, -10, 'AI', '#FF4D5E', 64, 'transform:rotate(-8deg)');
+    r += toggle(-220, 230, 1 - off, 1, '') + rtxt(-430, 200, 'صدای کپی‌شده', 50, 'var(--mu)');
+    if (sh) { const ks = pr(t, sh.a + .3, sh.a + .8), n = Math.round(240 * eio(pr(t, sh.a + .4, sh.b)));
+      r += pop(ks, chip(-420, 380, `↗ ${fa(n)} ارسال`, 'var(--blue)', 60)) + pop(pr(t, W(sh, 'مامان') - .1, W(sh, 'مامان') + .3), bubble(-40, 370, 500, 'برای مامان و بابا', 1, true, 54)); } }
+  // P: a video of you → your voice lifts out of it → seconds counter → the clone toggle flips
+  { const b = bt('vc_clone'), k = b ? pr(t, b.a + .1, b.a + .5) : 0, ks = b ? pr(t, W(b, 'ثانیه') - .3, W(b, 'ثانیه') + .9) : 0, kc = b ? vcTog(b, t) : 0;
+    r += box(840, -400, 920, 900, '', `transform:scale(${(.92 + .08 * ex(k)).toFixed(3)})`) + rtxt(-1700, -370, 'ویدیوی تو', 54, 'var(--mu)');
+    r += `<div class="a" style="left:900px;top:-280px;width:800px;height:340px;border-radius:28px;background:linear-gradient(135deg,#2A2C34,#1A1B20);border:3px solid var(--line)"><div style="position:absolute;left:350px;top:110px;width:0;height:0;border-left:100px solid #fff;border-top:60px solid transparent;border-bottom:60px solid transparent;opacity:.9"></div><div style="position:absolute;left:40px;bottom:30px;width:720px;height:14px;border-radius:7px;background:#3A3C46"><div style="width:${(720 * pr(t, b ? b.a : 0, b ? b.b : 1)).toFixed(0)}px;height:14px;border-radius:7px;background:var(--blue)"></div></div></div>`;
+    r += `<div class="a" style="left:0;top:${(-ex(ks) * 40).toFixed(1)}px;opacity:${(.3 + .7 * ex(ks)).toFixed(2)}">${wave(920, 100, 760, 140, t, '#2F7BFF', 30, .4 + .6 * ex(ks))}</div>`;
+    r += txt(940, 270, `${fa((3 * ex(ks)).toFixed(1))}<span style="font-size:60px"> ثانیه</span>`, 120, '#fff');
+    r += toggle(1580, 440, kc, 1, '') + rtxt(-1750, 290, 'کپی صدا', 54, kc > .5 ? '#FF4D5E' : 'var(--mu)'); }
+  // C: the fake call: bubbles «مامان…» «تصادف کردم» «پول لازم دارم», urgent chip, amount counts up
+  { const b = bt('vc_call'), m = [['مامان…', b ? b.a + .2 : 0], ['تصادف کردم!', b ? W(b, 'تصادف') - .2 : 0], ['پول لازم دارم', b ? W(b, 'پول') - .2 : 0]];
+    r += box(840, 1100, 920, 900) + rtxt(-1700, 1130, 'تماس با صدای تو', 52, 'var(--mu)');
+    m.forEach(([q, d], i) => { r += bubble(900, 1230 + i * 200, 800, q, b ? pr(t, d, d + .4) : 0, false, 60); });
+    r += pop(b ? pr(t, b.a + .5, b.a + .9) : 0, chip(900, 1130, 'فوری!', '#FF4D5E', 52));
+    const km = b ? eio(pr(t, W(b, 'پول'), b.b)) : 0;
+    r += txt(900, 1850, `${fa(Math.round(50 * km))} میلیون تومان`, 84, km > 0 ? '#FF4D5E' : '#3A3C46'); }
+  // D: the secret: whisper bubble, lock closes, red ring draws, «راز» chip
+  { const b = bt('vc_secret'), kl = b ? pr(t, W(b, 'هیچ') - .2, W(b, 'هیچ') + .3) : 0, kr = b ? pr(t, b.a + .1, b.b) : 0;
+    r += box(-460, 1100, 920, 900) + ring(0, 1500, 250, kr, '#FF4D5E', 16);
+    r += `<div class="a" style="left:-90px;top:${(1330 + 50 * ex(kl)).toFixed(1)}px;width:180px;height:200px;border:26px solid #fff;border-bottom:0;border-radius:90px 90px 0 0;box-sizing:border-box"></div><div class="a" style="left:-130px;top:1490px;width:260px;height:200px;border-radius:30px;background:#fff"></div><div class="a" style="left:-18px;top:1550px;width:36px;height:70px;border-radius:18px;background:#111"></div>`;
+    r += pop(b ? pr(t, b.a + .2, b.a + .6) : 0, bubble(-400, 1150, 800, 'به هیچ‌کس نگو…', 1, false, 62));
+    r += pop(kl, chip(240, 1660, 'راز', '#FF4D5E', 64)); }
+  // L: the FBI warning card: border draws red, FBI chip, year chip, warning line
+  { const b = bt('vc_fbi'), kb = b ? pr(t, b.a + .1, b.a + .9) : 0, kf = b ? pr(t, W(b, 'FBI') - .1, W(b, 'FBI') + .3) : 0, kw = b ? pr(t, W(b, 'هشدار') - .1, W(b, 'هشدار') + .3) : 0;
+    r += `<svg class="a" style="left:-1770px;top:1090px" width="940" height="840"><rect x="8" y="8" width="924" height="824" rx="36" fill="#1D1E24" stroke="${kb > 0 ? '#FF4D5E' : '#3A3C46'}" stroke-width="8" stroke-dasharray="3400" stroke-dashoffset="${(3400 * (1 - ex(kb))).toFixed(0)}"/></svg>`;
+    r += pop(kf, `<div class="a" dir="ltr" style="left:-1700px;top:1150px;padding:6px 40px 14px;border-radius:24px;background:#fff;color:#111;font:900 150px V;letter-spacing:8px">FBI</div>`) + pop(pr(t, (b ? W(b, 'امسال') : 0) - .1, (b ? W(b, 'امسال') : 0) + .3), chip(-1180, 1210, fa('2026'), 'var(--blue)', 70));
+    r += pop(kw, `<div class="a" style="left:-1700px;top:1470px;width:800px;white-space:normal;font:900 76px/1.3 V;text-align:right">⚠️ هشدار: تماس با<br>صدای جعلیِ عزیزان</div>`, '-1300px', '1600px');
+    r += `<div class="a" style="left:-1700px;top:1800px;width:${(800 * pr(t, b ? W(b, 'هشدار') : 0, b ? b.b : 1)).toFixed(0)}px;height:18px;border-radius:9px;background:#FF4D5E"></div>`; }
+  // SL: slider 0→3 and the three-rule checklist appearing
+  { const b = bt('vc_three'), k = b ? vcSl(b, t) : 0, n = Math.round(3 * k), kx = -1680 + 760 * k;
+    r += box(-1760, 2560, 920, 960) + rtxt(880, 2600, 'امشب، با خانواده', 58, '#fff');
+    r += `<div class="a" style="left:-1680px;top:2830px;width:760px;height:20px;border-radius:10px;background:#2A2C34"></div><div class="a" style="left:-1680px;top:2830px;width:${(760 * k).toFixed(1)}px;height:20px;border-radius:10px;background:var(--blue)"></div><div class="a" style="left:${(kx - 40).toFixed(1)}px;top:2800px;width:80px;height:80px;border-radius:50%;background:#2E3038;border:4px solid var(--blue)"></div>`;
+    r += `<div class="a" style="left:${(kx - 90).toFixed(1)}px;top:2680px;width:180px;padding:6px 0 14px;border-radius:24px;background:var(--blue);font:900 76px V;text-align:center">${fa(n)}</div>`;
+    RULES.forEach((q, i) => { const kk = b ? pr(t, W(b, 'خانواده') - .3 + i * .25, W(b, 'خانواده') + .1 + i * .25) : 0; r += pop(kk, tick(-960, 2960 + i * 170, 110, 0) + rtxt(1010, 2975 + i * 170, `${fa(i + 1)}. ${q}`, 56, '#fff')); }); }
+  // K: the family code: password field fills dot by dot as the ball strikes keys; lock closes; «فقط خودتون»
+  { const b = bt('vc_code'), ks = b ? vcKeyTimes(b) : [], n = ks.filter(([tk]) => t >= tk).length, done = n > VTYPED.length, fieldK = b ? pr(t, b.a + .2, b.a + .7) : 0;
+    r += box(840, 3880, 920, 1300) + rtxt(-1700, 3920, '۱. رمز خانوادگی', 64, '#fff');
+    r += `<div class="a" style="left:880px;top:4060px;width:840px;height:130px;border-radius:65px;background:#2A2C34;border:4px solid ${done ? '#4ED6A0' : fieldK > 0 ? 'var(--blue)' : 'var(--line)'};font:900 80px/120px V;letter-spacing:18px;text-align:center;box-sizing:border-box" dir="ltr">${'•'.repeat(Math.min(n, VTYPED.length)) || '<span style="font-size:48px;letter-spacing:0;color:#9A9CA8">رمز؟</span>'}</div>`;
+    if (done) r += pop(pr(t, ks[ks.length - 1][0], ks[ks.length - 1][0] + .35), chip(900, 4230, '🔒 فقط خودتون بلدید', '#4ED6A0', 54, 'color:#0B0B0E'));
+    const kbK = b ? ex(pr(t, b.a + .3, b.a + .8)) : 0, kbY = mix(500, 0, kbK); let kb = '';
+    KEYROWS.forEach((row, ri) => [...row].forEach((c, i) => { const [kx, ky] = keyXY(c); const hit = ks.some(([tk, kc]) => kc === c && t >= tk - .1 && t < tk + .12);
+      kb += `<div class="a" style="left:${kx - 42}px;top:${ky - 50 + kbY}px;width:84px;height:100px;border-radius:16px;background:${hit ? 'var(--blue)' : '#2E3038'};font:600 44px/100px V;text-align:center" dir="ltr">${c}</div>`; }));
+    kb += `<div class="a" style="left:${ST.K[0] - 300}px;top:${ST.K[1] + 480 + kbY}px;width:600px;height:100px;border-radius:16px;background:#2E3038"></div><div class="a" style="left:${ST.K[0] + 340}px;top:${ST.K[1] + 480 + kbY}px;width:140px;height:100px;border-radius:16px;background:${done ? 'var(--blue)' : '#2E3038'};font:900 50px/100px V;text-align:center">↵</div>`;
+    r += `<div class="a" style="left:0;top:0;opacity:${(1 - (b ? ex(pr(t, b.b + .3, b.b + .8)) : 0)).toFixed(2)}">${kb}</div>`; }
+  // H: the emergency call test: mom asks «رمزمون چیه؟», typing dots, a dodge, red flag
+  { const b = bt('vc_ask'), kq = b ? pr(t, b.a + .3, b.a + .7) : 0, kn = b ? pr(t, b.b - 1.0, b.b - .6) : 0;
+    r += box(-460, 2560, 920, 960) + chip(-420, 2590, 'تماس اضطراری', '#FF4D5E', 48);
+    r += bubble(-60, 2700, 480, 'رمزمون چیه؟', kq, true, 62);
+    r += t < (b ? b.b - 1.0 : 0) ? (kq >= 1 ? dots(-400, 2900, t) : '') : bubble(-400, 2900, 760, 'الان وقتش نیست!', kn, false, 60);
+    r += pop(pr(t, (b ? b.b : 0) - .7, (b ? b.b : 0) - .3), chip(-400, 3120, '🚩 رمز رو نمی‌دونه', '#FF4D5E', 54));
+    r += rtxt(-400, 3330, 'بدون رمز، پول بی پول', 50, 'var(--mu)'); }
+  // G: hang up → contacts card → the saved number → green call ring
+  { const b = bt('vc_back'), kd = b ? pr(t, b.a + .3, b.a + .6) : 0, kc = b ? pr(t, b.a + .7, b.a + 1.1) : 0, kg = b ? pr(t, W(b, 'زنگ') - .1, b.b) : 0;
+    r += box(840, 2560, 920, 960) + rtxt(-1700, 2600, '۲. قطع کن، خودت زنگ بزن', 54, '#fff');
+    r += roundBtn(1300, 3330, 180, '#FF4D5E', '✕', kd > 0 && kd < .5 ? .88 : 1) + txt(1220, 3440, 'قطع', 48, 'var(--mu)');
+    r += pop(kc, `<div class="a" style="left:900px;top:2720px;width:800px;height:260px;border-radius:30px;background:#2A2C34;border:3px solid var(--line)"><div style="position:absolute;right:40px;top:30px;font:900 70px V">بچه‌م</div><div dir="ltr" style="position:absolute;left:40px;top:150px;font:900 56px V;color:#9A9CA8">0912 ••• 4567</div><div style="position:absolute;left:40px;top:40px;padding:6px 20px 12px;border-radius:20px;background:var(--blue);font:900 40px V">ذخیره‌شده</div></div>`, '1300px', '2850px');
+    if (kg > 0) r += ring(1300, 3080, 110, kg, '#4ED6A0', 12) + roundBtn(1300, 3080, 150, '#4ED6A0', '✆', spring(pr(kg, 0, .3))); }
+  // F: caller ID can be faked: digits scramble, glitch, «جعلی» stamp
+  { const b = bt('vc_fake'), kf = b ? pr(t, W(b, 'جعل') - .1, W(b, 'جعل') + .3) : 0, gl = b && t > b.a && t < b.b ? Math.sin(t * 40) * 10 : 0;
+    const dig = '0912' + [...Array(7)].map((_, i) => String(Math.floor(Math.abs(Math.sin(Math.floor(t * 12) * 1.7 + i * 2.3)) * 10))).join('');
+    r += box(-460, 3880, 920, 1300) + rtxt(-400, 3920, 'شماره‌ای که می‌بینی', 54, 'var(--mu)');
+    r += `<div class="a" style="left:${-400 + gl}px;top:4040px;width:800px;height:300px;border-radius:30px;background:#2A2C34;border:3px solid ${kf > 0 ? '#FF4D5E' : 'var(--line)'}"><div style="position:absolute;right:40px;top:30px;font:900 76px V">بچه‌م</div><div dir="ltr" style="position:absolute;left:40px;top:170px;font:900 66px V;color:${kf > 0 ? '#FF4D5E' : '#fff'}">${kf > 0 ? '0912 ••• 4567' : dig.slice(0, 4) + ' ' + dig.slice(4)}</div></div>`;
+    r += pop(kf, `<div class="a" style="left:-260px;top:4420px;padding:10px 50px 22px;border:10px solid #FF4D5E;border-radius:30px;color:#FF4D5E;font:900 130px V;transform:rotate(-10deg)">جعلی</div>`, '0', '4520px');
+  }
+  // R: the three rules tick 1/2/3; «عجله» + «راز» = «خطر»
+  { const b = bt('vc_rule'), kw = b ? pr(t, W(b, 'خطر') - .1, W(b, 'خطر') + .3) : 0;
+    r += box(-1760, 3880, 920, 1300, '', `border-color:${kw > 0 ? 'var(--red)' : 'var(--line)'}`) + rtxt(880, 3920, '۳ قانون ساده', 66, '#fff');
+    RULES.forEach((q, i) => { const kk = b ? pr(t, b.a + .15 + i * .2, b.a + .45 + i * .2) : 0; r += tick(-960, 4060 + i * 150, 100, i < 2 ? kk : kw) + rtxt(1010, 4070 + i * 150, q, 52, '#fff'); });
+    r += pop(b ? pr(t, W(b, 'عجله') - .1, W(b, 'عجله') + .3) : 0, chip(-1700, 4560, 'عجله', '#2A2C34', 64)) + pop(b ? pr(t, W(b, 'نگو') - .1, W(b, 'نگو') + .3) : 0, chip(-1420, 4560, '+ راز', '#2A2C34', 64));
+    r += pop(kw, `<div class="a" style="left:-1700px;top:4740px;width:800px;padding:20px 0 34px;border-radius:40px;background:var(--red);font:900 110px V;text-align:center">= خطر</div>`, '-1300px', '4850px'); }
+  return r;
+}
+function hookVC(t, ho) {
+  let s = '';
+  const k = eio(pr(t, ho - .1, ho + .7)), sh = t < ho ? Math.sin(t * 38) * 6 * (Math.floor(t * 1.4) % 2 ? 0 : 1) : 0;
+  const L = mix(0, 14, k), T = mix(0, 450, k), Wd = mix(1080, 1052, k), Ht = mix(1920, 740, k);
+  s += `<div class="a" style="left:${L}px;top:${T}px;width:${Wd}px;height:${Ht}px;overflow:hidden;border-radius:${mix(0, 40, k)}px;background:linear-gradient(180deg,#FFFFFF,#EEF1F7);opacity:${(1 - pr(t, ho + .3, ho + .8)).toFixed(2)}">`;
+  if (t < ho + .2) {
+    const z = (.86 + .14 * spring(pr(t, 0, .45))) * (1 + .015 * eio(pr(t, .45, ho))), rot = Math.sin(t * 31) * 1.6 * (Math.floor(t * 1.4) % 2 ? 0 : 1);
+    s += `<div style="position:absolute;inset:0;transform:scale(${z.toFixed(3)}) translateX(${sh.toFixed(1)}px) rotate(${rot.toFixed(2)}deg);transform-origin:50% 45%">`;
+    s += `<div class="a" style="left:390px;top:110px;padding:10px 34px 16px;border-radius:30px;background:#E3E7EF;color:#4A4F5C;font:900 46px V">گوشی مامان</div>`;
+    s += `<div class="t" style="left:0;right:0;top:200px;text-align:center;font-size:150px;color:#111">بچه‌م</div><div class="t" style="left:0;right:0;top:400px;text-align:center;font:600 52px V;color:#6B7080">تماس ورودی…</div>`;
+    s += `<div class="a" style="left:0;top:0">${wave(170, 500, 740, 170, t, '#FF2E63', 30)}</div>`;
+    const ka = pr(t, 0, .25);
+    s += `<div class="a" dir="ltr" style="left:700px;top:470px;padding:8px 34px 16px;border-radius:26px;background:#FF2E63;color:#fff;font:900 96px V;transform:rotate(-9deg) scale(${(1.4 - .4 * ex(ka)).toFixed(3)})">AI</div>`;
+    const s1 = pr(t, 0, .25), s2 = pr(t, .15, .4);
+    s += `<div class="t" style="left:0;right:0;top:760px;text-align:center;font-size:122px;line-height:1.2;letter-spacing:-1px;color:#111;transform:scale(${(1.25 - .25 * ex(s1)).toFixed(3)})">اگه <span style="background:#FF2E63;color:#fff;padding:0 .16em .06em;border-radius:.16em">صدای تو</span></div>`;
+    s += `<div class="t" style="left:0;right:0;top:906px;text-align:center;font-size:122px;line-height:1.2;letter-spacing:-1px;color:#111;transform:translateY(${((1 - ex(s2)) * 60).toFixed(1)}px);opacity:${(.7 + .3 * ex(s2)).toFixed(2)}">به مامانت زنگ بزنه؟</div>`;
+    const pu = (t * 1.6) % 1;
+    [[300, '#FF3B30', '✕'], [780, '#34C759', '✆']].forEach(([x, c, ic]) => { s += `<div class="a" style="left:${x - 110 - 60 * pu}px;top:${1290 - 60 * pu}px;width:${220 + 120 * pu}px;height:${220 + 120 * pu}px;border-radius:50%;border:6px solid ${c};opacity:${(1 - pu).toFixed(2)}"></div>` + `<div class="a" style="left:${x - 110}px;top:1290px;width:220px;height:220px;border-radius:50%;background:${c};color:#fff;font:900 100px/220px V;text-align:center">${ic}</div>`; });
+    const kc = pr(t, 1.7, 2.0);
+    s += `<div class="a" style="left:240px;top:1580px;width:600px;padding:12px 0 20px;border-radius:34px;background:#111;color:#fff;font:900 54px V;text-align:center;transform:scale(${spring(kc).toFixed(3)});opacity:${cl(kc * 5)}">صدای کپی‌شده با AI</div>`;
+    s += `</div>`;
+  }
+  s += `</div>`;
+  return s;
+}
 function seek(t) {
   if (!B.length) return;
   let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
@@ -289,7 +439,8 @@ function seek(t) {
   // screen layer: the opening photo (shrinks into the world as a card) and the end card
   let s = '';
   const h = B[0], ho = h.b;
-  if (t < ho + .8) {
+  if (S.set === 'vc') { if (t < ho + .8) s += hookVC(t, ho); }
+  else if (t < ho + .8) {
     const k = eio(pr(t, ho - .1, ho + .7)), z = 1 + .18 * eio(pr(t, 0, ho));
     const L = mix(0, 560, k), T = mix(0, 90, k), Wd = mix(1080, 440, k), Ht = mix(1920, 760, k);
     s += `<div class="a" style="left:${L}px;top:${T}px;width:${Wd}px;height:${Ht}px;overflow:hidden;border-radius:${mix(0, 40, k)}px;opacity:${(1 - pr(t, ho + .4, ho + .8)).toFixed(2)}"><img src="${U('el/s00.jpg')}" style="width:100%;height:100%;object-fit:cover;transform:scale(${z.toFixed(3)})"></div>`;
