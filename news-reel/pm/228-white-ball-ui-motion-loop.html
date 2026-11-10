@@ -55,8 +55,11 @@ const BEAT_ST = {hook: 'T', found: 'P', cards: 'C', delay: 'D', photos: 'L', sli
   ask_ai: 'K', answer: 'K', night: 'K', flaw: 'F', tip: 'R', ask: 'T',
   // set "vc" (REEL-044, voice-clone family call): same world, new content per station
   vc_hook: 'T', vc_clone: 'P', vc_call: 'C', vc_secret: 'D', vc_fbi: 'L', vc_three: 'SL', vc_code: 'K', vc_ask: 'H',
-  vc_back: 'G', vc_fake: 'F', vc_rule: 'R', vc_share: 'T'};
-const KIND = {vc_rule: 'tip', vc_share: 'ask', vc_hook: 'hook'};
+  vc_back: 'G', vc_fake: 'F', vc_rule: 'R', vc_share: 'T',
+  // set "fs" (REEL-045, fake Instagram shops)
+  fs_hook: 'T', fs_stat: 'P', fs_how: 'C', fs_four: 'D', fs_price: 'L', fs_fake: 'SL', fs_gate: 'K', fs_enamad: 'H',
+  fs_check: 'G', fs_ai: 'F', fs_call: 'R', fs_share: 'T'};
+const KIND = {vc_rule: 'tip', vc_share: 'ask', vc_hook: 'hook', fs_call: 'tip', fs_share: 'ask', fs_hook: 'hook'};
 const SC_Y = 820;                                           // the screen point the camera centres stations on
 
 window.ready = (async () => {
@@ -71,7 +74,7 @@ window.ready = (async () => {
     B.push({bt, sc: bt.scene || {}, L, words, wt});
   }
   B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; b.st = BEAT_ST[b.sc.type] || 'T'; b.kind = KIND[b.sc.type] || b.sc.type; });
-  await Promise.all((S.set === 'vc' ? [] : ['s00.jpg', 'telegram.png']).map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + f); })));
+  await Promise.all((S.set ? [] : ['s00.jpg', 'telegram.png']).map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + f); })));
   await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'ربات Sofia')));
   window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
   // one idea per beat plus extra ideas on the beat's own moments (cards, ring, keys…), each with its matching sound
@@ -92,7 +95,9 @@ const W = (b, s) => { const i = b.words.findIndex(w => w.w.includes(s)); return 
 const SFX0 = {hook: 'notify', found: 'tap', cards: 'notify', delay: 'typing', photos: 'tap', slider: 'counter_tick', hotel: 'pop',
   gift: 'pop', ask_ai: 'typing', answer: 'notify', night: 'notify', flaw: 'notify', tip: 'sweep_soft', ask: 'click',
   vc_hook: 'notify', vc_clone: 'tap', vc_call: 'notify', vc_secret: 'tick', vc_fbi: 'hit', vc_three: 'counter_tick', vc_code: 'typing',
-  vc_ask: 'notify', vc_back: 'click', vc_fake: 'glass_ping', vc_rule: 'pop', vc_share: 'click'};
+  vc_ask: 'notify', vc_back: 'click', vc_fake: 'glass_ping', vc_rule: 'pop', vc_share: 'click',
+  fs_hook: 'pop', fs_stat: 'counter_tick', fs_how: 'click', fs_four: 'counter_tick', fs_price: 'tap', fs_fake: 'notify', fs_gate: 'typing',
+  fs_enamad: 'tap', fs_check: 'typing', fs_ai: 'shimmer', fs_call: 'click', fs_share: 'click'};
 // the moments inside a beat that get their own idea (camera kick) and sound
 const MOM = {
   hook: b => [[1.2, 'click']],
@@ -121,6 +126,18 @@ const MOM = {
   vc_fake: b => [[W(b, 'جعل'), 'hit']],
   vc_rule: b => [[W(b, 'عجله'), 'pop'], [W(b, 'نگو'), 'pop'], [W(b, 'خطر'), 'hit']],
   vc_share: b => [[W(b, 'مامان'), 'pop']],
+  fs_hook: b => [[1.4, 'tick']],
+  fs_stat: b => [[W(b, 'میلیون'), 'counter_tick'], [W(b, 'نصف'), 'hit']],
+  fs_how: b => [[W(b, 'جنس'), 'pop'], [W(b, 'نمی‌رسه'), 'hit']],
+  fs_four: b => [[W(b, 'چهار'), 'pop'], [W(b, 'نشونه'), 'tick']],
+  fs_price: b => [[W(b, 'ارزون'), 'hit']],
+  fs_fake: b => [[W(b, 'فیک'), 'notify'], [W(b, 'تعریف'), 'notify']],
+  fs_gate: b => [[W(b, 'درگاه'), 'tap'], [W(b, 'واقعی'), 'hit']],
+  fs_enamad: b => [[W(b, 'نداره'), 'hit']],
+  fs_check: b => [[W(b, 'سایت'), 'tap'], [W(b, 'استعلام'), 'notify']],
+  fs_ai: b => [[W(b, 'جستجوی'), 'shimmer'], [W(b, 'کپیه'), 'pop']],
+  fs_call: b => [[b.a + 1.2, 'tap'], [W(b, 'زنگ'), 'tap'], [W(b, 'زنگ') + 1.3, 'tap'], [W(b, 'زنگ') + 2.6, 'tap']],
+  fs_share: b => [[W(b, 'پیج'), 'pop']],
 };
 
 // ---- camera: station to station through one world, log-space zoom dipping out and back in on each move ----
@@ -186,6 +203,18 @@ function contact(b, t) {
     case 'vc_fake': return [s[0] + 380, s[1] + 600];
     case 'vc_rule': return [s[0] - 380, s[1] - 470];
     case 'vc_share': return [ST.T[0] - 150, ST.T[1]];
+    case 'fs_hook': return [s[0] + 380, s[1] + 230];
+    case 'fs_stat': return [s[0] - 380, s[1] + 400];
+    case 'fs_how': return t < W(b, 'جنس') - .1 ? [s[0] - 380, s[1] + 380] : [s[0] - 380, s[1] + 160];
+    case 'fs_four': return [s[0] - 380 + 760 * fsSl(b, t), s[1] - 160];
+    case 'fs_price': return [s[0] + 380, s[1] + 380];
+    case 'fs_fake': return [s[0] - 380, s[1] - 330];
+    case 'fs_gate': { const kp = fsKeyPress(b, t); return kp ? kp : [s[0] + 380, s[1] - 250]; }
+    case 'fs_enamad': return [s[0] - 380, s[1] + 380];
+    case 'fs_check': return [s[0] + 380, s[1] + 380];
+    case 'fs_ai': return [s[0] - 300 + 600 * pr(t, W(b, 'جستجوی'), W(b, 'جستجوی') + 1.2), s[1] - 300];
+    case 'fs_call': return [s[0] - 380, s[1] - 470];
+    case 'fs_share': return [ST.T[0] - 150, ST.T[1]];
   }
   return s;
 }
@@ -193,6 +222,10 @@ const sliderK = (b, t) => eio(pr(t, b.a + .5, W(b, '۷۰') + .2));
 const vcTog = (b, t) => ex(pr(t, W(b, 'کپی') - .15, W(b, 'کپی') + .15));
 const vcSl = (b, t) => eio(pr(t, b.a + .4, W(b, 'سه') + .25));
 const VTYPED = 'golabi';
+const fsSl = (b, t) => eio(pr(t, b.a + .3, W(b, 'چهار') + .25));
+const FTYPED = 'paybank';
+const fsKeyTimes = b => { const t0 = b.a + .5, t1 = W(b, 'بانکی'); return [...FTYPED, '↵'].map((c, i) => [t0 + (t1 - t0) * i / FTYPED.length, c]); };
+function fsKeyPress(b, t) { const ks = fsKeyTimes(b); let last = null; ks.forEach(([tk, c]) => { if (t >= tk - .12) last = keyXY(c); }); return t >= ks[0][0] - .12 ? last : null; }
 const vcKeyTimes = b => { const t0 = W(b, 'رمز') + .1, t1 = W(b, 'می‌دونید'); return [...VTYPED, '↵'].map((c, i) => [t0 + (t1 - t0) * i / VTYPED.length, c]); };
 function vcKeyPress(b, t) { const ks = vcKeyTimes(b); let last = null; ks.forEach(([tk, c]) => { if (t >= tk - .12) last = keyXY(c); }); return t >= ks[0][0] - .12 ? last : null; }
 // keyboard: the ball strikes each key of "Are you AI?" at a fixed time
@@ -227,6 +260,7 @@ const tg = (x, y, d) => `<img class="a" src="${U('el/telegram.png')}" style="lef
 // ---- every station draws itself from the time (local progress), wherever the camera is ----
 function stations(t) {
   if (S.set === 'vc') return stationsVC(t);
+  if (S.set === 'fs') return stationsFS(t);
   let r = '';
   const bt = type => B.find(b => b.sc.type === type);
   // T: the AI-persona toggle (flips ON in the hook, OFF at the end)
@@ -399,6 +433,111 @@ function stationsVC(t) {
     r += pop(kw, `<div class="a" style="left:-1700px;top:4740px;width:800px;padding:20px 0 34px;border-radius:40px;background:var(--red);font:900 110px V;text-align:center">= خطر</div>`, '-1300px', '4850px'); }
   return r;
 }
+
+// ================= set "fs": fake Instagram shops (REEL-045) =================
+const PRODS = [['👟', 330], ['👜', 15], ['⌚', 210], ['🎧', 280], ['🧥', 30], ['🕶️', 190], ['💄', 340], ['📱', 220], ['🎒', 120]];
+const tile = (x, y, w, i, fake, k = 1, price = '') => `<div class="a" style="left:${x}px;top:${y}px;width:${w}px;height:${w}px;border-radius:${w * .1}px;overflow:hidden;background:${fake ? '#3A3C46' : `linear-gradient(140deg,hsl(${PRODS[i][1]} 60% 62%),hsl(${PRODS[i][1] + 25} 55% 42%))`};transform:scale(${k.toFixed(3)});transition:none"><div style="position:absolute;inset:0;font:900 ${w * .42}px/${w}px V;text-align:center;filter:${fake ? 'grayscale(1) opacity(.45)' : 'none'}">${PRODS[i][0]}</div>${fake ? `<div style="position:absolute;left:0;right:0;bottom:${w * .08}px;text-align:center;font:900 ${w * .2}px V;color:#FF4D5E">فیک</div>` : price ? `<div style="position:absolute;right:${w * .06}px;bottom:${w * .06}px;padding:2px ${w * .06}px ${w * .04}px;border-radius:${w * .08}px;background:rgba(0,0,0,.55);font:900 ${w * .14}px V;color:#fff">${price}</div>` : ''}</div>`;
+const FSIGNS = ['خیلی ارزون', 'کامنت فیک', 'درگاه جعلی', 'بدون اینماد'];
+function stationsFS(t) {
+  let r = '';
+  const bt = type => B.find(b => b.sc.type === type);
+  // T: the shop page card (half its tiles fake); returns for the share
+  { const h = bt('fs_hook'), sh = bt('fs_share');
+    r += box(-470, -330, 940, 660) + rtxt(-430, -300, 'پیج فروشگاهی', 50, 'var(--mu)');
+    for (let i = 0; i < 6; i++) r += tile(-430 + (i % 3) * 290, -220 + Math.floor(i / 3) * 290, 260, i, [1, 3, 4].includes(i), 1, i === 0 ? '۱۹۹ت' : '');
+    if (sh) { const n = Math.round(320 * eio(pr(t, sh.a + .4, sh.b)));
+      r += pop(pr(t, sh.a + .3, sh.a + .7), chip(-430, 380, `↗ ${fa(n)} ارسال`, 'var(--blue)', 60)) + pop(pr(t, W(sh, 'پیج') - .1, W(sh, 'پیج') + .3), bubble(-20, 370, 480, 'قبل از خرید ببین', 1, true, 54)); } }
+  // P: FATA numbers: counter to 1.5 million, split bar 50/50
+  { const b = bt('fs_stat'), kc = b ? eio(pr(t, b.a + .3, W(b, 'میلیون') + .3)) : 0, ks = b ? pr(t, W(b, 'نصف') - .2, W(b, 'نصف') + .6) : 0;
+    r += box(840, -400, 920, 900) + chip(900, -370, 'پلیس فتا', '#FF4D5E', 48) + rtxt(-1700, -360, 'صفحه‌ی کسب‌وکار', 50, 'var(--mu)');
+    r += txt(900, -230, `${fa((1.5 * kc).toFixed(1))}<span style="font-size:70px"> میلیون</span>`, 150, '#fff');
+    r += `<div class="a" style="left:900px;top:70px;width:800px;height:90px;border-radius:24px;background:#2A2C34;overflow:hidden"><div style="position:absolute;right:0;top:0;height:90px;width:${(400 * ex(ks)).toFixed(0)}px;background:#4ED6A0"></div><div style="position:absolute;left:0;top:0;height:90px;width:${(400 * ex(ks)).toFixed(0)}px;background:#FF4D5E"></div></div>`;
+    r += pop(ks, txt(900, 190, '۷۵۰ هزار جعلی', 64, '#FF4D5E')) + pop(pr(ks, .3, 1), rtxt(-1700, 190, 'واقعی', 64, '#4ED6A0'));
+    r += rtxt(-1700, 330, 'نزدیک نصفشون', 56, '#fff', `opacity:${ex(ks).toFixed(2)}`); }
+  // C: deposit paid → parcel never arrives
+  { const b = bt('fs_how'), kp = b ? pr(t, b.a + .2, b.a + .6) : 0, kj = b ? pr(t, W(b, 'جنس') - .2, W(b, 'جنس') + .3) : 0, kx = b ? pr(t, W(b, 'نمی‌رسه') - .1, W(b, 'نمی‌رسه') + .3) : 0;
+    r += box(840, 1100, 920, 900) + rtxt(-1700, 1130, 'سفارش من', 56, '#fff');
+    r += pop(kp, `<div class="a" style="left:900px;top:1230px;width:800px;height:170px;border-radius:30px;background:#2A2C34;border:3px solid var(--line)"><div style="position:absolute;right:36px;top:22px;font:900 56px V">بیعانه پرداخت شد</div><div style="position:absolute;left:36px;top:30px;font:900 70px V;color:#4ED6A0">✓</div><div style="position:absolute;right:36px;top:100px;font:600 44px V;color:#9A9CA8">۵۰۰ هزار تومان</div></div>`, '1300px', '1315px');
+    r += `<div class="a" style="left:${1150 + 0}px;top:${(1440 + (1 - ex(kj)) * -200).toFixed(1)}px;font:900 220px V;opacity:${cl(kj * 4)}">📦</div>`;
+    const tr = b ? Math.min(.3, pr(t, W(b, 'جنس'), b.b)) : 0;
+    r += `<div class="a" style="left:900px;top:1790px;width:800px;height:24px;border-radius:12px;background:#2A2C34"><div style="width:${(800 * tr).toFixed(0)}px;height:24px;border-radius:12px;background:#F5B942"></div></div>` + rtxt(-1700, 1840, 'وضعیت: ارسال نشد', 54, kx > 0 ? '#FF4D5E' : 'var(--mu)');
+    r += pop(kx, `<div class="a" style="left:1360px;top:1470px;font:900 260px V;color:#FF4D5E">✕</div>`, '1460px', '1600px'); }
+  // D: slider 0→4 and the four signs
+  { const b = bt('fs_four'), k = b ? fsSl(b, t) : 0, n = Math.round(4 * k), kx = -380 + 760 * k;
+    r += box(-460, 1060, 920, 960) + rtxt(-400, 1100, 'قبل از خرید', 58, '#fff');
+    r += `<div class="a" style="left:-380px;top:1330px;width:760px;height:20px;border-radius:10px;background:#2A2C34"></div><div class="a" style="left:-380px;top:1330px;width:${(760 * k).toFixed(1)}px;height:20px;border-radius:10px;background:var(--blue)"></div><div class="a" style="left:${(kx - 40).toFixed(1)}px;top:1300px;width:80px;height:80px;border-radius:50%;background:#2E3038;border:4px solid var(--blue)"></div>`;
+    r += `<div class="a" style="left:${(kx - 90).toFixed(1)}px;top:1180px;width:180px;padding:6px 0 14px;border-radius:24px;background:var(--blue);font:900 76px V;text-align:center">${fa(n)}</div>`;
+    FSIGNS.forEach((q, i) => { const kk = b ? pr(t, W(b, 'نشونه') - .4 + i * .2, W(b, 'نشونه') + i * .2) : 0; r += pop(kk, tick(240, 1450 + i * 135, 96, 0) + rtxt(-220, 1462 + i * 135, `${fa(i + 1)}. ${q}`, 54, '#fff')); }); }
+  // L: price compare bars
+  { const b = bt('fs_price'), k1 = b ? eio(pr(t, b.a + .3, b.a + 1.0)) : 0, k2 = b ? eio(pr(t, W(b, 'ارزون') - .4, W(b, 'ارزون') + .2)) : 0;
+    r += box(-1760, 1080, 920, 840) + rtxt(880, 1110, '۱. قیمت', 64, '#fff');
+    r += rtxt(880, 1250, 'قیمت بازار', 50, 'var(--mu)') + `<div class="a" style="left:${-1680}px;top:1330px;width:${(760 * k1).toFixed(0)}px;height:90px;border-radius:20px;background:#5A5D68"></div>` + txt(-1660, 1340, `${fa(Math.round(480 * k1))} هزار`, 56, '#fff');
+    r += rtxt(880, 1480, 'این پیج', 50, 'var(--mu)') + `<div class="a" style="left:-1680px;top:1560px;width:${(315 * k2).toFixed(0)}px;height:90px;border-radius:20px;background:#FF4D5E"></div>` + txt(-1340, 1570, `${fa(Math.round(199 * k2))} هزار`, 56, '#fff', `opacity:${cl(k2 * 3)}`);
+    r += pop(pr(t, (b ? W(b, 'ارزون') : 0), (b ? W(b, 'ارزون') : 0) + .35), chip(-1660, 1730, 'خیلی ارزون؟! 🚩', '#FF4D5E', 58)); }
+  // SL: fake followers and identical comments
+  { const b = bt('fs_fake'), kf = b ? eio(pr(t, b.a + .3, b.a + 1.2)) : 0, u = b ? t - W(b, 'فیک') : -1;
+    r += box(-1760, 2560, 920, 960) + rtxt(880, 2590, '۲. فالوور و کامنت', 60, '#fff');
+    r += txt(-1700, 2690, `${fa(Math.round(1 + 83 * kf))}K`, 120, '#fff') + rtxt(880, 2720, 'فالوور در یک هفته', 46, 'var(--mu)');
+    for (let i = 0; i < 4; i++) { const kk = cl((u - i * .35) / .3); if (kk > 0) r += bubble(-1700 + (i % 2) * 60, 2880 + i * 140, 760, 'عالی بود 😍 حتماً بخرید', kk, false, 46); }
+    r += pop(b ? pr(t, W(b, 'تعریف') - .1, W(b, 'تعریف') + .3) : 0, chip(-1220, 3420, 'همه عین هم!', '#FF4D5E', 52)); }
+  // K: payment link: the ball types a fake domain; the real gateway domain compares; lock breaks
+  { const b = bt('fs_gate'), ks = b ? fsKeyTimes(b) : [], n = ks.filter(([tk]) => t >= tk).length, done = n > FTYPED.length, kr = b ? pr(t, W(b, 'واقعی') - .1, W(b, 'واقعی') + .3) : 0;
+    r += box(840, 3880, 920, 1300, '', `border-color:${kr > 0 ? 'var(--red)' : 'var(--line)'}`) + rtxt(-1700, 3920, '۳. لینک پرداخت', 60, '#fff');
+    const typed = FTYPED.slice(0, Math.min(n, FTYPED.length)).replace('paybank', 'pay-bank');
+    r += `<div class="a" dir="ltr" style="left:880px;top:4030px;width:840px;height:120px;border-radius:60px;background:#2A2C34;border:4px solid ${kr > 0 ? '#FF4D5E' : 'var(--blue)'};font:900 58px/112px V;padding:0 36px;box-sizing:border-box">🔒 ${typed}${done ? '.xyz' : ''}</div>`;
+    if (done) r += pop(pr(t, ks[ks.length - 1][0], ks[ks.length - 1][0] + .35), `<div class="a" dir="ltr" style="left:880px;top:4180px;padding:10px 30px 16px;border-radius:28px;background:#4ED6A0;color:#0B0B0E;font:900 50px V">✓ real: …shaparak.ir</div>`);
+    if (kr > 0) r += pop(kr, chip(900, 3910, 'جعلی', '#FF4D5E', 52));
+    const kbK = b ? ex(pr(t, b.a + .3, b.a + .8)) : 0, kbY = mix(500, 0, kbK); let kb = '';
+    KEYROWS.forEach((row) => [...row].forEach((c) => { const [kx, ky] = keyXY(c); const hit = ks.some(([tk, kc]) => kc === c && t >= tk - .1 && t < tk + .12);
+      kb += `<div class="a" style="left:${kx - 42}px;top:${ky - 50 + kbY}px;width:84px;height:100px;border-radius:16px;background:${hit ? 'var(--blue)' : '#2E3038'};font:600 44px/100px V;text-align:center" dir="ltr">${c}</div>`; }));
+    r += `<div class="a" style="left:0;top:0;opacity:${(1 - (b ? ex(pr(t, b.b + .3, b.b + .8)) : 0)).toFixed(2)}">${kb}</div>`; }
+  // H: the eNamad seal is missing
+  { const b = bt('fs_enamad'), ks = b ? pr(t, b.a + .2, b.a + .6) : 0, kn = b ? pr(t, W(b, 'نداره') - .1, W(b, 'نداره') + .3) : 0;
+    r += box(-460, 2560, 920, 960) + rtxt(-400, 2590, '۴. نماد اعتماد', 60, '#fff');
+    r += pop(ks, `<div class="a" style="left:-200px;top:2720px;width:400px;height:400px;border-radius:60px;background:linear-gradient(140deg,#2F7BFF,#1A4FB0);opacity:${(1 - .6 * ex(kn)).toFixed(2)}"><div style="position:absolute;inset:0;font:900 170px/360px V;text-align:center">★</div><div style="position:absolute;left:0;right:0;bottom:30px;text-align:center;font:900 58px V">اینماد</div></div>`, '0', '2920px');
+    r += pop(kn, `<div class="a" style="left:-150px;top:2700px;font:900 360px/1 V;color:#FF4D5E">✕</div>`, '0', '2900px') + pop(kn, chip(-140, 3200, 'نداره!', '#FF4D5E', 60)); }
+  // G: check the seal yourself on enamad.ir
+  { const b = bt('fs_check'), kt = b ? pr(t, W(b, 'سایت') - .3, W(b, 'سایت') + .6) : 0, kres = b ? pr(t, W(b, 'استعلام') - .1, W(b, 'استعلام') + .3) : 0, kfake = b ? pr(t, b.a + .2, b.a + .6) : 0;
+    r += box(840, 2560, 920, 960) + rtxt(-1700, 2590, 'استعلام', 60, '#fff') + pop(kfake, chip(900, 2580, 'اینماد جعلی هم داریم', '#FF4D5E', 44));
+    const full = 'enamad.ir', shown = full.slice(0, Math.round(full.length * kt));
+    r += `<div class="a" dir="ltr" style="left:900px;top:2740px;width:800px;height:120px;border-radius:60px;background:#2A2C34;border:4px solid var(--blue);font:900 60px/112px V;padding:0 36px;box-sizing:border-box">🔎 ${shown}</div>`;
+    r += pop(kres, `<div class="a" style="left:900px;top:2920px;width:800px;padding:26px 34px 34px;box-sizing:border-box;border-radius:30px;background:#2A2C34;border:3px solid #FF4D5E"><div style="font:900 60px V;text-align:right">نتیجه: پیدا نشد</div><div style="font:600 46px V;color:#9A9CA8;text-align:right;margin-top:10px">اسم و آدرس رو با پیج مقایسه کن</div></div>`, '1300px', '3020px');
+    r += pop(kres, `<div class="a" style="left:1000px;top:3240px;padding:8px 40px 18px;border:9px solid #FF4D5E;border-radius:26px;color:#FF4D5E;font:900 90px V;transform:rotate(-8deg)">جعلی</div>`, '1200px', '3300px'); }
+  // F: AI tip: image search the product photo
+  { const b = bt('fs_ai'), kscan = b ? pr(t, W(b, 'جستجوی') - .2, W(b, 'جستجوی') + 1.0) : 0, kres = b ? W(b, 'کپیه') : 0;
+    r += box(-460, 3880, 920, 1300) + rtxt(-400, 3910, 'جستجوی تصویر', 60, '#fff');
+    r += tile(-260, 4020, 520, 1, false, 1) + `<div class="a" style="left:-260px;top:${(4020 + 520 * kscan).toFixed(0)}px;width:520px;height:10px;background:#2F7BFF;opacity:${(kscan > 0 && kscan < 1 ? 1 : 0)}"></div>`;
+    for (let i = 0; i < 3; i++) { const kk = b ? pr(t, kres - .5 + i * .18, kres - .2 + i * .18) : 0; r += pop(kk, tile(-400 + i * 280, 4600, 240, 1, false, 1)); }
+    r += pop(b ? pr(t, kres, kres + .35) : 0, chip(-400, 4880, 'همین عکس، ۳ جای دیگه!', '#FF4D5E', 52)); }
+  // R: scammed? call FATA 096380 (dial pad)
+  { const b = bt('fs_call'), num = '096380', kd = b ? pr(t, W(b, 'زنگ'), b.b - .2) : 0, n = Math.round(num.length * kd);
+    r += box(-1760, 3880, 920, 1300) + rtxt(880, 3910, 'پلیس فتا', 66, '#fff');
+    r += `<div class="a" dir="ltr" style="left:-1680px;top:4040px;width:760px;text-align:center;font:900 120px V;letter-spacing:8px">${fa(num.slice(0, n)) || '·'}</div>`;
+    for (let i = 0; i < 9; i++) { const d = String(i + 1), on = num.slice(0, n).endsWith(d) && n > 0;
+      r += roundBtn(-1530 + (i % 3) * 230, 4290 + Math.floor(i / 3) * 175, 150, on ? 'var(--blue)' : '#2E3038', fa(d)); }
+    r += roundBtn(-1300, 4815, 150, num.slice(0, n).endsWith('0') && n > 0 ? 'var(--blue)' : '#2E3038', '۰'); }
+  return r;
+}
+function hookFS(t, ho) {
+  let s = '';
+  const k = eio(pr(t, ho - .1, ho + .7));
+  const L = mix(0, 14, k), T = mix(0, 450, k), Wd = mix(1080, 1052, k), Ht = mix(1920, 740, k);
+  s += `<div class="a" style="left:${L}px;top:${T}px;width:${Wd}px;height:${Ht}px;overflow:hidden;border-radius:${mix(0, 40, k)}px;background:linear-gradient(180deg,#FFFFFF,#EEF1F7);opacity:${(1 - pr(t, ho + .3, ho + .8)).toFixed(2)}">`;
+  if (t < ho + .2) {
+    const z = (.9 + .1 * spring(pr(t, 0, .45))) * (1 + .015 * eio(pr(t, .45, ho))), scroll = -60 * eio(pr(t, .5, ho));
+    s += `<div style="position:absolute;inset:0;transform:scale(${z.toFixed(3)});transform-origin:50% 45%">`;
+    s += `<div class="a" style="left:330px;top:90px;padding:10px 34px 16px;border-radius:30px;background:#E3E7EF;color:#4A4F5C;font:900 46px V">پیج فروشگاهی</div>`;
+    s += `<div class="t" style="left:0;right:0;top:190px;text-align:center;font-size:122px;line-height:1.2;letter-spacing:-1px;color:#111"><span style="background:#FF2E63;color:#fff;padding:0 .16em .06em;border-radius:.16em">نصف</span> فروشگاه‌های<br>اینستاگرام، فیکن؟</div>`;
+    const FAKE = [1, 3, 4, 6, 8];
+    for (let i = 0; i < 9; i++) { const fk = FAKE.indexOf(i), on = fk >= 0 && t >= .2 + fk * .14, kk = on ? pr(t, .2 + fk * .14, .36 + fk * .14) : 0;
+      s += tile(90 + (i % 3) * 310, 560 + Math.floor(i / 3) * 310 + scroll, 280, i, kk > .5, 1 + .08 * Math.sin(Math.PI * kk), ['۱۹۹ت', '', '۲۴۰ت', '', '', '۹۹ت', '', '۳۱۰ت', ''][i]); }
+    const kb = pr(t, .5, .8);
+    s += `<div class="a" style="left:0;right:0;top:1500px;text-align:center;font:900 120px V;color:#FF2E63;transform:scale(${(1.4 - .4 * ex(kb)).toFixed(3)});opacity:${cl(kb * 4).toFixed(2)}">${fa(Math.round(50 * ex(pr(t, .5, 1.1))))}٪ جعلی</div><div class="a" style="left:0;right:0;top:1660px;text-align:center;font:900 50px V;color:#111;opacity:${pr(t, .9, 1.2).toFixed(2)}">به گفته‌ی پلیس فتا</div>`;
+    s += `</div>`;
+  }
+  s += `</div>`;
+  return s;
+}
 function hookVC(t, ho) {
   let s = '';
   const k = eio(pr(t, ho - .1, ho + .7)), sh = t < ho ? Math.sin(t * 38) * 6 * (Math.floor(t * 1.4) % 2 ? 0 : 1) : 0;
@@ -440,6 +579,7 @@ function seek(t) {
   let s = '';
   const h = B[0], ho = h.b;
   if (S.set === 'vc') { if (t < ho + .8) s += hookVC(t, ho); }
+  else if (S.set === 'fs') { if (t < ho + .8) s += hookFS(t, ho); }
   else if (t < ho + .8) {
     const k = eio(pr(t, ho - .1, ho + .7)), z = 1 + .18 * eio(pr(t, 0, ho));
     const L = mix(0, 560, k), T = mix(0, 90, k), Wd = mix(1080, 440, k), Ht = mix(1920, 760, k);

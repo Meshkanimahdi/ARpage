@@ -1,0 +1,21 @@
+<!doctype html><html dir="rtl"><head><meta charset="utf-8"><style>
+@font-face{font-family:V;font-weight:900;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2)}
+@font-face{font-family:V;font-weight:600;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000}
+#bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#sh{position:absolute;left:0;right:0;height:900px}
+#t{position:absolute;left:70px;right:70px;font:900 128px/1.2 V;color:#fff;text-shadow:0 4px 24px rgba(0,0,0,.55),0 2px 4px rgba(0,0,0,.5)}
+#t b{color:var(--a,#FFC86B);font-weight:900}
+#h{position:absolute;left:0;right:0;bottom:60px;text-align:center;font:600 34px V;color:rgba(255,255,255,.75);letter-spacing:3px}
+</style></head><body><img id="bg"><div id="sh"></div><div id="t"></div><div id="h" dir="ltr">MESHKANI.PRO</div>
+<script>
+const Q=new URLSearchParams(location.search);
+document.getElementById('bg').src=Q.get('bg');
+const pos=Q.get('pos')||'top', t=document.getElementById('t'), sh=document.getElementById('sh');
+t.innerHTML=Q.get('title').replace(/\*([^*]+)\*/g,'<b>$1</b>').replace(/\|/g,'<br>');
+if(Q.get('a'))document.documentElement.style.setProperty('--a',Q.get('a'));
+t.style.textAlign=Q.get('align')||'center';
+if(pos==='top'){t.style.top='300px';sh.style.top='0';sh.style.background='linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,0))';}
+else {t.style.bottom='230px';sh.style.bottom='0';sh.style.background='linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.6))';}
+window.ok=document.fonts.ready;
+</script></body></html>
