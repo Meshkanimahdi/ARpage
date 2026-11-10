@@ -6,16 +6,20 @@ Instagram account `meshkani.pro`. Each scheduled run starts a fresh Claude
 session and is told which phase to run: **PREPARE** or **PUBLISH** (posts, §1–§2) or
 **REEL_PREPARE** / **REEL_PUBLISH** (the daily reel, §4–§5).
 
-Daily schedule (Tehran, user rule 2026-10-24):
+Daily schedule (Tehran, user rule **2026-11-10**, replaces the 2026-10-24 table). Mahdi: «تعداد ریلزها رو بکن دوتا
+در روز یکی همون ساعت ۱۲ یکی هم ۹ شب، روز هم یه پست اسلایدی» + carousel at 09:00 (his pick).
 
 | time | what is published | prepared at (main, retry) |
 |---|---|---|
 | **06:00** | ANALYTICS: the daily review that starts the day (§6) | — |
-| **09:00** | reel + its story | 06:30, 07:30 (the same morning, after ANALYTICS; never the night before) |
-| **12:00** | post + 3 stories, **every other day** (§1 cadence, 2026-10-27) | 10:30, 11:05 |
-| **15:00** | reel + its story | 12:45, 13:45 |
-| ~~18:00~~ | disabled 2026-10-27 (carousels every other day) | — |
+| **09:00** | carousel post + 3 stories, **every day** (§1) | 06:30, 07:30 (after ANALYTICS) |
+| **12:00** | reel + its story (the day's strongest "hero" topic) | 09:45, 10:45 |
 | **21:00** | reel + its story | 18:45, 19:45 |
+| **22:10, every 3 days** | PIVOT_REVIEW (§6b): deep page analysis; no virality → find why and pivot | — |
+
+Retired 2026-11-10: the 09:00 and 15:00 reels and the every-other-day 12:00 carousel. Caps: 1 carousel + 3 stories
+and 2 reels + 2 reel stories a day. Slots: post `09:00`, reels `12:00` and `21:00` (`config.json`, `tehran.py`).
+Older text below that names 09:00/15:00 reels or a 12:00 carousel is superseded by this table.
 
 Publish runs start at :57 the hour before. Each reel (one story that matters to the viewer's daily life, §00; news-reel/STORY_SPEC.md) is
 also shared to the Story. The comment and DM responder runs separately (responder/).
@@ -291,8 +295,8 @@ routine in Iran — told so that people **send it to someone they care about**.
   writes a `MODEL_MISMATCH` row (`model=<actual>`) in the Automation Log so the session gets moved.
 - Time zone is `Asia/Tehran` everywhere. Get times only from
   `python3 meshkani-pro/scripts/tehran.py`.
-- Slots: `12:00` (post, every other day; `18:00` disabled 2026-10-27), `09:00`, `15:00` and `21:00` (reels). Slot key format `YYYY-MM-DD|HH:MM`.
-- Per slot at most 1 post + 3 stories; per Tehran day at most 1 post (every other day) + 3 post stories + 3 reels + 3 reel stories.
+- Slots (2026-11-10): `09:00` (carousel post, every day), `12:00` and `21:00` (reels). Slot key format `YYYY-MM-DD|HH:MM`.
+- Per slot at most 1 post + 3 stories; per Tehran day at most 1 post + 3 post stories + 2 reels + 2 reel stories.
 - Publish window: from the slot time until slot time + 30 minutes. After that the
   slot is `SKIPPED_LATE`. A missed slot is never caught up later.
 - Never print, log or write to the sheet: API keys, Drive upload-session URLs,
@@ -399,7 +403,7 @@ except one log row `DUPLICATE_RUN_STOPPED`.
 
 ## 1. PREPARE phase (main 10:30 / 16:30, retry 11:05 / 17:05 Tehran)
 
-**Post cadence (user rule 2026-10-27): one carousel every other day, at 12:00 only.** Mahdi: «فعلا تو برنامه پست
+**Post cadence: superseded 2026-11-10 — one carousel every day at 09:00 (see the schedule table at the top).** Old rule (2026-10-27): one carousel every other day, at 12:00 only. Mahdi: «فعلا تو برنامه پست
 اسلایدی بشه روز در میون یه دونه». The 18:00 PREPARE/PUBLISH tasks are disabled. A day is a post day when the
 number of days since 2026-10-27 (Tehran date) is even (2026-10-29, 10-31, 11-02, …); on any other day the 12:00
 PREPARE, retry and PUBLISH write one log row "off day (carousel every other day)" and stop. The DAY_SUMMARY row
@@ -1481,6 +1485,27 @@ No publishing, no comments, no DMs, no account changes.
 
 Every PREPARE (§1.2 step 6) and REEL_PREPARE (§4.2 step 3, §4.3 step 0) reads `insights.json`. The
 insights steer choices; they never override facts, rotation or the user's rules.
+
+## 6b. PIVOT_REVIEW — every 3 days (user rule 2026-11-10)
+
+Mahdi: «هر سه روز هم آنالیز کن پیج رو و اگه وایرالیتی نداشتیم ببین مشکل کجاست و دوباره پیووت کن».
+Runs at 22:10 Tehran on days 1, 4, 7 … of the month (after the 21:00 publish). Read-only on Instagram.
+
+1. §0 setup; lock `pivot_<date>__pivot`. Refresh the data (analytics.py `perf_refresh`, account reach per day).
+2. Window = the last 3 days of posts/reels, compared with the 3 days before and with the all-time hits.
+3. **Virality test.** Viral = any reel ≥ 10k views or ≥ 50 shares per 1k views, or account reach up ≥ 30 % vs the
+   previous window. If none: diagnose, item by item, where it broke — topic (stake for the viewer?), hook / first
+   2 s (3-s hold, avg watch), cover + headline, length, slot, voice, format, share trigger (would someone send it to
+   family?), cadence/outages, and anything that may hurt distribution (reposts, repeated audio, watermark).
+   Compare with the hit pattern (war/safety, internet cutoff, job security, money, scams: a direct "you" stake
+   question + a practical checklist; 81–217 shares per 1k).
+4. **Pivot.** Write 3–5 concrete changes for the next 3 days (topic families, hook formulas, length, format, cover,
+   carousel angle) to `_automation/insights.json` → `pivot` {date, viral: bool, diagnosis[], changes[], next_3_days[]}
+   — every PREPARE reads it first and it overrides older recommendations. Re-plan the sheet tab `Week Plan` for the
+   next 3 days (date, 09:00 carousel, 12:00 reel, 21:00 reel).
+5. Sheet: append the review to `Weekly Analysis` (date, window, verdict, diagnosis, changes) and one Automation
+   Log row `PIVOT_REVIEW`. Scheduled-task prompts and slot times are never changed here — propose those to Mahdi.
+6. Two-line summary.
 
 ## 3. Reporting — sheet tab `Automation Log`
 

@@ -7,13 +7,9 @@
   },
   "timezone": "Asia/Tehran",
   "slots": {
-    "12:00": {
-      "prepare_start": "10:30",
-      "publish_at": "12:00"
-    },
-    "18:00": {
-      "prepare_start": "16:30",
-      "publish_at": "18:00"
+    "09:00": {
+      "prepare_start": "06:30",
+      "publish_at": "09:00"
     }
   },
   "grace_minutes": 30,
@@ -158,21 +154,13 @@
   ],
   "reel": {
     "slots": {
-      "09:00": {
+      "12:00": {
         "prepare_window": [
-          "06:15",
-          "08:30"
+          "09:30",
+          "11:30"
         ],
-        "prepare_main": "06:30",
-        "prepare_retry": "07:30"
-      },
-      "15:00": {
-        "prepare_window": [
-          "12:30",
-          "14:30"
-        ],
-        "prepare_main": "12:45",
-        "prepare_retry": "13:45"
+        "prepare_main": "09:45",
+        "prepare_retry": "10:45"
       },
       "21:00": {
         "prepare_window": [
@@ -183,13 +171,13 @@
         "prepare_retry": "19:45"
       }
     },
-    "publish_at": "09:00",
+    "publish_at": "12:00",
     "grace_minutes": 30,
     "format": "story reel (news-reel/STORY_SPEC.md)",
     "max_seconds": 92,
     "caps": {
-      "reels_per_day": 3,
-      "reel_stories_per_day": 3
+      "reels_per_day": 2,
+      "reel_stories_per_day": 2
     }
   },
   "analytics": {

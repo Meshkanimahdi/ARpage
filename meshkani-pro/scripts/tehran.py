@@ -5,7 +5,7 @@
   tehran.py slot prepare|publish     which slot this run serves, with deadlines (JSON)
   tehran.py wait-until HH:MM         block until that Tehran time today (max 9 minutes)
   tehran.py check-deadline SLOTKEY   exit 0 if still inside the publish window, 3 if late
-  tehran.py reel prepare|publish     which daily story reel (09:00, 15:00 or 21:00) this run serves (JSON)
+  tehran.py reel prepare|publish     which daily story reel (12:00 or 21:00) this run serves (JSON)
 """
 import json
 import sys
@@ -29,12 +29,14 @@ def at(day, hhmm):
 
 
 def slot_info(phase):
-    """Pick the slot whose window contains now: from 120 minutes before the
-    publish time until the end of the grace period."""
+    """Pick the slot whose window contains now: from 15 minutes before its
+    prepare_start (or 120 minutes before publish, whichever is earlier) until
+    the end of the grace period."""
     t = now()
     for slot, s in CONFIG["slots"].items():
         publish = at(t, s["publish_at"])
-        if publish - timedelta(minutes=120) <= t <= publish + GRACE:
+        start = min(at(t, s["prepare_start"]) - timedelta(minutes=15), publish - timedelta(minutes=120))
+        if start <= t <= publish + GRACE:
             return {
                 "phase": phase,
                 "slot_key": f"{publish:%Y-%m-%d}|{slot}",
@@ -53,8 +55,8 @@ def slot_info(phase):
 
 
 def reel_info(phase):
-    """Daily story reels at 09:00, 15:00 and 21:00 (config reel.slots), all prepared the same day.
-    prepare: 06:15-08:30 -> 09:00; 12:30-14:30 -> 15:00; 18:30-20:30 -> 21:00.
+    """Daily story reels at 12:00 and 21:00 (config reel.slots, Mahdi 2026-11-10), prepared the same day.
+    prepare: 09:30-11:30 -> 12:00; 18:30-20:30 -> 21:00.
     publish: the reel whose time is within 120 min before .. grace after now."""
     r, t = CONFIG["reel"], now()
     publish = None
