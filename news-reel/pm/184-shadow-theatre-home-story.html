@@ -154,7 +154,8 @@ let FOCUS = [];
 function cam(t) {
   const b = BEATS.find(b => t >= b.a && t < b.b) || BEATS[BEATS.length - 1];
   const [z0, z1] = b.bt.cam || [1, 1.06], k = E.io(P(t, b.a, b.b));
-  let z = lerp(z0, z1, k), cx = 540, cy = 960;
+  const bi = BEATS.indexOf(b), sw = bi % 2 ? 1 : -1;
+  let z = lerp(z0, z1, k), cx = 540 + sw * lerp(-34, 34, k), cy = 960 + lerp(20, -20, k);
   for (const f of FOCUS) { const kin = E.p3(P(t, f.t0, f.t0 + .7)), kout = f.t1 ? E.io(P(t, f.t1, f.t1 + .5)) : 0, kk = kin * (1 - kout);
     if (kk > 0) { z = lerp(z, f.z, kk); cx = lerp(cx, f.x, kk); cy = lerp(cy, f.y, kk); } }
   const tx = 540 - cx * z, ty = 960 - cy * z;
@@ -242,6 +243,7 @@ function seek(t) {
     if (it.stamp) { const a = t - it.t0, k = E.o(P(a, 0, .16)), shake = a > .16 ? Math.exp(-(a - .16) * 18) * Math.sin(a * 90) * 6 : 0, l = liftState(t, it);
       it.el.style.opacity = a < 0 ? 0 : l.op; it.el.style.transform = `translate(${it.x - it.w / 2 + shake}px,${it.y - 70}px) rotate(${it.r}deg) scale(${lerp(2.3, 1, k)})`; continue; }
     place(t, it);
+    if (['card', 'label', 'print', 'tag'].includes(it.kind) && t > it.t0 + .6 && t < it.t1) { const ph2 = it.t0 * 3.7; it.el.style.transform += ` translateY(${Math.sin(t * 2.1 + ph2) * 6}px) rotate(${Math.sin(t * 1.6 + ph2) * .8}deg)`; }
     if (it.kind === 'check') { const p = it.el.querySelector('.ck'); p.style.strokeDashoffset = 170 * (1 - E.p3(P(t, it.t0 + .1, it.t0 + .45))); }
     if (it.kind === 'ruler') { const r = it.el.querySelector('.rg'); r.setAttribute('width', 320 * E.io(P(t, it.t0 + .4, it.t0 + 1.2))); }
   }
@@ -252,14 +254,14 @@ function seek(t) {
   const th = BEATS.find(b => b.theatre), tb = th && th.theatre, T = $('theatre');
   if (tb && t >= tb.t0 && t < tb.t1) {
     T.style.opacity = 1; const k = P(t, tb.t0, tb.t1), g = E.io(P(t, th.words[8] ? th.words[8].a : tb.t0 + 1.5, (th.words[11] || {e: tb.t1}).e));
-    const flut = Math.sin(t * 7.3) * .5 + Math.sin(t * 3.1) * .4;
+    const flut = Math.sin(t * 7.3) * 1.2 + Math.sin(t * 3.1) * 1.0;
     T.querySelector('.light').style.transform = `scale(${1 + .03 * Math.sin(t * 2)}) skewX(${flut * .4}deg)`;
     $('woman').setAttribute('transform', `translate(${lerp(170, 60, g)},${lerp(760, 1050, g)}) scale(${lerp(1.9, 1.2, g)}) rotate(${flut * .6} 200 300)`);
     $('sphone').setAttribute('transform', `translate(${lerp(880, 700, g)},${lerp(1250, 900, g)}) scale(${lerp(1.0, 2.6, g)}) rotate(${-4 + flut} 0 0)`);
   } else T.style.opacity = 0;
   // torn-paper sweep: kraft sheet rises through the frame; the scene swaps under it
   const tr = $('tear'); let ty = 2000;
-  for (const t0 of (S._tears || [])) { const k = P(t, t0 - .22, t0 + .22); if (k > 0 && k < 1) ty = lerp(1960, -2380, E.io(k)); }
+  for (const t0 of (S._tears || [])) { const k = P(t, t0 - .16, t0 + .16); if (k > 0 && k < 1) ty = lerp(1960, -2380, E.io(k)); }
   tr.style.transform = `translateY(${ty - 2000}px)`;
   // captions on a torn paper strip
   const sub = $('sub'), b = BEATS.find(b => t >= b.L.start - .05 && t <= b.L.end + .25);
