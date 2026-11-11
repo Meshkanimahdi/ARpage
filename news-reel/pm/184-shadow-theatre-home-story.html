@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — paper desk assembly with one shadow-theatre turn (prompt 184)</title>
+<!-- Skill motion-graphy-2026, prompt 184 "Shadow theatre home story", adapted under RUNBOOK §4.0 and the
+     flat-lay assembly style (Mahdi 2026-11-11: light, never dark). One world: a cream paper desk seen from above.
+     Every fact is a real cut-out object, a paper tag, a photo print or a card that lands on the desk with
+     anticipation, a shadow that shrinks as it lands, squash on contact and a spring settle. The story turn is told
+     once in paper cut-out shadow theatre (warm backlight behind a paper sheet, silhouettes, paper that flutters).
+     Shots join through motion (torn-paper sweep, drop, slide), never crossfades. Pure seek(t): every style is computed
+     from t; no timers, no state carried between frames.
+     Data: story.json {beats[{id, text, ev[[word, op, ...args]], cam?[z0, z1]}], hook_title, end_text, end_sub, handle}
+       ops: obj name {x,y,w,r} · lift name · phone {x,y} · print id {x,y,w,r,slide?} · tag text {x,y,r} · label n text {y}
+            check {x,y} · arrow up|down {x,y} · ruler · cards [t1,t2,t3] · stamp text {x,y} · focus {z,x,y} · unfocus
+            circle · theatre · tear · clear
+     + timeline.json; cut-outs raw/o_<name>.png, prints raw/<id>.png. -->
+<style>
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-800-normal.woff2); }
+  @font-face { font-family: Vaz; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-500-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: Vaz; font-weight: 800; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-800-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --paper: #F1E8D8; --kraft: #D8C09A; --ink: #23201B; --acc: #E2672B; --red: #C2362B; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--paper); }
+  #stage { position: absolute; inset: 0; overflow: hidden; font-family: Vaz; color: var(--ink); }
+  #world { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0; }
+  #desk { position: absolute; left: -200px; top: -200px; width: 1480px; height: 2320px; background: var(--paper); }
+  #desk svg { position: absolute; inset: 0; }
+  .it { position: absolute; left: 0; top: 0; transform-origin: 50% 50%; will-change: transform, filter; }
+  .it img { display: block; width: 100%; }
+  .print { background: #fbfaf6; padding: 18px 18px 64px; box-sizing: border-box; }
+  .print img { width: 100%; }
+  .tag { padding: 18px 40px 24px 34px; background: #EBD9B6; border-radius: 10px 40px 40px 10px; font: 800 60px Vaz; white-space: nowrap; direction: rtl;
+         box-shadow: inset 0 0 0 3px rgba(35,32,27,.08); }
+  .tag:before { content: ''; position: absolute; right: 18px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: var(--paper); box-shadow: inset 0 2px 3px rgba(0,0,0,.25); }
+  .tag span { margin-right: 26px; }
+  .label { display: flex; align-items: center; gap: 22px; direction: rtl; white-space: nowrap; }
+  .label b { width: 92px; height: 92px; border-radius: 50%; background: var(--acc); color: #fff; font: 800 58px/92px Vaz; text-align: center; flex: none; }
+  .label span { background: #fbfaf6; padding: 14px 34px 22px; border-radius: 8px; font: 800 64px Vaz; }
+  .card { width: 940px; padding: 30px 44px 38px; box-sizing: border-box; background: #fffdf8; border-radius: 10px; font: 800 60px/1.35 Vaz; direction: rtl;
+          border-top: 10px solid var(--acc); }
+  .stamp { padding: 8px 36px 18px; border: 9px solid var(--red); border-radius: 22px; color: var(--red); font: 800 92px Vaz; white-space: nowrap; mix-blend-mode: multiply; }
+  .arrow { width: 170px; }
+  .ruler { width: 900px; height: 230px; direction: rtl; }
+  #phone { width: 430px; height: 860px; border-radius: 64px; background: #1c1c1f; box-sizing: border-box; padding: 18px; }
+  #phone .scr { width: 100%; height: 100%; border-radius: 48px; background: #fff; overflow: hidden; direction: rtl; position: relative; }
+  #phone .top { height: 118px; background: #f6f6f6; display: flex; align-items: flex-end; padding: 0 34px 18px; font: 800 44px Vaz; color: #A62626; box-sizing: border-box; }
+  #phone .pic { height: 250px; background: url() center/cover, #ddd; }
+  #phone h3 { margin: 30px 34px 4px; font: 800 52px Vaz; }
+  #phone p { margin: 0 34px; font: 500 30px Vaz; color: #777; }
+  #phone .blur { margin: 30px 34px 0; height: 54px; width: 300px; border-radius: 12px; background: #c9c9c9; filter: blur(5px); }
+  #phone .rng { position: relative; margin: 44px 34px 0; height: 22px; border-radius: 11px; background: #eee; }
+  #phone .rng i { position: absolute; top: 0; bottom: 0; right: 30%; left: 28%; border-radius: 11px; background: var(--acc); }
+  #phone .rows div { margin: 26px 34px 0; height: 26px; border-radius: 8px; background: #eee; }
+  #hookt { position: absolute; left: 30px; right: 30px; top: 250px; text-align: center; font: 800 120px/1.18 Vaz; letter-spacing: -1px; color: var(--ink); direction: rtl; opacity: 0; }
+  #hookt b { color: var(--acc); }
+  #sub { position: absolute; left: 70px; right: 150px; top: 1500px; height: 130px; display: flex; align-items: center; justify-content: center; direction: rtl; }
+  #sub .strip { display: inline-block; padding: 12px 40px 22px; background: #fffdf7; font: 800 62px/1.3 Vaz; white-space: nowrap; transform: rotate(-1.2deg);
+                clip-path: polygon(0 6%, 4% 0, 30% 5%, 62% 0, 96% 4%, 100% 0, 100% 94%, 96% 100%, 70% 95%, 34% 100%, 3% 96%, 0 100%); }
+  #sub .w { display: inline-block; margin: 0 .13em; }
+  #sub .k { color: var(--acc); }
+  #theatre { position: absolute; inset: 0; opacity: 0; background: #E9B66E; overflow: hidden; }
+  #theatre .light { position: absolute; left: -300px; top: 200px; width: 1680px; height: 1680px; border-radius: 50%; background: radial-gradient(closest-side, #FBE4B8, #F2C682 55%, #E5A85F); }
+  #theatre svg { position: absolute; left: 0; top: 0; }
+  #tear { position: absolute; left: -40px; width: 1160px; height: 2300px; background: var(--kraft); top: 2000px; }
+  #tear svg { position: absolute; left: 0; top: -60px; }
+  #end { position: absolute; left: 90px; right: 90px; top: 520px; height: 900px; opacity: 0; text-align: center; }
+  #end .disc { position: absolute; left: 0; right: 0; margin: auto; top: 0; width: 900px; height: 900px; border-radius: 50%; background: #fbf6ec; box-shadow: 0 30px 60px rgba(60,40,10,.18); }
+  #end h1 { position: relative; margin: 250px 0 0; font: 800 104px/1.3 Vaz; }
+  #end h1 b { color: var(--acc); }
+  #end p { position: relative; margin: 40px 0 0; font: 800 50px Vaz; }
+  #handle { position: absolute; left: 0; right: 0; top: 1330px; text-align: center; font: 800 40px Vaz; letter-spacing: 3px; direction: ltr; opacity: 0; color: var(--ink); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="world">
+    <div id="desk"></div>
+    <div id="items"></div>
+  </div>
+  <div id="theatre"><div class="light"></div><svg width="1080" height="1920" viewBox="0 0 1080 1920">
+    <g id="woman" fill="#2B1D14"><path d="M200,40 C120,40 90,110 95,170 C98,230 120,270 150,290 L130,330 C80,350 30,400 20,520 L20,600 L380,600 L380,520 C370,400 320,350 270,330 L250,290 C280,270 302,230 305,170 C310,110 280,40 200,40 Z"/></g>
+    <g id="sphone"><rect x="-120" y="-240" width="240" height="480" rx="40" fill="#2B1D14"/><rect x="-96" y="-206" width="192" height="400" rx="22" fill="#5a4030"/><rect x="-70" y="-60" width="140" height="18" rx="9" fill="#2B1D14"/></g>
+    <rect id="floor" x="0" y="1560" width="1080" height="360" fill="#2B1D14"/>
+    <g fill="#2B1D14"><path d="M120,1560 L120,1440 L200,1370 L280,1440 L280,1560 Z"/><rect x="170" y="1480" width="40" height="80" fill="#5a4030"/><circle cx="880" cy="1530" r="34"/><rect x="900" y="1522" width="120" height="16"/><rect x="990" y="1538" width="12" height="22"/></g>
+  </svg></div>
+  <div id="hookt"></div>
+  <div id="sub"></div>
+  <div id="end"><div class="disc"></div><h1></h1><p></p></div>
+  <div id="handle"></div>
+  <div id="tear"></div>
+</div>
+<script src="/logo-motion/node_modules/gsap/dist/gsap.min.js"></script>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const url = s => s.startsWith('/') ? s : DIR + s;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), lerp = (a, b, k) => a + (b - a) * k, P = (t, a, b) => clamp((t - a) / (b - a));
+const E = {o: gsap.parseEase('expo.out'), io: gsap.parseEase('sine.inOut'), p3: gsap.parseEase('power3.out'), b: gsap.parseEase('back.out(2.4)'), i3: gsap.parseEase('power3.in')};
+// damped spring: 0 → 1 with overshoot, settles in ~d s
+const spring = (x, d = .5) => x <= 0 ? 0 : 1 - Math.exp(-6 * x / d) * Math.cos(11 * x / d);
+const ISSUES = [], ITEMS = [], CUES = [];
+let S, TL, BEATS = [], END = 60, NAT = {};
+
+// ---------- paper desk: grain + torn kraft edges (deterministic) ----------
+function rnd(seed) { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+function torn(y0, h, dir, seed, w = 1480) { const r = rnd(seed); let d = `M0,${y0}`; for (let x = 0; x <= w; x += 22) d += ` L${x},${y0 + dir * (r() * 26 + (x % 66 ? 0 : 10))}`; return d + ` L${w},${y0 + dir * h} L0,${y0 + dir * h} Z`; }
+function buildDesk() {
+  $('desk').innerHTML = `<svg width="1480" height="2320"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .28  0 0 0 .2 0"/></filter>
+    <rect width="1480" height="2320" filter="url(#gr)"/>
+    <path d="${torn(430, 440, -1, 7)}" fill="#D8C09A"/><path d="${torn(410, 440, -1, 9)}" fill="#E4D2B0"/>
+    <path d="${torn(2060, 300, 1, 11)}" fill="#D8C09A"/><path d="${torn(2085, 300, 1, 13)}" fill="${'#E2672B'}" opacity=".85"/><path d="${torn(2100, 300, 1, 15)}" fill="#E4D2B0"/></svg>`;
+  $('tear').innerHTML = `<svg width="1160" height="80"><path d="${torn(60, 80, -1, 21, 1160).replace(/ Z$/, ' Z')}" fill="#D8C09A"/></svg>`;
+}
+
+// ---------- items ----------
+function mk(cls, html) { const d = document.createElement('div'); d.className = 'it ' + cls; d.innerHTML = html || ''; $('items').appendChild(d); return d; }
+function add(it) { it.t1 = it.t1 ?? 1e9; ITEMS.push(it); return it; }
+// height above the desk while dropping: 1 → 0 with a squash on contact and a spring settle; lifting reverses fast
+function dropState(t, it) {
+  const a = t - it.t0;
+  if (it.slide) { const k = E.p3(P(a, 0, .5)); return {h: 0, sx: 1, sy: 1, dx: lerp(1200, 0, k) + (1 - spring(a, .6)) * 0, dr: lerp(10, 0, k), op: a > 0 ? 1 : 0}; }
+  const fall = P(a, -.08, .3), h = a < -.08 ? 1 : 1 - E.i3(fall);
+  const c = a - .3, sq = c > 0 ? Math.exp(-c * 14) * Math.sin(c * 30) * .06 : 0;
+  return {h, sx: 1 + sq, sy: 1 - sq, dx: 0, dr: (1 - spring(Math.max(0, a), .55)) * 7, op: a > -.08 ? 1 : 0};
+}
+function liftState(t, it) { const k = E.i3(P(t, it.t1, it.t1 + .35)); return {h: k * 1.4, dy: -k * 260, op: 1 - P(t, it.t1 + .22, it.t1 + .35)}; }
+function place(t, it) {
+  const el = it.el; if (t < it.t0 - .1 || t > it.t1 + .4) { el.style.opacity = 0; return; }
+  const d = dropState(t, it), l = liftState(t, it), h = d.h + l.h, s = 1 + h * .22;
+  const W = it.w, H = el.offsetHeight || it.hh || W;
+  const x = it.x - W / 2 + d.dx, y = it.y - H / 2 + (l.dy || 0) - h * 40;
+  el.style.width = W + 'px';
+  el.style.transform = `translate(${x}px,${y}px) rotate(${(it.r || 0) + d.dr}deg) scale(${s * d.sx},${s * d.sy})`;
+  el.style.opacity = Math.min(d.op, l.op);
+  const sh = it.flat ? .6 : 1;
+  el.style.filter = `drop-shadow(${(8 + 40 * h) * sh}px ${(14 + 70 * h) * sh}px ${(10 + 46 * h) * sh}px rgba(70,45,15,${(.32 - .14 * Math.min(h, 1)) * sh}))`;
+}
+
+// ---------- timing ----------
+const shown = t => t.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/\|/g, ' ').trim().split(/\s+/);
+function beatWords(bt, L) {
+  const raw = shown(bt.text), words = raw.map(w => ({w: w.replace(/\*/g, ''), k: false}));
+  let on = false; raw.forEach((w, i) => { if (w.startsWith('*')) on = true; words[i].k = on; if (/\*[.…!؟?،:؛]*$/.test(w)) on = false; });
+  const n = L.words.length; words.forEach((w, i) => { const wi = Math.round(i * (n - 1) / Math.max(1, words.length - 1)); w.a = (L.words[wi] || [L.start])[0]; w.e = (L.words[wi] || [0, L.end])[1]; });
+  // caption chunks: ≤ 4 words, break after punctuation
+  const ch = []; let cur = [];
+  words.forEach((w, i) => { cur.push(i); if (cur.length >= 4 || /[،:؛.!؟]$/.test(w.w) && cur.length >= 2) { ch.push(cur); cur = []; } }); if (cur.length) ch.push(cur);
+  return {words, chunks: ch};
+}
+
+// ---------- camera ----------
+let FOCUS = [];
+function cam(t) {
+  const b = BEATS.find(b => t >= b.a && t < b.b) || BEATS[BEATS.length - 1];
+  const [z0, z1] = b.bt.cam || [1, 1.06], k = E.io(P(t, b.a, b.b));
+  let z = lerp(z0, z1, k), cx = 540, cy = 960;
+  for (const f of FOCUS) { const kin = E.p3(P(t, f.t0, f.t0 + .7)), kout = f.t1 ? E.io(P(t, f.t1, f.t1 + .5)) : 0, kk = kin * (1 - kout);
+    if (kk > 0) { z = lerp(z, f.z, kk); cx = lerp(cx, f.x, kk); cy = lerp(cy, f.y, kk); } }
+  const tx = 540 - cx * z, ty = 960 - cy * z;
+  $('world').style.transform = `translate(${tx}px,${ty}px) scale(${z})`;
+}
+
+// ---------- build from story ----------
+function ph() {
+  return `<div class="scr"><div class="top">دیوار</div><div class="pic" style="background:url(${url('raw/o_model.png')}) 50% 70%/auto 92% no-repeat, linear-gradient(#dfe9f2,#eef1ec)"></div>
+    <h3>ارزیابی قیمت</h3><p>بازه‌ی تخمینی این آگهی</p><div class="blur"></div><div class="rng"><i></i></div><div class="rows"><div style="width:70%"></div><div style="width:52%"></div><div style="width:61%"></div></div></div>`;
+}
+function svgArrow(dir) { const up = dir === 'up'; return `<svg viewBox="0 0 170 260" width="170"><path d="M85,${up ? 10 : 250} L160,${up ? 110 : 150} L112,${up ? 110 : 150} L112,${up ? 250 : 10} L58,${up ? 250 : 10} L58,${up ? 110 : 150} L10,${up ? 110 : 150} Z" fill="${up ? '#E2672B' : '#3B7A57'}"/></svg>`; }
+function svgCheck() { return `<svg viewBox="0 0 120 100" width="120"><path class="ck" d="M10,55 L45,88 L110,12" fill="none" stroke="#3B7A57" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="170" stroke-dashoffset="170"/></svg>`; }
+function svgRuler() {
+  let ticks = ''; for (let i = 0; i <= 30; i++) ticks += `<line x1="${30 + i * 28}" y1="40" x2="${30 + i * 28}" y2="${i % 5 ? 70 : 92}" stroke="#23201B" stroke-width="4"/>`;
+  return `<svg viewBox="0 0 900 230" width="900"><rect x="0" y="20" width="900" height="120" rx="10" fill="#E9D6AE"/>${ticks}
+    <rect class="rg" x="300" y="104" width="0" height="30" rx="15" fill="#E2672B"/>
+    <text x="450" y="210" text-anchor="middle" font-family="Vaz" font-weight="800" font-size="54" fill="#23201B">بازه‌ی تخمینی</text></svg>`;
+}
+
+window.ready = (async () => {
+  S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json();
+  END = TL.total; buildDesk();
+  for (const bt of S.beats) { const L = TL.lines[bt.id]; if (!L) throw new Error('unknown line ' + bt.id); BEATS.push({bt, L, ...beatWords(bt, L)}); }
+  BEATS.forEach((b, i) => { b.a = i ? b.L.start - .1 : 0; b.b = i + 1 < BEATS.length ? BEATS[i + 1].L.start - .1 : TL.end_start; });
+  const names = new Set(); for (const b of BEATS) for (const e of (b.bt.ev || [])) if (e[1] === 'obj') names.add(e[2]);
+  await Promise.all([...names].map(n => new Promise(res => { const im = new Image(); im.onload = () => { NAT[n] = im.naturalHeight / im.naturalWidth; res(); }; im.onerror = () => { ISSUES.push('missing cut-out ' + n); res(); }; im.src = url(`raw/o_${n}.png`); })));
+  const byName = {}; let phone = null; const live = () => ITEMS.filter(i => i.t1 > 1e8);
+  for (const b of BEATS) {
+    const wt = w => w === -1 ? b.a : (b.words[Math.min(w, b.words.length - 1)] || {}).a;
+    for (const e of (b.bt.ev || [])) {
+      const [w, op] = e, o0 = e[e.length - 1], t = Math.max(-1, wt(w) - .04 + (o0 && o0.dt || 0)), o = e[e.length - 1] && typeof e[e.length - 1] === 'object' && !Array.isArray(e[e.length - 1]) ? e[e.length - 1] : {};
+      if (op === 'obj') { const it = add({kind: 'obj', t0: t, x: o.x, y: o.y, w: o.w, r: o.r || 0, hh: o.w * (NAT[e[2]] || 1), el: mk('', `<img src="${url('raw/o_' + e[2] + '.png')}">`)}); byName[e[2]] = it; CUES.push([t + .28, o.sfx || 'tap', .3]); }
+      else if (op === 'lift') { const it = byName[e[2]] || (e[2] === 'phone' ? phone : null); if (it) it.t1 = t; }
+      else if (op === 'clear') { live().forEach((it, i) => it.t1 = t + i * .07); CUES.push([t, 'sweep_soft', .25]); }
+      else if (op === 'phone') { phone = add({kind: 'phone', t0: t, x: o.x, y: o.y, w: 430, hh: 860, sc: o.sc || 1, slideUp: true, el: mk('', '<div id="phone">' + ph() + '</div>')});
+        const hand = add({kind: 'hand', t0: t, x: o.x - 40, y: o.y + 430 * (o.sc || 1) + 180, w: 300, hh: 446, hand: true, el: mk('', `<img src="${url('raw/o_hand.png')}">`)}); hand.t1 = t + .75; phone.handT = t;
+        CUES.push([t + .55, 'glass_ping', .3]); }
+      else if (op === 'print') { const it = add({kind: 'print', t0: t, x: o.x, y: o.y, w: o.w, r: o.r || 0, hh: o.w * 1.84, slide: !!o.slide, el: mk('print', `<img src="${url('raw/' + e[2] + '.png')}">`)}); byName[e[2]] = it; CUES.push([t + (o.slide ? .3 : .28), o.slide ? 'sweep_soft' : 'tap', .3]); }
+      else if (op === 'tag') { const it = add({kind: 'tag', t0: t, x: o.x, y: o.y, w: o.w || 360, r: o.r || 0, hh: 110, flat: true, el: mk('tag', `<span>${e[2]}</span>`)}); byName['tag:' + e[2]] = it; CUES.push([t + .28, 'click', .32]); }
+      else if (op === 'label') { const it = add({kind: 'label', t0: t, x: o.x || 640, y: o.y, w: o.w || 640, hh: 100, flat: true, el: mk('label', `<b>${'۰۱۲۳۴۵۶۷۸۹'[e[2]]}</b><span>${e[3]}</span>`)}); byName['label' + e[2]] = it; CUES.push([t + .28, 'pop', .3]);
+        const ck = add({kind: 'check', t0: t + .45, x: 990, y: o.y, w: 120, hh: 100, flat: true, el: mk('', svgCheck())}); byName['check' + e[2]] = ck; }
+      else if (op === 'arrow') { const it = add({kind: 'arrow', t0: t, x: o.x, y: o.y, w: 170, hh: 260, el: mk('arrow', svgArrow(e[2]))}); byName['arrow' + e[2]] = it; CUES.push([t + .28, 'pop', .28]); }
+      else if (op === 'ruler') { const it = add({kind: 'ruler', t0: t, x: 540, y: o.y || 1180, w: 900, hh: 230, flat: true, el: mk('ruler', svgRuler())}); byName.ruler = it; CUES.push([t + .5, 'sweep_soft', .28]); }
+      else if (op === 'cards') { e[2].forEach((c, i) => { const it = add({kind: 'card', t0: t + i * .55, x: 540, y: (o.y || 640) + i * 250, w: 860, r: [-2, 1.5, -1][i], hh: 210, flat: true, el: mk('card', c)}); byName['card' + i] = it; CUES.push([t + i * .55 + .28, 'pop', .26]); }); }
+      else if (op === 'stamp') { const it = add({kind: 'stamp', t0: t, x: o.x || 540, y: o.y || 1420, w: o.w || 520, r: -11, hh: 140, stamp: true, flat: true, el: mk('stamp', e[2])}); byName.stamp = it; CUES.push([t + .16, 'hit', .4]); }
+      else if (op === 'focus') FOCUS.push({t0: t, z: o.z, x: o.x, y: o.y});
+      else if (op === 'unfocus') { const f = FOCUS[FOCUS.length - 1]; if (f) f.t1 = t; }
+      else if (op === 'circle') { if (phone) phone.circleT = t; CUES.push([t, 'click', .25]); }
+      else if (op === 'theatre') { b.theatre = {t0: b.a, t1: b.b}; CUES.push([b.a + .3, 'shimmer', .22]); }
+      else if (op === 'tear') { (S._tears = S._tears || []).push(t); CUES.push([t, 'sweep_soft', .3]); }
+    }
+  }
+  // end: everything still on the desk lifts off one by one before the end card
+  const te = TL.end_start; live().forEach((it, i) => it.t1 = te - .5 + i * .06);
+  const H = s => (s || '').replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>');
+  $('hookt').innerHTML = H(S.hook_title); $('end').querySelector('h1').innerHTML = H(S.end_text); $('end').querySelector('p').textContent = S.end_sub || '';
+  $('handle').textContent = (S.handle || '').toUpperCase().replace('@', '');
+  // pen circle on the phone (drawn in world coordinates over the range bar)
+  if (phone && phone.circleT) { phone.el.firstChild.insertAdjacentHTML('beforeend', `<svg style="position:absolute;left:-30px;top:560px" width="490" height="160" viewBox="0 0 490 160"><path class="pc" d="M40,90 C40,20 450,10 455,80 C460,150 60,160 30,95 C20,70 90,40 160,38" fill="none" stroke="#E2672B" stroke-width="10" stroke-linecap="round" stroke-dasharray="1300" stroke-dashoffset="1300"/></svg>`); phone.el.firstChild.style.position = 'relative'; }
+  await document.fonts.ready; await Promise.all(['500', '800'].map(w => document.fonts.load(`${w} 40px Vaz`, 'آزمایش MIT')));
+  await Promise.all([...document.images].map(im => im.complete ? 1 : new Promise(r => { im.onload = im.onerror = r; })));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  CUES.push([te, 'hit', .4]); CUES.sort((p, q) => p[0] - q[0]);
+  window.SCENES = BEATS.map((b, i) => ({t0: b.a, t1: b.b, type: 'desk', bg: b.bt.id, sfx: i ? [] : CUES})).concat([{t0: te, t1: END, type: 'end', bg: 'end', sfx: []}]);
+  seek(0);
+})();
+
+function seek(t) {
+  cam(t);
+  for (const it of ITEMS) {
+    if (it.kind === 'phone') {
+      const a = t - it.t0, k = E.p3(P(a, 0, .55)), out = it.t1 < 1e8 ? E.i3(P(t, it.t1, it.t1 + .4)) : 0, el = it.el;
+      if (a < 0 || out >= 1) { el.style.opacity = 0; continue; }
+      const y = lerp(it.y + 1300, it.y, k) + (1 - spring(Math.max(0, a - .45), .5)) * 0 - out * 1500;
+      el.style.width = '430px'; el.style.opacity = 1;
+      el.style.transform = `translate(${it.x - 215}px,${y - 430}px) rotate(${lerp(-9, -3, k)}deg) scale(${it.sc || 1})`;
+      el.style.filter = `drop-shadow(14px 26px 26px rgba(70,45,15,.32))`;
+      const pc = el.querySelector('.pc'); if (pc) pc.style.strokeDashoffset = 1300 * (1 - E.io(P(t, it.circleT, it.circleT + .6)));
+      continue;
+    }
+    if (it.hand) { const a = t - it.t0, k = E.p3(P(a, 0, .55)), back = E.io(P(t, it.t0 + .7, it.t0 + 1.2));
+      const y = lerp(it.y + 1300, it.y, k) + back * 900; it.el.style.width = it.w + 'px'; it.el.style.opacity = a < 0 || back >= 1 ? 0 : 1;
+      it.el.style.transform = `translate(${it.x - it.w / 2}px,${y - it.hh / 2}px) rotate(-6deg)`; it.el.style.filter = 'drop-shadow(10px 20px 20px rgba(70,45,15,.3))'; continue; }
+    if (it.stamp) { const a = t - it.t0, k = E.o(P(a, 0, .16)), shake = a > .16 ? Math.exp(-(a - .16) * 18) * Math.sin(a * 90) * 6 : 0, l = liftState(t, it);
+      it.el.style.opacity = a < 0 ? 0 : l.op; it.el.style.transform = `translate(${it.x - it.w / 2 + shake}px,${it.y - 70}px) rotate(${it.r}deg) scale(${lerp(2.3, 1, k)})`; continue; }
+    place(t, it);
+    if (it.kind === 'check') { const p = it.el.querySelector('.ck'); p.style.strokeDashoffset = 170 * (1 - E.p3(P(t, it.t0 + .1, it.t0 + .45))); }
+    if (it.kind === 'ruler') { const r = it.el.querySelector('.rg'); r.setAttribute('width', 320 * E.io(P(t, it.t0 + .4, it.t0 + 1.2))); }
+  }
+  // hook headline: on from frame 0, stamped with a settle, leaves with the first tear
+  const b0 = BEATS[0], hk = $('hookt'), hin = spring(t + .25, .5), hout = E.i3(P(t, b0.b - .25, b0.b + .1));
+  hk.style.opacity = t < b0.b + .1 ? 1 - hout : 0; hk.style.transform = `translateY(${-hout * 120}px) scale(${lerp(1.1, 1, Math.min(1, hin))})`;
+  // shadow theatre (the turn)
+  const th = BEATS.find(b => b.theatre), tb = th && th.theatre, T = $('theatre');
+  if (tb && t >= tb.t0 && t < tb.t1) {
+    T.style.opacity = 1; const k = P(t, tb.t0, tb.t1), g = E.io(P(t, th.words[8] ? th.words[8].a : tb.t0 + 1.5, (th.words[11] || {e: tb.t1}).e));
+    const flut = Math.sin(t * 7.3) * .5 + Math.sin(t * 3.1) * .4;
+    T.querySelector('.light').style.transform = `scale(${1 + .03 * Math.sin(t * 2)}) skewX(${flut * .4}deg)`;
+    $('woman').setAttribute('transform', `translate(${lerp(170, 60, g)},${lerp(760, 1050, g)}) scale(${lerp(1.9, 1.2, g)}) rotate(${flut * .6} 200 300)`);
+    $('sphone').setAttribute('transform', `translate(${lerp(880, 700, g)},${lerp(1250, 900, g)}) scale(${lerp(1.0, 2.6, g)}) rotate(${-4 + flut} 0 0)`);
+  } else T.style.opacity = 0;
+  // torn-paper sweep: kraft sheet rises through the frame; the scene swaps under it
+  const tr = $('tear'); let ty = 2000;
+  for (const t0 of (S._tears || [])) { const k = P(t, t0 - .22, t0 + .22); if (k > 0 && k < 1) ty = lerp(1960, -2380, E.io(k)); }
+  tr.style.transform = `translateY(${ty - 2000}px)`;
+  // captions on a torn paper strip
+  const sub = $('sub'), b = BEATS.find(b => t >= b.L.start - .05 && t <= b.L.end + .25);
+  if (b && b !== BEATS[0] && t < TL.end_start) {
+    const ci = b.chunks.findIndex(c => t < b.words[c[c.length - 1]].e + .1), c = b.chunks[ci < 0 ? b.chunks.length - 1 : ci];
+    const key = b.bt.id + ':' + c[0]; if (sub.dataset.k !== key) { sub.dataset.k = key; sub.innerHTML = '<span class="strip">' + c.map(i => `<span class="w${b.words[i].k ? ' k' : ''}">${b.words[i].w.replace(/[،:؛]$/, '')}</span>`).join('') + '</span>'; }
+    const a0 = b.words[c[0]].a, kk = E.b(P(t, a0 - .08, a0 + .2)); sub.style.opacity = 1; sub.style.transform = `translateY(${(1 - kk) * 40}px) scale(${lerp(.9, 1, kk)})`;
+    sub.querySelectorAll('.w').forEach((el, j) => { el.style.opacity = t >= b.words[c[j]].a - .05 ? 1 : .35; });
+  } else { sub.style.opacity = 0; sub.dataset.k = ''; }
+  // end card: paper disc lands, objects already lifted
+  const te = TL.end_start, ke = spring(t - te - .1, .55), en = $('end');
+  en.style.opacity = t >= te ? 1 : 0; en.style.transform = `translateY(${(1 - Math.min(1, ke)) * 500}px) rotate(${(1 - ke) * 6}deg)`;
+  $('handle').style.opacity = E.o(P(t, te + .5, te + 1));
+}
+window.seek = seek;
+</script>
+</body>
+</html>
