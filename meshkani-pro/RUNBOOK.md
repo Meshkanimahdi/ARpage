@@ -26,6 +26,16 @@ calls were REEL-034 and POST-031). `Week Plan` rows are drawn from Topic Bank ID
 **Covers (Mahdi 2026-11-10):** a realistic photo with a headline on it, not a graphic YouTube-style thumbnail: little
 or no pills/boxes/strokes; when the reel calls out a group (e.g. «نجارها»), the cover shows a real-looking person of that
 group (hands/back/three-quarter, no real person's likeness) and the group's name is in the headline.
+**Flat-lay assembly style (Mahdi 2026-11-11, 2–3 reels a week):** «ازین سبک موشن‌ها هم تو برنامت بگذار، دارک بودنش مد نظرم نیست».
+Reference: a top-down knolling scene in layered paper-cut. Realistic objects of the topic (e.g. for realtors: keys, a house
+model, a contract, a phone with a listing, a calculator) drop in one by one around a round centre emblem that carries the
+Persian headline. Each object casts a soft shadow and lands with a small settle, while a slow parallax push-in runs, with
+torn-paper edges and a thin warm rim. After about 4–6 s, a torn-paper or zoom-through transition moves into the story
+(UI/demo/photo plates). The palette must be LIGHT (cream/kraft/off-white paper, warm accent), never the reference's black
+and gold. Build it as code motion: separate cut-out PNGs (generated or segmented) on an HTML page, never a single still.
+Each object should also come back in the reel at the beat that names it. Quota: 2–3 of the week's 14 reels, spread across
+the week (never two days running). Record `"style": "flatlay_assembly"` in story.json and the motion_history entry.
+The Week Plan marks those slots.
 
 Retired 2026-11-10: the 09:00 and 15:00 reels and the every-other-day 12:00 carousel. Caps: 1 carousel + 3 stories
 and 2 reels + 2 reel stories a day. Slots: post `09:00`, reels `12:00` and `21:00` (`config.json`, `tehran.py`).
