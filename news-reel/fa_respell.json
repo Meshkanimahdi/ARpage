@@ -21,7 +21,10 @@
   "سن بنا": "senne banaa",
   "حکم": "hokm",
   "چونه‌زدن": "choone-zadan",
-  "مشاورای": "moshaveraaye"
+  "مشاورای": "moshaveraaye",
+  "نشان": "neshaan",
+  "بلد": "balad",
+  "مستأجرها": "mosta'jerhaa"
  },
  "_note_finglish": "Mahdi 2026-11-10: a Persian word the voice misreads is written in Finglish (Latin) on the TTS side, e.g. نجارها → najjarha (it read NEJJARHA). Screen text keeps Persian."
 }
