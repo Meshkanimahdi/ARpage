@@ -127,7 +127,7 @@ V.kpi = async (sc, v, b) => {    // dark KPI card: label, a number that climbs, 
   const d = xy.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' '); const ln = c.querySelector('.ln'), ar = c.querySelector('.ar'); ln.setAttribute('d', d); ar.setAttribute('d', d + ' L720 260 L0 260 Z');
   const L = ln.getTotalLength ? 2000 : 0;
   return t => { inn(c, t, b.a - .05, .5, 0, 80); c.style.transform += ` perspective(1600px) rotateX(${(1 - E.o(P(t, b.a, b.a + .7))) * 18}deg)`;
-    const k = E.p3(P(t, b.a + .3, b.a + 1.6)), val = lerp(v.from || 0, v.to, k); c.querySelector('.v').textContent = (v.prefix || '') + fa(v.decimals ? val.toFixed(v.decimals) : Math.round(val)) + (v.suffix || '');
+    const k = E.p3(P(t, b.a + .3, b.a + 1.6)), val = lerp(v.from || 0, v.to, k); c.querySelector('.v').textContent = (v.prefix || '') + fa(v.decimals ? val.toFixed(v.decimals).replace('.', '٫') : Math.round(val)) + (v.suffix || '');
     const len = ln.getTotalLength(); ln.style.strokeDasharray = len; ln.style.strokeDashoffset = len * (1 - k); ar.setAttribute('opacity', k); };
 };
 V.stack = async (sc, v, b) => {  // real photos / screenshots stacked as tilted 3D layers, rising with parallax
