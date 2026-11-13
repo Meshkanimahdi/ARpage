@@ -202,7 +202,8 @@ function camAt(t) {
   const k = P(t, c.t, c.t + dur), prev = CAM[i - 1] || c;
   if (k < 1 && i > 0) { const e = E.io(k), dip = Math.sin(Math.PI * k) * .16; const z = lerp(prev.z, c.z, e) * (1 - dip);
     return {x: lerp(prev.x, c.x, e), y: lerp(prev.y, c.y, e), z, v: Math.sin(Math.PI * k)}; }
-  const hold = Math.max(0, t - (c.t + dur)), span = n ? n.t - (c.t + dur) : 6;
+  const hold = Math.max(0, t - (c.t + dur)), span = n ? n.t - (c.t + dur) : Math.max(.5, END - (c.t + dur));
+  if (!n) return {x: c.x, y: c.y - 260 * E.s(clamp(hold / span)), z: c.z * (1 - .16 * E.s(clamp(hold / span))), v: 0};   // last key: keep drifting to the end, never a frozen tail
   return {x: c.x, y: c.y, z: c.z * (1 + .03 * E.s(clamp(hold / Math.max(.5, span)))), v: 0};
 }
 function seek(t) {
