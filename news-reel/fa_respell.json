@@ -32,5 +32,9 @@
   "آفت‌کش": "aafat-kosh"
  },
  "_note_finglish": "Mahdi 2026-11-10: a Persian word the voice misreads is written in Finglish (Latin) on the TTS side, e.g. نجارها → najjarha (it read NEJJARHA). Screen text keeps Persian.",
- "_note_2026_11_13": "Mahdi 2026-11-13: «سم» was read SEM, must be SAM. Every short homograph-risk word in a script (سم، کرد، مرد، شکر، ملک، …) is written in Finglish or with the vowel diacritic for the meaning used, and checked in voice/flags.json before assembly."
+ "_note_2026_11_13": "Mahdi 2026-11-13: «سم» was read SEM, must be SAM. Every short homograph-risk word in a script (سم، کرد، مرد، شکر، ملک، …) is written in Finglish or with the vowel diacritic for the meaning used, and checked in voice/flags.json before assembly.",
+ "آمفتامین": "amfetaamin",
+ "مکمل": "mokammel",
+ "گلوریا": "gloriaa",
+ "قطعی": "ghat'i"
 }

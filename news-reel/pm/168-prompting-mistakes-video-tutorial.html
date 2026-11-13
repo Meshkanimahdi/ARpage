@@ -177,7 +177,7 @@ window.ready = (async () => {
     for (const [wi, x, y, z] of (b.bt.cams || [])) { const t = wi ? b.wt(wi) - .4 : b.a - .4; CAM.push({t, x, y, z}); }
     const settle = (b.bt.cams || []).length && b !== BEATS[0] ? b.a + .55 : b.a;   // the hook draws from frame 0
     for (const [wi, id] of (b.bt.draw || [])) { const [base, part] = id.split('.'); const o = IT[base]; if (!o) { ISSUES.push('draw: unknown ' + id); continue; }
-      let t = Math.max(settle, b.wt(wi)); for (const [wj, x] of (b.bt.cams || [])) if (wj && wj <= wi) t = Math.max(t, b.wt(wj) + .55);
+      let t = Math.max(settle, b.wt(wi)); if (S.hook_instant && b === BEATS[0] && wi === 0) t = -1;   // the hook is fully on screen at frame 0 for (const [wj, x] of (b.bt.cams || [])) if (wj && wj <= wi) t = Math.max(t, b.wt(wj) + .55);
       if (part) { o.bars[part].t0 = t; o.t0 = Math.min(o.t0, t); } else o.t0 = Math.min(o.t0, t); }
     // label budget: ≤ 7 words with the subtitle chunk
     b.lw = b.labels.reduce((n, id) => { const [base, part] = id.split('.'); const o = IT[base]; const el = o && o.labels[id]; if (!el) { ISSUES.push('label: unknown ' + id); return n; }

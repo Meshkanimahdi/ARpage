@@ -579,5 +579,26 @@
   "score": 1,
   "voice": "4Uw730VKF274NsJJmpdv",
   "date": "2026-11-12"
+ },
+ "The BMJ": {
+  "mode": "A",
+  "spoken": "The BMJ",
+  "score": 1,
+  "voice": "HbdIG2FpGVUP5OajIK2j",
+  "date": "2026-11-13"
+ },
+ "deepfake": {
+  "mode": "A",
+  "spoken": "deepfake",
+  "score": 1,
+  "voice": "HbdIG2FpGVUP5OajIK2j",
+  "date": "2026-11-13"
+ },
+ "disappointed": {
+  "mode": "A",
+  "spoken": "disappointed",
+  "score": 1,
+  "voice": "HbdIG2FpGVUP5OajIK2j",
+  "date": "2026-11-13"
  }
 }
