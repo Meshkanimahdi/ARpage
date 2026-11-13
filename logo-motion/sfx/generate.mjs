@@ -1,5 +1,6 @@
 // Sound effects for the logo motion via ElevenLabs sound generation.
 // Usage: ELEVEN_KEY_FILE=key.txt node sfx/generate.mjs   (uses the "Alll" key line, never the image-only key)
+console.error('SFX/music generation is not allowed (Mahdi 2026-11-13): use the library files'); process.exit(3);
 import fs from 'node:fs';
 import path from 'node:path';
 const dir = path.dirname(new URL(import.meta.url).pathname);

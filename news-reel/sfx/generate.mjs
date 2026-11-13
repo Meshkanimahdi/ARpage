@@ -1,4 +1,5 @@
 // Music bed + transition effects for the news reel (ElevenLabs, audio key line only).
+console.error('SFX/music generation is not allowed (Mahdi 2026-11-13): use the library files in news-reel/sfx and news-reel/music'); process.exit(3);
 import fs from 'node:fs'; import path from 'node:path';
 const dir = path.dirname(new URL(import.meta.url).pathname);
 const key = fs.readFileSync(process.env.ELEVEN_KEY_FILE, 'utf8').match(/^Alll:\s*(\S+)/m)[1];

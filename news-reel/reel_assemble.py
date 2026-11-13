@@ -4,8 +4,7 @@
   python3 news-reel/reel_assemble.py --dir work/reel-2026-10-20   ->  <dir>/reel.mp4 (+ <dir>/frame_cover.jpg, a video frame; never the designed cover.jpg)
 
 Needs <dir>/timeline.json (reel_voice.mjs), <dir>/out/news.mp4 and <dir>/out/scenes.json (reel_render.mjs).
-Music: <dir>/music.mp3 if present; otherwise generated once from spec.music_prompt with ElevenLabs
-(audio key from env), falling back to the library bed news-reel/sfx/music60.mp3.
+Music: library only (news-reel/music/*.mp3 via story.json "music" or picked by content id); never generated (Mahdi 2026-11-13).
 """
 import argparse, json, os, shutil, subprocess, sys, urllib.request
 from pathlib import Path
@@ -26,23 +25,26 @@ def probe(f):
 
 
 def music(d, spec, length):
+    """Library music only (Mahdi 2026-11-13: «به هیچ عنوان از ای پی ای الونلبز برای ساخت موسیقی و افکت استفاده نکن،
+    فقط از کتابخونش»). Never calls a music/SFX generation API. Order: <dir>/music.mp3 (copied from the library),
+    story.json "music" (a file under news-reel/music/), else a library track picked from the content id."""
     f = d / 'music.mp3'
     if f.exists():
         return f
-    key = os.environ.get('Elevenlabs_API_KEY') or os.environ.get('ELEVENLABS_API_KEY')
-    prompt = spec.get('music_prompt') or 'Modern tech news underscore, confident and curious, pulsing synth bass, light electronic percussion, clean minimal, steady 110 bpm, no vocals, suitable under a spoken narration'
-    if key:
-        try:
-            req = urllib.request.Request('https://api.elevenlabs.io/v1/music?output_format=mp3_44100_192', method='POST',
-                                         headers={'xi-api-key': key, 'Content-Type': 'application/json'},
-                                         data=json.dumps({'prompt': prompt, 'music_length_ms': int(length * 1000) + 1500, 'force_instrumental': True}).encode())
-            with urllib.request.urlopen(req, timeout=240) as r:
-                f.write_bytes(r.read())
-            print('music: generated from prompt')
-            return f
-        except Exception as e:  # keep going with the library bed
-            print('music generation failed, using library bed:', e)
-    shutil.copy(SFX / 'music60.mp3', f)
+    lib = sorted((HERE / 'music').glob('*.mp3'))
+    want = spec.get('music')
+    src = None
+    if want:
+        c = Path(want) if Path(want).is_absolute() else (HERE.parent / want)
+        if c.exists() and c.resolve().parent == (HERE / 'music').resolve():
+            src = c
+        else:
+            print('music: story.json music is not a library file, picking from the library:', want)
+    if src is None and lib:
+        n = sum(map(ord, str(spec.get('content_id', '')))) % len(lib)
+        src = lib[n]
+    shutil.copy(src or (SFX / 'music60.mp3'), f)
+    print('music: library', (src or SFX / 'music60.mp3').name)
     return f
 
 

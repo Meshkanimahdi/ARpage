@@ -26,6 +26,27 @@ calls were REEL-034 and POST-031). `Week Plan` rows are drawn from Topic Bank ID
 **Covers (Mahdi 2026-11-10):** a realistic photo with a headline on it, not a graphic YouTube-style thumbnail: little
 or no pills/boxes/strokes; when the reel calls out a group (e.g. «نجارها»), the cover shows a real-looking person of that
 group (hands/back/three-quarter, no real person's likeness) and the group's name is in the headline.
+**Topics that win (Mahdi 2026-11-13, blocking):** «برو تو موضوع‌های جذاب‌تر… همش داری زندگی رو وصل می‌کنی به چت‌بات‌ها؛
+دنبال موضوعاتی باش مثل اون‌هایی که ریچ خوبی گرفتند و فالوور آوردند». The page's real hits (Performance tab): «همه می‌دونن… ولی
+یه هوش مصنوعی می‌پرسه: از کجا؟» (296k reach, 45.8k shares), «خودتو برای جنگ آماده کردی؟» (144k, 33k), «شغلت امن بمونه… لوله‌کش
+شو؟» (103k, 10k), «اینترنت قطع شد، گوشیت آماده‌ست؟» (57k, 15k), the voice-clone call (385 shares). So every reel comes from one of
+these families: (A) myth-busting — a belief «همه می‌دونن» checked with evidence; (B) crisis readiness for the whole family (war,
+internet cut, blackout, water cut, earthquake); (C) job security / which jobs survive; (D) scams that take money from families;
+(E) a strange, true AI news story people retell. The AI angle is the narrator or the evidence, NOT "ask a chatbot to …" as the
+payoff. "Use a chatbot for X" how-tos are at most 1 in 6 posts. Topic Bank rows are tagged with their family; new topics in
+these families are researched into the Topic Bank first (verified sources), then planned.
+**Motion (Mahdi 2026-11-13):** «سبک موشن‌هاتو پیشرفته‌تر کن». Prefer catalog prompts not yet built (3D, real-camera, kinetic
+type with depth, shadow theatre, stop-motion) and build their own engines; never the "photo + caption pill" template two reels
+in a row; style_distinct and motion_richness must reach 6 before READY whenever there is time to fix.
+**Sound (Mahdi 2026-11-13, blocking):** «به هیچ عنوان از API الون‌لبز برای ساخت موسیقی و افکت استفاده نکن، فقط از کتابخونش».
+Music only from news-reel/music/*.mp3 and effects only from news-reel/sfx/*.mp3. reel_assemble.py, slides_music.py and both
+sfx/generate.mjs refuse generation. ElevenLabs is used for the narration (TTS) only.
+**Voice (Mahdi 2026-11-13, blocking):** follow the elevenlabs-tts skill exactly: an English audio tag where the emotion turns
+(one short lowercase tag per sentence or clause, matched to the meaning — [serious], [worried], [whispers], [firm], [warmly],
+[excited]…, never the same tag twice in a row); English terms written in English (ChatGPT, Plantix, deepfake, VPN…) and passed
+through pron_test.mjs; any Persian word the voice can misread written in Finglish in fa_respell.json (e.g. سم → sam, it was read
+SEM in REEL-049) or with the vowel diacritic; numbers as words. After the voice, read voice/flags.json and re-voice every flagged
+beat whose word is a real misread before assembly.
 **Flat-lay assembly style (Mahdi 2026-11-11, 2–3 reels a week):** «ازین سبک موشن‌ها هم تو برنامت بگذار، دارک بودنش مد نظرم نیست».
 Reference: a top-down knolling scene in layered paper-cut. Realistic objects of the topic (e.g. for realtors: keys, a house
 model, a contract, a phone with a listing, a calculator) drop in one by one around a round centre emblem that carries the

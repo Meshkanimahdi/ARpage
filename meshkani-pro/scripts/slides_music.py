@@ -6,9 +6,9 @@ carries one continuous piece of music: slide k plays the track from k*SEG second
 viewer swipes, and the image stays exactly the approved slide, with a slow 3% push so it does not look frozen.
 
   python3 meshkani-pro/scripts/slides_music.py --slides s1.jpg s2.jpg s3.jpg --out work/final/ \
-      (--music track.mp3 | --prompt "music prompt") [--seg 8]
+      --music news-reel/music/<library track>.mp3 [--seg 8]
 
-Music: --music, or generated once with ElevenLabs /v1/music from --prompt (audio key from env, instrumental).
+Music: --music, a library track only; generation APIs are not allowed (Mahdi 2026-11-13).
 Out: <out>/slide1.mp4 … (1080x1350, H.264 yuv420p 30 fps, AAC 48 kHz, −16 LUFS, true peak ≤ −1.5),
 <out>/music.mp3, and <out>/slides_music.json (durations, offsets, md5).
 """
@@ -21,6 +21,7 @@ def run(*a):
 
 
 def gen_music(prompt, seconds, out):
+    sys.exit('music generation is not allowed (Mahdi 2026-11-13): use --music with a library track')
     key = os.environ.get('Elevenlabs_API_KEY') or os.environ.get('ELEVENLABS_API_KEY')
     if not key:
         sys.exit('no ElevenLabs key in env')
@@ -43,9 +44,7 @@ def main():
     if a.music:
         music.write_bytes(Path(a.music).read_bytes())
     elif not music.exists():
-        if not a.prompt:
-            sys.exit('give --music or --prompt')
-        gen_music(a.prompt, n * seg, music)
+        sys.exit('give --music <library track in news-reel/music/>: music generation is not allowed (Mahdi 2026-11-13)')
     # one loudness-normalised master so every slide sounds the same
     master = out / 'music_master.wav'
     run('ffmpeg', '-y', '-loglevel', 'error', '-i', str(music), '-af', 'loudnorm=I=-16:TP=-1.5:LRA=9', '-ar', '48000', '-ac', '2', str(master))
