@@ -932,7 +932,8 @@ For each story not yet `PUBLISHED`:
 4. `INSTAGRAM_POST_IG_USER_MEDIA_PUBLISH` → save `media_id`.
 5. Verify with `INSTAGRAM_GET_IG_MEDIA` (`id,permalink,timestamp,media_product_type,username`):
    `STORY`, right username; and/or `INSTAGRAM_GET_IG_USER_STORIES` (ig_user_id
-   `17841471767180096`). Save permalink, `published_at`, `expires_at` (+24 h),
+   `17841471767180096`). Save permalink, `published_at` (story times as UTC ISO, e.g. `2026-11-13T05:32:36+00:00`;
+   analytics reads the clock part as UTC, so a +03:30 string shows the story 3.5 h late), `expires_at` (+24 h),
    status `PUBLISHED`, write state.
 6. Update the story row: Status `Published`, Actual time, Published Story URL,
    Instagram Media ID, Parent Post URL, Expires At, Notes.
