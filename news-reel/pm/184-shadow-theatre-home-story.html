@@ -178,6 +178,7 @@ function svgRuler() {
 
 window.ready = (async () => {
   S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json();
+  if (S.theatre_svg) $('theatre').querySelector('svg').innerHTML = S.theatre_svg;   // story-specific silhouettes (ids: drift = moves in with the turn, sway = breathes)
   END = TL.total; buildDesk();
   for (const bt of S.beats) { const L = TL.lines[bt.id]; if (!L) throw new Error('unknown line ' + bt.id); BEATS.push({bt, L, ...beatWords(bt, L)}); }
   BEATS.forEach((b, i) => { b.a = i ? b.L.start - .1 : 0; b.b = i + 1 < BEATS.length ? BEATS[i + 1].L.start - .1 : TL.end_start; });
@@ -256,8 +257,10 @@ function seek(t) {
     T.style.opacity = 1; const k = P(t, tb.t0, tb.t1), g = E.io(P(t, th.words[8] ? th.words[8].a : tb.t0 + 1.5, (th.words[11] || {e: tb.t1}).e));
     const flut = Math.sin(t * 7.3) * 1.2 + Math.sin(t * 3.1) * 1.0;
     T.querySelector('.light').style.transform = `scale(${1 + .03 * Math.sin(t * 2)}) skewX(${flut * .4}deg)`;
-    $('woman').setAttribute('transform', `translate(${lerp(170, 60, g)},${lerp(760, 1050, g)}) scale(${lerp(1.9, 1.2, g)}) rotate(${flut * .6} 200 300)`);
-    $('sphone').setAttribute('transform', `translate(${lerp(880, 700, g)},${lerp(1250, 900, g)}) scale(${lerp(1.0, 2.6, g)}) rotate(${-4 + flut} 0 0)`);
+    if ($('drift')) { $('drift').setAttribute('transform', `translate(${lerp(760, 0, g)},${lerp(-40, 0, g)})`); $('drift').setAttribute('opacity', (.25 + .6 * g).toFixed(3)); }
+    if ($('sway')) $('sway').setAttribute('transform', `translate(0,${(Math.sin(t * 2.2) * 6).toFixed(2)})`);
+    if ($('woman')) $('woman').setAttribute('transform', `translate(${lerp(170, 60, g)},${lerp(760, 1050, g)}) scale(${lerp(1.9, 1.2, g)}) rotate(${flut * .6} 200 300)`);
+    if ($('sphone')) $('sphone').setAttribute('transform', `translate(${lerp(880, 700, g)},${lerp(1250, 900, g)}) scale(${lerp(1.0, 2.6, g)}) rotate(${-4 + flut} 0 0)`);
   } else T.style.opacity = 0;
   // torn-paper sweep: kraft sheet rises through the frame; the scene swaps under it
   const tr = $('tear'); let ty = 2000;
