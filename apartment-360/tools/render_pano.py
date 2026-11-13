@@ -18,6 +18,8 @@ PROMPT = (
     "lights, curtains and decor, and place the furniture where the grey boxes are (the photos win on details the boxes do not show). "
     "Walls that no photo shows stay plain and in the style of the visible walls; do not invent artwork, logos or text. "
     "Windows show only soft bright daylight through their curtains or film, nothing recognizable outside. "
+    "Never copy the guide's lines into the result: no outlines, arcs or wireframe lines anywhere. Each fixture (toilet, sink, "
+    "shower, bed, sofa) appears exactly as often as in the photos, never duplicated. "
     "Look of a professional real-estate 360 camera: sharp, evenly lit, straight vertical lines, no people, no text.")
 
 

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تور ۳۶۰ و پلان آپارتمان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap">
+<style>
+/* Layout: the panorama fills the screen; glass chrome in the corners; the plan opens as a full sheet over it */
+:root {
+  --hud: rgba(14, 18, 17, 0.62);
+  --hud-fg: #eef2f0;
+  --hud-muted: rgba(238, 242, 240, 0.68);
+  --hud-line: rgba(238, 242, 240, 0.16);
+  --accent: #5b86f0;
+  --ai: #f0b75b;
+  --paper: #f6f5f2;
+  --ink: #1f2321;
+  --muted: #6c716e;
+  --wall: #262b29;
+  --furn: #9aa09d;
+  --room: #ffffff;
+  --body: "Vazirmatn", Tahoma, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; background: #0e1211; color: var(--hud-fg); font-family: var(--body); overflow: hidden; }
+#stage { position: fixed; inset: 0; touch-action: none; cursor: grab; }
+#stage.drag { cursor: grabbing; }
+#stage canvas { display: block; width: 100%; height: 100%; }
+.glass { background: var(--hud); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--hud-line); border-radius: 12px; }
+.top { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); left: calc(12px + env(safe-area-inset-left, 0px)); display: flex; gap: 8px; align-items: flex-start; pointer-events: none; z-index: 2; }
+.top > * { pointer-events: auto; }
+.place { padding: 10px 14px; max-width: min(440px, 100%); min-width: 0; }
+.place .k { font-size: 11px; color: var(--hud-muted); }
+.place h1 { margin: 2px 0 0; font-size: 16px; font-weight: 700; text-wrap: balance; }
+.badge { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 11.5px; color: var(--ai); line-height: 1.6; }
+.badge::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--ai); }
+.tools { margin-inline-start: auto; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.btn { font: inherit; font-size: 13px; color: var(--hud-fg); padding: 8px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.btn[aria-pressed="true"] { background: var(--accent); border-color: transparent; }
+.btn:focus-visible, #map:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bottom { position: fixed; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); left: calc(12px + env(safe-area-inset-left, 0px)); display: flex; gap: 8px; align-items: flex-end; pointer-events: none; z-index: 2; }
+.bottom > * { pointer-events: auto; }
+#map { width: 210px; height: 150px; padding: 6px; cursor: pointer; }
+.nav { display: flex; gap: 6px; align-items: center; padding: 6px; margin-inline-start: auto; }
+.nav .count { font-size: 12px; color: var(--hud-muted); padding: 0 6px; font-variant-numeric: tabular-nums; }
+#hint { position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); padding: 7px 14px; font-size: 12.5px; color: var(--hud-muted); white-space: nowrap; transition: opacity .6s; pointer-events: none; z-index: 2; }
+#load { position: fixed; inset: 0; display: grid; place-items: center; font-size: 14px; color: var(--hud-muted); pointer-events: none; transition: opacity .5s; text-align: center; padding: 24px; }
+
+/* plan sheet */
+#plan { position: fixed; inset: 0; z-index: 5; background: var(--paper); color: var(--ink); display: grid; grid-template-rows: auto 1fr auto; color-scheme: light; }
+#plan[hidden] { display: none; }
+#plan header { display: flex; align-items: center; gap: 12px; padding: calc(14px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); }
+#plan h2 { margin: 0; font-size: 18px; }
+#plan header small { color: var(--muted); font-size: 12.5px; }
+#plan .close { margin-inline-start: auto; font: inherit; font-size: 13px; padding: 8px 14px; border-radius: 10px; border: 1px solid #d5d3cd; background: #fff; color: var(--ink); cursor: pointer; }
+#plan .sheet { min-height: 0; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); }
+#plan svg { width: 100%; height: 100%; display: block; }
+#plan footer { padding: 8px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)); font-size: 12px; color: var(--muted); line-height: 1.8; }
+.node { cursor: pointer; }
+.node:hover circle, .node:focus circle { fill: #3f6fe0; }
+.node:focus { outline: none; }
+@media (max-width: 640px) {
+  #map { width: 140px; height: 100px; }
+  .tools .lbl { display: none; }
+  #hint { white-space: normal; width: calc(100% - 32px); text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) { #hint, #load { transition: none; } }
+</style>
+</head>
+<body>
+<div id="stage" aria-label="نمای ۳۶۰ درجه؛ برای نگاه کردن بکشید و برای رفتن روی دایره‌های کف بزنید"></div>
+<div id="load">در حال بارگذاری نما…</div>
+
+<div class="top">
+  <div class="place glass" aria-live="polite">
+    <div class="k" id="pk">نقطه</div>
+    <h1 id="pt">—</h1>
+    <div class="badge">نما با هوش مصنوعی از روی عکس‌های آگهی و پلان ساخته شده؛ عکس ۳۶۰ واقعی نیست</div>
+  </div>
+  <div class="tools">
+    <button class="btn glass" id="bPlan" type="button">▦ <span class="lbl">پلان</span></button>
+    <button class="btn glass" id="bRot" type="button" aria-pressed="false">⟳ <span class="lbl">چرخش خودکار</span></button>
+    <button class="btn glass" id="bFull" type="button">⤢ <span class="lbl">تمام‌صفحه</span></button>
+  </div>
+</div>
+
+<div class="bottom">
+  <canvas id="map" class="glass" tabindex="0" aria-label="نقشه‌ی کوچک؛ روی هر نقطه بزنید تا به آن بروید"></canvas>
+  <div class="nav glass">
+    <button class="btn" id="bPrev" type="button" aria-label="نقطه‌ی قبلی">→</button>
+    <span class="count" id="cnt">۱ / ۹</span>
+    <button class="btn" id="bNext" type="button" aria-label="نقطه‌ی بعدی">←</button>
+  </div>
+</div>
+<div id="hint" class="glass">برای نگاه کردن به هر طرف بکشید · روی دایره‌های کف بزنید تا بروید</div>
+
+<section id="plan" hidden aria-label="پلان دوبعدی">
+  <header>
+    <h2>پلان آپارتمان</h2>
+    <small id="planSum"></small>
+    <button class="close" id="planClose" type="button">بازگشت به تور</button>
+  </header>
+  <div class="sheet"><svg id="planSvg" role="img" aria-label="پلان دوبعدی آپارتمان با اتاق‌ها و نقاط تور"></svg></div>
+  <footer>ابعاد تخمینی‌اند و از روی عکس‌های آگهی (اندازه‌ی مبلمان، درها و کاشی‌ها) به دست آمده‌اند؛ اندازه‌گیری واقعی در دست نبود. دایره‌های آبی نقاط تور ۳۶۰‌اند: روی هرکدام بزنید.</footer>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="home.js"></script>
+<script>
+(function () {
+  const H = window.HOME, $ = (id) => document.getElementById(id);
+  const fa = (v) => String(v).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[d]).replace(".", "٫");
+  const NODES = H.NODES, ORDER = NODES.map((q) => q.n);
+  const byN = Object.fromEntries(NODES.map((q) => [q.n, q]));
+  const room = Object.fromEntries(H.ROOMS.map((r) => [r.id, r]));
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const panoSrc = (n) => `panos/pano${String(n).padStart(2, "0")}.jpg`;
+  const yawFromPlan = (aDeg) => { const a = aDeg * Math.PI / 180; return Math.atan2(-Math.cos(a), -Math.sin(a)); };
+  const area = (r) => (r.x1 - r.x0) * (r.y1 - r.y0);
+
+  /* ---------- the plan as wall segments: room outlines with the openings cut out ---------- */
+  const OPEN = H.OPENINGS.concat(H.WINDOWS.map((w) => Object.assign({ window: true }, w)));
+  function edges(r) {
+    const e = [["x", r.y0, r.x0, r.x1], ["x", r.y1, r.x0, r.x1], ["y", r.x0, r.y0, r.y1], ["y", r.x1, r.y0, r.y1]];
+    const out = [];
+    e.forEach(([axis, c, a0, a1]) => {
+      let cuts = OPEN.filter((o) => !o.window && o.axis === axis && Math.abs(o.c - c) < 1e-6 && o.a1 > a0 && o.a0 < a1).map((o) => [o.a0, o.a1]).sort((p, q) => p[0] - q[0]);
+      let s = a0;
+      cuts.forEach(([u, v]) => { if (u > s) out.push([axis, c, s, u]); s = Math.max(s, v); });
+      if (s < a1) out.push([axis, c, s, a1]);
+    });
+    return out;
+  }
+  const WALLS = H.ROOMS.flatMap(edges);
+  const BOUNDS = { x0: Math.min(...H.ROOMS.map((r) => r.x0)), y0: Math.min(...H.ROOMS.map((r) => r.y0)), x1: Math.max(...H.ROOMS.map((r) => r.x1)), y1: Math.max(...H.ROOMS.map((r) => r.y1)) };
+
+  /* ---------- where each point can go: same room, or the next room through a door ---------- */
+  const doorBetween = (a, b) => H.OPENINGS.find((o) => o.rooms.includes(a) && o.rooms.includes(b));
+  const links = {};
+  NODES.forEach((a) => {
+    links[a.n] = NODES.filter((b) => b !== a && (b.room === a.room || doorBetween(a.room, b.room))).map((b) => {
+      if (b.room === a.room) return { n: b.n, x: b.x, y: b.y };
+      const o = doorBetween(a.room, b.room), m = (o.a0 + o.a1) / 2;
+      // the ring sits on the floor just inside the doorway, on this room's side
+      const ra = room[a.room], inside = o.axis === "x" ? (a.y < o.c ? -0.35 : 0.35) : (a.x < o.c ? -0.35 : 0.35);
+      return o.axis === "x" ? { n: b.n, x: m, y: o.c + inside, door: true } : { n: b.n, x: o.c + inside, y: m, door: true };
+    });
+  });
+
+  if (!window.THREE) { $("load").textContent = "کتابخانه‌ی سه‌بعدی بارگذاری نشد. اتصال اینترنت را بررسی کنید و صفحه را دوباره باز کنید."; buildPlan(); return; }
+  if (location.protocol === "file:") { $("load").textContent = "این صفحه را با یک سرور محلی باز کنید (python3 -m http.server)."; return; }
+
+  /* ---------- renderer and panorama spheres ---------- */
+  const stage = $("stage");
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  stage.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, 1, .05, 100);
+  camera.rotation.order = "YXZ";
+
+  const loader = new THREE.TextureLoader(), texCache = {};
+  function tex(n) {
+    if (!texCache[n]) texCache[n] = new Promise((res) => loader.load(panoSrc(n), (t) => {
+      t.encoding = THREE.sRGBEncoding; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter;
+      t.anisotropy = renderer.capabilities.getMaxAnisotropy(); res(t);
+    }, undefined, () => res(null)));
+    return texCache[n];
+  }
+  const R = 5;
+  function panoMesh() {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(R, 64, 32), new THREE.ShaderMaterial({
+      uniforms: { map: { value: null }, center: { value: new THREE.Vector3() }, opacity: { value: 1 } },
+      vertexShader: "varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position, 1.); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }",
+      fragmentShader: `uniform sampler2D map; uniform vec3 center; uniform float opacity; varying vec3 vW;
+        void main(){ vec3 d = normalize(vW - center);
+          vec2 uv = vec2(atan(d.x, -d.z) / 6.2831853 + .5, asin(clamp(d.y, -1., 1.)) / 3.1415927 + .5);
+          gl_FragColor = vec4(texture2D(map, uv).rgb, opacity);
+          #include <encodings_fragment>
+        }`,
+      side: THREE.BackSide, transparent: true, depthTest: false, depthWrite: false,
+    }));
+    m.frustumCulled = false; scene.add(m); return m;
+  }
+  const spheres = [panoMesh(), panoMesh()];
+  let front = 0;
+  function place(sphere, q, t) { sphere.position.set(q.x, q.h, q.y); sphere.material.uniforms.center.value.copy(sphere.position); sphere.material.uniforms.map.value = t; }
+
+  /* ---------- floor rings ---------- */
+  const accent = new THREE.Color("#5b86f0");
+  const spots = new THREE.Group(); scene.add(spots);
+  function spotMesh() {
+    const g = new THREE.Group();
+    const disc = new THREE.Mesh(new THREE.CircleGeometry(.24, 48), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .22, depthTest: false }));
+    const ring = new THREE.Mesh(new THREE.RingGeometry(.2, .245, 48), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .95, depthTest: false }));
+    [disc, ring].forEach((m) => { m.rotation.x = -Math.PI / 2; m.renderOrder = 10; g.add(m); });
+    g.userData.ring = ring; return g;
+  }
+  function buildSpots(n) {
+    spots.clear();
+    links[n].forEach((l) => { const s = spotMesh(); s.position.set(l.x, .02, l.y); s.userData.n = l.n; spots.add(s); });
+  }
+
+  /* ---------- moving ---------- */
+  let cur = null, yaw = 0, pitch = -.05, fov = 75, moving = null, auto = false, lastAct = performance.now(), inertia = null;
+  const ease = (k) => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+  const nearestAngle = (a, b) => { while (b - a > Math.PI) b -= 2 * Math.PI; while (b - a < -Math.PI) b += 2 * Math.PI; return b; };
+  async function go(n, opts = {}) {
+    if (moving || n === cur) return;
+    const q = byN[n], from = cur ? byN[cur] : null;
+    const t = await tex(n);
+    if (!t) { $("load").textContent = "تصویر این نما پیدا نشد."; $("load").style.opacity = 1; return; }
+    $("load").style.opacity = 0;
+    links[n].forEach((l) => tex(l.n));
+    const back = spheres[1 - front];
+    place(back, q, t);
+    if (!from || opts.instant || reduced) {
+      spheres[front].visible = false; back.visible = true; back.material.uniforms.opacity.value = 1; front = 1 - front;
+      camera.position.set(q.x, q.h, q.y);
+      yaw = opts.yaw !== undefined ? opts.yaw : yawFromPlan(q.a);
+      arrive(n); return;
+    }
+    // a jump into another room turns to face the way of travel; within a room the heading is kept
+    const head = Math.atan2(-(q.x - from.x), -(q.y - from.y));
+    const y0 = yaw, y1 = opts.face ? nearestAngle(y0, yawFromPlan(q.a)) : q.room !== from.room ? nearestAngle(y0, head) : y0;
+    back.visible = true; back.material.uniforms.opacity.value = 0; spots.visible = false;
+    const p0 = camera.position.clone(), p1 = new THREE.Vector3(q.x, q.h, q.y);
+    const dur = Math.min(1500, 650 + p0.distanceTo(p1) * 200), f0 = fov;
+    moving = { t0: performance.now(), dur, step(k) {
+      const e = ease(k);
+      camera.position.lerpVectors(p0, p1, e);
+      yaw = y0 + (y1 - y0) * e;
+      fov = f0 - Math.sin(Math.PI * k) * 10;
+      back.material.uniforms.opacity.value = Math.min(1, Math.max(0, (k - .15) / .6));
+      spheres[front].material.uniforms.opacity.value = 1 - Math.max(0, (k - .55) / .45);
+    }, done() {
+      fov = f0; spheres[front].visible = false; spheres[front].material.uniforms.opacity.value = 1; front = 1 - front;
+      back.material.uniforms.opacity.value = 1; arrive(n);
+    } };
+  }
+  function arrive(n) {
+    cur = n; moving = null; spots.visible = true; buildSpots(n);
+    const q = byN[n];
+    $("pk").textContent = `نقطه‌ی ${fa(n)} · ${room[q.room].name}`;
+    $("pt").textContent = q.cap;
+    $("cnt").textContent = `${fa(ORDER.indexOf(n) + 1)} / ${fa(ORDER.length)}`;
+    try { if (location.hash !== "#p" + n) history.replaceState(null, "", "#p" + n); } catch (e) { /* framed pages may refuse */ }
+    drawMap(); markPlan();
+  }
+
+  /* ---------- input ---------- */
+  const ptrs = new Map(); let drag = null, pinch0 = 0;
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  function act() { lastAct = performance.now(); if (auto) setAuto(false); }
+  stage.addEventListener("pointerdown", (e) => {
+    stage.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (ptrs.size === 1) drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false, vy: 0, vp: 0 };
+    if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch0 = Math.hypot(a.x - b.x, a.y - b.y); drag = null; }
+    act();
+  });
+  stage.addEventListener("pointermove", (e) => {
+    if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (ptrs.size === 2) { const [a, b] = [...ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch0) { fov = THREE.MathUtils.clamp(fov * pinch0 / d, 35, 100); pinch0 = d; } return; }
+    if (drag) {
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y, k = fov / 75 * .0042;
+      if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 5) { drag.moved = true; stage.classList.add("drag"); }
+      if (drag.moved && !moving) { yaw += dx * k; pitch = THREE.MathUtils.clamp(pitch + dy * k, -1.45, 1.45); drag.vy = dx * k; drag.vp = dy * k; }
+      drag.x = e.clientX; drag.y = e.clientY; return;
+    }
+    hover(e);
+  });
+  function endPtr(e) {
+    ptrs.delete(e.pointerId); stage.classList.remove("drag");
+    if (ptrs.size < 2) pinch0 = 0;
+    if (drag && !drag.moved && e.type === "pointerup") click(e);
+    if (drag && drag.moved) inertia = { vy: drag.vy, vp: drag.vp };
+    drag = null;
+  }
+  stage.addEventListener("pointerup", endPtr);
+  stage.addEventListener("pointercancel", endPtr);
+  stage.addEventListener("wheel", (e) => { e.preventDefault(); fov = THREE.MathUtils.clamp(fov + e.deltaY * .04, 35, 100); act(); }, { passive: false });
+  function target(e) {
+    const r = renderer.domElement.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObjects(spots.children, true)[0];
+    if (hit) { let o = hit.object; while (o && o.userData.n === undefined) o = o.parent; if (o) return o.userData.n; }
+    const p = ray.ray.intersectPlane(floorPlane, new THREE.Vector3());
+    if (!p || !cur) return null;
+    let best = null, bd = 1.4;
+    links[cur].forEach((l) => { const d = Math.hypot(l.x - p.x, l.y - p.z); if (d < bd) { bd = d; best = l.n; } });
+    return best;
+  }
+  function hover(e) {
+    if (e.pointerType !== "mouse" || moving) return;
+    const t = target(e);
+    spots.children.forEach((s) => { const on = s.userData.n === t; s.scale.setScalar(on ? 1.25 : 1); s.userData.ring.material.color.set(on ? accent : 0xffffff); });
+    stage.style.cursor = t ? "pointer" : "";
+  }
+  function click(e) { const t = target(e); if (t) go(t); }
+  addEventListener("keydown", (e) => {
+    if (!$("plan").hidden || (e.target.closest && e.target.closest("button"))) return;
+    if (e.key === "ArrowLeft") { yaw += .08; act(); }
+    else if (e.key === "ArrowRight") { yaw -= .08; act(); }
+    else if (e.key === "ArrowUp") { forward(); act(); }
+  });
+  function forward() {
+    if (!cur) return;
+    const d = camera.getWorldDirection(new THREE.Vector3()), q0 = byN[cur];
+    let best = null, bs = .5;
+    links[cur].forEach((l) => {
+      const vx = l.x - q0.x, vy = l.y - q0.y, L = Math.hypot(vx, vy);
+      const c = (vx * d.x + vy * d.z) / (L * Math.hypot(d.x, d.z)) - L * .04;
+      if (c > bs) { bs = c; best = l.n; }
+    });
+    if (best) go(best);
+  }
+
+  /* ---------- minimap ---------- */
+  const map = $("map"), mctx = map.getContext("2d");
+  let mapT = null;
+  function fit(W, Hh, pad) {
+    const s = Math.min((W - 2 * pad) / (BOUNDS.x1 - BOUNDS.x0), (Hh - 2 * pad) / (BOUNDS.y1 - BOUNDS.y0));
+    return { s, ox: (W - s * (BOUNDS.x1 - BOUNDS.x0)) / 2 - BOUNDS.x0 * s, oy: (Hh - s * (BOUNDS.y1 - BOUNDS.y0)) / 2 - BOUNDS.y0 * s };
+  }
+  function drawMap() {
+    const dpr = Math.min(devicePixelRatio || 1, 2), W = map.clientWidth, Hh = map.clientHeight;
+    map.width = W * dpr; map.height = Hh * dpr; mapT = fit(W, Hh, 8);
+    const { s, ox, oy } = mapT, X = (x) => ox + x * s, Y = (y) => oy + y * s;
+    mctx.setTransform(dpr, 0, 0, dpr, 0, 0); mctx.clearRect(0, 0, W, Hh);
+    H.ROOMS.forEach((r) => { mctx.fillStyle = cur && r.id === byN[cur].room ? "rgba(91,134,240,.22)" : "rgba(238,242,240,.07)"; mctx.fillRect(X(r.x0), Y(r.y0), (r.x1 - r.x0) * s, (r.y1 - r.y0) * s); });
+    mctx.strokeStyle = "rgba(238,242,240,.85)"; mctx.lineWidth = 2; mctx.beginPath();
+    WALLS.forEach(([axis, c, a0, a1]) => { if (axis === "x") { mctx.moveTo(X(a0), Y(c)); mctx.lineTo(X(a1), Y(c)); } else { mctx.moveTo(X(c), Y(a0)); mctx.lineTo(X(c), Y(a1)); } });
+    mctx.stroke();
+    if (cur) {
+      const q = byN[cur], d = camera.getWorldDirection(new THREE.Vector3()), a = Math.atan2(d.z, d.x), half = Math.min(1.2, THREE.MathUtils.degToRad(camera.fov * camera.aspect / 2));
+      const g = mctx.createRadialGradient(X(q.x), Y(q.y), 0, X(q.x), Y(q.y), 30);
+      g.addColorStop(0, "rgba(91,134,240,.8)"); g.addColorStop(1, "rgba(91,134,240,0)");
+      mctx.fillStyle = g; mctx.beginPath(); mctx.moveTo(X(q.x), Y(q.y)); mctx.arc(X(q.x), Y(q.y), 30, a - half, a + half); mctx.closePath(); mctx.fill();
+    }
+    NODES.forEach((q) => {
+      const on = q.n === cur;
+      mctx.beginPath(); mctx.arc(X(q.x), Y(q.y), on ? 5 : 3.4, 0, Math.PI * 2);
+      mctx.fillStyle = on ? "#5b86f0" : "#ffffff"; mctx.fill();
+      if (on) { mctx.lineWidth = 2; mctx.strokeStyle = "#ffffff"; mctx.stroke(); }
+    });
+  }
+  map.addEventListener("click", (e) => {
+    const r = map.getBoundingClientRect(), x = (e.clientX - r.left - mapT.ox) / mapT.s, y = (e.clientY - r.top - mapT.oy) / mapT.s;
+    let best = null, bd = 1.5;
+    NODES.forEach((q) => { const d = Math.hypot(q.x - x, q.y - y); if (d < bd) { bd = d; best = q.n; } });
+    if (best) { act(); go(best, { face: true }); }
+  });
+
+  /* ---------- buttons ---------- */
+  const step = (k) => { act(); go(ORDER[(ORDER.indexOf(cur) + k + ORDER.length) % ORDER.length], { face: true }); };
+  $("bNext").addEventListener("click", () => step(1));
+  $("bPrev").addEventListener("click", () => step(-1));
+  function setAuto(v) { auto = v; $("bRot").setAttribute("aria-pressed", String(v)); }
+  $("bRot").addEventListener("click", () => setAuto(!auto));
+  $("bFull").addEventListener("click", () => {
+    const el = document.documentElement;
+    if (!document.fullscreenElement) { if (el.requestFullscreen) el.requestFullscreen().catch(() => {}); }
+    else document.exitFullscreen().catch(() => {});
+  });
+  $("bPlan").addEventListener("click", () => { act(); $("plan").hidden = false; $("planClose").focus(); });
+  $("planClose").addEventListener("click", () => { $("plan").hidden = true; $("bPlan").focus(); });
+  addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("plan").hidden) $("planClose").click(); });
+
+  /* ---------- loop ---------- */
+  function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); drawMap(); }
+  addEventListener("resize", resize);
+  let last = performance.now(), mapTick = 0;
+  function frame(now) {
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    if (moving) { const k = Math.min(1, (now - moving.t0) / moving.dur); moving.step(k); if (k >= 1) moving.done(); }
+    else {
+      if (inertia) { yaw += inertia.vy; pitch = THREE.MathUtils.clamp(pitch + inertia.vp, -1.45, 1.45); inertia.vy *= .9; inertia.vp *= .9; if (Math.abs(inertia.vy) + Math.abs(inertia.vp) < 1e-4) inertia = null; }
+      if (!auto && !reduced && $("plan").hidden && now - lastAct > 9000) setAuto(true);
+      if (auto) yaw += dt * .09;
+    }
+    camera.rotation.set(pitch, yaw, 0); camera.fov = fov; camera.updateProjectionMatrix();
+    renderer.render(scene, camera);
+    if (now - mapTick > 120) { mapTick = now; drawMap(); }
+    requestAnimationFrame(frame);
+  }
+  setTimeout(() => ($("hint").style.opacity = 0), 7000);
+
+  /* ---------- the 2D plan sheet ---------- */
+  function buildPlan() {
+    const svg = $("planSvg"), NS = "http://www.w3.org/2000/svg", pad = 0.9;
+    const W = BOUNDS.x1 - BOUNDS.x0 + 2 * pad, Hh = BOUNDS.y1 - BOUNDS.y0 + 2 * pad;
+    svg.setAttribute("viewBox", `${BOUNDS.x0 - pad} ${BOUNDS.y0 - pad} ${W} ${Hh}`);
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    const el = (tag, attrs, parent = svg, text) => { const e = document.createElementNS(NS, tag); Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v)); if (text !== undefined) e.textContent = text; parent.appendChild(e); return e; };
+    const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+    H.ROOMS.forEach((r) => el("rect", { x: r.x0, y: r.y0, width: r.x1 - r.x0, height: r.y1 - r.y0, fill: css("--room") }));
+    // furniture
+    Object.values(H.FURNITURE).flat().forEach((f) => { if (f[5] - f[4] > .05 || f[6]) el("rect", { x: f[0], y: f[1], width: f[2] - f[0], height: f[3] - f[1], fill: "none", stroke: css("--furn"), "stroke-width": .025, rx: .04 }); });
+    // walls
+    WALLS.forEach(([axis, c, a0, a1]) => axis === "x" ? el("line", { x1: a0, y1: c, x2: a1, y2: c, stroke: css("--wall"), "stroke-width": .16, "stroke-linecap": "square" }) : el("line", { x1: c, y1: a0, x2: c, y2: a1, stroke: css("--wall"), "stroke-width": .16, "stroke-linecap": "square" }));
+    // windows: a light double line over the wall
+    H.WINDOWS.forEach((w) => {
+      const [x1, y1, x2, y2] = w.axis === "x" ? [w.a0, w.c, w.a1, w.c] : [w.c, w.a0, w.c, w.a1];
+      el("line", { x1, y1, x2, y2, stroke: "#ffffff", "stroke-width": .12 });
+      el("line", { x1, y1, x2, y2, stroke: "#7aa0e8", "stroke-width": .03 });
+    });
+    // door swings for real doors, a thin threshold for open passages
+    H.OPENINGS.forEach((o) => {
+      const w = o.a1 - o.a0;
+      if (o.kind === "open") { const [x1, y1, x2, y2] = o.axis === "x" ? [o.a0, o.c, o.a1, o.c] : [o.c, o.a0, o.c, o.a1]; el("line", { x1, y1, x2, y2, stroke: css("--furn"), "stroke-width": .02, "stroke-dasharray": ".08 .06" }); return; }
+      const into = o.rooms[1] ? room[o.rooms[1]] : room[o.rooms[0]];
+      const sgn = o.axis === "x" ? ((into.y0 + into.y1) / 2 > o.c ? 1 : -1) : ((into.x0 + into.x1) / 2 > o.c ? 1 : -1);
+      const P = (a, d) => o.axis === "x" ? [a, o.c + d * sgn] : [o.c + d * sgn, a];
+      const [hx, hy] = P(o.a0, 0), [ex, ey] = P(o.a0, w), [fx, fy] = P(o.a1, 0);
+      el("line", { x1: hx, y1: hy, x2: ex, y2: ey, stroke: css("--ink"), "stroke-width": .03 });
+      el("path", { d: `M ${ex} ${ey} A ${w} ${w} 0 0 ${o.axis === "x" ? (sgn > 0 ? 0 : 1) : (sgn > 0 ? 1 : 0)} ${fx} ${fy}`, fill: "none", stroke: css("--muted"), "stroke-width": .02, "stroke-dasharray": ".06 .05" });
+    });
+    // room names and areas
+    H.ROOMS.forEach((r) => {
+      // keep the name clear of the room's 360 points: try the centre, then nudge down or up
+      const clear = (x, y) => NODES.every((q) => Math.abs(q.y - y) > .75 || Math.abs(q.x - x) > 1.3);
+      const spots = [];
+      [0, .9, -.9, 1.5, -1.5].forEach((dy) => [0, -1.8, 1.8].forEach((dx) => spots.push([(r.x0 + r.x1) / 2 + dx, (r.y0 + r.y1) / 2 + dy])));
+      const [cx, cy] = spots.find(([x, y]) => clear(x, y) && x > r.x0 + .9 && x < r.x1 - .9 && y > r.y0 + .45 && y < r.y1 - .45) || [(r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2];
+      el("text", { x: cx, y: cy - .05, "text-anchor": "middle", "font-size": .34, "font-weight": 700, fill: css("--ink"), "font-family": "Vazirmatn, Tahoma, sans-serif" }, svg, r.name);
+      el("text", { x: cx, y: cy + .38, "text-anchor": "middle", "font-size": .26, fill: css("--muted"), "font-family": "Vazirmatn, Tahoma, sans-serif" }, svg, `≈ ${fa(area(r).toFixed(1))} م²`);
+    });
+    // scale bar
+    const sx = BOUNDS.x0, sy = BOUNDS.y1 + .5;
+    el("line", { x1: sx, y1: sy, x2: sx + 2, y2: sy, stroke: css("--ink"), "stroke-width": .04 });
+    [0, 1, 2].forEach((k) => el("line", { x1: sx + k, y1: sy - .1, x2: sx + k, y2: sy + .1, stroke: css("--ink"), "stroke-width": .03 }));
+    el("text", { x: sx + 1, y: sy + .45, "text-anchor": "middle", "font-size": .26, fill: css("--muted"), "font-family": "Vazirmatn, Tahoma, sans-serif" }, svg, "۲ متر");
+    // 360 points
+    NODES.forEach((q) => {
+      const g = el("g", { class: "node", tabindex: 0, role: "button", "aria-label": `نقطه‌ی ${fa(q.n)}: ${q.cap}`, "data-n": q.n });
+      const a = q.a * Math.PI / 180;
+      el("path", { d: `M ${q.x} ${q.y} L ${q.x + Math.cos(a - .5) * .7} ${q.y + Math.sin(a - .5) * .7} A .7 .7 0 0 1 ${q.x + Math.cos(a + .5) * .7} ${q.y + Math.sin(a + .5) * .7} Z`, fill: "rgba(91,134,240,.18)" }, g);
+      el("circle", { cx: q.x, cy: q.y, r: .22, fill: css("--accent"), stroke: "#fff", "stroke-width": .05 }, g);
+      el("text", { x: q.x, y: q.y + .085, "text-anchor": "middle", "font-size": .22, "font-weight": 700, fill: "#fff", "font-family": "Vazirmatn, Tahoma, sans-serif" }, g, fa(q.n));
+      const open = () => { $("plan").hidden = true; if (typeof go === "function") go(q.n, { face: true }); };
+      g.addEventListener("click", open);
+      g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
+    });
+    const total = H.ROOMS.reduce((s, r) => s + area(r), 0);
+    $("planSum").textContent = `${fa(H.ROOMS.length)} فضا · حدود ${fa(Math.round(total))} متر مربع · ${fa(NODES.length)} نقطه‌ی ۳۶۰`;
+  }
+  function markPlan() {
+    document.querySelectorAll("#planSvg .node circle").forEach((c) => c.setAttribute("stroke-width", c.parentNode.dataset.n == cur ? .1 : .05));
+  }
+
+  buildPlan();
+  const start = +((location.hash.match(/^#p(\d+)$/) || [])[1]) || ORDER[0];
+  resize();
+  go((byN[start] || byN[ORDER[0]]).n, { instant: true }).then(() => requestAnimationFrame(frame));
+  addEventListener("hashchange", () => { const m = location.hash.match(/^#p(\d+)$/); if (m && byN[+m[1]] && +m[1] !== cur) go(+m[1], { face: true }); });
+  window.TOUR360 = { go, look(y, p) { yaw = y; pitch = p; } };
+})();
+</script>
+</body>
+</html>
