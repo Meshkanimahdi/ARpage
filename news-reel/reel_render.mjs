@@ -36,11 +36,13 @@ if (args.mode === 'check' || args.mode === 'stills') {
   } else console.log(files.join('\n'));
 } else {
   const fps = 30, dur = await page.evaluate(() => window.DURATION), t0 = await page.evaluate(() => window.START);
-  const f = path.join(out, 'news.mp4');
+  const [pi, pn] = (args.part || '0/1').split('/').map(Number);   // --part=i/N renders one slice (parallel renders; join with ffmpeg concat)
+  const f = path.join(out, pn > 1 ? `news_part${pi}.mp4` : 'news.mp4');
   const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'png', '-i', '-',
     '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', f], {stdio: ['pipe', 'inherit', 'inherit']});
   const n = Math.round((dur - t0) * fps);
-  for (let i = 0; i < n; i++) {
+  const i0 = Math.floor(n * pi / pn), i1 = Math.floor(n * (pi + 1) / pn);
+  for (let i = i0; i < i1; i++) {
     await page.evaluate(t => window.seek(t), t0 + i / fps);
     const buf = await page.screenshot({type: 'png'});
     if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));

@@ -110,6 +110,7 @@ function buildDesk() {
     <rect width="1480" height="2320" filter="url(#gr)"/>
     <path d="${torn(430, 440, -1, 7)}" fill="#D8C09A"/><path d="${torn(410, 440, -1, 9)}" fill="#E4D2B0"/>
     <path d="${torn(2060, 300, 1, 11)}" fill="#D8C09A"/><path d="${torn(2085, 300, 1, 13)}" fill="${'#E2672B'}" opacity=".85"/><path d="${torn(2100, 300, 1, 15)}" fill="#E4D2B0"/></svg>`;
+  if (S && S.paper_grain) { const gr = document.createElement('div'); gr.style.cssText = 'position:absolute;inset:0;pointer-events:none;opacity:' + S.paper_grain + ';background-image:repeating-linear-gradient(90deg, rgba(90,60,30,.10) 0 13px, rgba(255,255,255,.08) 13px 31px),repeating-linear-gradient(0deg, rgba(90,60,30,.08) 0 11px, rgba(255,255,255,.06) 11px 27px)'; $('desk').appendChild(gr); }   // linen-paper weave on the desk (real paper, not a flat fill)
   $('tear').innerHTML = `<svg width="1160" height="80"><path d="${torn(60, 80, -1, 21, 1160).replace(/ Z$/, ' Z')}" fill="#D8C09A"/></svg>`;
 }
 
