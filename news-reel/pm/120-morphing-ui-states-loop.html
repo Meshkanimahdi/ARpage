@@ -26,12 +26,12 @@
   #shape { position: absolute; overflow: hidden; background: #fff; box-shadow: 0 30px 80px rgba(14,14,16,.12), 0 0 0 1px rgba(14,14,16,.05); }
   .ct { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
   #bgp { position: absolute; inset: -60px; background-size: cover; background-position: center; filter: blur(22px) saturate(.9); opacity: .55; }
-  #title { position: absolute; left: 50px; right: 50px; top: 90px; text-align: center; font: 900 92px/1.2 V; color: var(--ink); z-index: 5; }
+  #title { position: absolute; left: 50px; right: 50px; top: 50px; text-align: center; font: 900 92px/1.2 V; color: var(--ink); z-index: 5; }
   #title b { color: var(--acc); }
   #cursor { position: absolute; left: 0; top: 0; width: 58px; height: 58px; }
   #ring { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 6px solid var(--ink); }
   #sub { position: absolute; left: 60px; right: 60px; top: 1620px; display: flex; justify-content: center; }
-  #sub span.s { display: inline-block; background: var(--ink); color: #fff; font: 900 62px/1.3 V; padding: 10px 34px 18px; border-radius: 26px; }
+  #sub span.s { display: inline-block; background: var(--ink); color: #fff; font: 900 76px/1.3 V; padding: 10px 34px 18px; border-radius: 26px; }
   #sub b { color: #FFC53D; font-weight: 900; }
   #handle { position: absolute; left: 0; right: 0; top: 1800px; text-align: center; font: 500 34px V; color: var(--mu); direction: ltr; }
   .digit { display: inline-block; width: 136px; height: 210px; margin: 0 6px; border-radius: 30px; background: #F3F2EF; font: 900 128px/210px V; color: var(--ink); }
@@ -73,7 +73,7 @@ const GEO = {
 };
 function content(s, t, k) {   // k = 0..1 progress inside the state
   switch (s.kind) {
-    case 'call': return `<img src="${url('raw/' + s.img + '.png')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55">
+    case 'call': return `<img src="${url('raw/' + s.img + '.png')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55;transform:scale(${(1 + .15 * k).toFixed(4)})">
       <div class="ct" style="justify-content:flex-start;padding-top:90px;color:#fff"><div style="font:500 44px V;opacity:.85">${s.sub || 'تماس ورودی'}</div>
       <div style="margin-top:14px;font:900 96px V">${s.name}</div></div>
       <div style="position:absolute;left:0;right:0;bottom:80px;display:flex;justify-content:space-around">
@@ -114,15 +114,17 @@ function seek(t) {
   const k = spring(t - s.t0), sh = $('shape');
   const v = j => lerp(g0[j], g[j], i === 0 ? 1 : k);
   sh.style.cssText += `;left:${v(0).toFixed(1)}px;top:${v(1).toFixed(1)}px;width:${v(2).toFixed(1)}px;height:${v(3).toFixed(1)}px;border-radius:${v(4).toFixed(1)}px;background:${k > .5 || i === 0 ? g[5] : g0[5]}`;
-  const sw = i === 0 ? 1 : P(t, s.t0 + .05, s.t0 + .22), inner = clamp((t - s.t0) / Math.max(.6, s.t1 - s.t0));
+  const sw = i === 0 ? 1 : P(t, s.t0 + .02, s.t0 + .18), inner = clamp((t - s.t0) / Math.max(.6, s.t1 - s.t0));
   const band = s.img && s.kind !== 'call' ? `<img src="${url('raw/' + s.img + '.png')}" style="position:absolute;left:0;right:0;top:0;width:100%;height:42%;object-fit:cover">` : '';
-  sh.innerHTML = `<div style="position:absolute;inset:0;opacity:${sw.toFixed(3)};filter:blur(${(10 * (1 - sw)).toFixed(1)}px)">${band}<div style="position:absolute;left:0;right:0;bottom:0;top:${band ? '42%' : '0'}">${content(s, t, inner)}</div></div>`;
+  const out = i > 0 ? 1 - P(t, s.t0, s.t0 + .14) : 0, pb = prev.img && prev.kind !== 'call' ? `<img src="${url('raw/' + prev.img + '.png')}" style="position:absolute;left:0;right:0;top:0;width:100%;height:42%;object-fit:cover">` : '';
+  sh.innerHTML = (out > 0 ? `<div style="position:absolute;inset:0;opacity:${out.toFixed(3)};filter:blur(${(10 * (1 - out)).toFixed(1)}px)">${pb}<div style="position:absolute;left:0;right:0;bottom:0;top:${pb ? '42%' : '0'}">${content(prev, t, 1)}</div></div>` : '') +
+    `<div style="position:absolute;inset:0;opacity:${sw.toFixed(3)};filter:blur(${(10 * (1 - sw)).toFixed(1)}px)">${band}<div style="position:absolute;left:0;right:0;bottom:0;top:${band ? '42%' : '0'}">${content(s, t, inner)}</div></div>`;   // crossfade: old content out while the new one comes in, never an empty card
   let bi = i; while (bi > 0 && !ST[bi].img) bi--; const bimg = ST[bi].img; if ($('bgp').dataset.k !== bimg) { $('bgp').dataset.k = bimg; $('bgp').style.backgroundImage = bimg ? `url(${url('raw/' + bimg + '.png')})` : 'none'; }
   // camera: a gentle push toward the shape after each change, never a cut
   // camera: zooms so each state fills the frame (prompt rule), springing with the shape; a slow push inside the state
   const fit = q => { const z = Math.min(980 / q[2], 1380 / q[3], 2.4); return [z, q[0] + q[2] / 2, q[1] + q[3] / 2]; };
   const fa0 = fit(g0), fa1 = fit(g), kz = i === 0 ? 1 : k, last = i === ST.length - 1;
-  const push = (1 + (last ? .08 : .03) * P(t, s.t0, s.t1)) * (i === 0 ? lerp(1.2, 1, 1 - Math.pow(1 - P(t, 0, 1.4), 3)) : 1);   // opener push-in from frame 0; the end card keeps moving
+  const push = (1 + (last ? .08 : .03) * P(t, s.t0, s.t1)) * (i === 0 ? lerp(1.12, 1, 1 - Math.pow(1 - P(t, 0, 1.4), 3)) : 1);   // opener push-in from frame 0; the end card keeps moving
   const z = lerp(fa0[0], fa1[0], kz) * push, ccx = lerp(fa0[1], fa1[1], kz), ccy = lerp(fa0[2], fa1[2], kz);
   $('cam').style.transform = `translate(${(540 - ccx * z).toFixed(1)}px,${(930 - ccy * z).toFixed(1)}px) scale(${z.toFixed(4)})`;
   // the hook title: on screen from frame 0, leaves when the first state changes
