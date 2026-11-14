@@ -27,7 +27,7 @@
   .ct { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
   #bgp { position: absolute; inset: -60px; background-size: cover; background-position: center; filter: blur(22px) saturate(.9); opacity: .55; }
   #title { position: absolute; left: 50px; right: 50px; top: 50px; text-align: center; font: 900 92px/1.2 V; color: var(--ink); z-index: 5; }
-  #title b { color: var(--acc); }
+  #title b { color: #E8A317; }
   #cursor { position: absolute; left: 0; top: 0; width: 58px; height: 58px; }
   #ring { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 6px solid var(--ink); }
   #sub { position: absolute; left: 60px; right: 60px; top: 1620px; display: flex; justify-content: center; }
@@ -78,7 +78,7 @@ function content(s, t, k) {   // k = 0..1 progress inside the state
       <div style="margin-top:14px;font:900 96px V">${s.name}</div></div>
       <div style="position:absolute;left:0;right:0;bottom:80px;display:flex;justify-content:space-around">
         <div style="width:150px;height:150px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font:900 64px V;color:#fff">✕</div>
-        <div style="width:150px;height:150px;border-radius:50%;background:var(--ok);transform:scale(${(1 + .06 * Math.sin(t * 8)).toFixed(3)});display:flex;align-items:center;justify-content:center;font:900 64px V;color:#fff">✆</div></div>`;
+        <div style="width:150px;height:150px;border-radius:50%;background:var(--ok);transform:scale(${(1 + .13 * Math.abs(Math.sin(t * 5))).toFixed(3)});box-shadow:0 0 0 ${(30 * ((t * 1.6) % 1)).toFixed(1)}px rgba(31,157,85,${(.45 * (1 - (t * 1.6) % 1)).toFixed(3)});display:flex;align-items:center;justify-content:center;font:900 64px V;color:#fff">✆</div></div>`;
     case 'sms': return `<div class="ct" style="align-items:stretch;justify-content:flex-start;padding:46px 56px;text-align:right">
       <div style="display:flex;justify-content:space-between;font:900 44px V;color:var(--mu)"><span>${s.from}</span><span>الان</span></div>
       <div style="margin-top:${s.img ? 40 : 160}px;font:900 ${s.img ? 78 : 92}px/1.4 V;color:var(--ink)">${s.text}</div></div>`;
@@ -113,7 +113,9 @@ function seek(t) {
   const i = stateAt(t), s = ST[i], prev = ST[Math.max(0, i - 1)], g = GEO[s.kind], g0 = GEO[prev.kind];
   const k = spring(t - s.t0), sh = $('shape');
   const v = j => lerp(g0[j], g[j], i === 0 ? 1 : k);
+  const sq = i === 0 ? 0 : Math.exp(-7 * (t - s.t0)) * Math.sin(16 * (t - s.t0)) * .07;   // squash and stretch as the shape lands
   sh.style.cssText += `;left:${v(0).toFixed(1)}px;top:${v(1).toFixed(1)}px;width:${v(2).toFixed(1)}px;height:${v(3).toFixed(1)}px;border-radius:${v(4).toFixed(1)}px;background:${k > .5 || i === 0 ? g[5] : g0[5]}`;
+  sh.style.transform = `scale(${(1 + sq).toFixed(4)},${(1 - sq).toFixed(4)})`; sh.style.transformOrigin = '50% 50%';
   const sw = i === 0 ? 1 : P(t, s.t0 + .02, s.t0 + .18), inner = clamp((t - s.t0) / Math.max(.6, s.t1 - s.t0));
   const band = s.img && s.kind !== 'call' ? `<img src="${url('raw/' + s.img + '.png')}" style="position:absolute;left:0;right:0;top:0;width:100%;height:42%;object-fit:cover">` : '';
   const out = i > 0 ? 1 - P(t, s.t0, s.t0 + .14) : 0, pb = prev.img && prev.kind !== 'call' ? `<img src="${url('raw/' + prev.img + '.png')}" style="position:absolute;left:0;right:0;top:0;width:100%;height:42%;object-fit:cover">` : '';
@@ -133,7 +135,7 @@ function seek(t) {
   // cursor: travels to the next state's click point and clicks just before it
   const nx = ST[i + 1], cx0 = s.cx ?? 820, cy0 = s.cy ?? 1250;
   let cx = cx0, cy = cy0, press = 0;
-  if (nx) { const m = P(t, nx.t0 - .6, nx.t0 - .12), e = m < .5 ? 2 * m * m : 1 - Math.pow(-2 * m + 2, 2) / 2; cx = lerp(cx0, nx.cx ?? 540, e); cy = lerp(cy0, nx.cy ?? 900, e); press = P(t, nx.t0 - .12, nx.t0) * (1 - P(t, nx.t0, nx.t0 + .1)); }
+  if (nx) { const m = P(t, s.t0 + .15, nx.t0 - .12), e = m < .5 ? 2 * m * m : 1 - Math.pow(-2 * m + 2, 2) / 2; cx = lerp(cx0, nx.cx ?? 540, e); cy = lerp(cy0, nx.cy ?? 900, e); press = P(t, nx.t0 - .12, nx.t0) * (1 - P(t, nx.t0, nx.t0 + .1)); }
   $('cursor').style.transform = `translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px) scale(${(1 - .15 * press).toFixed(3)})`;
   const rk = P(t, s.t0, s.t0 + .45), r = $('ring'); r.style.left = (s.cx ?? 540) + 'px'; r.style.top = (s.cy ?? 900) + 'px';
   r.style.opacity = i ? (1 - rk) * .5 : 0; r.style.transform = `scale(${(.4 + rk).toFixed(3)})`;
