@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — one shape, many UI states (prompt 120)</title>
+<!-- Skill motion-graphy-2026, prompt 120 "Morphing UI states loop" (UI), built as its own engine.
+     Look from the prompt: Dribbble-level UI motion. One shape, never cut: every state is the same element morphing its
+     size, radius and colour while its content swaps with a short blur. A cursor drives every change with real clicks.
+     Light warm-gray canvas, black and white components, one clean UI font, one accent. Springs everywhere (closed-form
+     step responses, a tiny overshoot at most); something happens on every beat; the last frame returns to the first
+     shape so it loops. Banned kept: bouncy easing, particle bursts, glows, gradients on UI chrome, dead time.
+     Allowed edits (SKILL.md): 1440x1440 → 1080x1920, the state list → the story's own UI states (story.states),
+     Geist → Vazirmatn (Persian), the song → library music + per-state library sfx (page standard), captions on a
+     strip (RUNBOOK sound-off rule), the opening state may carry a real photo (RUNBOOK §4.0 rule 4).
+     Data: story.json {hook_title, states[{at:[beatId, word], kind: call|sms|code|balance|toast|button|rule|dial, …}],
+       beats[{id, text}], end_text, handle} + timeline.json; photos raw/<img>.png. Pure seek(t). -->
+<style>
+  @font-face { font-family: V; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-500-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --bg: #EDEBE6; --ink: #0E0E10; --mu: #77757D; --acc: #E5484D; --ok: #1F9D55; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+  #stage { position: absolute; inset: 0; overflow: hidden; font-family: V; background: var(--bg); direction: rtl; }
+  #cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0; }
+  #shape { position: absolute; overflow: hidden; background: #fff; box-shadow: 0 30px 80px rgba(14,14,16,.12), 0 0 0 1px rgba(14,14,16,.05); }
+  .ct { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  #bgp { position: absolute; inset: -60px; background-size: cover; background-position: center; filter: blur(22px) saturate(.9); opacity: .55; }
+  #title { position: absolute; left: 50px; right: 50px; top: 90px; text-align: center; font: 900 92px/1.2 V; color: var(--ink); z-index: 5; }
+  #title b { color: var(--acc); }
+  #cursor { position: absolute; left: 0; top: 0; width: 58px; height: 58px; }
+  #ring { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 6px solid var(--ink); }
+  #sub { position: absolute; left: 60px; right: 60px; top: 1620px; display: flex; justify-content: center; }
+  #sub span.s { display: inline-block; background: var(--ink); color: #fff; font: 900 62px/1.3 V; padding: 10px 34px 18px; border-radius: 26px; }
+  #sub b { color: #FFC53D; font-weight: 900; }
+  #handle { position: absolute; left: 0; right: 0; top: 1800px; text-align: center; font: 500 34px V; color: var(--mu); direction: ltr; }
+  .digit { display: inline-block; width: 136px; height: 210px; margin: 0 6px; border-radius: 30px; background: #F3F2EF; font: 900 128px/210px V; color: var(--ink); }
+  .btn { display: inline-block; padding: 18px 44px 26px; border-radius: 999px; font: 900 48px V; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bgp"></div><div id="title"></div><div id="cam"><div id="shape"></div>
+    <svg id="cursor" viewBox="0 0 58 58"><path d="M10 6 L10 46 L20 36 L28 54 L35 51 L27 33 L42 33 Z" fill="#0E0E10" stroke="#fff" stroke-width="3" stroke-linejoin="round"/></svg>
+    <div id="ring"></div></div>
+  <div id="sub"></div>
+  <div id="handle"></div>
+</div>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const url = s => s.startsWith('/') ? s : DIR + s;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), lerp = (a, b, k) => a + (b - a) * k, P = (t, a, b) => clamp((t - a) / (b - a));
+const strip = s => s.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/\|/g, ' ').trim();
+const fa = s => String(s).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const money = v => fa(Math.round(v).toLocaleString('en-US'));
+// closed-form spring step response: critically-damped-ish with a tiny overshoot (≈3%), settles in ~0.45 s
+const spring = dt => dt <= 0 ? 0 : 1 - Math.exp(-11 * dt) * (Math.cos(13 * dt) + .85 * Math.sin(13 * dt));
+let S, TL, BEATS = [], ST = [], END = 30, TE = 30, ISSUES = [], CUES = [];
+
+// geometry of the one shape per state kind (x, y, w, h, radius, background)
+const GEO = {
+  call:    [110, 600, 860, 1000, 72, '#111'],
+  sms:     [70, 380, 940, 1180, 64, '#fff'],
+  chat:    [70, 380, 940, 1180, 64, '#fff'],
+  code:    [60, 420, 960, 1100, 64, '#fff'],
+  loader:  [440, 760, 200, 200, 100, '#fff'],
+  balance: [90, 560, 900, 680, 64, '#fff'],
+  toast:   [110, 760, 860, 220, 110, '#0E0E10'],
+  rule:    [70, 420, 940, 1100, 120, '#fff'],
+  dial:    [120, 470, 840, 1060, 80, '#fff'],
+  button:  [80, 760, 920, 420, 210, '#0E0E10'],
+};
+function content(s, t, k) {   // k = 0..1 progress inside the state
+  switch (s.kind) {
+    case 'call': return `<img src="${url('raw/' + s.img + '.png')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55">
+      <div class="ct" style="justify-content:flex-start;padding-top:90px;color:#fff"><div style="font:500 44px V;opacity:.85">${s.sub || 'تماس ورودی'}</div>
+      <div style="margin-top:14px;font:900 96px V">${s.name}</div></div>
+      <div style="position:absolute;left:0;right:0;bottom:80px;display:flex;justify-content:space-around">
+        <div style="width:150px;height:150px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font:900 64px V;color:#fff">✕</div>
+        <div style="width:150px;height:150px;border-radius:50%;background:var(--ok);transform:scale(${(1 + .06 * Math.sin(t * 8)).toFixed(3)});display:flex;align-items:center;justify-content:center;font:900 64px V;color:#fff">✆</div></div>`;
+    case 'sms': return `<div class="ct" style="align-items:stretch;justify-content:flex-start;padding:46px 56px;text-align:right">
+      <div style="display:flex;justify-content:space-between;font:900 44px V;color:var(--mu)"><span>${s.from}</span><span>الان</span></div>
+      <div style="margin-top:${s.img ? 40 : 160}px;font:900 ${s.img ? 78 : 92}px/1.4 V;color:var(--ink)">${s.text}</div></div>`;
+    case 'chat': return `<div class="ct" style="align-items:stretch;justify-content:flex-start;padding:46px 50px;text-align:right">
+      <div style="font:900 44px V;color:var(--mu)">${s.from}</div>
+      <div style="margin-top:${s.img ? 30 : 120}px;align-self:flex-start;max-width:820px;padding:36px 46px 46px;border-radius:60px 60px 60px 16px;background:#F3F2EF;font:900 ${s.img ? 72 : 86}px/1.4 V;color:var(--ink)">${s.text}</div></div>`;
+    case 'code': { const n = Math.round(s.digits.length * clamp(k * 1.6)); return `<div class="ct"><div style="font:900 50px V;color:var(--mu);margin-bottom:34px">${s.label}</div>
+      <div dir="ltr">${[...s.digits].map((d, i) => `<span class="digit" style="${i < n ? '' : 'color:transparent'}">${fa(d)}</span>`).join('')}</div></div>`; }
+    case 'loader': return `<svg width="200" height="200" viewBox="0 0 200 200" style="position:absolute;inset:0"><circle cx="100" cy="100" r="62" fill="none" stroke="#E5E3DE" stroke-width="16"/>
+      <circle cx="100" cy="100" r="62" fill="none" stroke="#0E0E10" stroke-width="16" stroke-linecap="round" stroke-dasharray="120 300" transform="rotate(${(t * 520) % 360} 100 100)"/></svg>`;
+    case 'balance': { const v = lerp(s.from, s.to, clamp((k - .25) / .6) ** .7), red = v < s.from * .99;
+      return `<div class="ct"><div style="font:900 52px V;color:var(--mu)">${s.label}</div>
+      <div style="margin-top:20px;font:900 118px V;color:${red ? 'var(--acc)' : 'var(--ink)'};direction:ltr">${money(v)}</div><div style="font:900 50px V;color:var(--mu)">تومان</div>
+      <div style="margin:44px 70px 0;height:22px;border-radius:11px;background:#F3F2EF;width:760px"><div style="height:22px;border-radius:11px;background:${red ? 'var(--acc)' : 'var(--ink)'};width:${(760 * v / s.from).toFixed(0)}px"></div></div></div>`; }
+    case 'toast': return `<div class="ct" style="flex-direction:row;gap:26px;color:#fff;font:900 56px V"><span style="width:84px;height:84px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center">!</span>${s.text}</div>`;
+    case 'rule': { const on = P(t, s.t0 + .35, s.t0 + .6), kx = spring(t - s.t0 - .35);
+      return `<div class="ct" style="padding:0 70px">
+      <div style="font:900 54px V;color:var(--mu)">قانون ${fa(s.n)}</div><div style="margin:10px 0 40px;font:900 96px/1.25 V;color:var(--ink)">${s.text}</div>
+      <div style="flex:none;width:400px;height:220px;border-radius:110px;background:${on > .5 ? 'var(--ok)' : '#D9D7D1'};position:relative">
+        <div style="position:absolute;top:20px;left:${(20 + 180 * clamp(kx, 0, 1.03)).toFixed(1)}px;width:180px;height:180px;border-radius:50%;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.18)"></div></div></div>`; }
+    case 'dial': return `<div class="ct" style="justify-content:flex-start;padding-top:80px"><div style="font:900 50px V;color:var(--mu)">${s.label}</div>
+      <div style="margin-top:22px;font:900 128px V;color:var(--ink);direction:ltr">${fa(s.number)}</div>
+      <div style="margin-top:50px;display:grid;grid-template-columns:repeat(3,170px);gap:26px">${[1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, ''].map(d => `<div style="height:150px;border-radius:50%;background:${d === '' ? 'transparent' : '#F3F2EF'};font:900 70px/150px V">${d === '' ? '' : fa(d)}</div>`).join('')}</div>
+      <div style="margin-top:34px;width:160px;height:160px;border-radius:50%;background:var(--ok);display:flex;align-items:center;justify-content:center;font:900 70px V;color:#fff">✆</div></div>`;
+    case 'button': return `<div class="ct" style="color:#fff;font:900 88px/1.3 V;padding:0 50px">${s.text}</div>`;
+  }
+  ISSUES.push('unknown state ' + s.kind); return '';
+}
+function stateAt(t) { let i = 0; for (let k = 0; k < ST.length; k++) if (t >= ST[k].t0) i = k; return i; }
+
+function seek(t) {
+  const i = stateAt(t), s = ST[i], prev = ST[Math.max(0, i - 1)], g = GEO[s.kind], g0 = GEO[prev.kind];
+  const k = spring(t - s.t0), sh = $('shape');
+  const v = j => lerp(g0[j], g[j], i === 0 ? 1 : k);
+  sh.style.cssText += `;left:${v(0).toFixed(1)}px;top:${v(1).toFixed(1)}px;width:${v(2).toFixed(1)}px;height:${v(3).toFixed(1)}px;border-radius:${v(4).toFixed(1)}px;background:${k > .5 || i === 0 ? g[5] : g0[5]}`;
+  const sw = i === 0 ? 1 : P(t, s.t0 + .05, s.t0 + .22), inner = clamp((t - s.t0) / Math.max(.6, s.t1 - s.t0));
+  const band = s.img && s.kind !== 'call' ? `<img src="${url('raw/' + s.img + '.png')}" style="position:absolute;left:0;right:0;top:0;width:100%;height:42%;object-fit:cover">` : '';
+  sh.innerHTML = `<div style="position:absolute;inset:0;opacity:${sw.toFixed(3)};filter:blur(${(10 * (1 - sw)).toFixed(1)}px)">${band}<div style="position:absolute;left:0;right:0;bottom:0;top:${band ? '42%' : '0'}">${content(s, t, inner)}</div></div>`;
+  let bi = i; while (bi > 0 && !ST[bi].img) bi--; const bimg = ST[bi].img; if ($('bgp').dataset.k !== bimg) { $('bgp').dataset.k = bimg; $('bgp').style.backgroundImage = bimg ? `url(${url('raw/' + bimg + '.png')})` : 'none'; }
+  // camera: a gentle push toward the shape after each change, never a cut
+  // camera: zooms so each state fills the frame (prompt rule), springing with the shape; a slow push inside the state
+  const fit = q => { const z = Math.min(980 / q[2], 1380 / q[3], 2.4); return [z, q[0] + q[2] / 2, q[1] + q[3] / 2]; };
+  const fa0 = fit(g0), fa1 = fit(g), kz = i === 0 ? 1 : k, push = 1 + .03 * P(t, s.t0, s.t1);
+  const z = lerp(fa0[0], fa1[0], kz) * push, ccx = lerp(fa0[1], fa1[1], kz), ccy = lerp(fa0[2], fa1[2], kz);
+  $('cam').style.transform = `translate(${(540 - ccx * z).toFixed(1)}px,${(930 - ccy * z).toFixed(1)}px) scale(${z.toFixed(4)})`;
+  // the hook title: on screen from frame 0, leaves when the first state changes
+  const tt = $('title'); tt.style.opacity = (ST[1] ? 1 - P(t, ST[1].t0 - .3, ST[1].t0) : 1).toFixed(3);
+  tt.style.transform = `translateY(${(-40 * P(t, ST[1] ? ST[1].t0 - .3 : 99, ST[1] ? ST[1].t0 : 100)).toFixed(1)}px)`;
+  // cursor: travels to the next state's click point and clicks just before it
+  const nx = ST[i + 1], cx0 = s.cx ?? 820, cy0 = s.cy ?? 1250;
+  let cx = cx0, cy = cy0, press = 0;
+  if (nx) { const m = P(t, nx.t0 - .6, nx.t0 - .12), e = m < .5 ? 2 * m * m : 1 - Math.pow(-2 * m + 2, 2) / 2; cx = lerp(cx0, nx.cx ?? 540, e); cy = lerp(cy0, nx.cy ?? 900, e); press = P(t, nx.t0 - .12, nx.t0) * (1 - P(t, nx.t0, nx.t0 + .1)); }
+  $('cursor').style.transform = `translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px) scale(${(1 - .15 * press).toFixed(3)})`;
+  const rk = P(t, s.t0, s.t0 + .45), r = $('ring'); r.style.left = (s.cx ?? 540) + 'px'; r.style.top = (s.cy ?? 900) + 'px';
+  r.style.opacity = i ? (1 - rk) * .5 : 0; r.style.transform = `scale(${(.4 + rk).toFixed(3)})`;
+  // captions
+  const sub = $('sub'), b = BEATS.find(b => t >= b.L.start - .05 && t <= b.L.end + .2);
+  if (b && t < TE && t > (ST[1] ? ST[1].t0 - .3 : 0)) { const ci = b.chunks.findIndex(ch => t < b.wt(ch[ch.length - 1] + 1) + .05); const ch = b.chunks[ci < 0 ? b.chunks.length - 1 : ci];
+    sub.innerHTML = `<span class="s">${ch.map(j => b.shown[j].k ? `<b>${b.shown[j].w}</b>` : b.shown[j].w).join(' ')}</span>`; sub.style.opacity = 1; } else sub.style.opacity = 0;
+}
+
+window.ready = (async () => {
+  S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json();
+  const wtOf = {};
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) { ISSUES.push('no line ' + bt.id); continue; }
+    const shown = strip(bt.text).split(/\s+/).map(w => ({w: w.replace(/\*/g, ''), k: /\*/.test(w)}));
+    const wt = j => { const ws = L.words || []; if (!ws.length) return L.start + (L.end - L.start) * j / shown.length; const wi = Math.min(ws.length - 1, Math.round(j * (ws.length - 1) / Math.max(1, shown.length - 1))); return ws[wi][0]; };
+    const chunks = []; for (let j = 0; j < shown.length; j += 3) chunks.push([...Array(Math.min(3, shown.length - j)).keys()].map(q => q + j));
+    BEATS.push({bt, L, shown, wt, chunks}); wtOf[bt.id] = wt;
+  }
+  TE = TL.end_start; END = TL.total;
+  ST = S.states.map(s => Object.assign({}, s, {t0: s.at[0] === 'end' ? TE : (wtOf[s.at[0]] ? Math.max(0, wtOf[s.at[0]](s.at[1]) - .05) : (ISSUES.push('bad at ' + s.at), 0))}));
+  ST[0].t0 = 0; ST.sort((a, b) => a.t0 - b.t0); ST.forEach((s, i) => { s.t1 = i + 1 < ST.length ? ST[i + 1].t0 : END; });
+  const SND = {call: 'notify', sms: 'notify', chat: 'tap', code: 'typing', loader: 'tick', balance: 'counter_tick', toast: 'hit', rule: 'click', dial: 'tap', button: 'pop'};
+  ST.forEach((s, i) => { if (i) CUES.push([s.t0, SND[s.kind] || 'tap', .3]); });
+  $('title').innerHTML = (S.hook_title || '').replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>');
+  $('handle').textContent = S.handle || '@meshkani.pro';
+  await document.fonts.ready; await Promise.all(['500', '900'].map(w => document.fonts.load(`${w} 40px V`, 'آزمایش AI ۱۲۳')));
+  for (const s of S.states) if (s.img) await new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = url('raw/' + s.img + '.png'); });
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  window.SCENES = ST.map((s, i) => ({t0: s.t0, t1: s.t1, type: s.kind, bg: s.kind, sfx: i ? [] : CUES.map(c => [c[0], c[1], c[2]])}));
+  seek(0);
+})();
+window.seek = seek;
+</script>
+</body>
+</html>
