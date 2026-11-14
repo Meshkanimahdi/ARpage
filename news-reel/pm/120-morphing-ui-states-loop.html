@@ -103,7 +103,7 @@ function content(s, t, k) {   // k = 0..1 progress inside the state
       <div style="margin-top:22px;font:900 128px V;color:var(--ink);direction:ltr">${fa(s.number)}</div>
       <div style="margin-top:50px;display:grid;grid-template-columns:repeat(3,170px);gap:26px">${[1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, ''].map(d => `<div style="height:150px;border-radius:50%;background:${d === '' ? 'transparent' : '#F3F2EF'};font:900 70px/150px V">${d === '' ? '' : fa(d)}</div>`).join('')}</div>
       <div style="margin-top:34px;width:160px;height:160px;border-radius:50%;background:var(--ok);display:flex;align-items:center;justify-content:center;font:900 70px V;color:#fff">✆</div></div>`;
-    case 'button': return `<div class="ct" style="color:#fff;font:900 88px/1.3 V;padding:0 50px">${s.text}</div>`;
+    case 'button': return `<div class="ct" style="color:#fff;font:900 88px/1.3 V;padding:0 50px;transform:translateY(${(10 * Math.sin(t * 4)).toFixed(1)}px) scale(${(1 + .03 * Math.sin(t * 6)).toFixed(3)})">${s.text}</div>`;
   }
   ISSUES.push('unknown state ' + s.kind); return '';
 }
@@ -121,7 +121,8 @@ function seek(t) {
   // camera: a gentle push toward the shape after each change, never a cut
   // camera: zooms so each state fills the frame (prompt rule), springing with the shape; a slow push inside the state
   const fit = q => { const z = Math.min(980 / q[2], 1380 / q[3], 2.4); return [z, q[0] + q[2] / 2, q[1] + q[3] / 2]; };
-  const fa0 = fit(g0), fa1 = fit(g), kz = i === 0 ? 1 : k, push = 1 + .03 * P(t, s.t0, s.t1);
+  const fa0 = fit(g0), fa1 = fit(g), kz = i === 0 ? 1 : k, last = i === ST.length - 1;
+  const push = (1 + (last ? .08 : .03) * P(t, s.t0, s.t1)) * (i === 0 ? lerp(1.2, 1, 1 - Math.pow(1 - P(t, 0, 1.4), 3)) : 1);   // opener push-in from frame 0; the end card keeps moving
   const z = lerp(fa0[0], fa1[0], kz) * push, ccx = lerp(fa0[1], fa1[1], kz), ccy = lerp(fa0[2], fa1[2], kz);
   $('cam').style.transform = `translate(${(540 - ccx * z).toFixed(1)}px,${(930 - ccy * z).toFixed(1)}px) scale(${z.toFixed(4)})`;
   // the hook title: on screen from frame 0, leaves when the first state changes
