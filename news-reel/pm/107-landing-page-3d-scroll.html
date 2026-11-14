@@ -167,7 +167,12 @@ window.ready = (async () => {
     const wt = j => { const ws = L.words || []; if (!ws.length) return L.start + (L.end - L.start) * j / shown.length; const wi = Math.min(ws.length - 1, Math.round(j * (ws.length - 1) / Math.max(1, shown.length - 1))); return ws[wi][0]; };
     const chunks = []; for (let j = 0; j < shown.length; j += 3) chunks.push([...Array(Math.min(3, shown.length - j)).keys()].map(q => q + j));
     BEATS.push({bt, L, shown, wt, chunks});
-    const sc = secY[bt.sec]; if (!sc) ISSUES.push('unknown section ' + bt.sec); else { const fy = sc.y + (bt.focus != null ? bt.focus : Math.min(sc.h, 1500) * .45); KEYS.push([L.start - .3, fy], [Math.max(L.start, L.end - .45), fy + 140]); }   // hold the section while it is spoken, drift a little, then travel
+    const sc = secY[bt.sec]; if (!sc) ISSUES.push('unknown section ' + bt.sec); else { const fy = sc.y + (bt.focus != null ? bt.focus : Math.min(sc.h, 1500) * .45); let cur = Math.max(fy, KEYS.length ? KEYS[KEYS.length - 1][1] : fy); KEYS.push([L.start - .3, cur]);
+      // the camera glides quickly to each piece as it is named (a short fast travel, never back), then holds with a small drift
+      const cues = (bt.lift || []).map(([w, id]) => [wt(w), byId[id]]).filter(c => c[1]).sort((p, q) => p[0] - q[0]);
+      for (const [tw, o] of cues) { if (tw - .15 <= KEYS[KEYS.length - 1][0]) continue; const ny = Math.max(cur + 150, o.y + o.h / 2 - 120);
+        KEYS.push([tw - .15, cur + 25], [tw + .12, ny]); cur = ny; }
+      KEYS.push([Math.max(KEYS[KEYS.length - 1][0] + .2, L.end - .45), cur + 90]); }   // hold the section while it is spoken, drift a little, then travel
     for (const [w, id] of (bt.lift || [])) { const o = byId[id]; if (!o) { ISSUES.push('unknown piece ' + id); continue; } o.t0 = Math.min(o.t0, Math.max(0, wt(w) - .1)); CUES.push([o.t0, o.el.classList.contains('big') ? 'hit' : o.el.classList.contains('chip') ? 'pop' : 'tap', .3]); }
   }
   // pieces with no cue lift as the camera reaches them
