@@ -607,5 +607,26 @@
   "score": 1,
   "voice": "4D8rX5FMrycxXbF6iW0I",
   "date": "2026-11-13"
+ },
+ "CDC": {
+  "mode": "A",
+  "spoken": "CDC",
+  "score": 1,
+  "voice": "8Ebkg5uUcbSbeqGucAoR",
+  "date": "2026-11-14"
+ },
+ "ECDC": {
+  "mode": "A",
+  "spoken": "ECDC",
+  "score": 1,
+  "voice": "8Ebkg5uUcbSbeqGucAoR",
+  "date": "2026-11-14"
+ },
+ "concerned": {
+  "mode": "A",
+  "spoken": "concerned",
+  "score": 1,
+  "voice": "8Ebkg5uUcbSbeqGucAoR",
+  "date": "2026-11-14"
  }
 }

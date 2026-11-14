@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — 3D fly-over of a fact sheet (prompt 107)</title>
+<!-- Skill motion-graphy-2026, prompt 107 "Landing page 3D scroll" (3D), built as its own engine.
+     Look from the prompt: a page lies flat on a bright studio floor (#f9fbfb centre, #f2f3f6 corners) with a soft wide
+     shadow and 24px corners. One continuous camera, never a cut: it starts low over the hero and glides backwards down
+     the page at a steady speed while looking up it; cards, photos and chips lift off and stand up toward the lens as the
+     camera passes them; focus is thin in front of the subject (near edge melts) and almost none behind it. At the end it
+     rises straight overhead to show the whole page as one strip, dives into the hero and lands it as a card under a
+     two-line title (line 1 word by word, then an italic grey tail), a white badge pill on top.
+     Allowed edits (SKILL.md): 14.5 s → the voiced length, 1440x1152 → 1080x1920, the landing page → a Persian fact sheet
+     built from story.json (the story's own "page"), WebGL quads → CSS 3D planes (pure seek(t), page standard), the
+     track → library music + per-cut library sfx (page standard), captions on a strip (RUNBOOK sound-off rule).
+     Data: story.json {page{sections[{id, kind: hero|cards|big|tips, title?, img?, chips?[[id,text,tone]], cards?[[id,title,sub,tone,img?]],
+       big?, sub?, src?, items?[[id,text]]}]}, beats[{id, text, sec, lift?[[word, pieceId]]}], end_text, end_sub, handle}
+     + timeline.json; photos raw/<img>.png. Pure seek(t): every style is computed from t. -->
+<style>
+  @font-face { font-family: V; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-500-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --ink: #14171F; --mu: #6B7080; --acc: #E5484D; --ok: #12A150; --y: #F2B544; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #f2f3f6; }
+  #stage { position: absolute; inset: 0; overflow: hidden; font-family: V; background: radial-gradient(1100px 1500px at 50% 50%, #f9fbfb 0%, #f2f3f6 100%); }
+  #view { position: absolute; inset: 0; perspective: 1880px; perspective-origin: 540px 960px; }
+  #cam { position: absolute; left: 0; top: 0; width: 900px; transform-style: preserve-3d; transform-origin: 0 0; }
+  #page { position: absolute; left: 0; top: 0; width: 900px; background: #fff; border-radius: 24px; transform-style: preserve-3d;
+          box-shadow: 0 0 0 1px rgba(20,23,31,.04), 0 40px 160px rgba(20,23,31,.16); direction: rtl; }
+  .sec { position: absolute; left: 0; width: 900px; transform-style: preserve-3d; }
+  .pc { position: absolute; transform-style: preserve-3d; transform-origin: 50% 50%; }
+  .face { position: absolute; inset: 0; border-radius: 22px; overflow: hidden; }
+  .sh { position: absolute; inset: 0; border-radius: 22px; background: #1a2133; }
+  .ttl { position: absolute; left: 50px; right: 50px; font: 900 76px/1.25 V; color: var(--ink); text-align: right; }
+  .ttl b { color: var(--acc); font-weight: 900; }
+  .card .face { background: #fff; box-shadow: inset 0 0 0 3px #EEF0F4; padding: 30px 38px; box-sizing: border-box; }
+  .card h3 { margin: 0; font: 900 58px/1.25 V; color: var(--ink); }
+  .card p { margin: 10px 0 0; font: 500 40px/1.45 V; color: var(--mu); }
+  .chip .face { display: flex; align-items: center; justify-content: center; font: 900 50px V; white-space: nowrap; border-radius: 999px; }
+  .big .face { background: var(--ink); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .tip .face { background: #F3FBF6; box-shadow: inset 0 0 0 3px #CDEFD9; display: flex; align-items: center; gap: 26px; padding: 0 36px; box-sizing: border-box; font: 900 52px/1.3 V; color: var(--ink); }
+  .tip .ck { flex: none; width: 84px; height: 84px; border-radius: 50%; background: var(--ok); color: #fff; font: 900 56px/84px V; text-align: center; }
+  img.ph { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #sub { position: absolute; left: 60px; right: 60px; top: 1600px; display: flex; justify-content: center; direction: rtl; }
+  #sub span.s { display: inline-block; background: rgba(20,23,31,.88); color: #fff; font: 900 54px/1.3 V; padding: 10px 34px 18px; border-radius: 26px; }
+  #sub b { color: var(--y); font-weight: 900; }
+  #end { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+  #badge { position: absolute; left: 50%; top: 120px; transform: translateX(-50%); background: #fff; border-radius: 999px; padding: 10px 34px 16px;
+           font: 900 40px V; color: var(--ink); box-shadow: 0 10px 40px rgba(20,23,31,.12); direction: ltr; white-space: nowrap; }
+  #l1 { position: absolute; left: 60px; right: 60px; top: 230px; text-align: center; font: 900 92px/1.25 V; color: var(--ink); }
+  #l2 { position: absolute; left: 60px; right: 60px; top: 1500px; text-align: center; font: 500 64px/1.4 V; color: #8b8b92; font-style: italic; }
+  #l1 span, #l2 span { display: inline-block; margin: 0 10px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="view"><div id="cam"><div id="page"></div></div></div>
+  <div id="sub"></div>
+  <div id="end"><div id="badge"></div><div id="l1"></div><div id="l2"></div></div>
+</div>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const url = s => s.startsWith('/') ? s : DIR + s;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), lerp = (a, b, k) => a + (b - a) * k, P = (t, a, b) => clamp((t - a) / (b - a));
+const eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2, eo = k => 1 - Math.pow(1 - k, 3), ex = k => k >= 1 ? 1 : 1 - Math.pow(2, -10 * k);
+const strip = s => s.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/\|/g, ' ').trim();
+const FOC = 1880, TILT = 56 * Math.PI / 180, W = 900;
+let S, TL, PIECES = [], SECS = [], BEATS = [], KEYS = [], H = 0, END = 30, TE = 30, ISSUES = [], CUES = [];
+
+function el(tag, cls, parent, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; parent.appendChild(e); return e; }
+function piece(sec, id, cls, x, y, w, h, inner, lift = 30, stand = 30) {
+  const p = el('div', 'pc ' + cls, sec.el); p.style.cssText += `left:${x}px;top:${y}px;width:${w}px;height:${h}px`;
+  const sh = el('div', 'sh', p); const f = el('div', 'face', p, inner);
+  const o = {id, el: p, sh, face: f, x, y: sec.y + y, w, h, lift, stand, t0: Infinity, sec}; PIECES.push(o); return o;
+}
+const tone = t => ({red: ['#FDECEC', '#C9252B'], ink: ['#14171F', '#fff'], y: ['#FFF4DA', '#7A5200'], ok: ['#E7F7EE', '#0B7A3A']}[t] || ['#F1F3F7', '#14171F']);
+
+function build() {
+  const pg = $('page'); let y = 60;
+  for (const s of S.page.sections) {
+    const sec = {id: s.id, y, el: el('div', 'sec', pg)}; sec.el.style.top = y + 'px'; let h = 0;
+    if (s.kind === 'hero') {
+      piece(sec, s.id + '_img', 'photo', 40, 40, 820, 1000, `<img class="ph" src="${url('raw/' + s.img + '.png')}">`, 40, 34);
+      const t = el('div', 'ttl', sec.el, s.title.replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>')); t.style.top = '1080px'; t.style.fontSize = '66px';
+      (s.chips || []).forEach(([id, tx, tn], i) => { const [bg, fg] = tone(tn); piece(sec, id, 'chip', i % 2 ? 470 : 70, 1330 + Math.floor(i / 2) * 140, 360, 110, tx, 70 + 50 * (i % 2), 50).face.style.cssText += `background:${bg};color:${fg}`; });
+      h = 1330 + Math.ceil((s.chips || []).length / 2) * 140 + 40;
+    } else if (s.kind === 'cards') {
+      const t = el('div', 'ttl', sec.el, s.title.replace(/\*([^*]+)\*/g, '<b>$1</b>')); t.style.top = '0px'; let yy = 140;
+      (s.cards || []).forEach(([id, ti, sub, tn, img]) => { const [bg, fg] = tone(tn);
+        const hh = img ? 560 : 260, inner = (img ? `<img class="ph" style="height:300px;border-radius:16px;margin-bottom:18px" src="${url('raw/' + img + '.png')}">` : '') + `<h3 style="color:${fg === '#fff' ? '#fff' : fg}">${ti}</h3>` + (sub ? `<p>${sub}</p>` : '');
+        const o = piece(sec, id, 'card', 50, yy, 800, hh, inner, 40, 38); o.face.style.background = bg; if (tn === 'ink') o.face.querySelector('p') && (o.face.querySelector('p').style.color = '#C9CDD8'); yy += hh + 40; });
+      h = yy + 20;
+    } else if (s.kind === 'big') {
+      const t = el('div', 'ttl', sec.el, s.title.replace(/\*([^*]+)\*/g, '<b>$1</b>')); t.style.top = '0px';
+      piece(sec, s.id + '_big', 'big', 50, 140, 800, 620, `<div style="font:900 300px/1 V;color:var(--y)">${s.big}</div><div style="margin-top:20px;font:900 52px/1.35 V;text-align:center;padding:0 40px">${s.sub}</div>` + (s.src ? `<div style="margin-top:22px;font:500 32px V;color:#AEB3C2">${s.src}</div>` : ''), 60, 40);
+      h = 820;
+    } else if (s.kind === 'tips') {
+      const t = el('div', 'ttl', sec.el, s.title.replace(/\*([^*]+)\*/g, '<b>$1</b>')); t.style.top = '0px'; let yy = 150;
+      (s.items || []).forEach(([id, tx], i) => { piece(sec, id, 'tip', 50, yy, 800, 210, `<span class="ck">${'۱۲۳۴۵'[i]}</span><span>${tx}</span>`, 22 + 30 * i, 30); yy += 250; });
+      h = yy + 40;
+    }
+    sec.h = h; sec.el.style.height = h + 'px'; SECS.push(sec); y += h + 120;
+  }
+  H = y; $('page').style.height = H + 'px';
+}
+
+// camera: (camY = page y under the look-at point, tilt, distance)
+function project(px, py, pz, c) {   // page point → screen (x, y, scale, depth)
+  const x = px - W / 2, y = py - c.y, z = pz;
+  const ca = Math.cos(c.tilt), sa = Math.sin(c.tilt);
+  const y2 = y * ca - z * sa, z2 = y * sa + z * ca - c.d;   // rotateX(+tilt): +y (further down the page) comes toward the lens
+  const sc = FOC / (FOC - z2);
+  return {x: 540 + x * sc, y: 960 + y2 * sc, sc, depth: FOC - z2};
+}
+function camAt(t) {
+  if (t < TE) {   // monotone glide through the beat keys (never stops, never reverses)
+    let i = 0; for (let k = 0; k < KEYS.length; k++) if (t >= KEYS[k][0]) i = k;
+    const a = KEYS[i], b = KEYS[Math.min(i + 1, KEYS.length - 1)];
+    const k = b[0] > a[0] ? P(t, a[0], b[0]) : 1, e = .35 * k + .65 * eio(k);
+    return {y: lerp(a[1], b[1], e), tilt: TILT, d: lerp(-120, 220, clamp(t / TE)), z: 1};
+  }
+  const r = P(t, TE, TE + .7), dv = P(t, TE + .75, TE + 1.15), last = KEYS[KEYS.length - 1][1];
+  const fitD = FOC * (H / 1500 - 1);              // distance that shows the whole page as one strip
+  const heroY = SECS[0].y + 40 + 500, heroD = FOC * (900 / 1010 - 1);
+  let c = {y: lerp(last, H / 2, eio(r)), tilt: lerp(TILT, 0, eio(r)), d: Math.exp(lerp(Math.log(400), Math.log(400 + fitD), eio(r))) - 400 + 220 * (1 - r)};
+  if (dv > 0) { const e = eio(dv); c = {y: lerp(H / 2, heroY - 160, e), tilt: 0, d: Math.exp(lerp(Math.log(400 + fitD), Math.log(Math.max(1, 400 + heroD)), e)) - 400}; }
+  c.d += -40 * P(t, TE + 1.15, END);   // hold: creep 2% closer
+  return c;
+}
+
+function seek(t) {
+  const c = camAt(t);
+  $('cam').style.transform = `translate3d(540px,960px,${-c.d}px) rotateX(${c.tilt}rad) translate3d(${-W / 2}px,${-c.y}px,0)`;
+  // pieces: lift at their cue, stand up toward the lens as the camera passes them; shadow on the page
+  for (const o of PIECES) {
+    const k = ex(P(t, o.t0, o.t0 + .7)), pass = t < TE ? clamp(1 - Math.abs(o.y + o.h / 2 - c.y) / 900) : 0;
+    const z = (o.lift * .3 + o.lift * .7 * k), ang = o.stand * eo(clamp(k * .4 + pass * .8)) * (t < TE ? 1 : 1 - P(t, TE, TE + .5));
+    o.el.style.transform = `translateZ(${z.toFixed(1)}px) rotateX(${(-ang).toFixed(2)}deg)`;
+    o.sh.style.transform = `translate3d(${(.10 * z).toFixed(1)}px,${(4 + .36 * z).toFixed(1)}px,${(-z).toFixed(1)}px)`;
+    o.sh.style.filter = `blur(${(7 + .5 * z).toFixed(1)}px)`; o.sh.style.opacity = .26;
+    o.face.style.opacity = o.t0 === Infinity ? 1 : (.55 + .45 * k);
+  }
+  // depth of field per section: blur near the lens (bottom of frame), almost none behind
+  const dofOn = t < TE + .5;
+  for (const s of SECS) { const p = project(W / 2, s.y + s.h / 2, 0, c), near = (p.y - 1180) / 26, far = (520 - p.y) / 260;
+    const b = dofOn ? clamp(Math.max(near, far, 0), 0, 18) : 0; s.el.style.filter = b > .4 ? `blur(${b.toFixed(1)}px)` : ''; }
+  // captions: the spoken chunk on a strip (sound-off viewers), hidden on the end card
+  const sub = $('sub'), b = BEATS.find(b => t >= b.L.start - .05 && t <= b.L.end + .2);
+  if (b && t < TE) { const ci = b.chunks.findIndex(ch => t < b.wt(ch[ch.length - 1] + 1) + .05); const ch = b.chunks[ci < 0 ? b.chunks.length - 1 : ci];
+    sub.innerHTML = `<span class="s">${ch.map(i => b.shown[i].k ? `<b>${b.shown[i].w}</b>` : b.shown[i].w).join(' ')}</span>`; sub.style.opacity = 1; } else sub.style.opacity = 0;
+  // end card: badge, line 1 word by word, italic grey tail word by word (each rising out of a blur)
+  const E = $('end'), te = TE + 1.15; E.style.opacity = t >= te - .05 ? 1 : 0;
+  $('badge').style.opacity = P(t, te + .05, te + .35);
+  [['l1', te + .15, .06], ['l2', te + .4, .05]].forEach(([id, t0, dt]) => $(id).querySelectorAll('span').forEach((sp, i) => { const k = P(t, t0 + i * dt, t0 + i * dt + .34);
+    sp.style.opacity = k; sp.style.transform = `translateY(${(16 * (1 - eo(k))).toFixed(1)}px)`; sp.style.filter = k < 1 ? `blur(${(12 * (1 - k)).toFixed(1)}px)` : ''; }));
+}
+
+window.ready = (async () => {
+  S = await (await fetch(url('story.json'))).json(); TL = await (await fetch(url('timeline.json'))).json();
+  build();
+  const byId = Object.fromEntries(PIECES.map(o => [o.id, o])), secY = Object.fromEntries(SECS.map(s => [s.id, s]));
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) { ISSUES.push('no timeline line ' + bt.id); continue; }
+    const shown = strip(bt.text).split(/\s+/).map(w => ({w: w.replace(/\*/g, ''), k: /\*/.test(w)}));
+    const wt = j => { const ws = L.words || []; if (!ws.length) return L.start + (L.end - L.start) * j / shown.length; const wi = Math.min(ws.length - 1, Math.round(j * (ws.length - 1) / Math.max(1, shown.length - 1))); return ws[wi][0]; };
+    const chunks = []; for (let j = 0; j < shown.length; j += 3) chunks.push([...Array(Math.min(3, shown.length - j)).keys()].map(q => q + j));
+    BEATS.push({bt, L, shown, wt, chunks});
+    const sc = secY[bt.sec]; if (!sc) ISSUES.push('unknown section ' + bt.sec); else { const fy = sc.y + (bt.focus != null ? bt.focus : Math.min(sc.h, 1500) * .45); KEYS.push([L.start - .3, fy], [Math.max(L.start, L.end - .45), fy + 140]); }   // hold the section while it is spoken, drift a little, then travel
+    for (const [w, id] of (bt.lift || [])) { const o = byId[id]; if (!o) { ISSUES.push('unknown piece ' + id); continue; } o.t0 = Math.min(o.t0, Math.max(0, wt(w) - .1)); CUES.push([o.t0, o.el.classList.contains('big') ? 'hit' : o.el.classList.contains('chip') ? 'pop' : 'tap', .3]); }
+  }
+  // pieces with no cue lift as the camera reaches them
+  KEYS.sort((a, b) => a[0] - b[0]); if (KEYS.length) KEYS.unshift([-1, KEYS[0][1] - 120]);
+  for (const o of PIECES) if (o.t0 === Infinity) { const k = KEYS.find(k => k[1] >= o.y - 300); o.t0 = k ? Math.max(0, k[0] + .5) : 0; }
+  TE = TL.end_start; END = TL.total; KEYS.push([TE, Math.max(KEYS[KEYS.length - 1][1] + 200, KEYS[KEYS.length - 1][1])]);
+  // end card text
+  $('badge').textContent = S.handle || '@meshkani.pro';
+  const words = s => strip(s || '').split(/\s+/).map(w => `<span>${w.replace(/\*([^*]+)\*/g, '<b style="color:var(--acc)">$1</b>').replace(/\*/g, '')}</span>`).join('');
+  $('l1').innerHTML = words(S.end_text); $('l2').innerHTML = words(S.end_sub);
+  CUES.push([TE + .1, 'sweep_soft', .26], [TE + 1.15, 'glass_ping', .3]);
+  await document.fonts.ready; await Promise.all(['500', '900'].map(w => document.fonts.load(`${w} 40px V`, 'آزمایش AI')));
+  await Promise.all([...document.images].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; })));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  window.SCENES = BEATS.map((b, i) => ({t0: b.L.start, t1: i + 1 < BEATS.length ? BEATS[i + 1].L.start : TE, type: 'fly', bg: b.bt.sec, sfx: i ? [] : CUES.map(c => [c[0], c[1], c[2]])}))
+    .concat([{t0: TE, t1: END, type: 'end', bg: 'end', sfx: []}]);
+  seek(0);
+})();
+window.seek = seek;
+</script>
+</body>
+</html>
