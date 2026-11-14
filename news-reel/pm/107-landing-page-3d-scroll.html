@@ -43,7 +43,7 @@
   .tip .ck { flex: none; width: 84px; height: 84px; border-radius: 50%; background: var(--ok); color: #fff; font: 900 56px/84px V; text-align: center; }
   img.ph { width: 100%; height: 100%; object-fit: cover; display: block; }
   #sub { position: absolute; left: 60px; right: 60px; top: 1600px; display: flex; justify-content: center; direction: rtl; }
-  #sub span.s { display: inline-block; background: rgba(20,23,31,.88); color: #fff; font: 900 54px/1.3 V; padding: 10px 34px 18px; border-radius: 26px; }
+  #sub span.s { display: inline-block; background: rgba(20,23,31,.88); color: #fff; font: 900 64px/1.3 V; padding: 10px 34px 18px; border-radius: 26px; }
   #sub b { color: var(--y); font-weight: 900; }
   #end { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
   #badge { position: absolute; left: 50%; top: 120px; transform: translateX(-50%); background: #fff; border-radius: 999px; padding: 10px 34px 16px;
@@ -82,7 +82,7 @@ function build() {
   for (const s of S.page.sections) {
     const sec = {id: s.id, y, el: el('div', 'sec', pg)}; sec.el.style.top = y + 'px'; let h = 0;
     if (s.kind === 'hero') {
-      piece(sec, s.id + '_img', 'photo', 40, 40, 820, 1000, `<img class="ph" src="${url('raw/' + s.img + '.png')}">`, 40, 34);
+      piece(sec, s.id + '_img', 'photo', 40, 40, 820, 1000, `<img class="ph" src="${url('raw/' + s.img + '.png')}"><div style="position:absolute;left:0;right:0;top:0;height:420px;background:linear-gradient(rgba(10,12,18,.72),rgba(10,12,18,0))"></div><div style="position:absolute;left:30px;right:30px;top:46px;text-align:center;font:900 92px/1.22 V;color:#fff;text-shadow:0 4px 18px rgba(0,0,0,.5)">${s.title.replace(/\*([^*]+)\*/g, '<span style="color:#F2B544">$1</span>').replace(/\|/g, '<br>')}</div>`, 40, 34);
       const t = el('div', 'ttl', sec.el, s.title.replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>')); t.style.top = '1080px'; t.style.fontSize = '66px';
       (s.chips || []).forEach(([id, tx, tn], i) => { const [bg, fg] = tone(tn); piece(sec, id, 'chip', i % 2 ? 470 : 70, 1330 + Math.floor(i / 2) * 140, 360, 110, tx, 70 + 50 * (i % 2), 50).face.style.cssText += `background:${bg};color:${fg}`; });
       h = 1330 + Math.ceil((s.chips || []).length / 2) * 140 + 40;
@@ -119,13 +119,15 @@ function camAt(t) {
     let i = 0; for (let k = 0; k < KEYS.length; k++) if (t >= KEYS[k][0]) i = k;
     const a = KEYS[i], b = KEYS[Math.min(i + 1, KEYS.length - 1)];
     const k = b[0] > a[0] ? P(t, a[0], b[0]) : 1, e = .35 * k + .65 * eio(k);
-    return {y: lerp(a[1], b[1], e), tilt: TILT, d: lerp(-120, 220, clamp(t / TE)), z: 1};
+    const g = {y: lerp(a[1], b[1], e), tilt: TILT, d: lerp(-120, 220, clamp(t / TE)), z: 1};
+    const op = eio(P(t, .35, 1.8)); if (op < 1) { const hy = SECS[0].y + 40 + 500; g.y = lerp(hy, g.y, op); g.tilt = lerp(0, TILT, op); g.d = lerp(FOC * (900 / 1080 - 1) - 60 - 40 * clamp(t / .35), g.d, op); }   // opener: photo card fills the frame, then the camera pulls back onto the floor
+    return g;
   }
   const r = P(t, TE, TE + .7), dv = P(t, TE + .75, TE + 1.15), last = KEYS[KEYS.length - 1][1];
-  const fitD = FOC * (H / 1500 - 1);              // distance that shows the whole page as one strip
+  const fitD = FOC * (Math.min(H, 3600) / 1500 - 1);   // rise until about a third of the sheet shows
   const heroY = SECS[0].y + 40 + 500, heroD = FOC * (900 / 1010 - 1);
-  let c = {y: lerp(last, H / 2, eio(r)), tilt: lerp(TILT, 0, eio(r)), d: Math.exp(lerp(Math.log(400), Math.log(400 + fitD), eio(r))) - 400 + 220 * (1 - r)};
-  if (dv > 0) { const e = eio(dv); c = {y: lerp(H / 2, heroY - 160, e), tilt: 0, d: Math.exp(lerp(Math.log(400 + fitD), Math.log(Math.max(1, 400 + heroD)), e)) - 400}; }
+  let c = {y: lerp(last, Math.max(heroY, last - 1600), eio(r)), tilt: lerp(TILT, 0, eio(r)), d: Math.exp(lerp(Math.log(400), Math.log(400 + fitD), eio(r))) - 400 + 220 * (1 - r)};
+  if (dv > 0) { const e = eio(dv); c = {y: lerp(Math.max(heroY, last - 1600), heroY - 160, e), tilt: 0, d: Math.exp(lerp(Math.log(400 + fitD), Math.log(Math.max(1, 400 + heroD)), e)) - 400}; }
   c.d += -40 * P(t, TE + 1.15, END);   // hold: creep 2% closer
   return c;
 }
@@ -136,16 +138,16 @@ function seek(t) {
   // pieces: lift at their cue, stand up toward the lens as the camera passes them; shadow on the page
   for (const o of PIECES) {
     const k = ex(P(t, o.t0, o.t0 + .7)), pass = t < TE ? clamp(1 - Math.abs(o.y + o.h / 2 - c.y) / 900) : 0;
-    const z = (o.lift * .3 + o.lift * .7 * k), ang = o.stand * eo(clamp(k * .4 + pass * .8)) * (t < TE ? 1 : 1 - P(t, TE, TE + .5));
+    const z = (o.lift * .3 + o.lift * .7 * k), ang = o.stand * eo(clamp(k * .4 + pass * .8)) * (t < TE ? 1 : 1 - P(t, TE, TE + .5)) * eio(P(t, .6, 1.8));   // flat while the camera is flat over the opener
     o.el.style.transform = `translateZ(${z.toFixed(1)}px) rotateX(${(-ang).toFixed(2)}deg)`;
     o.sh.style.transform = `translate3d(${(.10 * z).toFixed(1)}px,${(4 + .36 * z).toFixed(1)}px,${(-z).toFixed(1)}px)`;
     o.sh.style.filter = `blur(${(7 + .5 * z).toFixed(1)}px)`; o.sh.style.opacity = .26;
-    o.face.style.opacity = o.t0 === Infinity ? 1 : (.55 + .45 * k);
+    o.face.style.opacity = o.cued ? (.55 + .45 * k) : 1;
   }
   // depth of field per section: blur near the lens (bottom of frame), almost none behind
-  const dofOn = t < TE + .5;
+  const dofOn = t < TE + .5, dofK = P(t, 1.2, 2.0);   // no blur while the opener card fills the frame
   for (const s of SECS) { const p = project(W / 2, s.y + s.h / 2, 0, c), near = (p.y - 1180) / 26, far = (520 - p.y) / 260;
-    const b = dofOn ? clamp(Math.max(near, far, 0), 0, 18) : 0; s.el.style.filter = b > .4 ? `blur(${b.toFixed(1)}px)` : ''; }
+    const b = dofOn ? clamp(Math.max(near, far, 0), 0, 18) * dofK : 0; s.el.style.filter = b > .4 ? `blur(${b.toFixed(1)}px)` : ''; }
   // captions: the spoken chunk on a strip (sound-off viewers), hidden on the end card
   const sub = $('sub'), b = BEATS.find(b => t >= b.L.start - .05 && t <= b.L.end + .2);
   if (b && t < TE) { const ci = b.chunks.findIndex(ch => t < b.wt(ch[ch.length - 1] + 1) + .05); const ch = b.chunks[ci < 0 ? b.chunks.length - 1 : ci];
@@ -173,7 +175,7 @@ window.ready = (async () => {
       for (const [tw, o] of cues) { if (tw - .15 <= KEYS[KEYS.length - 1][0]) continue; const ny = Math.max(cur + 150, o.y + o.h / 2 - 120);
         KEYS.push([tw - .15, cur + 25], [tw + .12, ny]); cur = ny; }
       KEYS.push([Math.max(KEYS[KEYS.length - 1][0] + .2, L.end - .45), cur + 90]); }   // hold the section while it is spoken, drift a little, then travel
-    for (const [w, id] of (bt.lift || [])) { const o = byId[id]; if (!o) { ISSUES.push('unknown piece ' + id); continue; } o.t0 = Math.min(o.t0, Math.max(0, wt(w) - .1)); CUES.push([o.t0, o.el.classList.contains('big') ? 'hit' : o.el.classList.contains('chip') ? 'pop' : 'tap', .3]); }
+    for (const [w, id] of (bt.lift || [])) { const o = byId[id]; if (!o) { ISSUES.push('unknown piece ' + id); continue; } o.t0 = Math.min(o.t0, Math.max(0, wt(w) - .1)); o.cued = true; CUES.push([o.t0, o.el.classList.contains('big') ? 'hit' : o.el.classList.contains('chip') ? 'pop' : 'tap', .3]); }
   }
   // pieces with no cue lift as the camera reaches them
   KEYS.sort((a, b) => a[0] - b[0]); if (KEYS.length) KEYS.unshift([-1, KEYS[0][1] - 120]);
