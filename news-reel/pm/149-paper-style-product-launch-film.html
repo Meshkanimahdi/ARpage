@@ -275,8 +275,71 @@ function scene43(b, t, u, ink, dark) {
   return null;
 }
 
+// ===== REEL-057 (blackout: the pump stops, the water goes too) =====
+function scene57(b, t, u, ink, dark) {
+  const s = b.sc, A = b.a;
+  switch (s.type) {
+    case 'pw_hook': {
+      // frame 0: the dark-kitchen print, headline on paper from frame 0; the paper flips dark at 0.6 s (the power cut);
+      // the «هیچی!» tag drops with gravity on its word, a red X strikes the tap, the recipient tag drops on its phrase
+      const tn = W(b, s, 0, A + 1.4), ts = W(b, s, 1, A + 3), off = pr(t, .5, .8);
+      let r = `<div style="position:absolute;inset:0;background:#1B1A18;opacity:${(off * .92).toFixed(2)}"></div>`;
+      r += bigWord('برق رفت؟', 110, 120, off > .5 ? '#F3EEE4' : ink, 1) + bigWord('<span style="color:var(--a1)">آب</span> هم می‌ره!', 250, 130, off > .5 ? '#F3EEE4' : ink, 1);
+      r += print(s.img, 90, 470, 900, -2, 1, mix(1.18, 1.0, ez.out(pr(t, 0, 2.2))), '50% 55%');
+      r += tagDrop('هیچی!', 360, t, tn - .15, 1260, '#E5322D', '#fff', -6);
+      r += svg(markerPath('M 300 760 L 600 1060', pr(t, tn, tn + .25), '#E5322D', 26) + markerPath('M 600 760 L 300 1060', pr(t, tn + .15, tn + .4), '#E5322D', 26));
+      r += tagDrop('بفرست برای مدیر ساختمون', 150, t, ts - .1, 1500, '#FFE14D', 'var(--ink)', 3);
+      return r;
+    }
+    case 'pw_pump': {
+      const tw = W(b, s, 0, A + 1), tp = W(b, s, 1, A + 2);
+      let r = print(s.img, 300, 380, 640, 4, pr(t, A, A + .4), mix(1.05, 1.22, pr(t, A, b.b)), '50% 55%');
+      r += svg(`<g transform="translate(170 760)"><rect x="-60" y="-80" width="120" height="160" rx="20" fill="#D8D2C6"/><circle cx="-24" cy="-20" r="12" fill="#1B1A18"/><circle cx="24" cy="-20" r="12" fill="#1B1A18"/></g>` + markerPath('M 230 760 C 280 700, 300 660, 330 640', pr(t, tw - .1, tw + .4), 'var(--a1)', 14));
+      r += stickyAt('پمپ خاموش', 120, 1150, '#FFB4A2', pr(t, tp - .1, tp + .3), -5);
+      r += handNote('سخنگوی آبفای استان تهران', 420, 1340, pr(t, A + .4, A + 1.2), ink, -2, 54);
+      return r + bigWord('قطع برق = قطع پمپ', 160, 104, ink, pr(t, A, A + .45));
+    }
+    case 'pw_app': {
+      const tb = W(b, s, 0, A + .8), tf = W(b, s, 1, A + 2);
+      let r = print(s.img, 330, 380, 600, -4, pr(t, A, A + .4), mix(1.05, 1.18, pr(t, A, b.b)), '50% 50%');
+      r += bigWord(fa(1), 120, 240, 'var(--a1)', pr(t, A - .05, A + .35));
+      r += tagDrop('«برق من»', 100, t, tb - .1, 900, 'var(--a2)', '#fff', -4);
+      r += tagDrop('رایگان · رسمی', 120, t, tf - .1, 1060, '#BFE3C0', 'var(--ink)', 3);
+      r += handNote('جدول کانال‌ها رسمی نیست', 300, 1260, pr(t, Math.min(tf - .6, b.wt(10)), Math.min(tf + .2, b.wt(10) + .8)), 'var(--a1)', -3, 64);
+      return r + svg(markerPath('M 330 1340 C 500 1370, 760 1330, 930 1350', pr(t, tf + .6, tf + 1.1), 'var(--a1)', 12));
+    }
+    case 'pw_fill': {
+      const tb = W(b, s, 0, A + .8);
+      let r = print(s.img, 180, 360, 720, 3, pr(t, A, A + .4), mix(1.02, 1.16, pr(t, A, b.b)), '50% 50%');
+      r += bigWord(fa(2), 120, 240, 'var(--a1)', pr(t, A - .05, A + .35));
+      ['بطری', 'بطری', 'قابلمه'].forEach((w, i) => { r += tagDrop(w, 90 + i * 320, t, tb + i * .25, 1270 - i * 20, ['#C4D5EE', '#C4D5EE', '#FFE14D'][i], 'var(--ink)', [-5, 3, -2][i]); });
+      r += handNote('قبل از ساعت خاموشی', 260, 1470, pr(t, A + .5, A + 1.3), 'var(--a2)', -3, 70);
+      return r;
+    }
+    case 'pw_valve': {
+      const tv = W(b, s, 0, A + .8), tt = W(b, s, 1, A + 2.5), flip = pr(t, tt - .15, tt + .3);
+      let r = print(s.img, 150, 380, 780, -3, pr(t, A, A + .4), mix(1.05, 1.2, pr(t, A, tt)), '50% 55%');
+      if (flip > 0) r += `<div style="position:absolute;left:0;top:0;width:1080px;height:1920px;clip-path:inset(0 0 0 ${((1 - ez.out(flip)) * 100).toFixed(1)}%)">${print(s.img2, 150, 380, 780, 2, 1, mix(1.0, 1.12, pr(t, tt, b.b)), '50% 45%')}</div>`;
+      r += bigWord(fa(3), 120, 240, 'var(--a1)', pr(t, A - .05, A + .35));
+      r += tagDrop('شیر یک‌طرفه', 110, t, tv - .1, 1200, 'var(--a2)', '#fff', -4);
+      r += tagDrop('مخزن ۲۴ ساعته', 520, t, tt - .1, 1250, '#FFE14D', 'var(--ink)', 3);
+      r += svg(markerPath('M 960 1300 L 960 760 M 930 800 L 960 760 L 990 800', pr(t, tv + .2, tv + .8), 'var(--a1)', 14));
+      return r;
+    }
+    case 'pw_ask': {
+      let r = '';
+      [['اپ برق من', '#FFE14D'], ['آب ذخیره', '#BFE3C0'], ['مخزن؟', '#C4D5EE']].forEach(([n, c], i) => { const bo = Math.abs(Math.sin((t - A) * 4 + i)) * 40; r += stickyAt(n, 60 + i * 340, 420 - bo, c, pr(t, A + i * .15, A + .4 + i * .15), [-6, 4, -3][i]); });
+      const tw = W(b, s, 0, A + .8); r += bigWord('ساختمون شما مخزن داره؟', 860, 96, 'var(--a1)', pr(t, A + .2, A + .6));
+      r += tagDrop('تو کامنت بگو 👇', 300, t, tw - .1, 1180, 'var(--a2)', '#fff', -3);
+      return r + svg(markerPath('M 240 1400 C 400 1300, 640 1330, 840 1230', pr(t, tw + .3, tw + .9), ink, 12));
+    }
+  }
+  return null;
+}
+
 function scene(b, t, u, ink, dark) {
   const s = b.sc;
+  { const r57 = scene57(b, t, u, ink, dark); if (r57 !== null) return r57; }
   { const r43 = scene43(b, t, u, ink, dark); if (r43 !== null) return r43; }
   switch (s.type) {
     case 'hook': {
