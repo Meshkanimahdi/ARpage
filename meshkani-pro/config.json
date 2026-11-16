@@ -112,7 +112,7 @@
     },
     "postboard": {
       "request_size": "2560x3200",
-      "fallback_aspect_ratio": "4:5",
+      "fallback_aspect_ratio": "3:4",
       "final": [
         2560,
         3200
