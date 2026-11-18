@@ -100,8 +100,19 @@ def lint(d, kind, hist_path):
         else:
             fam = json.loads((HERE / 'pm' / 'families.json').read_text())['family']
             mine = fam.get(pid, pid)
-            used = [fam.get(x.get('prompt', '').split('-')[0], x.get('prompt', '').split('-')[0]) for x in hist[-10:]]
-            if mine in used: f.append(f'motion prompt {pid} (family {mine}) was used in the last 10 reels')
+            used = [fam.get(x.get('prompt', '').split('-')[0], x.get('prompt', '').split('-')[0]) for x in hist[-14:]]
+            if mine in used: f.append(f'motion prompt {pid} (family {mine}) was used in the last 14 reels')
+            # user rule 2026-11-18 (RUNBOOK §00.24): plate-led looks (hand-made, story, editorial) at most 1 reel in 4;
+            # and 1 reel in 4 runs on a newly built engine from an unused catalog prompt, until 40 engines exist
+            PLATE = ('HAND', 'STORY', 'EDIT')
+            if (m.get('category') or '').upper() in PLATE and any((x.get('category') or '').upper() in PLATE for x in hist[-3:]):
+                f.append(f"motion.category {m.get('category')} is a picture-led look and one was used in the last 3 reels: pick a data/UI/type/3D/explainer prompt")
+            built = len([x for x in (HERE / 'pm').glob('[0-9]*.html') if 'cover-bg' not in x.name])
+            if built < 40 and len(hist) >= 3 and not m.get('engine_new') and not any(x.get('engine_new') for x in hist[-3:]):
+                f.append(f'only {built} of 85 motion prompts have an engine and the last 3 reels reused old ones: this reel builds a NEW engine from an unused prompt (motion.engine_new: true) — RUNBOOK §00.24')
+            leads = [str(sc_.get('lead', '')).lower() for sc_ in (m.get('scenes') or [])]
+            if leads and any(not l for l in leads): f.append('every motion scene needs `lead`: data | chart | ui | type | 3d | diagram | photo')
+            if leads and leads.count('photo') > max(1, len(leads) // 4): f.append(f"{leads.count('photo')} of {len(leads)} scenes are photo-led (max a quarter): redesign them as data, chart, UI or type scenes")
             if hist and (m.get('category') or '') == hist[-1].get('category'): f.append(f"motion.category {m.get('category')} repeats the previous reel")
         sc = m.get('scenes') or []
         if len(sc) < 6: f.append('plan at least 6 scenes')

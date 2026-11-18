@@ -347,6 +347,35 @@ routine in Iran — told so that people **send it to someone they care about**.
    - **No real faces in generated plates:** the critic checks every panel for portraits, posters or banknotes of
      real people (the image model adds them to Iranian classrooms and money); such a panel is dropped.
 
+24. **Motion graphics for real, measured on the engine (user rule 2026-11-18).** Mahdi: «کلاً هم از سبک‌های موشن گرافیک
+   خارج شدیم و همش تصویرمحور شده، ما این‌همه پرامپت موشن گرافیک به سیستم اضافه کردیم که تنوع داشته باشیم، این چرا
+   رعایت نمی‌شه؟». What the audit found (setup, 2026-11-18, frames of REEL-056/058/059):
+   - Only **19 of the 85** catalog prompts have an engine; with a 10-reel cooldown the same ~11 kept cycling.
+   - The gate checked the engine's **file name**. Each run rewrote the scenes inside an old engine file for the new
+     story («Engine 074: fake-child-photo scenes for REEL-058»), so "074 engraving" and "211 last light" became
+     full-bleed generated photos with a caption strip. REEL-059 is a photo slideshow under an engine name.
+   - 13 of the last 30 reels used picture-led categories (HAND, STORY, EDIT), which §4.0 rule 9 reserves for
+     character stories.
+   Rules, all hard (§00.22):
+   - **Photo probe.** After the check render: `node news-reel/reel_render.mjs --dir=work/story --page=<engine>
+     --mode=probe` → `out/photo_probe.json` (the share of each second covered by raster pictures). **At most 35 %
+     of the reel's seconds may be photo-led** (picture cover ≥ 60 % of the frame); `reel_gate.py` fails without the
+     file or above the limit. Upload `photo_probe.json` with the package for the publish-time gate.
+   - **Scenes declare their lead:** `concept.json → motion.scenes[].lead` = data | chart | ui | type | 3d | diagram |
+     photo; at most a quarter are `photo`.
+   - **Picture-led looks (HAND, STORY, EDIT) at most 1 reel in 4.** News and practice reels use data, UI, kinetic
+     type, 3D, explainer or music-driven prompts.
+   - **Cooldown 14 reels** for a prompt family and its engine (was 10).
+   - **A new engine 1 reel in 4**, built from a catalog prompt that has none yet (`motion.engine_new: true`), until
+     40 engines exist. Start with the rotation list entries never built: 207, 112, 225, 095, 219, then the rest of
+     the catalog by category so every category has ≥ 4 engines. Build new engines in idle time between slots too,
+     tested on the last story, so a prepare only has to pick one.
+   - **An engine keeps its own look.** A run fills an engine with the new story's data, text and numbers; it does
+     not replace the prompt's scene types with photos. If the prompt's look does not fit the story, pick another prompt.
+   - The numbers say motion style alone does not raise watch time (REEL-056, real charts, kept 19 %; REEL-059, a
+     photo story, 40 %): the first 3 seconds and the story do. So this rule is about the brand looking expert and
+     varied; §00.25 is about growth.
+
 ## 0. Ground rules (both phases)
 
 - **Motion graphics (user rule 2026-10-23):** every reel's motion style comes from the skill

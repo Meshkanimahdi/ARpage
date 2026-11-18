@@ -57,7 +57,7 @@ def main():
     fails, info = [], {}
     story = json.loads((d / 'story.json').read_text())
     hist = json.loads(Path(a.history).read_text()) if Path(a.history).exists() else []
-    last10 = hist[-10:]
+    last10 = hist[-14:]   # 2026-11-18: cooldown 14 reels (was 10; 19 engines kept cycling every 11)
 
     # 1. attention
     layout = a.layout or story.get('layout', 'photo')
@@ -101,14 +101,14 @@ def main():
             fails.append(f'engine {base} is not the engine of prompt {pid} (a prompt may not borrow another engine)')
         used_p = [h.get('prompt', '').split('-')[0] for h in last10]
         used_e = [Path(h.get('engine', '')).name for h in last10]
-        if pid_num in used_p: fails.append(f'prompt {pid_num} was used in the last 10 reels')
+        if pid_num in used_p: fails.append(f'prompt {pid_num} was used in the last 14 reels')
         # many catalog prompts are the same text under another name (pm/families.json): block the family too
         fp = HERE / 'pm' / 'families.json'
         fam = json.loads(fp.read_text())['family'] if fp.exists() else {}
         mine_f = fam.get(pid_num, pid_num)
         twins = [p for p in used_p if p and fam.get(p, p) == mine_f and p != pid_num]
         if twins: fails.append(f'prompt {pid_num} is the same prompt family ({mine_f}) as {twins[0]}, used in the last 10 reels')
-        if base in used_e: fails.append(f'engine {base} was used in the last 10 reels')
+        if base in used_e: fails.append(f'engine {base} was used in the last 14 reels')
         # a new engine must really be new: not a renamed copy of an engine used in the last 10 reels
         ep = (HERE.parent / eng) if not Path(eng).is_absolute() else Path(eng)
         if ep.exists():
@@ -121,6 +121,15 @@ def main():
                     if r > 0.6: fails.append(f'engine {ep.name} is {r:.0%} the same code as {op.name} (used by {h.get("reel")}): build the prompt\'s own look')
         if not cat: fails.append('story.json must name motion_category (UI, TYPE, EDIT, STORY, 3D, EXPL, …)')
         elif hist and hist[-1].get('category') == cat: fails.append(f'category {cat} repeats the previous reel')
+
+    # 4a2. photo slideshow check (user rule 2026-11-18, RUNBOOK §00.24): measured on the engine itself by
+    # `reel_render.mjs --mode=probe`; a reel whose seconds are mostly photos is not motion graphics, whatever its engine is called
+    pp = next((x for x in (d / 'out' / 'photo_probe.json', d / 'photo_probe.json') if x.exists()), None)
+    if not pp: fails.append('no photo_probe.json: run `node news-reel/reel_render.mjs --dir=<dir> --page=<engine> --mode=probe` (RUNBOOK §00.24)')
+    else:
+        pr = json.loads(pp.read_text()); info['photo_probe'] = {k: pr.get(k) for k in ('mean_cover', 'photo_led_share')}
+        if (pr.get('photo_led_share') or 0) > 0.35:
+            fails.append(f"photo-led seconds {pr['photo_led_share']:.0%} of the reel (max 35 %): this is a photo slideshow, rebuild the scenes as motion graphics (charts, numbers, UI, type) — RUNBOOK §00.24")
 
     # 4b. topic cooldown (user rule 2026-10-26: robots/workers two days running): the field must differ from the
     # last 4 reels (≈ 36 h), and from the posts of the last 2 days when the run passes them in story.json → recent_fields
@@ -188,7 +197,7 @@ def main():
     out = {'pass': not fails, 'fails': fails, 'hard_fails': hard_fails, 'score_fails': score_fails,
            'low_score_publish_allowed': not hard_fails, 'info': info,
            'history_entry': {'reel': story.get('content_id', ''), 'date': story.get('date', ''), 'prompt': pid, 'engine': eng,
-                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'voice_gender': vg, 'mix': (story.get('mix') or (story.get('story') or {}).get('mix', '')), 'ai_anchor': (story.get('ai_anchor') or {}).get('url', ''), 'series': (story.get('series') or {}).get('name', ''), 'series_part': (story.get('series') or {}).get('part'), 'sfx': sorted(sx_now), 'life': story.get('life'), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else ''),
+                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'voice_gender': vg, 'engine_new': bool(story.get('engine_new')), 'photo_led': (info.get('photo_probe') or {}).get('photo_led_share'), 'mix': (story.get('mix') or (story.get('story') or {}).get('mix', '')), 'ai_anchor': (story.get('ai_anchor') or {}).get('url', ''), 'series': (story.get('series') or {}).get('name', ''), 'series_part': (story.get('series') or {}).get('part'), 'sfx': sorted(sx_now), 'life': story.get('life'), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else ''),
                              **({f'cover_{k}': json.loads(rep_p.read_text()).get(k, '') for k in ('kicker', 'sub', 'twist')} if rep_p.exists() else {})}}
     (d / 'gate.json').write_text(json.dumps(out, ensure_ascii=False, indent=1))
     print(json.dumps(out, ensure_ascii=False))

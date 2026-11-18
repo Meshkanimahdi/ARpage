@@ -22,7 +22,26 @@ if (errors.length || issues.length) console.log('ISSUES:\n  ' + [...errors, ...i
 if (errors.length) { await browser.close(); server.close(); process.exit(5); }
 fs.writeFileSync(path.join(out, 'scenes.json'), JSON.stringify(await page.evaluate(() => window.SCENES || []), null, 1));
 const shot = async (t, f) => { await page.evaluate(t => window.seek(t), t); await page.screenshot({path: f, type: 'jpeg', quality: 85}); };
-if (args.mode === 'check' || args.mode === 'stills') {
+if (args.mode === 'probe') {
+  // user rule 2026-11-18 (RUNBOOK §00.24): how much of each second is a photo? Samples one frame per second and measures the
+  // share of the frame covered by raster pictures (img, video, svg <image>, CSS background-image url). A reel whose frames are
+  // mostly photos is a slideshow, whatever the engine file is called. Writes out/photo_probe.json; reel_gate.py enforces it.
+  const dur = await page.evaluate(() => window.DURATION), t0 = await page.evaluate(() => window.START || 0);
+  const probe = () => { const W = innerWidth, H = innerHeight, C = 40, gw = Math.ceil(W / C), gh = Math.ceil(H / C), g = new Uint8Array(gw * gh);
+    const vis = el => { for (let e = el; e && e.nodeType === 1; e = e.parentElement) { const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.08) return false; } return true; };
+    const els = [...document.querySelectorAll('img, video, image')];
+    for (const e of document.querySelectorAll('body *')) { const b = getComputedStyle(e).backgroundImage; if (b && b.includes('url(')) els.push(e); }
+    for (const e of els) { if (!vis(e)) continue; const r = e.getBoundingClientRect(); if (r.width < 80 || r.height < 80) continue;   // icons and logos do not count
+      const x0 = Math.max(0, Math.floor(r.left / C)), x1 = Math.min(gw, Math.ceil(r.right / C)), y0 = Math.max(0, Math.floor(r.top / C)), y1 = Math.min(gh, Math.ceil(r.bottom / C));
+      for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) g[y * gw + x] = 1; }
+    return g.reduce((a, b) => a + b, 0) / g.length; };
+  const samples = [];
+  for (let t = t0 + 0.5; t < dur; t += 1) { await page.evaluate(t => window.seek(t), t); samples.push({t: +t.toFixed(2), cover: +(await page.evaluate(probe)).toFixed(3)}); }
+  const led = samples.filter(s => s.cover >= 0.6).length / Math.max(1, samples.length);
+  const rep = {samples, mean_cover: +(samples.reduce((a, s) => a + s.cover, 0) / Math.max(1, samples.length)).toFixed(3), photo_led_share: +led.toFixed(3)};
+  fs.writeFileSync(path.join(out, 'photo_probe.json'), JSON.stringify(rep, null, 1));
+  console.log(`photo probe: mean cover ${rep.mean_cover}, photo-led seconds ${(led * 100).toFixed(0)} % (limit 35 %)`);
+} else if (args.mode === 'check' || args.mode === 'stills') {
   let ts;
   if (args.mode === 'check') { const sc = await page.evaluate(() => window.SCENES); ts = sc.map(s => +Math.min(s.t1 - .2, s.t0 + Math.max(1.6, (s.t1 - s.t0) * .7)).toFixed(2)); }
   else ts = args.t.split(',').map(Number);
