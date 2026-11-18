@@ -12,7 +12,7 @@ that talks about Mahdi cuts to a Mahdi panel; shots never hold more than ~5 s an
 import argparse, json, os, re, subprocess, sys
 from concurrent.futures import ThreadPoolExecutor
 
-ap = argparse.ArgumentParser(); ap.add_argument('--dir', required=True); ap.add_argument('--plan-only', action='store_true'); a = ap.parse_args()
+ap = argparse.ArgumentParser(); ap.add_argument('--dir', required=True); ap.add_argument('--plan-only', action='store_true'); ap.add_argument('--reuse-video', action='store_true'); a = ap.parse_args()
 D = a.dir.rstrip('/') + '/'; OUT = D + 'out/'; os.makedirs(OUT, exist_ok=True)
 INTRO = float(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', D + 'audio/intro.mp3'], capture_output=True, text=True).stdout)
 EP = float(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', D + 'audio/ep1.mp3'], capture_output=True, text=True).stdout)
@@ -138,7 +138,8 @@ for u in U:
         t0 = ch[0]['start'] + OFF - 0.05
         t1 = (min(ps[n + 1][0]['start'], ch[-1]['end'] + 0.6) if n + 1 < len(ps) else ch[-1]['end'] + 0.35) + OFF
         lead = f"{{\\c{COL[u['sp']]}}}{NAME[u['sp']]}{{\\c&HFFFFFF&}}: " if n == 0 else ''
-        ev.append([t0, t1, f"{lead}{txt}"])
+        RLM = '\u200f'                                   # a strong RTL mark first, so a line that starts with Latin
+        ev.append([t0, t1, RLM + f"{lead}{txt}".replace(r'\N', '\\N' + RLM)])  # (Founder, GPU) still reads RTL
 for j in range(len(ev) - 1): ev[j][1] = min(ev[j][1], ev[j + 1][0])      # never two cues at once
 HDR = """[Script Info]
 ScriptType: v4.00+
@@ -181,8 +182,9 @@ open(OUT + 'subs.ass', 'w').write(ass)
 
 if a.plan_only: print('plan only: shots', len(shots), 'subtitle cues', len(ev)); sys.exit(0)
 # ---- picture: motion.py renders every frame (camera, 3D stickers, titles, light FX) on the global 30 fps clock
-subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'motion.py'), '--dir', D,
-                '--off', str(OFF), '--ep', str(EP)], check=True)
+if not (a.reuse_video and os.path.exists(OUT + 'video_raw.mp4')):
+    subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'motion.py'), '--dir', D,
+                    '--off', str(OFF), '--ep', str(EP)], check=True)
 
 # ---- audio: intro at 0, episode at OFF, mastered to −14 LUFS; burn subtitles; ~4.5 Mbps for Instagram
 af = (f"[1:a]aresample=48000,loudnorm=I=-16:TP=-2[i];[2:a]aresample=48000,adelay={int(OFF * 1000)}|{int(OFF * 1000)}[e];"
