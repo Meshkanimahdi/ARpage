@@ -373,8 +373,8 @@ routine in Iran — told so that people **send it to someone they care about**.
    - **An engine keeps its own look.** A run fills an engine with the new story's data, text and numbers; it does
      not replace the prompt's scene types with photos. If the prompt's look does not fit the story, pick another prompt.
    - The numbers say motion style alone does not raise watch time (REEL-056, real charts, kept 19 %; REEL-059, a
-     photo story, 40 %): the first 3 seconds and the story do. So this rule is about the brand looking expert and
-     varied; §00.25 is about growth.
+     photo story, 40 %): the first seconds and the story do (meshkani-pro/AUDIT-2026-11-18.md). So this rule is about
+     the brand looking expert and varied, not about reach.
 
 ## 0. Ground rules (both phases)
 
