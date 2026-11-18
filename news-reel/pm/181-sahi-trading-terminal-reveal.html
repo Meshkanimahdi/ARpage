@@ -68,7 +68,7 @@ window.ready = (async () => {
   TOTAL = T.total;
   BEATS = D.beats.map(prep).filter(Boolean);
   BEATS.forEach((x, i) => { x.i = i; x.a = i ? x.L.start - .08 : 0; x.z = i + 1 < BEATS.length ? BEATS[i + 1].L.start - .08 : T.end_start; });
-  const pics = [...new Set(BEATS.map(x => x.s.img).filter(Boolean))].map(n => src('raw/' + n + '.png')).concat([src('el/' + PROD()), src('el/' + BRAND())]);
+  const pics = [...new Set(BEATS.map(x => x.s.img).filter(Boolean))].map(n => src('raw/' + n + '.png')).concat([src('el/' + PROD()), src('el/' + BRAND()), src('raw/mug.png'), src('raw/mug2.png'), src('el/openai.png')]);
   await Promise.all(pics.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = u; })));
   await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'آمار Claude')));
   BEATS.forEach(x => { x.keys = (KEYS[x.s.type] || (() => []))(x).filter(v => v > x.a + .5 && v < x.z - .5).sort((p, q) => p - q); });
@@ -79,7 +79,7 @@ window.ready = (async () => {
   const cuts = [];
   for (const x of BEATS) {
     const pts = [x.a, ...x.keys];
-    pts.forEach((p, j) => cuts.push({t0: +p.toFixed(2), t1: +(j + 1 < pts.length ? pts[j + 1] : x.z).toFixed(2), type: x.s.type, bg: x.b.id + (j ? '.' + j : ''), sfx: [[p, j ? ['hit', 'tick', 'sweep_soft', 'tick'][(j + x.i) % 4] : (x.i % 2 ? 'sweep_soft' : 'whoosh'), j ? .35 : .3]]}));
+    pts.forEach((p, j) => cuts.push({t0: +p.toFixed(2), t1: +(j + 1 < pts.length ? pts[j + 1] : x.z).toFixed(2), type: x.s.type, bg: x.b.id + (j ? '.' + j : ''), sfx: [[p, (x.s.type || '').startsWith('g_') ? (j ? (D.sfx_palette || ['tick'])[(j + x.i) % (D.sfx_palette || ['tick']).length] : GSFX[x.s.type] || 'tick') : j ? ['hit', 'tick', 'sweep_soft', 'tick'][(j + x.i) % 4] : (x.i % 2 ? 'sweep_soft' : 'whoosh'), j ? .35 : .3]]}));
   }
   cuts.push({t0: T.end_start, t1: TOTAL, type: 'end', bg: 'end', sfx: [[T.end_start + .1, 'hit', .5]]});
   window.SCENES = cuts; window.START = 0; window.DURATION = TOTAL; window.ISSUES = ISSUES;
@@ -157,6 +157,129 @@ const CAMS = {
   vote: x => [[x.a, .2, 540, 960], [x.a + .5, 1, 540, 960], [x.when('کامنت'), 1.1, 540, 1050]]
 };
 
+// ===== REEL-061 set (ChatGPT Images 2.6 makes GIFs): scene types g_* — windows still land one per beat on the terminal ground =====
+// the through-line object is the product photo: a still that starts to loop, then the upload thumb, the reply GIF, the 9-frame
+// sheet, and the Story frame. The GIF "turn" is the photo itself squeezed on a cosine (a real loop, no generated frames).
+const GSFX = {g_hook: 'riser', g_news: 'typing', g_plans: 'notify', g_upload: 'click', g_prompt: 'typing', g_frames: 'tick', g_story: 'shimmer', g_ask: 'notify'};
+const gfr = t => Math.floor(((t * 7) % 9 + 9) % 9);                      // GIF frame index (≈ 7 fps, 9 frames)
+function mugGif(x0, y0, sz, t, live, idx, st = '') {
+  const i = idx !== undefined ? idx : live ? gfr(t) : 0, ph = i / 9 * Math.PI * 2, sx = live || idx !== undefined ? .72 + .28 * Math.cos(ph) : 1, img = (i % 2 && (live || idx !== undefined)) ? 'mug2' : 'mug';
+  return `<div class="ab" style="left:${x0}px;top:${y0}px;width:${sz}px;height:${sz}px;border-radius:${sz * .08}px;overflow:hidden;background:#EFE6DA;${st}"><img src="${src('raw/' + img + '.png')}" style="position:absolute;left:0;top:0;width:${sz}px;height:${sz}px;object-fit:cover;transform:scaleX(${sx.toFixed(3)}) translateX(${(Math.sin(ph) * sz * .04).toFixed(1)}px)"></div>`;
+}
+function arrowCur(x0, y0, t, tc) {
+  const p = tc !== undefined && t >= tc ? Math.exp(-9 * (t - tc)) : 0, rg = tc !== undefined && t >= tc ? ramp(t, tc, tc + .45) : 1;
+  return `<svg class="ab" style="left:0;top:0;overflow:visible" width="1080" height="1920">${rg < 1 ? `<circle cx="${x0}" cy="${y0}" r="${24 + 70 * rg}" fill="none" stroke="#F0B90B" stroke-width="${6 * (1 - rg)}"/>` : ''}<g transform="translate(${x0} ${y0}) scale(${1 - .16 * p})"><path d="M0 0 L0 64 L16 50 L28 76 L40 70 L28 46 L50 46 Z" fill="#fff" stroke="#05070A" stroke-width="5" stroke-linejoin="round"/></g></svg>`;
+}
+const step = (n, k) => k <= 0 ? '' : `<div class="ab" style="left:80px;top:180px;width:150px;height:150px;border-radius:34px;background:var(--up);color:#05070A;font:900 120px/150px V;text-align:center;transform:rotate(-5deg) scale(${lerp(1.6, 1, ex(k)).toFixed(3)});opacity:${clamp(k * 5).toFixed(2)}">${fa(n)}</div>`;
+const gIcon = () => logo('openai.png', 46, '#fff');
+KEYS.g_hook = x => [x.when('گیف'), x.when('بفرست')];
+KEYS.g_news = x => [x.when('تازه‌ی'), x.when('پنجاه'), x.when('گیف')];
+KEYS.g_plans = x => [x.when('همه‌ی'), x.when('رایگان')];
+KEYS.g_upload = x => [x.when('عکس'), x.when('آپلود')];
+KEYS.g_prompt = x => [x.when('بنویس'), x.when('لوپ'), x.when('بچرخه')];
+KEYS.g_frames = x => [x.when('خراب'), x.when('همون'), x.when('سرعتش')];
+KEYS.g_story = x => [x.when('ذخیره'), x.when('بدون')];
+KEYS.g_ask = x => [x.when('چی'), x.when('کامنت')];
+CAMS.g_hook = x => [[x.a, 1.1, 540, 980], [x.when('گیف'), 1, 540, 960], [x.when('بفرست'), 1.07, 540, 1120]];
+CAMS.g_news = x => [[x.a, 1.4, 540, 520], [x.when('تازه‌ی'), 1, 540, 900], [x.when('پنجاه'), 1.1, 540, 1060], [x.when('گیف'), 1.04, 540, 1200]];
+CAMS.g_plans = x => [[x.a, .5, 540, 960], [x.a + .5, 1, 540, 960], [x.when('همه‌ی'), 1.1, 540, 760], [x.when('رایگان'), 1.08, 540, 1150]];
+CAMS.g_upload = x => [[x.a, 1.3, 540, 1100], [x.when('عکس'), 1, 540, 960], [x.when('آپلود'), 1.15, 540, 1180]];
+CAMS.g_prompt = x => [[x.a, 1, 540, 960], [x.when('بنویس'), 1.12, 540, 1250], [x.when('لوپ'), 1.05, 540, 1150], [x.when('بچرخه'), 1.12, 540, 640]];
+CAMS.g_frames = x => [[x.a, 2.2, 300, 500], [x.a + .6, 1, 540, 900], [x.when('خراب'), 1.15, 700, 900], [x.when('همون'), 1.05, 540, 1250], [x.when('سرعتش'), 1.1, 540, 1400]];
+CAMS.g_story = x => [[x.a, .4, 540, 960], [x.a + .5, 1, 540, 960], [x.when('ذخیره'), 1.12, 540, 1250], [x.when('بدون'), 1.06, 540, 900]];
+CAMS.g_ask = x => [[x.a, 1.3, 540, 700], [x.when('چی'), 1, 540, 960], [x.when('کامنت'), 1.1, 540, 1250]];
+function drawG(x, t) {
+  const s = x.s, A = x.a, w = x.when, Z = x.z;
+  const big = (txt, x0, y0, sz, col, k, dir = 'rtl') => k <= 0 ? '' : `<div class="ab" style="left:${x0}px;right:${x0}px;top:${y0}px;text-align:center;font:900 ${sz}px/1.1 V;color:${col};direction:${dir};transform:scale(${lerp(1.5, 1, ex(k)).toFixed(3)});opacity:${clamp(k * 5).toFixed(2)}">${txt}</div>`;
+  switch (s.type) {
+    case 'g_hook': {
+      // frame 0: headline on screen, the product still sits in a ChatGPT window; on «گیف» it starts to loop, the GIF badge
+      // slams on, the 9-frame strip fans out under it; the recipient chip on «بفرست»
+      const tg = w('گیف'), tb = w('بفرست'), live = t >= tg, kw = ramp(t, 0, .25), kb = ramp(t, tg - .05, tg + .25), kf = ramp(t, tg + .3, tg + 1.1);
+      const body = mugGif(110, 40, 600, t, live) + `<div class="ab mono" style="left:110px;top:670px;font-size:30px;color:var(--dim)">${live ? 'GIF · frame ' + (gfr(t) + 1) + '/9' : 'photo.jpg · still'}</div>` +
+        (kb > 0 ? `<div class="ab" style="left:560px;top:60px;padding:8px 30px 16px;border-radius:20px;background:var(--amb);color:#05070A;font:900 72px V;direction:ltr;transform:rotate(6deg) scale(${lerp(1.8, 1, ex(kb)).toFixed(3)})">GIF</div>` : '');
+      const strip = [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => { const kk = ex(ramp(kf, i * .08, i * .08 + .3)); return kk <= 0 ? '' : mugGif(90 + i * 102 - (1 - kk) * i * 60, 1290, 92, t, false, i, `opacity:${kk.toFixed(2)};border:3px solid ${i === gfr(t) && live ? 'var(--amb)' : 'transparent'}`); }).join('');
+      return ground() + win(150, 520, 780, 760, 'chatgpt.com · Images 2.6', body, kw, 'up', live ? 'var(--amb)' : '') + strip +
+        chip('بفرست برای دوستت که آنلاین می‌فروشه 👇', 80, 1410, 50, '#fff', '#05070A', ramp(t, tb - .05, tb + .25), 'rtl');
+    }
+    case 'g_news': {
+      const ki = ramp(t, w('تازه‌ی') - .2, w('تازه‌ی') + .6), kd = ramp(t, w('چهارم') - .05, w('چهارم') + .25), k5 = ramp(t, w('پنجاه') - .1, w('پنجاه') + .8), kg = ramp(t, w('گیف') - .05, w('گیف') + .25);
+      const art = `<div style="padding:34px 40px;direction:ltr"><div style="display:flex;align-items:center;gap:20px">${logo('openai.png', 80, '#fff')}<span style="font:900 44px V;color:var(--dim)">OpenAI · News</span></div>` +
+        `<div style="margin-top:30px;font:900 78px/1.15 V;color:#fff">${typed('Introducing Images 2.6', ki)}${ki > 0 && ki < 1 ? caret(t) : ''}</div>` +
+        `<div style="margin-top:24px;height:16px;width:${(760 * ex(ramp(t, A + .3, A + 1.4))).toFixed(0)}px;border-radius:8px;background:#1A222C"></div><div style="margin-top:14px;height:16px;width:${(560 * ex(ramp(t, A + .5, A + 1.6))).toFixed(0)}px;border-radius:8px;background:#1A222C"></div></div>`;
+      const old = 640, nw = old * lerp(1, .5, ex(k5));
+      const speed = `<div style="padding:30px 40px;direction:rtl"><div style="font:900 44px V;color:var(--dim)">زمان ساخت یه عکس</div>` +
+        `<div style="margin-top:24px;display:flex;align-items:center;gap:24px"><span style="width:150px;font:900 40px V;color:var(--dim)">قبلی</span><div style="width:${old}px;height:56px;border-radius:28px;background:#2A3440"></div></div>` +
+        `<div style="margin-top:22px;display:flex;align-items:center;gap:24px"><span style="width:150px;font:900 40px V;color:var(--up)">۲.۶</span><div style="width:${nw.toFixed(0)}px;height:56px;border-radius:28px;background:var(--up)"></div></div></div>`;
+      return ground() + win(80, 190, 920, 520, 'openai.com/index/introducing-images-2-6', art, ramp(t, A, A + .3), 'up') +
+        chip('۴ نوامبر ۲۰۲۶', 620, 150, 54, 'var(--amb)', '#05070A', kd, 'rtl') +
+        win(80, 760, 920, 390, 'speed', speed, ramp(t, A + .4, A + .7), 'down', k5 > 0 ? 'var(--up)' : '') +
+        big('۵۰٪ سریع‌تر', 80, 1190, 120, 'var(--up)', k5) + chip('+ حالا گیف هم می‌سازه', 270, 1370, 56, '#fff', '#05070A', kg, 'rtl');
+    }
+    case 'g_plans': {
+      const ka = ramp(t, w('همه‌ی') - .1, w('همه‌ی') + .2), kf = ramp(t, w('رایگان') - .05, w('رایگان') + .3);
+      const plans = [['Free', 'رایگان', kf], ['Plus', '', ramp(t, ka, ka + .3) * (t > w('همه‌ی') ? 1 : 0)], ['Pro', '', ramp(t, w('همه‌ی') + .4, w('همه‌ی') + .7)]];
+      const body = plans.map((p, i) => `<div style="display:flex;align-items:center;justify-content:space-between;padding:30px 44px;border-bottom:2px solid var(--line);direction:ltr;background:${i === 0 && kf > 0 ? 'rgba(22,199,132,.14)' : 'transparent'}"><span style="font:900 64px V;color:#fff">${p[0]}</span><span style="font:900 56px V;color:var(--dim);direction:rtl">${p[1]}</span><span style="font:900 72px V;color:var(--up);transform:scale(${lerp(2, 1, ex(p[2])).toFixed(3)});opacity:${clamp(p[2] * 4).toFixed(2)}">✓</span></div>`).join('');
+      const dev = [['🌐 وب', .2], ['💻 دسکتاپ', .5], ['📱 موبایل', .8]].map((d, i) => chip(d[0], 90 + i * 310, 1160, 54, '#1A222C', '#fff', ramp(t, A + 1 + d[1], A + 1.3 + d[1]), 'rtl')).join('');
+      return ground() + win(80, 260, 920, 560, 'ChatGPT · GIF · who gets it', body, ramp(t, A, A + .3), 'up', 'var(--up)') + dev +
+        big('حتی حساب رایگان ✓', 60, 900, 104, 'var(--up)', kf) + chip(`${gIcon()} <span style="vertical-align:middle">ChatGPT</span>`, 380, 170, 54, '#fff', '#05070A', ramp(t, A + .05, A + .35));
+    }
+    case 'g_upload': {
+      const tu = w('آپلود'), te = w('عکس'), kt = ramp(t, tu + .05, tu + .45), cx = lerp(900, 200, ex(ramp(t, te, tu))), cy = lerp(1500, 1140, ex(ramp(t, te, tu)));
+      const comp = `<div class="ab" style="left:30px;right:30px;top:34px;height:150px;border-radius:75px;background:#1A222C;display:flex;align-items:center;padding:0 30px;gap:24px;direction:ltr">` +
+        `<span style="width:96px;height:96px;border-radius:50%;background:${t > tu ? 'var(--up)' : '#2A3440'};color:#05070A;font:900 80px/90px V;text-align:center">+</span><span style="font:600 44px V;color:var(--dim);direction:rtl">از ChatGPT بپرس…</span></div>` +
+        (kt > 0 ? `<div class="ab" style="left:40px;top:${(220 + (1 - ex(kt)) * 200).toFixed(0)}px;opacity:${clamp(kt * 4).toFixed(2)}">${mugGif(0, 0, 300, t, false).replace('class="ab"', 'class="ab" ')}<div class="ab mono" style="left:330px;top:120px;font-size:30px;color:var(--up)">mug.jpg ✓</div></div>` : '');
+      return ground() + step(1, ramp(t, A, A + .3)) + win(80, 920, 920, 600, 'chatgpt.com', comp, ramp(t, A + .1, A + .4), 'down', t > tu ? 'var(--up)' : '') +
+        win(300, 230, 700, 560, 'photos', mugGif(40, 30, 440, t, false) + `<div class="ab mono" style="left:500px;top:60px;font-size:28px;color:var(--dim);line-height:1.8">1 photo<br>plain bg<br>good light</div>`, ramp(t, A + .2, A + .5), 'right') +
+        chip('یه عکس ساده کافیه', 300, 820, 56, 'var(--amb)', '#05070A', ramp(t, te - .05, te + .25), 'rtl') + arrowCur(cx, cy, t, tu);
+    }
+    case 'g_prompt': {
+      const tw = w('بنویس'), tl = w('لوپ'), tr = w('بچرخه'), q = 'یه گیف کوتاه و لوپ بساز که محصول آروم بچرخه؛ پس‌زمینه ساده بمونه.';
+      const kq = ramp(t, tw, tr + .2), ks = tr + .35, kr = ramp(t, ks + .1, ks + .4), kp = ramp(t, ks, ks + 1.2), done = kp >= 1;
+      const comp = `<div style="padding:30px 36px;direction:rtl;font:900 52px/1.45 V;color:#fff;white-space:normal">${typed(q, kq)}${kq < 1 ? caret(t) : ''}</div>` +
+        `<div class="ab" style="left:34px;bottom:30px;width:96px;height:96px;border-radius:50%;background:${t > ks ? 'var(--up)' : '#2A3440'};color:#05070A;font:900 60px/96px V;text-align:center">↑</div>`;
+      const ring = `<svg class="ab" style="left:300px;top:150px" width="300" height="300"><circle cx="150" cy="150" r="110" fill="none" stroke="#1A222C" stroke-width="18"/><circle cx="150" cy="150" r="110" fill="none" stroke="var(--amb)" stroke-width="18" stroke-linecap="round" stroke-dasharray="${(691 * kp).toFixed(0)} 999" transform="rotate(-90 150 150)"/></svg>`;
+      const reply = kr <= 0 ? '' : done ? mugGif(150, 30, 520, t, true) + `<div class="ab" style="left:600px;top:40px;padding:6px 22px 12px;border-radius:16px;background:var(--amb);color:#05070A;font:900 52px V;direction:ltr">GIF</div>` : ring;
+      return ground() + step(2, ramp(t, A, A + .3)) + win(80, 1020, 920, 470, 'message', comp, ramp(t, A + .1, A + .4), 'down') +
+        win(110, 360, 860, 620, 'ChatGPT · Images 2.6', reply, kr, 'up', done ? 'var(--amb)' : '') +
+        chip('لوپ = بی‌پایان می‌چرخه', 340, 230, 52, '#fff', '#05070A', ramp(t, tl - .05, tl + .25), 'rtl') + arrowCur(lerp(700, 150, ex(ramp(t, ks - .6, ks))), lerp(1700, 1420, ex(ramp(t, ks - .6, ks))), t, ks);
+    }
+    case 'g_frames': {
+      const tb = w('خراب'), th = w('همون'), tsp = w('سرعتش'), kx = ramp(t, tb - .05, tb + .25), kfix = ramp(t, th + .6, th + 1.0), kd = ramp(t, tsp - .1, tsp + .6);
+      const cells = [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => { const cx = 40 + (i % 3) * 280, cy = 30 + Math.floor(i / 3) * 280, kk = ramp(t, A + .1 + i * .06, A + .3 + i * .06), bad = i === 5 && kx > 0;
+        const broken = bad && kfix < .5 ? 'filter:hue-rotate(160deg) saturate(1.6) blur(2px);' : '';
+        return kk <= 0 ? '' : `<div class="ab" style="left:${cx}px;top:${cy}px;opacity:${clamp(kk * 4).toFixed(2)};transform:scale(${lerp(.8, 1, ex(kk)).toFixed(3)})">${mugGif(0, 0, 250, t, false, i, broken + `border:6px solid ${bad ? (kfix >= .5 ? 'var(--up)' : 'var(--dn)') : 'transparent'};box-sizing:border-box`)}` +
+          `<div class="ab mono" style="left:12px;top:12px;font-size:24px;color:#fff;background:rgba(5,7,10,.7);padding:2px 10px;border-radius:8px">${i + 1}</div>` +
+          (bad ? `<div class="ab" style="left:150px;top:150px;width:90px;height:90px;border-radius:50%;background:${kfix >= .5 ? 'var(--up)' : 'var(--dn)'};color:#fff;font:900 64px/86px V;text-align:center;transform:scale(${lerp(2, 1, ex(kfix >= .5 ? kfix : kx)).toFixed(3)})">${kfix >= .5 ? '✓' : '✕'}</div>` : '') + '</div>'; }).join('');
+      const kb = ramp(t, th - .05, th + .25), fixTxt = 'فقط قاب ۶: رنگش رو مثل بقیه کن';
+      const dial = `<div style="padding:26px 40px;direction:ltr;display:flex;align-items:center;gap:30px"><span style="font:900 44px V;color:var(--dim);direction:rtl">سرعت</span><div style="position:relative;flex:1;height:16px;border-radius:8px;background:#1A222C"><div style="position:absolute;left:0;top:0;height:16px;border-radius:8px;width:${(30 + 45 * ex(kd)).toFixed(0)}%;background:var(--amb)"></div><div style="position:absolute;top:-22px;left:calc(${(30 + 45 * ex(kd)).toFixed(0)}% - 30px);width:60px;height:60px;border-radius:50%;background:#fff"></div></div><span class="mono" style="font-size:44px;color:#fff">${(1 + ex(kd)).toFixed(1)}x</span></div>`;
+      return ground() + win(110, 210, 860, 900, 'GIF · 9 frames · sheet', cells, ramp(t, A, A + .3), 'up', kx > 0 && kfix < .5 ? 'var(--dn)' : '') +
+        (kb > 0 ? `<div class="ab" style="left:150px;top:1140px;max-width:780px;padding:20px 36px 30px;border-radius:34px 34px 34px 8px;background:#1A222C;border:3px solid var(--up);font:900 52px/1.4 V;color:#fff;direction:rtl;transform:scale(${lerp(.8, 1, ex(kb)).toFixed(3)});opacity:${clamp(kb * 4).toFixed(2)}">${typed(fixTxt, ramp(t, th, th + .6))}</div>` : '') +
+        win(110, 1290, 860, 160, 'playback', dial, ramp(t, tsp - .3, tsp), 'down') + chip('فقط همون قاب، نه از اول', 560, 150, 46, 'var(--amb)', '#05070A', ramp(t, th + .9, th + 1.2), 'rtl');
+    }
+    case 'g_story': {
+      const ts = w('ذخیره'), tn = w('بدون'), kd = ramp(t, ts - .05, ts + .3), kp = ramp(t, ts + .3, ts + .8), kn = ramp(t, tn - .05, tn + .25);
+      const ph = `<div class="ab" style="left:0;top:0;right:0;bottom:0;background:#EFE6DA"></div>` + mugGif(30, 260, 360, t, true, undefined, 'border-radius:30px') +
+        `<div class="ab" style="left:24px;right:24px;top:28px;height:8px;border-radius:4px;background:rgba(0,0,0,.15)"><div style="width:${(100 * ramp(t, ts, Z)).toFixed(0)}%;height:8px;border-radius:4px;background:#fff"></div></div>` +
+        `<div class="ab" style="left:24px;top:60px;font:900 34px V;color:#3A2E24;direction:rtl;right:24px;text-align:right">ماگ دست‌ساز · فقط ۳ تا مونده</div>` +
+        `<div class="ab" style="left:60px;right:60px;bottom:70px;padding:14px 0 22px;border-radius:30px;background:#05070A;color:#fff;font:900 40px V;text-align:center">سفارش در دایرکت</div>`;
+      const phone = kp <= 0 ? '' : `<div class="ab" style="left:300px;top:${(300 + (1 - ex(kp)) * 300).toFixed(0)}px;width:480px;height:860px;border-radius:64px;background:#111;border:12px solid #2A2F36;overflow:hidden;opacity:${clamp(kp * 4).toFixed(2)}">${ph}</div>`;
+      return ground() + win(80, 1210, 920, 260, 'save', `<div style="padding:40px;display:flex;gap:30px;align-items:center;direction:rtl"><span style="padding:18px 46px 28px;border-radius:28px;background:${t > ts ? 'var(--up)' : '#2A3440'};color:#05070A;font:900 56px V">⬇ ذخیره</span><span class="mono" style="font-size:34px;color:var(--dim)">mug.gif · 9 frames</span></div>`, ramp(t, A, A + .3), 'down') + phone +
+        chip('بدون طراح ✓', 70, 420, 64, 'var(--amb)', '#05070A', kn, 'rtl') + chip('برای استوری', 70, 560, 54, '#fff', '#05070A', kd, 'rtl') + arrowCur(lerp(600, 760, ex(ramp(t, ts - .6, ts))), lerp(1700, 1330, ex(ramp(t, ts - .6, ts))), t, ts);
+    }
+    case 'g_ask': {
+      const tq = w('چی'), tc = w('کامنت'), ky = ramp(t, tc + .2, tc + 1.2);
+      const opts = [['☕ محصول دست‌ساز', tq], ['🍰 کیک و شیرینی', tq + .35], ['👗 لباس', tq + .7]];
+      const body = `<div style="padding:40px;direction:rtl"><div style="font:900 50px V;color:var(--dim)">کامنت‌ها</div>` +
+        opts.map((o, i) => { const kk = ramp(t, o[1] - .05, o[1] + .25); return `<div style="margin-top:26px;padding:22px 34px 32px;border-radius:30px;background:${i === 0 ? 'rgba(240,185,11,.16)' : '#1A222C'};border:3px solid ${i === 0 ? 'var(--amb)' : 'var(--line)'};font:900 60px V;color:#fff;transform:translateX(${((1 - ex(kk)) * 300).toFixed(0)}px);opacity:${clamp(kk * 4).toFixed(2)}">${o[0]}</div>`; }).join('') +
+        `<div style="margin-top:44px;padding:26px 34px;border-radius:30px;background:#0A0E13;border:2px solid var(--line);font:900 54px V;color:#fff">${typed('من اول ماگ‌هامو گیف می‌کنم', ky)}${ky > 0 && ky < 1 ? caret(t) : ''}</div></div>`;
+      return ground() + mugGif(390, 150, 300, t, true, undefined, 'border-radius:50%;border:8px solid var(--amb);box-sizing:border-box') + win(80, 500, 920, 940, 'comments', body, ramp(t, A + .1, A + .4), 'up', 'var(--amb)') +
+        chip('کامنت بنویس ✍', 330, 1440, 64, '#fff', '#05070A', ramp(t, tc - .05, tc + .25), 'rtl');
+    }
+  }
+  return null;
+}
+
 function seek(t) {
   if (!BEATS.length) return;
   let x = BEATS[0]; for (const q of BEATS) if (t >= q.a) x = q;
@@ -170,7 +293,8 @@ function seek(t) {
 
 // running HUD: a status strip with the clock and the beat ticker (the terminal's own chrome), every scene but the hook
 function hud(x, t) {
-  if (x.s.type === 'hook' || x.s.type === 'vote') return '';
+  if (['hook', 'vote', 'g_hook', 'g_ask'].includes(x.s.type)) return '';
+  if (D.hud) return `<div class="ab mono" style="left:40px;right:40px;top:58px;height:64px;display:flex;align-items:center;gap:18px;padding:0 24px;border-radius:14px;background:rgba(10,14,19,.92);border:2px solid var(--line);font-size:26px;color:var(--dim)">${logo('openai.png', 40, '#fff')}<span style="color:var(--tx)">${D.hud[0]}</span><span style="margin-left:auto">${D.hud[1]}</span><span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--up);transform:scale(${(1 + .5 * Math.exp(-8 * ((t % BEAT + BEAT) % BEAT))).toFixed(3)})"></span></div>`;
   const pulse = Math.exp(-8 * ((t % BEAT + BEAT) % BEAT));
   return `<div class="ab mono" style="left:40px;right:40px;top:58px;height:64px;display:flex;align-items:center;gap:18px;padding:0 24px;border-radius:14px;background:rgba(10,14,19,.92);border:2px solid var(--line);font-size:26px;color:var(--dim)">` +
     `${logo(PROD(), 40, '#fff')}${logo(BRAND(), 40, '#fff')}<span style="color:var(--tx)">freelance market · AI skills</span><span style="margin-left:auto">2025 reports</span>` +
@@ -178,7 +302,7 @@ function hud(x, t) {
 }
 // captions: the spoken words, chunk by chunk (≤ 4 words), accent words in amber, on a solid dark plate
 function captions(x, t) {
-  if (x.s.type === 'hook' && t < x.at(4)) return hookTitle(x, t);
+  if ((x.s.type === 'hook' || x.s.type === 'g_hook') && t < x.at(4)) return hookTitle(x, t);
   if (t > x.L.end + .3) return '';
   const W = x.shown, n = W.length; let j = 0; for (let q = 0; q < n; q++) if (t >= W[q].t - .05) j = q;
   const ch = []; let cur = []; W.forEach((w, q) => { cur.push(q); if (cur.length === 4 || /[،؛.!؟?…:»]$/.test(w.w)) { ch.push(cur); cur = []; } }); if (cur.length) ch.push(cur);
@@ -189,6 +313,7 @@ function captions(x, t) {
 }
 function hookTitle(x, t) {
   const k = ex(ramp(t, 0, .25));
+  if (D.hook_lines) return `<div class="ab" style="left:0;right:0;top:170px;transform:translateY(${((1 - k) * -40).toFixed(1)}px)"><div class="cap" style="position:relative;font-size:124px;line-height:1.2;color:#fff">${D.hook_lines[0]}</div><div class="cap" style="position:relative;margin-top:14px"><span style="display:inline-block;padding:4px 40px 22px;border-radius:26px;background:var(--amb);color:#05070A;font-size:124px;line-height:1.2">${D.hook_lines[1]}</span></div></div>`;
   return `<div class="ab" style="left:0;right:0;top:170px;transform:translateY(${((1 - k) * -40).toFixed(1)}px)">` +
     `<div class="cap" style="position:relative;margin-bottom:24px"><span style="display:inline-block;padding:6px 30px 14px;border-radius:20px;background:var(--up);color:#05070A;font:900 56px V">${D.series_tag || ''}</span></div>` +
     `<div class="cap" style="position:relative;font-size:132px;line-height:1.2;color:#fff;text-shadow:0 6px 0 rgba(0,0,0,.55),0 0 30px rgba(0,0,0,.6)">اگه درآمدت</div>` +
@@ -197,6 +322,7 @@ function hookTitle(x, t) {
 
 function draw(x, t) {
   const s = x.s, A = x.a, at = x.at, w = x.when;
+  if ((s.type || '').startsWith('g_')) { const gh = drawG(x, t); if (gh !== null) return gh; }
   const big = (txt, x0, y0, sz, col, k) => k <= 0 ? '' : `<div class="ab" style="left:${x0}px;right:${x0}px;top:${y0}px;text-align:center;font:900 ${sz}px/1.1 V;color:${col};direction:ltr;transform:scale(${lerp(1.5, 1, ex(k)).toFixed(3)});opacity:${clamp(k * 5).toFixed(2)}">${txt}</div>`;
   const pct = (v, k) => '+' + fa(Math.round(v * (k >= 1 ? 1 : ex(k))).toLocaleString('en-US')) + '٪';
   const stat = (x0, y0, wd, label, val, k, col) => k <= 0 ? '' : `<div class="ab" style="left:${x0}px;top:${y0}px;width:${wd}px;height:300px;border-radius:24px;background:var(--pane);border:3px solid ${col};transform:translateY(${((1 - ex(k)) * 120).toFixed(1)}px);opacity:${clamp(k * 4).toFixed(2)};text-align:center">` +
@@ -326,7 +452,7 @@ function ending(u, t) {
   return ground() + `<div class="ab" style="left:0;right:0;top:520px;text-align:center;transform:scale(${lerp(1.4, 1, ex(k)).toFixed(3)})">` +
     `<div style="font:900 150px/1.2 V;color:#fff">${(D.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--amb)">$1</span>')}</div>` +
     `<div style="margin-top:30px;font:900 64px V;color:var(--dim);opacity:${k2.toFixed(2)}">${D.end_sub || ''}</div>` +
-    `<div style="margin-top:50px;display:flex;flex-direction:column;gap:22px;align-items:center;opacity:${k2.toFixed(2)}"><span style="padding:12px 36px 20px;border-radius:22px;background:var(--up);color:#05070A;font:900 54px V">۱ · نقشهٔ ۳۰ روزه</span><span style="padding:12px 36px 20px;border-radius:22px;background:var(--amb);color:#05070A;font:900 54px V">۲ · مشتری خارجی، قانونی</span></div>` +
+    `<div style="margin-top:50px;display:flex;flex-direction:column;gap:22px;align-items:center;opacity:${k2.toFixed(2)}">${(D.end_chips || ['۱ · نقشهٔ ۳۰ روزه', '۲ · مشتری خارجی، قانونی']).map((c, i) => `<span style="padding:12px 36px 20px;border-radius:22px;background:${i % 2 ? 'var(--amb)' : 'var(--up)'};color:#05070A;font:900 54px V">${c}</span>`).join('')}</div>` +
     `<div class="mono" style="margin-top:60px;font-size:44px;color:var(--dim);opacity:${k2.toFixed(2)}">${D.handle || ''}</div></div>`;
 }
 window.seek = seek;
