@@ -642,5 +642,19 @@
   "score": 1,
   "voice": "GSj19hKjOQsPFCZlq1le",
   "date": "2026-11-17"
+ },
+ "TrueUp": {
+  "mode": "A",
+  "spoken": "TrueUp",
+  "score": 1,
+  "voice": "01Hje9fLgarTAqnLKNEK",
+  "date": "2026-11-18"
+ },
+ "Challenger": {
+  "mode": "A",
+  "spoken": "Challenger",
+  "score": 1,
+  "voice": "01Hje9fLgarTAqnLKNEK",
+  "date": "2026-11-18"
  }
 }

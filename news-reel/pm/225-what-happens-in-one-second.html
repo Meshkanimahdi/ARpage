@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — one-concept morph showreel (prompt 225)</title>
+<!-- Skill motion-graphy-2026, prompt 225 "What happens in one second" (UI), built as its own engine (RUNBOOK §00.24).
+     The prompt's look, kept: ONE visual concept carried through the whole film — a row of unit squares, each square
+     a group of people — and every shot is made out of the previous one: the squares morph into a grid, the grid
+     collapses into a bar, the bar turns into 3D month columns, the columns fold into a UI card list, and the end title
+     returns to the first frame so it loops. One typeface (Vazirmatn, Latin in Inter), three colours plus black and
+     white, 120 BPM: something moves on every beat (a beat pulse on the live shape). Required range: kinetic type,
+     shape morphing, a 2D-to-3D moment, a data/UI moment and an end title. Banned: particles, glows, flares,
+     camera shake, RGB split, crossfades, gradients, bouncy easing, holds over half a second.
+     Page standards: 1080x1920, Persian narration (eleven_v4) with a word-by-word caption, library music.
+     Data: story.json beats[{id, text, scene{type: m_hook|m_grid|m_bar|m_months|m_ui|m_ask, words[], extra_hits[],
+     n?, big?, label?, share?, months?, items?}}], end_text, end_sub. Pure seek(t): every style from t. -->
+<style>
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --bg: #F4F1EA; --ink: #111111; --a1: #FF3B1F; --a2: #2B4CFF; --a3: #F5C400; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
+  #root { position: absolute; inset: 0; overflow: hidden; background: var(--bg); font-family: V; font-weight: 900; color: var(--ink); }
+  #stage { position: absolute; inset: 0; }
+  .t { position: absolute; left: 0; right: 0; text-align: center; line-height: 1.08; white-space: nowrap; }
+  #sub { position: absolute; left: 70px; right: 70px; top: 1500px; height: 120px; display: flex; align-items: center; justify-content: center; }
+  #sub .ln { font: 900 56px/1.3 V; white-space: nowrap; color: var(--ink); border-bottom: 8px solid var(--ink); padding: 0 6px 6px; }
+  #sub .w { display: inline-block; margin: 0 .12em; }
+</style>
+</head>
+<body>
+<div id="root"><div id="stage"></div><div id="sub"></div></div>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const U = s => s.startsWith('/') ? s : DIR + s, $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), mix = (a, b, k) => a + (b - a) * k, pr = (t, a, b) => cl((t - a) / (b - a));
+const ex = k => 1 - Math.pow(2, -10 * cl(k));                                        // exponential ease-out
+const sp = k => { k = cl(k); return 1 - Math.exp(-6 * k) * Math.cos(7.5 * k) * (1 - k); }; // damped spring, settles at 1, no bounce past ~3%
+const fa = s => String(s).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]).replace(/,/g, '٬').replace(/\./g, '٫');
+const BEAT = 0.5;                                                                      // 120 BPM
+const ISSUES = [], B = []; let S, TL, END;
+const C = { ink: 'var(--ink)', a1: 'var(--a1)', a2: 'var(--a2)', a3: 'var(--a3)', bg: 'var(--bg)' };
+const pulse = t => 1 + .06 * Math.exp(-12 * (t % BEAT));                       // a tick on every beat
+const svg = inner => `<svg width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;left:0;top:0;overflow:visible">${inner}</svg>`;
+const sq = (x, y, s, col, rot = 0, o = 1, r = 6) => `<rect x="${(x - s / 2).toFixed(1)}" y="${(y - s / 2).toFixed(1)}" width="${s.toFixed(1)}" height="${s.toFixed(1)}" rx="${r}" fill="${col}" opacity="${o.toFixed(2)}" transform="rotate(${rot.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+// kinetic type: each line slides up out of a mask; *word* gets the accent block
+function big(lines, y, size, k, col = C.ink, acc = C.a1) {
+  return lines.map((ln, i) => { const kk = ex(cl(k * 1.5 - i * .3)), html = ln.replace(/\*([^*]+)\*/g, `<span style="background:${acc};color:#fff;padding:0 .14em .04em">$1</span>`);
+    return `<div class="t" style="top:${y + i * size * 1.14}px;height:${size * 1.16}px;overflow:hidden;font-size:${size}px;color:${col}"><div style="transform:translateY(${((1 - kk) * 110).toFixed(1)}%)">${html}</div></div>`; }).join('');
+}
+const small = (txt, x, y, size, k, col = C.ink, ltr = false) => `<div ${ltr ? 'dir="ltr"' : ''} style="position:absolute;left:${x}px;top:${y}px;font:900 ${size}px V;color:${col};white-space:nowrap;opacity:${cl(k * 2).toFixed(2)};transform:translateY(${((1 - ex(k)) * 30).toFixed(1)}px)">${txt}</div>`;
+
+// ===== the through-line object: N unit squares, laid out per scene; positions blend from the previous layout =====
+const N = 40;
+// layouts return [{x,y,s,col,rot}] for i in 0..N-1
+const L_row = (red) => Array.from({length: N}, (_, i) => { const j = i % 5, rowI = Math.floor(i / 5); return {x: 150 + j * 195, y: 1000, s: rowI ? 0 : 175, col: j === red ? C.a1 : C.ink, rot: 0}; });
+const L_grid = (k) => Array.from({length: N}, (_, i) => { const c = i % 5, r = Math.floor(i / 5); return {x: 170 + c * 185, y: 640 + r * 105, s: 96, col: C.ink, rot: 0}; });
+const L_bar = (share) => Array.from({length: N}, (_, i) => { const n = Math.round(N * share); return {x: 90 + (i + .5) * (900 / N), y: 960, s: 900 / N - 3, col: i >= N - n ? C.a1 : C.ink, rot: 0, h: 420}; });
+function blend(A, Bb, k) { return A.map((a, i) => { const b = Bb[i]; return {x: mix(a.x, b.x, k), y: mix(a.y, b.y, k), s: mix(a.s, b.s, k), col: k < .5 ? a.col : b.col, rot: mix(a.rot, b.rot, k), h: mix(a.h || a.s, b.h || b.s, k)}; }); }
+const drawUnits = (U_, extra = '') => svg(U_.map(u => u.s > .5 ? `<rect x="${(u.x - u.s / 2).toFixed(1)}" y="${(u.y - (u.h || u.s) / 2).toFixed(1)}" width="${u.s.toFixed(1)}" height="${(u.h || u.s).toFixed(1)}" rx="6" fill="${u.col}" transform="rotate(${u.rot.toFixed(1)} ${u.x.toFixed(1)} ${u.y.toFixed(1)})"/>` : '').join('') + extra);
+
+function scene(b, t) {
+  const s = b.sc, A = b.a, w = (s.words || []).map(j => b.wt(j)), u = t - A, pk = pulse(t);
+  const ent = ex(pr(t, A - .05, A + .45));                       // how far this shot has grown out of the last
+  let r = '';
+  switch (s.type) {
+    case 'm_hook': {
+      // frame 0: five squares in a row already on screen with the headline; on «یکی» the fourth square turns red and
+      // lifts; on «بفرست» the recipient line slides in. Matches the end frame so the film loops.
+      const red = w[0] !== undefined && t >= w[0] - .05 ? 3 : -1, lift = red >= 0 ? sp(pr(t, w[0] - .05, w[0] + .5)) : 0;
+      const hop = Math.floor(t / BEAT) % 5, hk = Math.exp(-10 * (t % BEAT));
+      const R = L_row(red).map((q, i) => (i === 3 ? {...q, y: q.y - 90 * lift, rot: 8 * lift} : (red < 0 && i === hop ? {...q, y: q.y - 60 * hk, rot: -10 * hk} : q)));
+      r += big(s.big || ['از هر *۵* تعدیل،', '*۱* گردن هوش مصنوعی'], 280, 128, 1);
+      r += `<div style="position:absolute;inset:0;transform:scale(${pk.toFixed(4)});transform-origin:540px 1060px">${drawUnits(R)}</div>`;
+      if (red >= 0) r += small('AI', 690, 1110 - 90 * lift, 90, pr(t, w[0], w[0] + .3), C.a1, true);
+      if (w[1] !== undefined) r += big(['بفرست برای *همکارت* 👇'], 1270, 64, pr(t, w[1] - .05, w[1] + .45), C.ink, C.a2);
+      return r;
+    }
+    case 'm_grid': {
+      // the row multiplies into a 5x8 grid (each square ≈ 5,000 people) while the counter rolls to the total
+      const k = ex(pr(t, A, A + .8)), G = blend(L_row(-1), L_grid(), k);
+      const n = Math.round((s.n || 207000) * (1 - Math.pow(1 - pr(t, A + .2, A + 1.8), 3)));
+      r += `<div class="t" dir="ltr" style="top:260px;font-size:170px;color:var(--ink)">${fa(n.toLocaleString('en-US'))}</div>`;
+      r += big([s.label || 'اخراج از شرکت‌های فناوری · ۲۰۲۶'], 470, 56, pr(t, A + .2, A + .7), C.ink);
+      r += `<div style="position:absolute;inset:0;transform:scale(${pk.toFixed(4)});transform-origin:540px 990px">${drawUnits(G)}</div>`;
+      r += small('<span dir="ltr">TrueUp</span> · ۱۸ نوامبر', 380, 1420, 44, pr(t, A + .4, A + .9), C.a2);
+      return r;
+    }
+    case 'm_bar': {
+      // the grid collapses into one long bar; the AI share (red) grows from the right on its keyword
+      const k = ex(pr(t, A, A + .7)), share = s.share || .2, ks = w[0] !== undefined ? pr(t, w[0] - .05, w[0] + .9) : k;
+      const Bt = L_bar(share * ex(ks)), G = blend(L_grid(), Bt, k);
+      r += big(s.big || ['ژانویه تا اکتبر', '*۱۲۱٬۴۰۱* تعدیل به‌خاطر AI'], 300, 84, pr(t, A, A + .5));
+      r += `<div style="position:absolute;inset:0;transform:scale(${pk.toFixed(4)});transform-origin:540px 1000px">${drawUnits(G)}</div>`;
+      if (w[1] !== undefined) { const kp = pr(t, w[1] - .05, w[1] + .4); r += small(`<span style="font-size:150px;color:var(--a1)">${fa(Math.round(20 * ex(kp)))}٪</span>`, 680, 1150, 60, kp); }
+      r += small('<span dir="ltr">Challenger, Gray &amp; Christmas</span>', 300, 1420, 44, pr(t, A + .4, A + .9), C.a2);
+      if (s.note) r += small(s.note, 210, 1320, 44, pr(t, A + .5, A + 1.0), '#6F6A60');
+      return r;
+    }
+    case 'm_months': {
+      // 2D to 3D: the bar tips back in perspective and splits into month columns; October is a sliver
+      const k = ex(pr(t, A, A + .9)), tilt = 58 * k, months = s.months || [], mx = Math.max(...months.map(m => m[1]), 1);
+      const ko = w[0] !== undefined ? pr(t, w[0] - .05, w[0] + .5) : 0;
+      let cols = '';
+      months.forEach((m, i) => { const h = 520 * (m[1] / mx) * ex(pr(t, A + .2 + i * .06, A + .6 + i * .06)), x = 150 + i * (780 / months.length), wd = 780 / months.length - 14, last = i === months.length - 1;
+        cols += `<div style="position:absolute;left:${x.toFixed(0)}px;bottom:0;width:${wd.toFixed(0)}px;height:${h.toFixed(0)}px;background:${last ? 'var(--a1)' : 'var(--ink)'};transform-origin:50% 100%;transform:scaleY(${last ? (1 + .25 * Math.sin(Math.PI * ko)) : 1})"></div>` +
+                `<div style="position:absolute;left:${x.toFixed(0)}px;bottom:-70px;width:${wd.toFixed(0)}px;text-align:center;font:900 34px V;color:${last ? 'var(--a1)' : 'var(--ink)'}">${m[0]}</div>`; });
+      r += `<div style="position:absolute;left:0;top:560px;width:1080px;height:700px;perspective:1600px"><div style="position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(${(tilt * .35).toFixed(1)}deg) rotateY(${(-18 * k).toFixed(1)}deg) scale(${pk.toFixed(4)});transform-origin:540px 700px">${cols}</div></div>`;
+      r += big(s.big || ['ولی تو *اکتبر*؟'], 290, 100, pr(t, A, A + .5));
+      if (ko > 0) r += big(['فقط *۱٬۲۶۵* از ۴۳٬۹۹۴'], 1380, 70, ko, C.ink, C.a1);
+      if (w[1] !== undefined) r += small('کمترین ماه امسال', 380, 470, 54, pr(t, w[1] - .05, w[1] + .4), C.a2);
+      return r;
+    }
+    case 'm_ui': {
+      // the columns fold into a task-card UI: three example tasks, each with a "repeat" meter filling on its word
+      const items = s.items || [], k = ex(pr(t, A, A + .6));
+      r += big(s.big || ['سؤال اصلی:', 'کار تو چقدر *تکراریه*؟'], 280, 88, pr(t, A, A + .5));
+      items.forEach((it, i) => { const tw = w[i] !== undefined ? w[i] : A + .6 + i * .5, kk = pr(t, tw - .1, tw + .5), y = 640 + i * 230, sl = (1 - ex(pr(t, A + .1 + i * .12, A + .6 + i * .12))) * 900;
+        r += `<div style="position:absolute;left:110px;top:${y}px;width:860px;height:190px;border:6px solid var(--ink);background:#fff;transform:translateX(${sl.toFixed(0)}px) scale(${(i === Math.floor(((t - A) / BEAT) % items.length) ? pk : 1).toFixed(4)})">` +
+             `<div style="position:absolute;right:40px;top:28px;font:900 56px V">${it[0]}</div>` +
+             `<div style="position:absolute;left:40px;right:40px;bottom:30px;height:34px;background:#E4E0D6"><div style="height:100%;width:${(it[1] * ex(kk)).toFixed(1)}%;background:${it[1] > 60 ? 'var(--a1)' : 'var(--a2)'}"></div></div>` +
+             `<div dir="ltr" style="position:absolute;left:40px;top:28px;font:900 56px V;color:${it[1] > 60 ? 'var(--a1)' : 'var(--a2)'}">${fa(Math.round(it[1] * ex(kk)))}%</div></div>`; });
+      r += small('مثال', 110, 1350, 40, k, '#8A857A');
+      return r;
+    }
+    case 'm_ask': {
+      // the cards collapse back into five squares; the ask lands; the frame heads back to the first frame
+      const k = ex(pr(t, A, A + .7)), R = L_row(3).map((q, i) => (i === 3 ? {...q, y: q.y - 90, rot: 8} : q));
+      r += big(s.big || ['تو شرکت شما،', 'AI *بهونه* بود یا *دلیل*؟'], 300, 92, pr(t, A, A + .5), C.ink, C.a1);
+      r += `<div style="position:absolute;inset:0;transform:scale(${(pk * mix(.6, 1, k)).toFixed(4)});transform-origin:540px 1060px;opacity:${k.toFixed(2)}">${drawUnits(R)}</div>`;
+      if (w[0] !== undefined) r += big(['تو *کامنت* بگو 👇'], 1270, 64, pr(t, w[0] - .05, w[0] + .45), C.ink, C.a2);
+      return r;
+    }
+  }
+  return '';
+}
+function endCard(u) {
+  const q = (S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="background:var(--a1);color:#fff;padding:0 .14em .04em">$1</span>');
+  const R = L_row(3).map((q2, i) => (i === 3 ? {...q2, y: q2.y - 90, rot: 8} : q2));
+  return big([q], 360, 96, pr(u, 0, .5)) + `<div class="t" style="top:520px;font-size:56px;font-weight:600;opacity:${pr(u, .3, .7)}">${S.end_sub || ''}</div>` +
+    `<div style="position:absolute;inset:0;transform:scale(${pulse(u).toFixed(4)});transform-origin:540px 1060px">${drawUnits(R)}</div>` +
+    `<div class="t" dir="ltr" style="top:1300px;font-size:44px;font-weight:600;letter-spacing:6px;color:var(--a2);opacity:${pr(u, .5, .9)}">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;
+}
+
+window.ready = (async () => {
+  S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json();
+  END = TL.total;
+  const shown = t => t.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/);
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) { ISSUES.push('no timing for ' + bt.id); continue; }
+    const raw = shown(bt.text); let on = false;
+    const words = raw.map(w => { if (w.startsWith('*')) on = true; const k = on || /\*/.test(w); if (/\*[.…،؛!؟?]*$/.test(w)) on = false; return {w: w.replace(/\*/g, ''), k}; });
+    const wt = j => { const i = Math.round(cl(j / Math.max(1, words.length - 1)) * (L.words.length - 1)); return (L.words[i] || [L.start])[0]; };
+    const kis = words.map((w, i) => w.k && (i === 0 || !words[i - 1].k) ? i : -1).filter(i => i >= 0);
+    B.push({bt, sc: bt.scene || {}, L, words, wt, kt: kis.map(wt)});
+  }
+  B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'هوش مصنوعی AI 207')));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  const SC = [];
+  for (const b of B) {
+    const pts = [b.a, ...b.kt.filter(h => h > b.a + .9 && h < b.b - .9)];
+    (b.sc.extra_hits || []).forEach(j => { const h = b.wt(j); if (h > b.a + .9 && h < b.b - .9) pts.push(h); });
+    const ps = [...new Set(pts.map(x => +x.toFixed(2)))].sort((p, q) => p - q);
+    ps.forEach((p, i) => SC.push({t0: p, t1: i + 1 < ps.length ? ps[i + 1] : b.b, type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''), sfx: i ? [[p, (S.sfx_hits || ['tick'])[SC.length % (S.sfx_hits || ['tick']).length], .35]] : [[p, (S.sfx_open || ['pop'])[b.i % (S.sfx_open || ['pop']).length], .3]]}));
+  }
+  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .2, S.sfx_end || 'hit', .5]]});
+  window.SCENES = SC;
+  for (const s of SC) if (s.t1 - s.t0 > 3.2) ISSUES.push(`idea ${s.bg} holds ${(s.t1 - s.t0).toFixed(1)} s (> 3): add a hit`);
+  seek(0);
+})();
+
+const PAL = [['#F4F1EA', '#111111', '#2B4CFF'], ['#111111', '#F4F1EA', '#F5C400'], ['#2B4CFF', '#FFFFFF', '#F5C400'], ['#F5C400', '#111111', '#2B4CFF']];
+function grid() { let g = ''; for (let x = 0; x <= 1080; x += 72) g += `<line x1="${x}" y1="0" x2="${x}" y2="1920"/>`; for (let y = 0; y <= 1920; y += 72) g += `<line x1="0" y1="${y}" x2="1080" y2="${y}"/>`; return `<svg width="1080" height="1920" style="position:absolute;left:0;top:0"><g stroke="var(--ink)" stroke-opacity=".16" stroke-width="3">${g}</g></svg>`; }
+function seek(t) {
+  if (!B.length) return;
+  { const SC = window.SCENES || []; let si = 0; SC.forEach((s, i) => { if (t >= s.t0) si = i; }); const p = PAL[si % PAL.length], R_ = document.documentElement.style; R_.setProperty('--bg', p[0]); R_.setProperty('--ink', p[1]); R_.setProperty('--a2', p[2]); }
+  let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
+  const endOn = t >= TL.end_start, b = B[bi];
+  const h = grid() + (endOn ? endCard(t - TL.end_start) : scene(b, t));
+  const st = $('stage'); if (st._h !== h) { st._h = h; st.innerHTML = h; }
+  caption(b, t, endOn);
+}
+function caption(b, t, endOn) {
+  const sub = $('sub');
+  if (endOn || t > b.L.end + .3 || (b.i === 0 && S.hook_nocap)) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
+  const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + c0;
+  if (sub._k !== key) { sub._k = key; const lat = w => /^[A-Za-z0-9.\-&]+[،,.!?؟…؛]*$/.test(w.w);
+    sub.innerHTML = `<span class="ln">${ch.map((w, q) => `<span class="w" data-i="${q}" ${lat(w) ? 'dir="ltr"' : ''} style="${w.k ? 'color:var(--a1)' : ''}">${w.w}</span>`).join(' ')}</span>`; }
+  sub.querySelectorAll('.w').forEach(el => { const tw = b.wt(c0 + +el.dataset.i); el.style.opacity = .25 + .75 * ex(pr(t, tw - .05, tw + .2)); });
+}
+window.seek = seek;
+</script>
+</body>
+</html>
