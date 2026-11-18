@@ -19,6 +19,19 @@ routine**, in a way people **send to someone they care about**. Every other reel
 - **Tone:** calm, practical, true. A frightening subject is told as "how to be ready", with a reputable
   source; no predictions of war or crashes, no fake numbers.
 
+## 1b. Guard against drift: the niche is the topic, life is the angle
+"Life impact" is an angle, not a topic. Left alone, a life-first rule slides into generic advice: on one AI page,
+twelve of fifteen reels in a row became household and safety tips (gas leaks, heating, freezer food, antibiotics,
+"don't share your code" scams) with no AI development behind them, and the owner said the page had lost its
+purpose. Rules that stop it:
+- **Every piece stands on a real, recent development in the niche** (`ai_anchor {what, who, date, url}`, ≤ 14
+  days for news and practice pieces, ≤ 30 for stories). No anchor, no piece.
+- **A weekly mix** set in the brand profile (e.g. 60 % niche news told through its effect on people, 25 %
+  practice — a real use or tool, 15 % stories/series), enforced as a minimum share of news in every 7 pieces.
+- **Cap the advice families** (safety, scams, household, health tips): at most 1 in 14 pieces, only as news
+  about a new development in the niche, never as "be careful" advice.
+- Review the last 15 topics every week: if one family fills more than a third, stop it for two weeks.
+
 ## 2. Topic filter (from an owner's review of a 72-topic bank)
 - **News alone is not a topic.** Each topic needs a use the viewer can act on, or a surprising view of their
   own life through the niche.

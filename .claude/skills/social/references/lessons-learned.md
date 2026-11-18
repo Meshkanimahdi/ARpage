@@ -32,3 +32,4 @@ designing a new pipeline; most of these are invisible until they cost a week.
 | Reel published on a different engine than reported to the owner | Report what actually shipped (from state and history), including fallbacks |
 | Next series part came the next day, before comments arrived | One week between parts, same weekday and slot; real vote count |
 | Carousels: median reach 38, 1 save in 26 posts | Utility carousels (checklists, prompts, comparisons), slide 2 delivers, save/send ask, story push |
+| "Life impact first" turned an AI-news page into household and scam tips (12 of 15 reels) | The niche development is the topic, life is the angle: ai_anchor required, weekly mix, advice families capped at 1 in 14 |
