@@ -309,7 +309,7 @@ def glitch(fr, T, k):
         if r.random() < 0.25: out[y:y + hh // 3, :, int(r.integers(0, 3))] = 255
     return out
 def shockwave(fr, x, k):
-    r = int(60 + 1100 * eout(x / 0.55)); a = (1 - x / 0.55) ** 1.5
+    r = int(60 + 1100 * eout(x / 0.55)); a = max(0.0, 1 - x / 0.55) ** 1.5
     if a <= 0: return
     layer = np.zeros((H, W, 3), np.uint8); cv2.circle(layer, (W // 2, int(H * 0.42)), r, (int(255 * a), int(235 * a), int(210 * a)), int(26 * a) + 2)
     add_light(fr, cv2.GaussianBlur(layer, (0, 0), 10))
