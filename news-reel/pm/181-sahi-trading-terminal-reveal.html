@@ -86,8 +86,8 @@ window.ready = (async () => {
   for (const c of cuts) if (c.t1 - c.t0 > 3.2) ISSUES.push(`shot ${c.bg} holds ${(c.t1 - c.t0).toFixed(1)} s (> 3): add a key`);
   seek(0);
 })();
-const PROD = () => (D.product || 'fiverr').toLowerCase().replace(/[^a-z0-9]/g, '') + '.svg';
-const BRAND = () => (D.brand || 'upwork').toLowerCase().replace(/[^a-z0-9]/g, '') + '.svg';
+const PROD = () => D.product_file || (D.product || 'fiverr').toLowerCase().replace(/[^a-z0-9]/g, '') + '.svg';
+const BRAND = () => D.brand_file || (D.brand || 'upwork').toLowerCase().replace(/[^a-z0-9]/g, '') + '.svg';
 
 // camera keys inside a beat (each is a clear camera change = a new shot)
 const KEYS = {
@@ -172,22 +172,32 @@ function arrowCur(x0, y0, t, tc) {
 }
 const step = (n, k) => k <= 0 ? '' : `<div class="ab" style="left:80px;top:180px;width:150px;height:150px;border-radius:34px;background:var(--up);color:#05070A;font:900 120px/150px V;text-align:center;transform:rotate(-5deg) scale(${lerp(1.6, 1, ex(k)).toFixed(3)});opacity:${clamp(k * 5).toFixed(2)}">${fa(n)}</div>`;
 const gIcon = () => logo('openai.png', 46, '#fff');
-KEYS.g_hook = x => [x.when('گیف'), x.when('بفرست')];
-KEYS.g_news = x => [x.when('تازه‌ی'), x.when('پنجاه'), x.when('گیف')];
-KEYS.g_plans = x => [x.when('همه‌ی'), x.when('رایگان')];
+KEYS.g_hook = x => [x.when('گیف'), x.when('گیف', 1)];
+KEYS.g_news = x => [x.when('تازه‌ش'), x.when('پنجاه'), x.when('گیف')];
+KEYS.g_plans = x => [x.when('پلن‌ها'), x.when('رایگان')];
 KEYS.g_upload = x => [x.when('عکس'), x.when('آپلود')];
 KEYS.g_prompt = x => [x.when('بنویس'), x.when('لوپ'), x.when('بچرخه')];
-KEYS.g_frames = x => [x.when('خراب'), x.when('همون'), x.when('سرعتش')];
-KEYS.g_story = x => [x.when('ذخیره'), x.when('بدون')];
-KEYS.g_ask = x => [x.when('چی'), x.when('کامنت')];
-CAMS.g_hook = x => [[x.a, 1.1, 540, 980], [x.when('گیف'), 1, 540, 960], [x.when('بفرست'), 1.07, 540, 1120]];
-CAMS.g_news = x => [[x.a, 1.4, 540, 520], [x.when('تازه‌ی'), 1, 540, 900], [x.when('پنجاه'), 1.1, 540, 1060], [x.when('گیف'), 1.04, 540, 1200]];
-CAMS.g_plans = x => [[x.a, .5, 540, 960], [x.a + .5, 1, 540, 960], [x.when('همه‌ی'), 1.1, 540, 760], [x.when('رایگان'), 1.08, 540, 1150]];
+KEYS.g_frames = x => [x.when('خراب'), x.when('همون'), x.when('سرعت')];
+KEYS.g_story = x => [x.when('دانلودش'), x.when('ویدیو'), x.when('بدون')];
+KEYS.g_ask = x => [x.when('چی'), x.when('کامنت'), x.when('بفرست')];
+CAMS.g_hook = x => [[x.a, 1.1, 540, 980], [x.when('گیف'), 1, 540, 960], [x.when('گیف', 1), 1.07, 540, 1120]];
+CAMS.g_news = x => [[x.a, 1.4, 540, 520], [x.when('تازه‌ش'), 1, 540, 900], [x.when('پنجاه'), 1.08, 540, 960], [x.when('گیف'), 1.04, 540, 1050]];
+CAMS.g_plans = x => [[x.a, .5, 540, 960], [x.a + .5, 1, 540, 960], [x.when('پلن‌ها'), 1.1, 540, 760], [x.when('رایگان'), 1.08, 540, 1150]];
 CAMS.g_upload = x => [[x.a, 1.3, 540, 1100], [x.when('عکس'), 1, 540, 960], [x.when('آپلود'), 1.15, 540, 1180]];
-CAMS.g_prompt = x => [[x.a, 1, 540, 960], [x.when('بنویس'), 1.12, 540, 1250], [x.when('لوپ'), 1.05, 540, 1150], [x.when('بچرخه'), 1.12, 540, 640]];
-CAMS.g_frames = x => [[x.a, 2.2, 300, 500], [x.a + .6, 1, 540, 900], [x.when('خراب'), 1.15, 700, 900], [x.when('همون'), 1.05, 540, 1250], [x.when('سرعتش'), 1.1, 540, 1400]];
-CAMS.g_story = x => [[x.a, .4, 540, 960], [x.a + .5, 1, 540, 960], [x.when('ذخیره'), 1.12, 540, 1250], [x.when('بدون'), 1.06, 540, 900]];
+CAMS.g_prompt = x => [[x.a, 1, 540, 960], [x.when('بنویس'), 1.06, 540, 1080], [x.when('لوپ'), 1.05, 540, 1150], [x.when('بچرخه'), 1.12, 540, 640]];
+CAMS.g_frames = x => [[x.a, 1.6, 540, 700], [x.a + .6, 1, 540, 900], [x.when('خراب'), 1.15, 700, 900], [x.when('همون'), 1.05, 540, 1250], [x.when('سرعت'), 1.1, 540, 1400]];
+CAMS.g_story = x => [[x.a, .4, 540, 960], [x.a + .5, 1, 540, 960], [x.when('دانلودش'), 1.12, 540, 1250], [x.when('ویدیو'), 1.04, 540, 1000], [x.when('بدون'), 1.08, 540, 900]];
 CAMS.g_ask = x => [[x.a, 1.3, 540, 700], [x.when('چی'), 1, 540, 960], [x.when('کامنت'), 1.1, 540, 1250]];
+// REEL-061 ground: the terminal's own log scrolls behind every window (frame renders, timings, sizes) on a brighter grid,
+// so the black page is never empty; a large outlined frame counter drifts across it
+const LOGW = ['render frame', 'loop ok', 'encode gif', 'frame_count 9', 'duration 200ms', 'model 2.6', 'edit frame', 'speed 0.5x', 'export', 'upload mug.jpg'];
+function gground(t) {
+  const off = (t * 46) % 46;
+  let rows = ''; for (let r = 0; r < 46; r++) { const n = (r + Math.floor(t * 46 / 46)) ; let line = ''; for (let c = 0; c < 3; c++) { const k = (n * 7 + c * 3) % LOGW.length; line += `<span style="display:inline-block;width:360px">${String(((n * 37 + c * 11) % 900) + 100).padStart(4, '0')} ${LOGW[k]}</span>`; } rows += `<div style="height:46px">${line}</div>`; }
+  return `<div class="ab" style="inset:-400px;background-color:#070A0E;background-image:linear-gradient(#22303D 2px,transparent 2px),linear-gradient(90deg,#22303D 2px,transparent 2px);background-size:90px 90px"></div>` +
+    `<div class="ab mono" style="left:20px;top:${(-off).toFixed(1)}px;width:1080px;font-size:26px;line-height:46px;color:#3A4A5A;white-space:nowrap">${rows}</div>` +
+    `<div class="ab mono" style="left:${(-200 + 40 * Math.sin(t * .4)).toFixed(0)}px;top:1100px;font-size:520px;line-height:1;color:transparent;-webkit-text-stroke:4px rgba(240,185,11,.22)">${String(gfr(t) + 1).padStart(2, '0')}/09</div>`;
+}
 function drawG(x, t) {
   const s = x.s, A = x.a, w = x.when, Z = x.z;
   const big = (txt, x0, y0, sz, col, k, dir = 'rtl') => k <= 0 ? '' : `<div class="ab" style="left:${x0}px;right:${x0}px;top:${y0}px;text-align:center;font:900 ${sz}px/1.1 V;color:${col};direction:${dir};transform:scale(${lerp(1.5, 1, ex(k)).toFixed(3)});opacity:${clamp(k * 5).toFixed(2)}">${txt}</div>`;
@@ -195,15 +205,15 @@ function drawG(x, t) {
     case 'g_hook': {
       // frame 0: headline on screen, the product still sits in a ChatGPT window; on «گیف» it starts to loop, the GIF badge
       // slams on, the 9-frame strip fans out under it; the recipient chip on «بفرست»
-      const tg = w('گیف'), tb = w('بفرست'), live = t >= tg, kw = ramp(t, 0, .25), kb = ramp(t, tg - .05, tg + .25), kf = ramp(t, tg + .3, tg + 1.1);
+      const tg = w('گیف'), tb = w('گیف', 1), live = t >= tg, kw = ramp(t, 0, .25), kb = ramp(t, tg - .05, tg + .25), kf = ramp(t, tg + .3, tg + 1.1);
       const body = mugGif(110, 40, 600, t, live) + `<div class="ab mono" style="left:110px;top:670px;font-size:30px;color:var(--dim)">${live ? 'GIF · frame ' + (gfr(t) + 1) + '/9' : 'photo.jpg · still'}</div>` +
         (kb > 0 ? `<div class="ab" style="left:560px;top:60px;padding:8px 30px 16px;border-radius:20px;background:var(--amb);color:#05070A;font:900 72px V;direction:ltr;transform:rotate(6deg) scale(${lerp(1.8, 1, ex(kb)).toFixed(3)})">GIF</div>` : '');
-      const strip = [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => { const kk = ex(ramp(kf, i * .08, i * .08 + .3)); return kk <= 0 ? '' : mugGif(90 + i * 102 - (1 - kk) * i * 60, 1290, 92, t, false, i, `opacity:${kk.toFixed(2)};border:3px solid ${i === gfr(t) && live ? 'var(--amb)' : 'transparent'}`); }).join('');
-      return ground() + win(150, 520, 780, 760, 'chatgpt.com · Images 2.6', body, kw, 'up', live ? 'var(--amb)' : '') + strip +
-        chip('بفرست برای دوستت که آنلاین می‌فروشه 👇', 80, 1410, 50, '#fff', '#05070A', ramp(t, tb - .05, tb + .25), 'rtl');
+      const strip = [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => { const kk = ex(ramp(kf, i * .08, i * .08 + .3)); return kk <= 0 ? '' : mugGif(90 + i * 102 - (1 - kk) * i * 60, 1400, 92, t, false, i, `opacity:${kk.toFixed(2)};border:3px solid ${i === gfr(t) && live ? 'var(--amb)' : 'transparent'}`); }).join('');
+      return gground(t) + win(150, 620, 780, 760, 'chatgpt.com · Images 2.6', body, kw, 'up', live ? 'var(--amb)' : '') + strip +
+        chip('عکس ← گیف ✓', 330, 300, 80, 'var(--amb)', '#05070A', ramp(t, tb - .05, tb + .25), 'rtl');
     }
     case 'g_news': {
-      const ki = ramp(t, w('تازه‌ی') - .2, w('تازه‌ی') + .6), kd = ramp(t, w('چهارم') - .05, w('چهارم') + .25), k5 = ramp(t, w('پنجاه') - .1, w('پنجاه') + .8), kg = ramp(t, w('گیف') - .05, w('گیف') + .25);
+      const ki = ramp(t, w('تازه‌ش') - .2, w('تازه‌ش') + .6), kd = ramp(t, w('سیزدهم') - .05, w('سیزدهم') + .25), k5 = ramp(t, w('پنجاه') - .1, w('پنجاه') + .8), kg = ramp(t, w('گیف') - .05, w('گیف') + .25);
       const art = `<div style="padding:34px 40px;direction:ltr"><div style="display:flex;align-items:center;gap:20px">${logo('openai.png', 80, '#fff')}<span style="font:900 44px V;color:var(--dim)">OpenAI · News</span></div>` +
         `<div style="margin-top:30px;font:900 78px/1.15 V;color:#fff">${typed('Introducing Images 2.6', ki)}${ki > 0 && ki < 1 ? caret(t) : ''}</div>` +
         `<div style="margin-top:24px;height:16px;width:${(760 * ex(ramp(t, A + .3, A + 1.4))).toFixed(0)}px;border-radius:8px;background:#1A222C"></div><div style="margin-top:14px;height:16px;width:${(560 * ex(ramp(t, A + .5, A + 1.6))).toFixed(0)}px;border-radius:8px;background:#1A222C"></div></div>`;
@@ -211,17 +221,17 @@ function drawG(x, t) {
       const speed = `<div style="padding:30px 40px;direction:rtl"><div style="font:900 44px V;color:var(--dim)">زمان ساخت یه عکس</div>` +
         `<div style="margin-top:24px;display:flex;align-items:center;gap:24px"><span style="width:150px;font:900 40px V;color:var(--dim)">قبلی</span><div style="width:${old}px;height:56px;border-radius:28px;background:#2A3440"></div></div>` +
         `<div style="margin-top:22px;display:flex;align-items:center;gap:24px"><span style="width:150px;font:900 40px V;color:var(--up)">۲.۶</span><div style="width:${nw.toFixed(0)}px;height:56px;border-radius:28px;background:var(--up)"></div></div></div>`;
-      return ground() + win(80, 190, 920, 520, 'openai.com/index/introducing-images-2-6', art, ramp(t, A, A + .3), 'up') +
-        chip('۴ نوامبر ۲۰۲۶', 620, 150, 54, 'var(--amb)', '#05070A', kd, 'rtl') +
+      return gground(t) + win(80, 190, 920, 520, 'openai.com/index/introducing-images-2-6', art, ramp(t, A, A + .3), 'up') +
+        chip('۱۳ آبان / ۴ نوامبر', 540, 150, 50, 'var(--amb)', '#05070A', kd, 'rtl') +
         win(80, 760, 920, 390, 'speed', speed, ramp(t, A + .4, A + .7), 'down', k5 > 0 ? 'var(--up)' : '') +
         big('۵۰٪ سریع‌تر', 80, 1190, 120, 'var(--up)', k5) + chip('+ حالا گیف هم می‌سازه', 270, 1370, 56, '#fff', '#05070A', kg, 'rtl');
     }
     case 'g_plans': {
-      const ka = ramp(t, w('همه‌ی') - .1, w('همه‌ی') + .2), kf = ramp(t, w('رایگان') - .05, w('رایگان') + .3);
-      const plans = [['Free', 'رایگان', kf], ['Plus', '', ramp(t, ka, ka + .3) * (t > w('همه‌ی') ? 1 : 0)], ['Pro', '', ramp(t, w('همه‌ی') + .4, w('همه‌ی') + .7)]];
+      const ka = ramp(t, w('پلن‌ها') - .1, w('پلن‌ها') + .2), kf = ramp(t, w('رایگان') - .05, w('رایگان') + .3);
+      const plans = [['Free', 'رایگان', kf], ['Plus', '', ramp(t, ka, ka + .3) * (t > w('پلن‌ها') ? 1 : 0)], ['Pro', '', ramp(t, w('پلن‌ها') + .4, w('پلن‌ها') + .7)]];
       const body = plans.map((p, i) => `<div style="display:flex;align-items:center;justify-content:space-between;padding:30px 44px;border-bottom:2px solid var(--line);direction:ltr;background:${i === 0 && kf > 0 ? 'rgba(22,199,132,.14)' : 'transparent'}"><span style="font:900 64px V;color:#fff">${p[0]}</span><span style="font:900 56px V;color:var(--dim);direction:rtl">${p[1]}</span><span style="font:900 72px V;color:var(--up);transform:scale(${lerp(2, 1, ex(p[2])).toFixed(3)});opacity:${clamp(p[2] * 4).toFixed(2)}">✓</span></div>`).join('');
       const dev = [['🌐 وب', .2], ['💻 دسکتاپ', .5], ['📱 موبایل', .8]].map((d, i) => chip(d[0], 90 + i * 310, 1160, 54, '#1A222C', '#fff', ramp(t, A + 1 + d[1], A + 1.3 + d[1]), 'rtl')).join('');
-      return ground() + win(80, 260, 920, 560, 'ChatGPT · GIF · who gets it', body, ramp(t, A, A + .3), 'up', 'var(--up)') + dev +
+      return gground(t) + win(80, 260, 920, 560, 'ChatGPT · GIF · who gets it', body, ramp(t, A, A + .3), 'up', 'var(--up)') + dev +
         big('حتی حساب رایگان ✓', 60, 900, 104, 'var(--up)', kf) + chip(`${gIcon()} <span style="vertical-align:middle">ChatGPT</span>`, 380, 170, 54, '#fff', '#05070A', ramp(t, A + .05, A + .35));
     }
     case 'g_upload': {
@@ -229,7 +239,7 @@ function drawG(x, t) {
       const comp = `<div class="ab" style="left:30px;right:30px;top:34px;height:150px;border-radius:75px;background:#1A222C;display:flex;align-items:center;padding:0 30px;gap:24px;direction:ltr">` +
         `<span style="width:96px;height:96px;border-radius:50%;background:${t > tu ? 'var(--up)' : '#2A3440'};color:#05070A;font:900 80px/90px V;text-align:center">+</span><span style="font:600 44px V;color:var(--dim);direction:rtl">از ChatGPT بپرس…</span></div>` +
         (kt > 0 ? `<div class="ab" style="left:40px;top:${(220 + (1 - ex(kt)) * 200).toFixed(0)}px;opacity:${clamp(kt * 4).toFixed(2)}">${mugGif(0, 0, 300, t, false).replace('class="ab"', 'class="ab" ')}<div class="ab mono" style="left:330px;top:120px;font-size:30px;color:var(--up)">mug.jpg ✓</div></div>` : '');
-      return ground() + step(1, ramp(t, A, A + .3)) + win(80, 920, 920, 600, 'chatgpt.com', comp, ramp(t, A + .1, A + .4), 'down', t > tu ? 'var(--up)' : '') +
+      return gground(t) + step(1, ramp(t, A, A + .3)) + win(80, 920, 920, 600, 'chatgpt.com', comp, ramp(t, A + .1, A + .4), 'down', t > tu ? 'var(--up)' : '') +
         win(300, 230, 700, 560, 'photos', mugGif(40, 30, 440, t, false) + `<div class="ab mono" style="left:500px;top:60px;font-size:28px;color:var(--dim);line-height:1.8">1 photo<br>plain bg<br>good light</div>`, ramp(t, A + .2, A + .5), 'right') +
         chip('یه عکس ساده کافیه', 300, 820, 56, 'var(--amb)', '#05070A', ramp(t, te - .05, te + .25), 'rtl') + arrowCur(cx, cy, t, tu);
     }
@@ -239,33 +249,33 @@ function drawG(x, t) {
       const comp = `<div style="padding:30px 36px;direction:rtl;font:900 52px/1.45 V;color:#fff;white-space:normal">${typed(q, kq)}${kq < 1 ? caret(t) : ''}</div>` +
         `<div class="ab" style="left:34px;bottom:30px;width:96px;height:96px;border-radius:50%;background:${t > ks ? 'var(--up)' : '#2A3440'};color:#05070A;font:900 60px/96px V;text-align:center">↑</div>`;
       const ring = `<svg class="ab" style="left:300px;top:150px" width="300" height="300"><circle cx="150" cy="150" r="110" fill="none" stroke="#1A222C" stroke-width="18"/><circle cx="150" cy="150" r="110" fill="none" stroke="var(--amb)" stroke-width="18" stroke-linecap="round" stroke-dasharray="${(691 * kp).toFixed(0)} 999" transform="rotate(-90 150 150)"/></svg>`;
-      const reply = kr <= 0 ? '' : done ? mugGif(150, 30, 520, t, true) + `<div class="ab" style="left:600px;top:40px;padding:6px 22px 12px;border-radius:16px;background:var(--amb);color:#05070A;font:900 52px V;direction:ltr">GIF</div>` : ring;
-      return ground() + step(2, ramp(t, A, A + .3)) + win(80, 1020, 920, 470, 'message', comp, ramp(t, A + .1, A + .4), 'down') +
-        win(110, 360, 860, 620, 'ChatGPT · Images 2.6', reply, kr, 'up', done ? 'var(--amb)' : '') +
+      const reply = kr <= 0 ? mugGif(40, 40, 260, t, false) + `<div class="ab mono" style="left:330px;top:150px;font-size:32px;color:var(--up)">mug.jpg ✓ uploaded</div><div class="ab" style="left:40px;top:340px;font:900 48px V;color:var(--dim);direction:rtl;right:40px;text-align:right">منتظر دستور تو…${caret(t)}</div>` : done ? mugGif(150, 30, 520, t, true) + `<div class="ab" style="left:600px;top:40px;padding:6px 22px 12px;border-radius:16px;background:var(--amb);color:#05070A;font:900 52px V;direction:ltr">GIF</div>` : ring;
+      return gground(t) + step(2, ramp(t, A, A + .3)) + win(80, 1020, 920, 470, 'message', comp, ramp(t, A + .1, A + .4), 'down') +
+        win(110, 360, 860, 620, 'ChatGPT · Images 2.6', reply, ramp(t, A + .15, A + .45), 'up', done ? 'var(--amb)' : '') +
         chip('لوپ = بی‌پایان می‌چرخه', 340, 230, 52, '#fff', '#05070A', ramp(t, tl - .05, tl + .25), 'rtl') + arrowCur(lerp(700, 150, ex(ramp(t, ks - .6, ks))), lerp(1700, 1420, ex(ramp(t, ks - .6, ks))), t, ks);
     }
     case 'g_frames': {
-      const tb = w('خراب'), th = w('همون'), tsp = w('سرعتش'), kx = ramp(t, tb - .05, tb + .25), kfix = ramp(t, th + .6, th + 1.0), kd = ramp(t, tsp - .1, tsp + .6);
+      const tb = w('خراب'), th = w('همون'), tsp = w('سرعت'), kx = ramp(t, tb - .05, tb + .25), kfix = ramp(t, th + .6, th + 1.0), kd = ramp(t, tsp - .1, tsp + .6);
       const cells = [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => { const cx = 40 + (i % 3) * 280, cy = 30 + Math.floor(i / 3) * 280, kk = ramp(t, A + .1 + i * .06, A + .3 + i * .06), bad = i === 5 && kx > 0;
         const broken = bad && kfix < .5 ? 'filter:hue-rotate(160deg) saturate(1.6) blur(2px);' : '';
         return kk <= 0 ? '' : `<div class="ab" style="left:${cx}px;top:${cy}px;opacity:${clamp(kk * 4).toFixed(2)};transform:scale(${lerp(.8, 1, ex(kk)).toFixed(3)})">${mugGif(0, 0, 250, t, false, i, broken + `border:6px solid ${bad ? (kfix >= .5 ? 'var(--up)' : 'var(--dn)') : 'transparent'};box-sizing:border-box`)}` +
           `<div class="ab mono" style="left:12px;top:12px;font-size:24px;color:#fff;background:rgba(5,7,10,.7);padding:2px 10px;border-radius:8px">${i + 1}</div>` +
           (bad ? `<div class="ab" style="left:150px;top:150px;width:90px;height:90px;border-radius:50%;background:${kfix >= .5 ? 'var(--up)' : 'var(--dn)'};color:#fff;font:900 64px/86px V;text-align:center;transform:scale(${lerp(2, 1, ex(kfix >= .5 ? kfix : kx)).toFixed(3)})">${kfix >= .5 ? '✓' : '✕'}</div>` : '') + '</div>'; }).join('');
-      const kb = ramp(t, th - .05, th + .25), fixTxt = 'فقط قاب ۶: رنگش رو مثل بقیه کن';
-      const dial = `<div style="padding:26px 40px;direction:ltr;display:flex;align-items:center;gap:30px"><span style="font:900 44px V;color:var(--dim);direction:rtl">سرعت</span><div style="position:relative;flex:1;height:16px;border-radius:8px;background:#1A222C"><div style="position:absolute;left:0;top:0;height:16px;border-radius:8px;width:${(30 + 45 * ex(kd)).toFixed(0)}%;background:var(--amb)"></div><div style="position:absolute;top:-22px;left:calc(${(30 + 45 * ex(kd)).toFixed(0)}% - 30px);width:60px;height:60px;border-radius:50%;background:#fff"></div></div><span class="mono" style="font-size:44px;color:#fff">${(1 + ex(kd)).toFixed(1)}x</span></div>`;
-      return ground() + win(110, 210, 860, 900, 'GIF · 9 frames · sheet', cells, ramp(t, A, A + .3), 'up', kx > 0 && kfix < .5 ? 'var(--dn)' : '') +
+      const kb = ramp(t, th - .05, th + .25), fixTxt = 'فقط فریم ۶: رنگش رو مثل بقیه کن';
+      const dial = `<div style="padding:26px 40px;direction:ltr;display:flex;align-items:center;gap:30px"><span style="font:900 44px V;color:var(--dim);direction:rtl">سرعت</span><div style="position:relative;flex:1;height:16px;border-radius:8px;background:#1A222C"><div style="position:absolute;left:0;top:0;height:16px;border-radius:8px;width:${(50 - 25 * ex(kd)).toFixed(0)}%;background:var(--amb)"></div><div style="position:absolute;top:-22px;left:calc(${(50 - 25 * ex(kd)).toFixed(0)}% - 30px);width:60px;height:60px;border-radius:50%;background:#fff"></div></div><span class="mono" style="font-size:44px;color:#fff">${(1 - .5 * ex(kd)).toFixed(1)}x</span></div>`;
+      return gground(t) + win(110, 210, 860, 900, 'GIF · 9 frames · sheet', cells, ramp(t, A, A + .3), 'up', kx > 0 && kfix < .5 ? 'var(--dn)' : '') +
         (kb > 0 ? `<div class="ab" style="left:150px;top:1140px;max-width:780px;padding:20px 36px 30px;border-radius:34px 34px 34px 8px;background:#1A222C;border:3px solid var(--up);font:900 52px/1.4 V;color:#fff;direction:rtl;transform:scale(${lerp(.8, 1, ex(kb)).toFixed(3)});opacity:${clamp(kb * 4).toFixed(2)}">${typed(fixTxt, ramp(t, th, th + .6))}</div>` : '') +
-        win(110, 1290, 860, 160, 'playback', dial, ramp(t, tsp - .3, tsp), 'down') + chip('فقط همون قاب، نه از اول', 560, 150, 46, 'var(--amb)', '#05070A', ramp(t, th + .9, th + 1.2), 'rtl');
+        win(110, 1290, 860, 160, 'playback', dial, ramp(t, tsp - .3, tsp), 'down') + chip('فقط همون فریم، نه از اول', 560, 150, 46, 'var(--amb)', '#05070A', ramp(t, th + .9, th + 1.2), 'rtl');
     }
     case 'g_story': {
-      const ts = w('ذخیره'), tn = w('بدون'), kd = ramp(t, ts - .05, ts + .3), kp = ramp(t, ts + .3, ts + .8), kn = ramp(t, tn - .05, tn + .25);
+      const ts = w('دانلودش'), tv = w('ویدیو'), tn = w('بدون'), kd = ramp(t, ts - .05, ts + .3), kp = ramp(t, ts + .3, ts + .8), kn = ramp(t, tn - .05, tn + .25);
       const ph = `<div class="ab" style="left:0;top:0;right:0;bottom:0;background:#EFE6DA"></div>` + mugGif(30, 260, 360, t, true, undefined, 'border-radius:30px') +
         `<div class="ab" style="left:24px;right:24px;top:28px;height:8px;border-radius:4px;background:rgba(0,0,0,.15)"><div style="width:${(100 * ramp(t, ts, Z)).toFixed(0)}%;height:8px;border-radius:4px;background:#fff"></div></div>` +
         `<div class="ab" style="left:24px;top:60px;font:900 34px V;color:#3A2E24;direction:rtl;right:24px;text-align:right">ماگ دست‌ساز · فقط ۳ تا مونده</div>` +
         `<div class="ab" style="left:60px;right:60px;bottom:70px;padding:14px 0 22px;border-radius:30px;background:#05070A;color:#fff;font:900 40px V;text-align:center">سفارش در دایرکت</div>`;
       const phone = kp <= 0 ? '' : `<div class="ab" style="left:300px;top:${(300 + (1 - ex(kp)) * 300).toFixed(0)}px;width:480px;height:860px;border-radius:64px;background:#111;border:12px solid #2A2F36;overflow:hidden;opacity:${clamp(kp * 4).toFixed(2)}">${ph}</div>`;
-      return ground() + win(80, 1210, 920, 260, 'save', `<div style="padding:40px;display:flex;gap:30px;align-items:center;direction:rtl"><span style="padding:18px 46px 28px;border-radius:28px;background:${t > ts ? 'var(--up)' : '#2A3440'};color:#05070A;font:900 56px V">⬇ ذخیره</span><span class="mono" style="font-size:34px;color:var(--dim)">mug.gif · 9 frames</span></div>`, ramp(t, A, A + .3), 'down') + phone +
-        chip('بدون طراح ✓', 70, 420, 64, 'var(--amb)', '#05070A', kn, 'rtl') + chip('برای استوری', 70, 560, 54, '#fff', '#05070A', kd, 'rtl') + arrowCur(lerp(600, 760, ex(ramp(t, ts - .6, ts))), lerp(1700, 1330, ex(ramp(t, ts - .6, ts))), t, ts);
+      return gground(t) + win(80, 1210, 920, 260, 'save', `<div style="padding:40px;display:flex;gap:30px;align-items:center;direction:rtl"><span style="padding:18px 46px 28px;border-radius:28px;background:${t > ts ? 'var(--up)' : '#2A3440'};color:#05070A;font:900 56px V">⬇ دانلود</span><span class="mono" style="font-size:34px;color:var(--dim)">mug.gif · 9 frames</span></div>`, ramp(t, A, A + .3), 'down') + phone +
+        chip('بدون طراح ✓', 70, 420, 64, 'var(--amb)', '#05070A', kn, 'rtl') + chip('برای استوری', 70, 560, 54, '#fff', '#05070A', kd, 'rtl') + chip('GIF → MP4 اگه لازم شد', 70, 690, 46, '#1A222C', '#fff', ramp(t, tv - .05, tv + .25)) + arrowCur(lerp(600, 760, ex(ramp(t, ts - .6, ts))), lerp(1700, 1330, ex(ramp(t, ts - .6, ts))), t, ts);
     }
     case 'g_ask': {
       const tq = w('چی'), tc = w('کامنت'), ky = ramp(t, tc + .2, tc + 1.2);
@@ -273,8 +283,8 @@ function drawG(x, t) {
       const body = `<div style="padding:40px;direction:rtl"><div style="font:900 50px V;color:var(--dim)">کامنت‌ها</div>` +
         opts.map((o, i) => { const kk = ramp(t, o[1] - .05, o[1] + .25); return `<div style="margin-top:26px;padding:22px 34px 32px;border-radius:30px;background:${i === 0 ? 'rgba(240,185,11,.16)' : '#1A222C'};border:3px solid ${i === 0 ? 'var(--amb)' : 'var(--line)'};font:900 60px V;color:#fff;transform:translateX(${((1 - ex(kk)) * 300).toFixed(0)}px);opacity:${clamp(kk * 4).toFixed(2)}">${o[0]}</div>`; }).join('') +
         `<div style="margin-top:44px;padding:26px 34px;border-radius:30px;background:#0A0E13;border:2px solid var(--line);font:900 54px V;color:#fff">${typed('من اول ماگ‌هامو گیف می‌کنم', ky)}${ky > 0 && ky < 1 ? caret(t) : ''}</div></div>`;
-      return ground() + mugGif(390, 150, 300, t, true, undefined, 'border-radius:50%;border:8px solid var(--amb);box-sizing:border-box') + win(80, 500, 920, 940, 'comments', body, ramp(t, A + .1, A + .4), 'up', 'var(--amb)') +
-        chip('کامنت بنویس ✍', 330, 1440, 64, '#fff', '#05070A', ramp(t, tc - .05, tc + .25), 'rtl');
+      return gground(t) + mugGif(390, 150, 300, t, true, undefined, 'border-radius:50%;border:8px solid var(--amb);box-sizing:border-box') + win(80, 500, 920, 940, 'comments', body, ramp(t, A + .1, A + .4), 'up', 'var(--amb)') +
+        chip('کامنت بنویس ✍', 330, 1440, 64, '#fff', '#05070A', ramp(t, tc - .05, tc + .25), 'rtl') + chip('بفرست برای دوستت که آنلاین می‌فروشه 👇', 60, 60, 46, 'var(--amb)', '#05070A', ramp(t, w('بفرست') - .05, w('بفرست') + .25), 'rtl');
     }
   }
   return null;
@@ -313,7 +323,7 @@ function captions(x, t) {
 }
 function hookTitle(x, t) {
   const k = ex(ramp(t, 0, .25));
-  if (D.hook_lines) return `<div class="ab" style="left:0;right:0;top:170px;transform:translateY(${((1 - k) * -40).toFixed(1)}px)"><div class="cap" style="position:relative;font-size:124px;line-height:1.2;color:#fff">${D.hook_lines[0]}</div><div class="cap" style="position:relative;margin-top:14px"><span style="display:inline-block;padding:4px 40px 22px;border-radius:26px;background:var(--amb);color:#05070A;font-size:124px;line-height:1.2">${D.hook_lines[1]}</span></div></div>`;
+  if (D.hook_lines) return `<div class="ab" style="left:0;right:0;top:120px;height:420px;background:linear-gradient(rgba(7,10,14,.92) 70%,rgba(7,10,14,0))"></div><div class="ab" style="left:0;right:0;top:170px;transform:translateY(${((1 - k) * -40).toFixed(1)}px)"><div class="cap" style="position:relative;font-size:124px;line-height:1.2;color:#fff">${D.hook_lines[0]}</div><div class="cap" style="position:relative;margin-top:14px"><span style="display:inline-block;padding:4px 40px 22px;border-radius:26px;background:var(--amb);color:#05070A;font-size:124px;line-height:1.2">${D.hook_lines[1]}</span></div></div>`;
   return `<div class="ab" style="left:0;right:0;top:170px;transform:translateY(${((1 - k) * -40).toFixed(1)}px)">` +
     `<div class="cap" style="position:relative;margin-bottom:24px"><span style="display:inline-block;padding:6px 30px 14px;border-radius:20px;background:var(--up);color:#05070A;font:900 56px V">${D.series_tag || ''}</span></div>` +
     `<div class="cap" style="position:relative;font-size:132px;line-height:1.2;color:#fff;text-shadow:0 6px 0 rgba(0,0,0,.55),0 0 30px rgba(0,0,0,.6)">اگه درآمدت</div>` +
@@ -449,7 +459,8 @@ function usMap(x0, y0, w, k, kg) {
 // end card: the line the prompt ends on, on the terminal ground
 function ending(u, t) {
   const k = ramp(u, 0, .3), k2 = ramp(u, .5, .8);
-  return ground() + `<div class="ab" style="left:0;right:0;top:520px;text-align:center;transform:scale(${lerp(1.4, 1, ex(k)).toFixed(3)})">` +
+  let pul = ''; if (D.end_chips) for (let i = 0; i < 3; i++) { const ph = ((u * .7 + i / 3) % 1); pul += `<circle cx="540" cy="330" r="${150 + 200 * ph}" fill="none" stroke="#F0B90B" stroke-width="${8 * (1 - ph) + 1}" opacity="${(1 - ph).toFixed(2)}"/>`; }
+  return ground() + (D.end_chips ? `<svg class="ab" style="left:0;top:0" width="1080" height="1920">${pul}</svg>` + mugGif(390, 180, 300, t, true, undefined, `border-radius:50%;border:8px solid var(--amb);box-sizing:border-box;transform:scale(${lerp(.4, 1, ex(k)).toFixed(3)})`) : '') + `<div class="ab" style="left:0;right:0;top:520px;text-align:center;transform:scale(${lerp(1.4, 1, ex(k)).toFixed(3)})">` +
     `<div style="font:900 150px/1.2 V;color:#fff">${(D.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--amb)">$1</span>')}</div>` +
     `<div style="margin-top:30px;font:900 64px V;color:var(--dim);opacity:${k2.toFixed(2)}">${D.end_sub || ''}</div>` +
     `<div style="margin-top:50px;display:flex;flex-direction:column;gap:22px;align-items:center;opacity:${k2.toFixed(2)}">${(D.end_chips || ['۱ · نقشهٔ ۳۰ روزه', '۲ · مشتری خارجی، قانونی']).map((c, i) => `<span style="padding:12px 36px 20px;border-radius:22px;background:${i % 2 ? 'var(--amb)' : 'var(--up)'};color:#05070A;font:900 54px V">${c}</span>`).join('')}</div>` +
