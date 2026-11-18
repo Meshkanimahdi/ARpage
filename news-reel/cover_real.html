@@ -7,6 +7,16 @@
 @font-face{font-family:V;font-weight:900;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2)}
 @font-face{font-family:V;font-weight:900;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2);unicode-range:U+0000-00FF}
 @font-face{font-family:V;font-weight:600;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-600-normal.woff2);unicode-range:U+0000-00FF}
+@font-face{font-family:Lalezar;font-weight:400;src:url(/logo-motion/node_modules/@fontsource/lalezar/files/lalezar-arabic-400-normal.woff2)}
+@font-face{font-family:Markazi;font-weight:700;src:url(/logo-motion/node_modules/@fontsource/markazi-text/files/markazi-text-arabic-700-normal.woff2)}
+@font-face{font-family:Kufi;font-weight:900;src:url(/logo-motion/node_modules/@fontsource/noto-kufi-arabic/files/noto-kufi-arabic-arabic-900-normal.woff2)}
+@font-face{font-family:Changa;font-weight:800;src:url(/logo-motion/node_modules/@fontsource/changa/files/changa-arabic-800-normal.woff2)}
+@font-face{font-family:Messiri;font-weight:700;src:url(/logo-motion/node_modules/@fontsource/el-messiri/files/el-messiri-arabic-700-normal.woff2)}
+/* headline styles (Mahdi 2026-11-18: «تیترها همه با یه فونت و یه استایل نباشه که یکنواخت باشه»): ?style=bold|poster|serif|kufi|tech|soft */
+body.underline #t b{color:#fff;text-decoration:underline;text-decoration-color:var(--a,#FFC86B);text-decoration-thickness:.085em;text-underline-offset:.2em}
+body.marker #t b{color:#fff;background:linear-gradient(transparent 56%,var(--a,#FFC86B) 56%,var(--a,#FFC86B) 94%,transparent 94%);padding:0 .14em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+body.twosize #t .s{font-size:.6em;font-weight:inherit;opacity:.95}
+body.rule #blk::before{content:'';display:block;width:150px;height:8px;background:var(--a,#FFC86B);margin:0 auto 34px;border-radius:4px}
 html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000}
 #bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 #sh{position:absolute;left:0;right:0;top:0;bottom:0}
@@ -21,13 +31,19 @@ window.ISSUES=[]; const TOP=500, BOT=1420;
 $('bg').src=Q.get('bg');
 let pos=Q.get('pos')||'center'; pos={top:'upper',bottom:'lower',middle:'center'}[pos]||pos; if(!['center','upper','lower'].includes(pos))pos='center';
 const t=$('t'), blk=$('blk');
+const STYLES={bold:{font:'V',w:900,scale:1,lh:1.2,mode:'color'}, poster:{font:'Lalezar',w:400,scale:1.14,lh:1.18,mode:'color'},
+  serif:{font:'Markazi',w:700,scale:1.22,lh:1.08,mode:'underline'}, kufi:{font:'Kufi',w:900,scale:.9,lh:1.42,mode:'marker'},
+  tech:{font:'Changa',w:800,scale:1.02,lh:1.22,mode:'rule'}, soft:{font:'Messiri',w:700,scale:1.2,lh:1.22,mode:'twosize'}};   // Reem Kufi was tried and dropped: its stretched letterforms hurt legibility
+const STYLE=STYLES[Q.get('style')]?Q.get('style'):'bold', ST=STYLES[STYLE];
+document.body.classList.add(ST.mode); t.style.fontFamily=ST.font+', V'; t.style.fontWeight=ST.w; t.style.lineHeight=ST.lh;
 t.innerHTML=(Q.get('title')||'').replace(/[<>&]/g,'').replace(/\*([^*]+)\*/g,'<b>$1</b>').replace(/\|/g,'<br>');
 if(Q.get('a'))document.documentElement.style.setProperty('--a',Q.get('a'));
-window.ok=(async()=>{ await document.fonts.ready; await Promise.all(['900 120px V','600 30px V'].map(f=>document.fonts.load(f,'آزمایش AI')));
+if(ST.mode==='twosize') t.innerHTML=t.innerHTML.split(/(<b>.*?<\/b>|<br>)/).map(x=>(/^<b>|^<br>/.test(x)||!x.trim())?x:`<span class="s">${x}</span>`).join('');
+window.ok=(async()=>{ await document.fonts.ready; await Promise.all(['900 120px V','600 30px V',`${ST.w} 120px ${ST.font}`].map(f=>document.fonts.load(f,'آزمایش AI')));
   await $('bg').decode().catch(()=>ISSUES.push('background image failed'));
-  let fs=+(Q.get('fs')||128); const min=120;
+  let fs=Math.round(+(Q.get('fs')||128)*ST.scale); const min=Math.round(120*ST.scale);
   const place=()=>{ const h=blk.offsetHeight; let y = pos==='upper' ? TOP+20 : pos==='lower' ? BOT-20-h : Math.round((1920-h)/2); blk.style.top=y+'px'; return [y,y+h]; };
-  const lines=()=>Math.round(t.offsetHeight/(fs*1.2));
+  const lines=()=>Math.round(t.offsetHeight/(fs*ST.lh));
   const bad=()=>{ const [a,b]=place(); return a<TOP||b>BOT||lines()>3||t.scrollWidth>t.clientWidth+1; };
   t.style.fontSize=fs+'px';
   while(bad()&&fs>min){ fs-=4; t.style.fontSize=fs+'px'; }
@@ -38,5 +54,5 @@ window.ok=(async()=>{ await document.fonts.ready; await Promise.all(['900 120px 
   $('sh').style.background=`linear-gradient(180deg, rgba(0,0,0,0) ${Math.max(0,c-r-12)}%, rgba(0,0,0,.5) ${c-r/2}%, rgba(0,0,0,.5) ${c+r/2}%, rgba(0,0,0,0) ${Math.min(100,c+r+12)}%)`;
   const words=(Q.get('title')||'').replace(/[*|]/g,' ').trim().split(/\s+/).length;
   if(words>9) ISSUES.push(`headline has ${words} words (max 9)`);
-  window.REPORT={font_px:fs,pos,top:a,bottom:b,lines:lines(),words,title:Q.get('title'),safe_band:[TOP,BOT]}; })();
+  window.REPORT={style:STYLE,accent:Q.get('a')||'#FFC86B',font_px:Math.round(fs/ST.scale),render_px:fs,pos,top:a,bottom:b,lines:lines(),words,title:Q.get('title'),safe_band:[TOP,BOT]}; })();
 </script></body></html>

@@ -34,6 +34,15 @@ lower inside that band, ≥ 120 px, ≤ 3 lines. Render every realistic cover wi
 (writes `cover_report.json`; exit 5 = shorten the headline, never move it to an edge); write the background prompt so the
 subject's face is not in the band where the text goes. `reel_gate.py` fails a cover outside the band or with a hand-written
 report. The same band applies to carousel slide 1 and to the 8 cover candidates (§00.23).
+**Headline type varies (Mahdi 2026-11-18, blocking):** «تیترها همه با یه فونت و یه استایل نباشه که یکنواخت باشه». Every cover on
+the grid had the same Vazirmatn-black headline with one gold word. `cover_real` now has six headline styles (`style` in the
+covers list): `bold` (Vazirmatn 900, coloured accent word), `poster` (Lalezar display), `serif` (Markazi, accent word
+underlined), `kufi` (Noto Kufi 900, highlighter band on the accent word), `tech` (Changa 800 with a short accent rule above),
+`soft` (El Messiri, a small first line and a big accent line). Rules: the style is **not one of the last 3 covers'**, the
+accent colour differs from the previous cover's, and the style fits the story (serif/soft for human and family stories,
+poster/tech/bold for money, jobs and hard news, kufi for warnings). Among the 8 candidates (§00.23) use at least 3 styles.
+Legibility first: if a style makes the headline harder to read on that photo, take another. `reel_gate.py` checks the rotation
+(history: `cover_style`, `cover_accent`).
 **Topics that win (Mahdi 2026-11-13, blocking):** «برو تو موضوع‌های جذاب‌تر… همش داری زندگی رو وصل می‌کنی به چت‌بات‌ها؛
 دنبال موضوعاتی باش مثل اون‌هایی که ریچ خوبی گرفتند و فالوور آوردند». The page's real hits (Performance tab): «همه می‌دونن… ولی
 یه هوش مصنوعی می‌پرسه: از کجا؟» (296k reach, 45.8k shares), «خودتو برای جنگ آماده کردی؟» (144k, 33k), «شغلت امن بمونه… لوله‌کش

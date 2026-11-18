@@ -79,6 +79,11 @@ def main():
             lo, hi = rep['safe_band']
             if not (lo <= (rep.get('top') or 0) and (rep.get('bottom') or 9999) <= hi):
                 fails.append(f"cover headline at y {rep.get('top')}–{rep.get('bottom')} is outside the safe band {lo}–{hi}: re-render with cover_real.mjs")
+            # user rule 2026-11-18: headline font/style rotates — not a style of the last 3 covers, accent colour ≠ previous cover
+            sty, acc = rep.get('style') or '', (rep.get('accent') or '').lower()
+            if not sty: fails.append('cover_report.json has no style: render with the current cover_real.mjs (style = bold|poster|serif|kufi|tech|soft)')
+            elif sty in [h.get('cover_style') for h in hist[-3:]]: fails.append(f"cover headline style «{sty}» was used in the last 3 covers: pick another (bold, poster, serif, kufi, tech, soft)")
+            if acc and hist and acc == (hist[-1].get('cover_accent') or '').lower(): fails.append(f'cover accent colour {acc} repeats the previous cover: change it')
         elif rep.get('pos') != 'center':
             fails.append('cover_report.json was not written by cover_render.mjs or cover_real.mjs (no centred stack, no safe band): re-render the cover')
         if (rep.get("font_px") or 0) < 120: fails.append(f"cover headline too small ({rep.get('font_px')} px < 120)")
@@ -206,7 +211,7 @@ def main():
            'low_score_publish_allowed': not hard_fails, 'info': info,
            'history_entry': {'reel': story.get('content_id', ''), 'date': story.get('date', ''), 'prompt': pid, 'engine': eng,
                              'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'voice_gender': vg, 'engine_new': bool(story.get('engine_new')), 'photo_led': (info.get('photo_probe') or {}).get('photo_led_share'), 'mix': (story.get('mix') or (story.get('story') or {}).get('mix', '')), 'ai_anchor': (story.get('ai_anchor') or {}).get('url', ''), 'series': (story.get('series') or {}).get('name', ''), 'series_part': (story.get('series') or {}).get('part'), 'sfx': sorted(sx_now), 'life': story.get('life'), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else ''),
-                             **({f'cover_{k}': json.loads(rep_p.read_text()).get(k, '') for k in ('kicker', 'sub', 'twist')} if rep_p.exists() else {})}}
+                             **({f'cover_{k}': json.loads(rep_p.read_text()).get(k, '') for k in ('kicker', 'sub', 'twist', 'style', 'accent')} if rep_p.exists() else {})}}
     (d / 'gate.json').write_text(json.dumps(out, ensure_ascii=False, indent=1))
     print(json.dumps(out, ensure_ascii=False))
     sys.exit(0 if not fails else 3)
