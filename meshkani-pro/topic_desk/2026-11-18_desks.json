@@ -1,0 +1,1071 @@
+{
+ "desks": [
+  {
+   "desk": null,
+   "topics": [
+    {
+     "headline_fa": "عکس خودت رو با ChatGPT گیف کن",
+     "explanation_fa": "OpenAI روز ۴ نوامبر Images 2.6 را منتشر کرد؛ مدل تصویرسازی تازه‌ای که به گفته شرکت ۵۰ درصد سریع‌تر عکس می‌سازد و در ویرایش‌های پشت‌سرهم جزئیات را بهتر حفظ می‌کند. طبق گزارش‌ها حالا می‌شود از روی متن یا عکس، گیف متحرک ساخت و قاب‌به‌قاب ویرایشش کرد. این قابلیت در همه پلن‌های ChatGPT روی وب، دسکتاپ و موبایل آمده است.",
+     "why_iranians_care_fa": "خیلی از کسب‌وکارهای کوچک ایرانی که در اینستاگرام می‌فروشند پول طراح گرافیک ندارند. وقتی ابزار در پلن رایگان هم هست، بدون پرداخت ارزی می‌شود برای پست و استوری محتوای متحرک ساخت.",
+     "life_angle_fa": "تمرین عملی: ۱) وارد ChatGPT شو. ۲) عکس محصولت را آپلود کن. ۳) بنویس: «از این عکس یک گیف کوتاه و لوپ بساز که محصول آرام بچرخد و پس‌زمینه ساده بماند.» ۴) اگر یک قاب خوب نبود، همان قاب را با یک جمله اصلاح کن. ۵) خروجی را برای استوری ذخیره کن. یعنی تبلیغ متحرک پیجت را خودت در چند دقیقه می‌سازی.",
+     "mix": "practice",
+     "format_hint": "ریلز آموزشی قدم‌به‌قدم با صفحه‌ضبط",
+     "ai_anchor": {
+      "what": "Release of ChatGPT Images 2.6 / GPT-Image-2.6 (Flare and Sunburst) with GIF creation and 50% faster generation",
+      "who": "OpenAI",
+      "date": "2026-11-04",
+      "url": "https://openai.com/index/introducing-images-2-6/"
+     },
+     "sources": [
+      "https://openai.com/index/introducing-images-2-6/",
+      "https://betanews.com/article/chatgpt-images-gifs-faster-generation/",
+      "https://www.mysmartprice.com/gear/internet/internet-news/openai-images-2-6-brings-faster-image-generation-and-gif-creation-to-chatgpt/"
+     ]
+    },
+    {
+     "headline_fa": "قوی‌ترین مدل گوگل حالا دست همه‌ست",
+     "explanation_fa": "گوگل ۱۰ نوامبر Gemini 4 Carbon، قوی‌ترین مدل خودش، را برای توسعه‌دهنده‌های پولی در Gemini API و AI Studio و برای مشترکان AI Ultra در اپ Gemini، حالت AI Mode جست‌وجو و Antigravity باز کرد. این مدل دو هفته قبل‌تر فقط در اختیار گروه کوچکی از متخصصان امنیت سایبری بود. قیمت مقدماتی API، ۲ دلار برای هر میلیون توکن ورودی و ۱۰ دلار برای خروجی اعلام شده است.",
+     "why_iranians_care_fa": "برنامه‌نویس‌های ایرانی که برای مشتری خارجی کار می‌کنند، با این مدل‌ها رقابت می‌کنند یا با آن‌ها کار می‌کنند. گوگل بیشتر از قبل روی کارهای چندمرحله‌ای کدنویسی و پژوهش تمرکز کرده است.",
+     "life_angle_fa": "اگر شغلت کدنویسی یا تحقیق است، معیار «یک نفر با هوش مصنوعی» دوباره بالاتر رفت. سؤال واقعی این است که کدام بخش کارت را می‌سپاری به مدل و کدام را خودت نگه می‌داری.",
+     "mix": "news",
+     "format_hint": "کاروسل مقایسه‌ای: چه کسی، کجا، چه قیمتی",
+     "ai_anchor": {
+      "what": "Gemini 4 Carbon made available to paying developers (Gemini API, AI Studio) and Google AI Ultra subscribers",
+      "who": "Google DeepMind",
+      "date": "2026-11-10",
+      "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-carbon-now-available/"
+     },
+     "sources": [
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-carbon-now-available/",
+      "https://thenextweb.com/news/google-gemini-4-carbon-available-developers-ultra",
+      "https://www.digitaltrends.com/computing/google-gemini-4-carbon-is-now-available-for-complex-ai-tasks/"
+     ]
+    },
+    {
+     "headline_fa": "چین مدل غول‌پیکرش رو مجانی داد",
+     "explanation_fa": "استارتاپ چینی مون‌شات ۴ نوامبر وزن‌های کامل مدل Kimi K3.1 Pro را روی هاگینگ‌فیس منتشر کرد؛ مدلی با ۲.۸ تریلیون پارامتر و پنجره متنی حدود یک میلیون توکن، با مجوز اختصاصی Kimi. این مدل قبلاً در اواخر اکتبر فقط از طریق API در دسترس بود. مون‌شات می‌گوید پیش از انتشار عمومی، داده‌های مربوط به حمله سایبری را از آموزش آن حذف کرده است.",
+     "why_iranians_care_fa": "مدل‌های بازِ چینی برای ایرانی‌ها مهم‌اند، چون شرکت‌ها و دانشگاه‌ها می‌توانند آن‌ها را روی سرور خودشان اجرا کنند و به تحریم یا مسدود شدن حساب آمریکایی وابسته نباشند.",
+     "life_angle_fa": "اگر در شرکت یا دانشگاه ایرانی کار می‌کنی، رقابت چین با آمریکا یعنی مدل‌های قوی‌تری که می‌شود روی زیرساخت داخلی نصب کرد. البته این مدل خاص سخت‌افزار بسیار سنگینی می‌خواهد.",
+     "mix": "news",
+     "format_hint": "ریلز خبری کوتاه با نقشه آمریکا در برابر چین",
+     "ai_anchor": {
+      "what": "Moonshot AI publishes full open weights of Kimi K3.1 Pro (2.8T parameters) on Hugging Face",
+      "who": "Moonshot AI",
+      "date": "2026-11-04",
+      "url": "https://technode.com/2026/11/05/moonshot-ai-releases-kimi-k3-1-pro-model-weights/"
+     },
+     "sources": [
+      "https://technode.com/2026/11/05/moonshot-ai-releases-kimi-k3-1-pro-model-weights/",
+      "https://thenextweb.com/news/moonshot-kimi-k3-1-pro-open-weight-cyber",
+      "https://runtimewire.com/article/moonshot-ai-kimi-k3-1-pro-weights"
+     ]
+    },
+    {
+     "headline_fa": "علی‌بابا قوی‌ترین Qwen رو رونمایی کرد",
+     "explanation_fa": "علی‌بابا ۱۶ نوامبر Qwen4-Max، قوی‌ترین مدل خانواده Qwen، را عرضه کرد. پیش‌نمایش محدودش از ۱۱ نوامبر شروع شده بود. این مدل فقط از طریق API در دسترس است و قیمتش از ۱.۵ دلار برای هر میلیون توکن ورودی و ۴.۵ دلار برای خروجی شروع می‌شود. برخلاف روال قبلی تیم Qwen، وزن‌های نسخه Max منتشر نشده و علی‌بابا گفته مدل‌های کوچک‌تر Qwen4 بعداً متن‌باز می‌شوند.",
+     "why_iranians_care_fa": "Qwen از محبوب‌ترین مدل‌های باز بین توسعه‌دهنده‌های ایرانی بوده است. بسته شدن نسخه پرچم‌دار یعنی بهترین نسخه را دیگر نمی‌شود روی سرور خودت نصب کرد.",
+     "life_angle_fa": "اگر کسب‌وکار یا پروژه‌ات روی مدل‌های باز چینی حساب کرده، حالا باید منتظر نسخه‌های کوچک‌تر بمانی یا برای API پول بدهی. این روی هزینه و نقشه راه محصولت اثر دارد.",
+     "mix": "news",
+     "format_hint": "پست تک‌تصویر با جدول قیمت",
+     "ai_anchor": {
+      "what": "Alibaba releases Qwen4-Max, API-only flagship of the Qwen4 family",
+      "who": "Alibaba (Qwen)",
+      "date": "2026-11-16",
+      "url": "https://www.alibabacloud.com/press-room/alibaba-unveils-qwen4-max"
+     },
+     "sources": [
+      "https://www.alibabacloud.com/press-room/alibaba-unveils-qwen4-max",
+      "https://tech-insider.org/qwen4-four-variants-no-confirmed-open-weights-alibaba-2026/"
+     ]
+    },
+    {
+     "headline_fa": "Claude حالا وارد جلسه‌های کاری‌ت می‌شه",
+     "explanation_fa": "آنتروپیک ۱۲ نوامبر نسخه بتای Claude Meetings را برای مشترکان Team و Enterprise باز کرد. Claude به‌عنوان یک شرکت‌کننده قابل‌دیدن وارد تماس Google Meet می‌شود، به سؤال‌ها جواب می‌دهد و همان وسط جلسه برنامه، جدول زمانی و سند کاری می‌سازد. طبق گزارش‌ها متن جلسه و خلاصه را نگه می‌دارد، ولی صدای جلسه را نه.",
+     "why_iranians_care_fa": "خیلی از فریلنسرهای ایرانی با تیم‌های خارجی جلسه آنلاین دارند. از این به بعد ممکن است یک «همکار هوش مصنوعی» هم در جلسه باشد که حرف‌ها را صورت‌جلسه می‌کند.",
+     "life_angle_fa": "اگر با شرکت خارجی کار می‌کنی، جلسه‌ها دیگر فقط بین آدم‌ها نیست. هرچه بگویی ممکن است همان لحظه به سند و تسک تبدیل شود. یعنی وضوح حرف زدنت ارزش بیشتری پیدا می‌کند.",
+     "mix": "news",
+     "format_hint": "ریلز سناریویی: جلسه با یک همکار هوش مصنوعی",
+     "ai_anchor": {
+      "what": "Claude Meetings beta: Claude joins Google Meet calls and builds working documents live",
+      "who": "Anthropic",
+      "date": "2026-11-12",
+      "url": "https://venturebeat.com/ai/anthropic-brings-claude-into-google-meet-to-draft-documents-and-whiteboards-during-your-meetings/"
+     },
+     "sources": [
+      "https://venturebeat.com/ai/anthropic-brings-claude-into-google-meet-to-draft-documents-and-whiteboards-during-your-meetings/",
+      "https://cryptobriefing.com/anthropic-claude-meetings-beta-video-calls/"
+     ]
+    },
+    {
+     "headline_fa": "Claude می‌خواد جای اکسل و وایت‌بردت رو بگیره",
+     "explanation_fa": "آنتروپیک ۱۰ نوامبر از Claude Whiteboards و Claude Sheets به‌صورت بتا رونمایی کرد و Claude Data را عمومی کرد. Sheets صفحه‌گسترده‌ای است که Claude همراه تو می‌سازد و ویرایشش می‌کند. Whiteboards یک تخته مشترک برای ایده‌پردازی تیمی است. Data هم از روی داده‌های انبار داده یا CRM گزارش و داستان داده می‌سازد. هر سه روی وب، دسکتاپ و موبایل در پلن‌های پولی هستند.",
+     "why_iranians_care_fa": "کارمندها و حسابدارهای ایرانی بخش بزرگی از روزشان را در اکسل می‌گذرانند. حالا آزمایشگاه‌های هوش مصنوعی مستقیماً سراغ همین کارهای روزمره اداری آمده‌اند.",
+     "life_angle_fa": "اگر شغلت جدول درست کردن و گزارش گرفتن است، ابزارهایی دارند می‌آیند که این کار را از روی یک جمله انجام می‌دهند. یادگرفتن «درست سؤال پرسیدن از داده» از تسلط روی فرمول‌های اکسل مهم‌تر می‌شود.",
+     "mix": "news",
+     "format_hint": "کاروسل «شغل اکسلی تو در ۲۰۲۷»",
+     "ai_anchor": {
+      "what": "Introducing Claude Whiteboards, Claude Sheets (beta) and Claude Data (GA)",
+      "who": "Anthropic",
+      "date": "2026-11-10",
+      "url": "https://www.claude.com/resources/articles/sheets-whiteboards-data"
+     },
+     "sources": [
+      "https://www.claude.com/resources/articles/sheets-whiteboards-data",
+      "https://www.itechpost.com/articles/237776/20261111/claude-gets-new-workplace-tools-anthropic-takes-aim-microsoft-office-google-workspace.htm",
+      "https://cryptobriefing.com/anthropic-launches-claude-sheets-whiteboards-beta/"
+     ]
+    },
+    {
+     "headline_fa": "مغازه‌ها حالا تو ChatGPT پروفایل دارن",
+     "explanation_fa": "OpenAI ۱۰ نوامبر نسخه بتای «Businesses in ChatGPT» را راه انداخت. کسب‌وکارها در Business Hub صفحه خودشان را پیدا می‌کنند، مالکیتش را با تلفن، ایمیل کاری، رکورد DNS یا فروشگاه Shopify تأیید می‌کنند و می‌توانند ایجنت فروش و پشتیبانی بسازند. فعلاً واجد شرایط بودن به صنعت و کشور بستگی دارد و مغازه‌ها و رستوران‌های محلی فقط لیستینگ آمریکایی را می‌توانند ثبت کنند.",
+     "why_iranians_care_fa": "مشتری‌ها کم‌کم به‌جای گوگل از ChatGPT می‌پرسند کجا خرید کنند. کسب‌وکارهای ایرانی فعلاً جزو کشورهای مجاز نیستند و همین یعنی در ویترین تازه هوش مصنوعی دیده نمی‌شوند.",
+     "life_angle_fa": "اگر کسب‌وکار آنلاین داری، دیده شدن دیگر فقط سئو گوگل و اینستاگرام نیست. اینکه چت‌بات‌ها درباره برندت چه می‌گویند هم مهم شده است. از همین حالا اطلاعات سایت و صفحه‌هایت را دقیق و یکدست نگه دار.",
+     "mix": "news",
+     "format_hint": "ریلز توضیحی: ویترین تازه فروش",
+     "ai_anchor": {
+      "what": "Businesses in ChatGPT (beta): verified business profiles and business agents via Business Hub",
+      "who": "OpenAI",
+      "date": "2026-11-10",
+      "url": "https://thenextweb.com/news/openai-businesses-in-chatgpt-business-agents"
+     },
+     "sources": [
+      "https://thenextweb.com/news/openai-businesses-in-chatgpt-business-agents",
+      "https://venturebeat.com/technology/openai-lets-you-claim-your-business-in-chatgpt-and-set-up-a-custom-agentic-ai-customer-sales-rep",
+      "https://braindetox.kr/en/posts/chatgpt_business_profiles_beta.html"
+     ]
+    },
+    {
+     "headline_fa": "هوش مصنوعی‌ای که هک کردن بلده، ولی قفله",
+     "explanation_fa": "OpenAI ۵ نوامبر GPT-6 Cyber را معرفی کرد؛ مدلی برای پیدا کردن و تأیید آسیب‌پذیری‌های نرم‌افزاری در کارهای امنیتی مجاز. دسترسی فقط برای مشتری‌های تأییدشده برنامه Daybreak Red است. این اولین مدلی است که در چارچوب آمادگی OpenAI در حوزه سایبری رتبه «بحرانی» گرفته است. امتیازش در بنچمارک ExploitGym ۴۸.۵ درصد گزارش شده، در برابر ۳۲.۱ درصد نسخه قبلی.",
+     "why_iranians_care_fa": "ایران بارها هدف حمله‌های سایبری به بانک‌ها، پمپ‌بنزین‌ها و زیرساخت‌ها بوده است. وقتی هوش مصنوعی در پیدا کردن حفره امنیتی تا این حد قوی می‌شود، فاصله مدافع و مهاجم به اینکه چه کسی به این ابزارها دسترسی دارد بستگی پیدا می‌کند.",
+     "life_angle_fa": "اپ بانکی و سرویس‌هایی که هر روز استفاده می‌کنی در دنیایی کار می‌کنند که حفره‌هایشان با هوش مصنوعی سریع‌تر پیدا می‌شود. برای متخصص امنیت ایرانی هم یعنی مهارت کار با این ابزارها به شرط اصلی استخدام تبدیل می‌شود.",
+     "mix": "story",
+     "format_hint": "ریلز روایی با لحن دلهره‌آور و کنترل‌شده",
+     "ai_anchor": {
+      "what": "OpenAI launches GPT-6 Cyber for vetted Daybreak Red customers, first model rated Critical for cyber under its Preparedness Framework",
+      "who": "OpenAI",
+      "date": "2026-11-05",
+      "url": "https://fortune.com/2026/11/05/openai-debuts-new-cybersecurity-focused-ai-model-amid-growing-alarm-about-ai-driven-cyber-attacks/"
+     },
+     "sources": [
+      "https://fortune.com/2026/11/05/openai-debuts-new-cybersecurity-focused-ai-model-amid-growing-alarm-about-ai-driven-cyber-attacks/",
+      "https://openai.com/index/introducing-gpt-6-cyber/",
+      "https://thenewstack.io/openai-gpt6-cyber-exploits/"
+     ]
+    },
+    {
+     "headline_fa": "گوشیت به‌زودی خودش غذا سفارش می‌ده",
+     "explanation_fa": "گوگل ۱۰ نوامبر اعلام کرد Gemini Intelligence به گوشی‌های بیشتری مثل سری Pixel 10 و Motorola Signature 27 می‌آید. قابلیت خودکارسازی کارها، یعنی سفارش غذا، درخواست تاکسی و رزرو رستوران از داخل اپ‌های اندروید، از آمریکا و کره جنوبی به بریتانیا، هند و ژاپن گسترش پیدا می‌کند. ابزار دیکته Rambler هم با پشتیبانی از صحبت مخلوط هندی و انگلیسی اضافه شده است.",
+     "why_iranians_care_fa": "بیشتر ایرانی‌ها اندرویدی‌اند و هر روز با اسنپ و اسنپ‌فود کار دارند. این خبر نشان می‌دهد دستیار گوشی دارد از جواب دادن به کار انجام دادن داخل اپ‌ها می‌رسد، هرچند فعلاً برای ایران و اپ‌های ایرانی در دسترس نیست.",
+     "life_angle_fa": "پشتیبانی از گفتار مخلوط هندی و انگلیسی نشان می‌دهد زبان‌های غیرانگلیسی هم در نوبت‌اند. سؤال این است که کی اپ‌های ایرانی و فارسی به این موج می‌رسند و چه کسی اولین نسخه فارسی‌اش را می‌سازد.",
+     "mix": "news",
+     "format_hint": "ریلز «یک روز با دستیاری که خودش کار می‌کند»",
+     "ai_anchor": {
+      "what": "Gemini Intelligence expands to more Android devices; task automation extends to UK, India and Japan",
+      "who": "Google",
+      "date": "2026-11-10",
+      "url": "https://ppc.land/googles-gemini-can-now-use-food-and-ride-apps-for-people-in-3-more-countries/"
+     },
+     "sources": [
+      "https://ppc.land/googles-gemini-can-now-use-food-and-ride-apps-for-people-in-3-more-countries/",
+      "https://letsdatascience.com/news/google-expands-gemini-intelligence-to-pixel-10-and-motorola-4f80b58f",
+      "https://www.thurrott.com/?p=343730"
+     ]
+    },
+    {
+     "headline_fa": "انویدیا می‌خواد هوش مصنوعی برات ارزون‌تر بشه",
+     "explanation_fa": "طبق گزارش SDxCentral در ۱۳ نوامبر، انویدیا یکی از اعضای مؤسس کنسرسیوم SGLang شد. این پروژه از سازمان غیرانتفاعی LMSYS است و AMD، اینتل، گوگل، متا و کلادفلر هم در آن عضوند. هدف آن بهبود مشترک SGLang است، موتور متن‌بازی که مدل‌های هوش مصنوعی را اجرا می‌کند. یان باک، معاون انویدیا، این کار را راهی برای ارزان‌تر و در دسترس‌تر کردن اجرای مدل‌ها توصیف کرده است.",
+     "why_iranians_care_fa": "شرکت‌های ایرانی که مدل‌های باز را روی سرور خودشان اجرا می‌کنند، مستقیماً از ابزارهای متن‌باز مثل SGLang استفاده می‌کنند. هر بهبودی در این نرم‌افزار یعنی بیرون کشیدن کار بیشتر از همان GPUهای کمیاب و گران.",
+     "life_angle_fa": "قیمت سرویس‌های هوش مصنوعی ایرانی که استفاده می‌کنی تا حد زیادی به هزینه اجرای مدل بستگی دارد. نرم‌افزار متن‌باز بهتر می‌تواند این هزینه را پایین بیاورد، بدون اینکه کسی مجبور به خرید سخت‌افزار تازه باشد.",
+     "mix": "news",
+     "format_hint": "پست تک‌تصویر با لوگوهای اعضای کنسرسیوم",
+     "ai_anchor": {
+      "what": "Nvidia joins as inaugural member of LMSYS's SGLang Consortium for open-source AI inference",
+      "who": "Nvidia",
+      "date": "2026-11-13",
+      "url": "https://www.sdxcentral.com/news/nvidia-gets-back-on-the-horse-with-ai-inference-pledge/"
+     },
+     "sources": [
+      "https://www.sdxcentral.com/news/nvidia-gets-back-on-the-horse-with-ai-inference-pledge/"
+     ]
+    }
+   ]
+  },
+  {
+   "desk": null,
+   "topics": [
+    {
+     "headline_fa": "دیگه برای خرید، فقط به آمازون پیامک بده",
+     "explanation_fa": "آمازون از ۶ نوامبر به گروه کوچکی از کاربران آمریکایی (فقط با دعوت‌نامه) اجازه داد با پیامک معمولی با ایجنت خرید Alexa for Shopping حرف بزنند. کاربر می‌نویسد «غذای سگم تمام شده» یا عکس یک دستور غذا یا یک لباس را می‌فرستد. ایجنت چند گزینه پیشنهاد می‌دهد، قیمت را زیر نظر می‌گیرد و با تأیید کاربر خرید را تمام می‌کند. آمازون گفته در هفته‌های آینده آن را برای کاربران بیشتری باز می‌کند.",
+     "why_iranians_care_fa": "بزرگ‌ترین فروشگاه اینترنتی دنیا خرید را از اپ و سایت بیرون برده و به یک پیام متنی رسانده. فروشگاه‌های ایرانی هم معمولاً همین الگوها را با کمی فاصله کپی می‌کنند.",
+     "life_angle_fa": "خرید دارد از «گشتن و مقایسه کردن» به «سپردن کار به ایجنت» تغییر می‌کند. اگر فروشنده‌ای، باید بدانی که کم‌کم مشتری‌ات یک ایجنت خواهد بود، نه آدمی که در اپ می‌چرخد.",
+     "mix": "news",
+     "format_hint": "reel: چت پیامکی شبیه‌سازی‌شده",
+     "ai_anchor": {
+      "what": "Text-to-shop with the Alexa for Shopping agent (invite-only, US)",
+      "who": "Amazon",
+      "date": "2026-11-06",
+      "url": "https://thenextweb.com/news/amazon-alexa-for-shopping-text-message-agent"
+     },
+     "sources": [
+      "https://thenextweb.com/news/amazon-alexa-for-shopping-text-message-agent",
+      "https://aboutamazon.com/news/retail/alexa-for-shopping-text-to-shop",
+      "https://chainstoreage.com/amazon-launches-text-interaction-alexa-shopping"
+     ]
+    },
+    {
+     "headline_fa": "توی چت‌جی‌پی‌تی، حالا با ایجنت مغازه‌ها حرف می‌زنی",
+     "explanation_fa": "OpenAI در ۱۰ نوامبر نسخه بتای «Businesses in ChatGPT» را عرضه کرد. شرکت‌ها می‌توانند پروفایل تأییدشده با تیک آبی داشته باشند و برای خودشان ایجنت بسازند. وقتی اسم یک برند در جواب چت‌جی‌پی‌تی بیاید، کاربر می‌تواند در یک گفتگوی جدا و برچسب‌دار با ایجنت همان برند مثلاً قیمت‌ها را مقایسه کند. فعلاً فقط برای کسب‌وکارهای فروشگاهی و آنلاین آمریکا باز است.",
+     "why_iranians_care_fa": "خیلی از ایرانی‌ها برای انتخاب کالا از چت‌جی‌پی‌تی سؤال می‌کنند. حالا خود برندها مستقیم وارد همین گفتگو می‌شوند و جواب‌ها کمتر بی‌طرف خواهند بود.",
+     "life_angle_fa": "دفعه بعد که از هوش مصنوعی پرسیدی «کدام گوشی را بخرم؟»، دقت کن جواب از خود چت‌جی‌پی‌تی است یا از ایجنت فروشنده.",
+     "mix": "news",
+     "format_hint": "carousel: قبل و بعد یک گفتگوی خرید",
+     "ai_anchor": {
+      "what": "Verified Business Agents and Business Hub in ChatGPT (beta)",
+      "who": "OpenAI",
+      "date": "2026-11-10",
+      "url": "https://thenextweb.com/news/openai-businesses-in-chatgpt-business-agents"
+     },
+     "sources": [
+      "https://thenextweb.com/news/openai-businesses-in-chatgpt-business-agents",
+      "https://yourstory.com/ai-story/openai-business-agents-chatgpt-company-chats",
+      "https://www.webpronews.com/openai-businesses-in-chatgpt-business-hub-business-agents/"
+     ]
+    },
+    {
+     "headline_fa": "OpenAI آژانس مسافرتی هوش مصنوعی را خرید",
+     "explanation_fa": "OpenAI استارتاپ Odessia را خرید. Odessia ایجنتی برای برنامه‌ریزی و رزرو سفر بود و بنیان‌گذارش، فرانسیس دیویدسون (هم‌بنیان‌گذار Sonder)، خبر را ۱۰ نوامبر اعلام کرد. به گفته دیویدسون، تابستان گذشته ده‌ها هزار کاربر اولیه بیش از ۶۰ میلیون دلار سفر در سال را با آن برنامه‌ریزی کرده بودند. گزارش‌ها می‌گویند سرویس فقط ۲۷ روز بعد از عرضه عمومی بسته شد و تیمش به OpenAI رفت.",
+     "why_iranians_care_fa": "آژانس‌های مسافرتی و تورگردان‌ها یکی از رایج‌ترین شغل‌ها در شهرهای ایران‌اند. این خرید نشان می‌دهد بزرگ‌ترین شرکت هوش مصنوعی مستقیماً سراغ رزرو سفر رفته است.",
+     "life_angle_fa": "اگر در آژانس مسافرتی کار می‌کنی، رقیب آینده‌ات احتمالاً یک پنجره چت است. ارزش تو در چیزهایی است که ایجنت ندارد: ویزا، شرایط خاص مسافر ایرانی و اعتماد.",
+     "mix": "story",
+     "format_hint": "reel داستانی: ۲۷ روز از عرضه تا خرید",
+     "ai_anchor": {
+      "what": "Acquisition of AI travel agent startup Odessia",
+      "who": "OpenAI",
+      "date": "2026-11-10",
+      "url": "https://skift.com/2026/11/10/a-year-after-sonders-collapse-francis-davidson-sells-his-ai-travel-startup-to-openai/"
+     },
+     "sources": [
+      "https://skift.com/2026/11/10/a-year-after-sonders-collapse-francis-davidson-sells-his-ai-travel-startup-to-openai/",
+      "https://www.phocuswire.com/news/startups/openai-acquires-ai-travel-agent-odessia",
+      "https://www.travelerstoday.com/articles/61254/20261112/openai-buys-odessia-shuts-it-down-ai-travel-agent-closes-27-days-after-launch.htm"
+     ]
+    },
+    {
+     "headline_fa": "همکار جدیدت ۲۴ ساعته کار می‌کند",
+     "explanation_fa": "Perplexity در اوایل نوامبر «Teammates» را عرضه کرد: ایجنت‌هایی که یک مسئولیت ثابت مثل کمپین تبلیغاتی، رسیدگی به باگ‌ها یا تحقیق را به عهده می‌گیرند و در پس‌زمینه کار می‌کنند. می‌توانند کار را به هم پاس بدهند و به ابزارهایی مثل اسلک و گیت‌هاب وصل شوند. کاربر هم می‌تواند دسکتاپ هر ایجنت را در دست بگیرد. فعلاً فقط برای مشترکان Max با ماهی ۲۰۰ دلار در دسترس است.",
+     "why_iranians_care_fa": "بسیاری از فریلنسرهای ایرانی در همین کارها، یعنی تحقیق، مدیریت کمپین و رسیدگی به باگ، برای مشتری خارجی کار می‌کنند. حالا ابزاری آمده که همین نقش‌ها را مثل یک «کارمند» تعریف می‌کند.",
+     "life_angle_fa": "سؤالی که کارفرمای خارجی‌ات از خودش می‌پرسد عوض می‌شود: «فریلنسر بگیرم یا ماهی ۲۰۰ دلار ایجنت؟» تو باید کسی باشی که این ایجنت‌ها را مدیریت می‌کند.",
+     "mix": "news",
+     "format_hint": "reel: مقایسه یک روز کاری فریلنسر و ایجنت",
+     "ai_anchor": {
+      "what": "Teammates: persistent background agents for ongoing work",
+      "who": "Perplexity",
+      "date": "2026-11-05",
+      "url": "https://www.techrepublic.com/article/news-perplexity-teammates-ai-agents-pricing-features/"
+     },
+     "sources": [
+      "https://www.techrepublic.com/article/news-perplexity-teammates-ai-agents-pricing-features/",
+      "https://thenewstack.io/perplexity-teammates-agent-orchestration/",
+      "https://www.digitaltrends.com/computing/perplexity-teammates-bring-autonomous-ai-agents-to-the-mac-app/"
+     ]
+    },
+    {
+     "headline_fa": "۶ هزار ایجنت آماده برای بانک‌ها و بیمه‌ها",
+     "explanation_fa": "IBM و مایکروسافت در ۱۰ نوامبر پلتفرم Imagine Enterprise را معرفی کردند که با بیش از ۶ هزار ایجنت و دارایی آماده از IBM Consulting شروع می‌شود. اولین حوزه‌هایش خدمات مالی، بیمه و خرده‌فروشی است و ایجنت‌ها بدون تعویض زیرساخت به داده‌ها و سیستم‌های فعلی شرکت وصل می‌شوند. قیمت و زمان عرضه عمومی هنوز اعلام نشده است.",
+     "why_iranians_care_fa": "کارمندان بانک و بیمه در ایران بخش بزرگی از نیروی کار اداری‌اند. وقتی دو غول فناوری ایجنت‌های آماده مخصوص همین صنایع می‌فروشند، الگوی آینده این شغل‌ها در دنیا مشخص‌تر می‌شود.",
+     "life_angle_fa": "اگر کارت ورود اطلاعات، بررسی پرونده یا پاسخ به مشتری در بانک یا بیمه است، این خبر نشان می‌دهد شرکت‌های بزرگ جهان دارند این کارها را به ایجنت می‌سپارند. مهارت‌های نظارتی و تصمیم‌گیری را جدی بگیر.",
+     "mix": "news",
+     "format_hint": "carousel: کدام کارهای بانکی اول ایجنتی می‌شوند",
+     "ai_anchor": {
+      "what": "Imagine Enterprise agent platform with 6,000+ prebuilt agents and assets",
+      "who": "IBM and Microsoft",
+      "date": "2026-11-10",
+      "url": "https://www.ciodive.com/news/microsoft-ibm-team-up-ai-agent-platform/874152/"
+     },
+     "sources": [
+      "https://www.ciodive.com/news/microsoft-ibm-team-up-ai-agent-platform/874152/",
+      "https://www.storagereview.com/news/ibm-microsoft-imagine-enterprise-ai-agent-platform",
+      "https://analyticsindiamag.com/ai-news/ibm-microsoft-launch-agentic-ai-platform-with-over-6000-ai-agents"
+     ]
+    },
+    {
+     "headline_fa": "بیمه‌ات را یک ایجنت قیمت می‌دهد",
+     "explanation_fa": "تام ویلسون، مدیرعامل Allstate، در جلسه گزارش مالی ۵ نوامبر اعلام کرد این شرکت بیمه اوایل ۲۰۲۷ یک «دستیار ایجنتیک شخصی» برای مشتریان عرضه می‌کند. این دستیار قیمت بیمه Allstate و رقبایش را اعلام می‌کند و به ایجنت‌های شخص ثالث مثل Muse متا هم پاسخ می‌دهد. ایجنت فعلی Ask Allstate تا سپتامبر ۱۵ درصد چت‌های پشتیبانی را جواب داده است.",
+     "why_iranians_care_fa": "خرید بیمه شخص ثالث و بدنه در ایران هنوز پر از تماس تلفنی و نماینده است. اینجا یک بیمه‌گر بزرگ آمریکایی دارد خودش را برای مشتری‌ای آماده می‌کند که یک ایجنت است.",
+     "life_angle_fa": "در آینده‌ای نه چندان دور، ایجنت تو با ایجنت شرکت بیمه چانه می‌زند. اگر نماینده بیمه هستی، باید بدانی تماس‌های قیمت‌گیری کم‌کم به ماشین‌ها می‌رسد.",
+     "mix": "news",
+     "format_hint": "post تک‌تصویری",
+     "ai_anchor": {
+      "what": "Plan for a consumer personal agentic assistant in early 2027, built on ALLIE",
+      "who": "Allstate",
+      "date": "2026-11-05",
+      "url": "https://insurancejournal.com/news/national/2026/11/06/891775.htm"
+     },
+     "sources": [
+      "https://insurancejournal.com/news/national/2026/11/06/891775.htm",
+      "https://www.carriermanagement.com/news/2026/11/10/294044.htm",
+      "https://letsdatascience.com/news/allstate-plans-personal-agentic-assistant-for-customers-in-e-6316886a"
+     ]
+    },
+    {
+     "headline_fa": "ایجنت‌ها ارزان شدند؛ کار تکراری‌ات در خطر است",
+     "explanation_fa": "متا در ۹ نوامبر مدل Muse Ember را عرضه کرد. این کوچک‌ترین و ارزان‌ترین مدل خانواده Muse است و برای کارهای تکراری ایجنت‌ها ساخته شده: فراخوانی ابزار، بخش‌های کوچک کدنویسی، استخراج اطلاعات و خواندن اسناد طولانی. قیمت API آن ۰٫۱ دلار برای هر میلیون توکن ورودی و ۰٫۵ دلار برای خروجی است و پنجره متنی‌اش یک میلیون توکن است.",
+     "why_iranians_care_fa": "وقتی اجرای هر کار ایجنتی تقریباً مجانی شود، خودکارسازی برای شرکت‌های کوچک و استارتاپ‌های ایرانی هم به‌صرفه می‌شود، نه فقط برای غول‌ها.",
+     "life_angle_fa": "کارهای تکراری مثل کپی کردن داده از PDF به اکسل یا دسته‌بندی ایمیل‌ها حالا با چند سنت انجام می‌شود. اگر شغلت فقط همین است، وقتش است که یاد بگیری این مدل‌ها را خودت به کار بگیری.",
+     "mix": "news",
+     "format_hint": "reel: هزینه یک کار با آدم در برابر مدل",
+     "ai_anchor": {
+      "what": "Muse Ember: low-cost small model for agent workloads",
+      "who": "Meta",
+      "date": "2026-11-09",
+      "url": "https://thenewstack.io/meta-muse-ember-launch/"
+     },
+     "sources": [
+      "https://thenewstack.io/meta-muse-ember-launch/",
+      "https://interestingengineering.com/ai-robotics/meta-muse-ember-smallest-model-ai-agents",
+      "https://www.vals.ai/models/meta_muse-ember"
+     ]
+    },
+    {
+     "headline_fa": "فتوشاپ و پریمیر حالا خودشان ادیت می‌کنند",
+     "explanation_fa": "ادوبی در Adobe MAX 2026 ایجنت خلاق خود را به ایلاستریتور، پریمیر، این‌دیزاین، افترافکت و Frame.io آورد. در پریمیر می‌تواند افکت را روی همه کلیپ‌ها اعمال کند، سوژه ماسک‌شده را دنبال کند و رنگ و نور کل سکانس را یک‌جا تنظیم کند. ادوبی همچنین به‌صورت پیش‌نمایش اجازه می‌دهد ایجنت‌های شخص ثالث روی فایل‌های پروژه در کامپیوتر کاربر تغییر بدهند.",
+     "why_iranians_care_fa": "تدوینگرها و طراحان گرافیک ایرانی، چه برای پیج‌های اینستاگرام و چه برای مشتری خارجی، تقریباً همه با همین نرم‌افزارها کار می‌کنند. دیجیاتو هم این خبر را پوشش داد.",
+     "life_angle_fa": "کارهای وقت‌گیری مثل اصلاح رنگ و تغییر سایز برای پلتفرم‌های مختلف که ساعت‌ها وقت تو را می‌گرفت، حالا با یک دستور انجام می‌شود. ارزش تو در ایده و سلیقه است، نه در کلیک‌های تکراری.",
+     "mix": "news",
+     "format_hint": "reel: قبل و بعد یک تدوین",
+     "ai_anchor": {
+      "what": "Creative Agent expanded into Premiere, Illustrator, InDesign, After Effects and Frame.io at Adobe MAX 2026",
+      "who": "Adobe",
+      "date": "2026-11-10",
+      "url": "https://digitalproduction.com/2026/11/10/adobe-max-2026-ai-video-audio-premiere-creative-agent/"
+     },
+     "sources": [
+      "https://digitalproduction.com/2026/11/10/adobe-max-2026-ai-video-audio-premiere-creative-agent/",
+      "https://www.digit.in/news/general/adobe-max-2026-always-on-ai-agents-for-firefly-creative-agent-for-photoshop-and-more-apps-announced.html",
+      "https://fstoppers.com/photoshop/adobe-max-2026-adobe-goes-all-agentic-ai-905495",
+      "https://digiato.com/artificial-intelligence/adobe-ai-agents-automate-creative-workflows-premiere-illustrator"
+     ]
+    },
+    {
+     "headline_fa": "همکاری که بدون پرسیدن، گزارش‌هایت را می‌نویسد",
+     "explanation_fa": "Databricks در ۱۱ نوامبر نسخه تازه Genie را معرفی کرد: یک «همکار» هوش مصنوعی همیشه‌روشن که کارهای طولانی سازمانی را درون محدوده‌هایی که کاربر تعیین می‌کند انجام می‌دهد. سیستم‌های متصل را زیر نظر دارد، با تغییر داده یا طبق زمان‌بندی خودش دست به کار می‌شود و بی‌آنکه منتظر دستور بماند از ابزارهای مجاز استفاده می‌کند. بودجه، سقف هزینه و ثبت همه اقداماتش با Unity Gateway کنترل می‌شود.",
+     "why_iranians_care_fa": "تحلیلگر داده و کارشناس گزارش‌گیری از شغل‌های پرطرفدار جوانان ایرانی است، چه در داخل و چه به‌صورت دورکاری. این ابزار مستقیماً همین کار را هدف گرفته.",
+     "life_angle_fa": "اگر کارت ساختن داشبورد و گزارش هفتگی است، این ایجنت آن را بدون درخواست تحویل می‌دهد. جای تو در سؤال درست پرسیدن و تفسیر عدد هاست.",
+     "mix": "news",
+     "format_hint": "carousel",
+     "ai_anchor": {
+      "what": "New always-on autonomous Genie for long-running enterprise work",
+      "who": "Databricks",
+      "date": "2026-11-11",
+      "url": "https://databricks.com/blog/new-genie-autonomous-ai-complex-enterprise-work"
+     },
+     "sources": [
+      "https://databricks.com/blog/new-genie-autonomous-ai-complex-enterprise-work",
+      "https://sdtimes.com/data/databricks-launches-new-always-on-genie-autonomous-ai-for-complex-enterprise-work/",
+      "https://www.techzine.eu/news/data-management/145764/databricks-genie-gets-a-makeover-autonomous-proactive-and-always-on/"
+     ]
+    },
+    {
+     "headline_fa": "مرورگر مخصوص ایجنت‌ها رایگان شد؛ خودت بساز",
+     "explanation_fa": "کلودفلر در ۱۳ نوامبر کد Kitesurf را با مجوز Apache 2.0 روی گیت‌هاب منتشر کرد. Kitesurf موتور مرورگری است که برای ایجنت‌ها ساخته شده و بدون کانتینر مرورگر، HTML را پردازش می‌کند، CSS را می‌فهمد و جاوااسکریپت را اجرا می‌کند. کلودفلر آن را آزمایشی می‌داند و نسخه خودمیزبان به‌طور پیش‌فرض احراز هویت ندارد.",
+     "why_iranians_care_fa": "بیشتر ابزارهای ایجنتی پولی هستند و پرداخت‌شان از ایران سخت است. یک موتور متن‌باز روی گیت‌هاب را برنامه‌نویس ایرانی می‌تواند بدون اشتراک خارجی دانلود کند و روی سیستم خودش اجرا کند.",
+     "life_angle_fa": "برای برنامه‌نویس‌ها: ۱) مخزن Kitesurf را از گیت‌هاب کلودفلر کلون کن. ۲) طبق راهنمای مخزن، آن را روی سیستم خودت اجرا کن. ۳) یک کار ساده مثل خواندن قیمت از یک صفحه را به آن بده و خروجی را بگیر. ۴) چون احراز هویت ندارد، آن را با آدرس عمومی روی اینترنت باز نگذار. با همین می‌توانی ایجنت جمع‌آوری اطلاعات بسازی و به‌عنوان نمونه‌کار ارائه بدهی.",
+     "mix": "practice",
+     "format_hint": "carousel آموزشی گام‌به‌گام",
+     "ai_anchor": {
+      "what": "Kitesurf browser engine for AI agents open-sourced under Apache 2.0",
+      "who": "Cloudflare",
+      "date": "2026-11-13",
+      "url": "https://phoronix.com/news/Cloudflare-Kitesurf-Open-Source"
+     },
+     "sources": [
+      "https://phoronix.com/news/Cloudflare-Kitesurf-Open-Source",
+      "https://betanews.com/article/kitesurf-browser-engine-open-source/",
+      "https://blog.cloudflare.com/tag/webassembly/",
+      "https://aiweekly.co/alerts/cloudflare-open-sources-kitesurf-browser-engine-for-ai-agents"
+     ]
+    }
+   ]
+  },
+  {
+   "desk": null,
+   "topics": [
+    {
+     "headline_fa": "هوش مصنوعی دیگه می‌تونه جای تو خرید کنه",
+     "explanation_fa": "OpenAI روز ۱۳ نوامبر «کیف پول ChatGPT» را معرفی کرد. با آن، ایجنت‌های ChatGPT می‌توانند با کارت‌های ویزا، مسترکارت و امریکن اکسپرس از سایت فروشگاه‌ها خرید کنند. فعلاً فقط برای مشترکان Pro بالای ۱۸ سال در آمریکا با کارت آمریکایی فعال است. خود OpenAI هم گفته سیستم‌های ضدتقلب بانک‌ها هنوز گاهی جلوی خرید ایجنت را می‌گیرند.",
+     "why_iranians_care_fa": "کاربران ایرانی کارت بین‌المللی ندارند و این سرویس به ایران نمی‌رسد. ولی مسیر خرید آنلاین دنیا دارد عوض می‌شود: به‌جای آدم‌ها، ایجنت‌ها جنس را مقایسه می‌کنند و می‌خرند. فروشگاه‌های ایرانی هم دیر یا زود با همین مدل روبه‌رو می‌شوند.",
+     "life_angle_fa": "اگر فروشنده‌ای، مشتری بعدی‌ات شاید اصلاً سایتت را نبیند و فقط ایجنتش اطلاعات محصول تو را بخواند. پس قیمت و موجودی دقیق و به‌روز از همین حالا مهم‌تر از عکس قشنگ است.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Launch of ChatGPT Wallet letting AI agents pay with major cards",
+      "who": "OpenAI",
+      "date": "2026-11-13",
+      "url": "https://openai.com/index/introducing-chatgpt-wallet/"
+     },
+     "sources": [
+      "https://openai.com/index/introducing-chatgpt-wallet/",
+      "https://www.digitalcommerce360.com/2026/11/16/openai-chatgpt-wallet-for-ai-purchases-through-retailer-checkouts/amp/",
+      "https://thepaypers.com/payments/news/openai-launches-chatgpt-wallet-for-agentic-payments-in-the-us",
+      "https://decrypt.co/383278/openai-chatgpt-wallet-ai-agents-shop-without-crypto"
+     ]
+    },
+    {
+     "headline_fa": "مغازه‌ت حالا تو ChatGPT ویترین داره؟",
+     "explanation_fa": "OpenAI حدود ۱۰ و ۱۱ نوامبر بخش «Businesses in ChatGPT» را به‌صورت آزمایشی راه انداخت. کسب‌وکارها پروفایل خودشان را در ChatGPT ثبت و تأیید می‌کنند و اطلاعات محصول و خدماتشان را به‌روز نگه می‌دارند. فروشگاه‌های اینترنتی واجد شرایط در آمریکا هم می‌توانند ایجنتی بسازند که به سؤال مشتری‌ها جواب بدهد. برای این ایجنت‌ها تبلیغ اسپانسری هم در نظر گرفته شده است.",
+     "why_iranians_care_fa": "خیلی از ایرانی‌ها برای انتخاب کالا و خدمات از ChatGPT می‌پرسند. وقتی ChatGPT به راهنمای خرید و جایگزین گوگل تبدیل شود، کسب‌وکاری که در جواب‌هایش نیست دیده نمی‌شود.",
+     "life_angle_fa": "اگر کسب‌وکار کوچکی داری، رقابت فقط سر رتبه در گوگل و اینستاگرام نیست. اینکه هوش مصنوعی درباره‌ات چه می‌گوید هم روی فروش اثر دارد.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Businesses in ChatGPT beta: business profiles, Business Hub and Business Agents",
+      "who": "OpenAI",
+      "date": "2026-11-11",
+      "url": "https://www.thetechoutlook.com/news/apps/openai-introduces-business-profiles-in-chatgpt-with-business-agents-limited-to-eligible-us-businesses/"
+     },
+     "sources": [
+      "https://www.thetechoutlook.com/news/apps/openai-introduces-business-profiles-in-chatgpt-with-business-agents-limited-to-eligible-us-businesses/",
+      "https://www.digit.in/news/general/openai-introduces-business-hub-in-chatgpt-lets-companies-connect-with-customers-through-ai-agents.html",
+      "https://www.itechpost.com/articles/237775/20261111/openai-introduces-chatgpt-business-agents-business-hub-new-ai-features-companies.htm"
+     ]
+    },
+    {
+     "headline_fa": "ببین ChatGPT درباره کسب‌وکارت چی می‌گه",
+     "explanation_fa": "حالا که OpenAI بخش پروفایل کسب‌وکارها را راه انداخته، ChatGPT بیش از قبل نقش راهنمای خرید پیدا می‌کند. کسب‌وکارهای ایرانی فعلاً نمی‌توانند پروفایل رسمی ثبت کنند. اما ChatGPT و Gemini هنوز از اطلاعات عمومی وب، مثل سایت و صفحه‌های معرفی، استفاده می‌کنند.",
+     "why_iranians_care_fa": "وقتی کسی می‌پرسد «بهترین فروشگاه X در تهران کدام است»، جواب هوش مصنوعی از اطلاعات عمومی شکل می‌گیرد. اگر اطلاعات تو ناقص یا قدیمی باشد، اسم رقیبت گفته می‌شود.",
+     "life_angle_fa": "قدم‌به‌قدم: ۱) در ChatGPT و Gemini بپرس «برای خرید [محصول تو] در [شهرت] کجا را پیشنهاد می‌کنی؟» و ببین اسمت می‌آید یا نه. ۲) بپرس «درباره [نام فروشگاهت] چه می‌دانی؟» و اطلاعات غلط را یادداشت کن. ۳) در سایت یا صفحه معرفی‌ات نام، آدرس، ساعت کاری، محدوده قیمت و محصولات اصلی را با متن ساده و دقیق بنویس. ۴) یک ماه بعد دوباره همان سؤال‌ها را بپرس و نتیجه را مقایسه کن.",
+     "mix": "practice",
+     "ai_anchor": {
+      "what": "Businesses in ChatGPT beta makes ChatGPT a business discovery surface",
+      "who": "OpenAI",
+      "date": "2026-11-11",
+      "url": "https://www.thetechoutlook.com/news/apps/openai-introduces-business-profiles-in-chatgpt-with-business-agents-limited-to-eligible-us-businesses/"
+     },
+     "sources": [
+      "https://www.thetechoutlook.com/news/apps/openai-introduces-business-profiles-in-chatgpt-with-business-agents-limited-to-eligible-us-businesses/",
+      "https://www.digit.in/news/general/openai-introduces-business-hub-in-chatgpt-lets-companies-connect-with-customers-through-ai-agents.html",
+      "https://digiato.com/promoted/iranian-shops-in-chatgpt-gemini-responses"
+     ]
+    },
+    {
+     "headline_fa": "شرکت سازنده ChatGPT حالا ۱.۲۵ تریلیون دلار می‌ارزه",
+     "explanation_fa": "بلومبرگ ۶ نوامبر گزارش داد OpenAI بخش اول دور جدید سرمایه‌گذاری‌اش را بسته است: حدود ۱۱ میلیارد دلار با ارزش‌گذاری ۱.۲۵ تریلیون دلار. OpenAI در سپتامبر دنبال دست‌کم ۳۰ میلیارد دلار با ارزش حدود ۱.۴ تریلیون بود، اما دور کوچک‌تر و ارزان‌تر بسته شد. ارزش‌گذاری قبلی شرکت در مارس ۸۵۲ میلیارد دلار بود.",
+     "why_iranians_care_fa": "قیمت اشتراک‌ها و سرویس رایگان ابزارهایی که ایرانی‌ها هر روز استفاده می‌کنند به همین پول‌ها بستگی دارد. اینکه سرمایه‌گذارها کمتر از انتظار پول دادند یعنی فشار برای درآمدزایی بیشتر است، از تبلیغات تا اشتراک‌های گران‌تر.",
+     "life_angle_fa": "اگر کار یا درآمدت به ChatGPT وابسته است، این خبر یعنی شرایط نسخه رایگان و قیمت‌ها احتمالاً تغییر می‌کند. بهتر است یک ابزار جایگزین هم بلد باشی.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "OpenAI closes about $11B first tranche at a $1.25T valuation",
+      "who": "OpenAI (reported by Bloomberg)",
+      "date": "2026-11-06",
+      "url": "https://siliconangle.com/2026/11/06/openai-reportedly-raises-11b-in-new-funding-at-1-25t-valuation/"
+     },
+     "sources": [
+      "https://siliconangle.com/2026/11/06/openai-reportedly-raises-11b-in-new-funding-at-1-25t-valuation/",
+      "https://tech-insider.org/openai-11-billion-funding-1-25-trillion-valuation-bloomberg-2026/",
+      "https://letsdatascience.com/blog/openai-wanted-30-billion-closed-11-billion-lower-price"
+     ]
+    },
+    {
+     "headline_fa": "سهام هوش مصنوعی ریخت؛ پولت کجاست؟",
+     "explanation_fa": "۵ نوامبر شاخص نزدک حدود ۵.۵ درصد سقوط کرد، بدترین روزش در حدود ۱۹ ماه. سهام تراشه بیشترین ضرر را دادند و انویدیا نزدیک ۹ درصد افت کرد. گزارش‌ها علت را تردید سرمایه‌گذارها درباره سرعت، هزینه و تأمین مالی موج هوش مصنوعی می‌دانند. به گفته رویترز، حدود ۲.۵ تریلیون دلار از ارزش بازار نزدک دود شد.",
+     "why_iranians_care_fa": "ایرانی‌هایی که در بازارهای جهانی، کریپتو یا صندوق‌های خارجی سرمایه دارند مستقیم تحت تأثیرند. کریپتو و سهام تکنولوژی معمولاً با هم بالا و پایین می‌روند. بحث «حباب هوش مصنوعی» هم روی قیمت جهانی سخت‌افزار و سرویس‌ها اثر می‌گذارد.",
+     "life_angle_fa": "اگر پس‌اندازت را به امید رشد هوش مصنوعی در توکن یا سهام تکنولوژی گذاشته‌ای، این روز نشان داد این بازار در یک جلسه چقدر می‌تواند تکان بخورد.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Nasdaq falls about 5.5% in AI and chip stock selloff",
+      "who": "Nasdaq / AI chipmakers incl. Nvidia, AMD",
+      "date": "2026-11-05",
+      "url": "https://openthemagazine.com/technology/quick-take-why-did-the-nasdaq-fall-55-seven-things-to-know-about-wall-streets-ai-sell-off"
+     },
+     "sources": [
+      "https://openthemagazine.com/technology/quick-take-why-did-the-nasdaq-fall-55-seven-things-to-know-about-wall-streets-ai-sell-off",
+      "https://www.swissinfo.ch/eng/nasdaq-100-wipes-out-%242%2e3-trillion-in-ai-selloff%3a-markets-wrap/92330151",
+      "https://stockanalysis.com/news/nasdaq-100-falls-chip-stocks-slide/"
+     ]
+    },
+    {
+     "headline_fa": "«به مامان ۲۰ پوند بده»؛ بانکی که با حرف زدن کار می‌کنه",
+     "explanation_fa": "بانک دیجیتال Starling در بریتانیا ۱۳ نوامبر قابلیت «Talk to Transact» را معرفی کرد. مشتری به دستیار هوش مصنوعی بانک می‌نویسد یا می‌گوید «پول لوله‌کش را ۲۰۰ پوند بده» یا «۲۰ پوند برای مامان بفرست» و پرداخت آماده می‌شود. این قابلیت تا پایان ۲۰۲۶ به همه حساب‌های شخصی و مشترک این بانک می‌رسد.",
+     "why_iranians_care_fa": "اپ‌های بانکی و پرداخت ایرانی هم دنبال دستیار هوشمندند. این مدل نشان می‌دهد بانکداری از منو و فرم به گفت‌وگو می‌رود؛ چیزی که مثلاً برای پدر و مادرهایی که با اپ بانک مشکل دارند خیلی به کار می‌آید.",
+     "life_angle_fa": "به‌جای چند صفحه کارت‌به‌کارت، یک جمله کافی است. چنین قابلیتی احتمالاً اولین تجربه واقعی «هوش مصنوعی که با پول تو کار می‌کند» خواهد بود.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Talk to Transact: natural-language and voice payments via Starling Assistant",
+      "who": "Starling Bank",
+      "date": "2026-11-13",
+      "url": "https://www.starlingbank.com/news/-talk-to-transact-starling-customers-can-use-their-voice-to-send-money"
+     },
+     "sources": [
+      "https://www.starlingbank.com/news/-talk-to-transact-starling-customers-can-use-their-voice-to-send-money",
+      "https://ffnews.com/news/starling-customers-can-use-their-voice-to-send-money-f97f411e",
+      "https://thepaypers.com/payments/news/starling-bank-rolls-out-voice-payments-via-agentic-ai-assistant"
+     ]
+    },
+    {
+     "headline_fa": "جمینای گوگل حالا خودش برات خرید می‌کنه",
+     "explanation_fa": "گوگل ۴ نوامبر پرداخت مستقیم را در AI Mode جست‌وجو و اپ جمینای در کانادا فعال کرد؛ اولین گسترش این قابلیت بیرون از آمریکا. پایه آن «پروتکل تجارت جهانی» (UCP) است و کاربر بدون رفتن به سایت فروشگاه، داخل جمینای خرید را تمام می‌کند. فعلاً فقط برخی فروشگاه‌های شاپیفای مثل lululemon و Simons در آن هستند.",
+     "why_iranians_care_fa": "گوگل و جمینای پرکاربردترین ابزارهای جست‌وجو برای ایرانی‌ها هستند. وقتی جست‌وجو خودش به صندوق پرداخت تبدیل شود، معنی «سایت فروشگاهی» و تبلیغات آنلاین عوض می‌شود.",
+     "life_angle_fa": "برای فروشنده‌ها و کسانی که در دیجیتال مارکتینگ کار می‌کنند، این یعنی مهارت فردا فقط سئو نیست؛ باید یاد بگیری محصولت چطور در جواب هوش مصنوعی دیده و خریده شود.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "UCP-powered direct checkout launches in AI Mode and Gemini in Canada",
+      "who": "Google",
+      "date": "2026-11-04",
+      "url": "https://blog.google/intl/en-ca/products/explore-get-answers/a-new-way-to-shop-introducing-a-more-intuitive-agentic-shopping-experience-for-consumers-and-retailers-in-canada/"
+     },
+     "sources": [
+      "https://blog.google/intl/en-ca/products/explore-get-answers/a-new-way-to-shop-introducing-a-more-intuitive-agentic-shopping-experience-for-consumers-and-retailers-in-canada/",
+      "https://www.iphoneincanada.ca/2026/11/04/google-gemini-can-now-buy-stuff-for-you-in-canada/",
+      "https://searchenginejournal.com/google-brings-ucp-direct-checkout-to-ai-mode-in-canada/595882"
+     ]
+    },
+    {
+     "headline_fa": "آمازون مغازه‌های کوچک رو مجانی تو هوش مصنوعیش می‌آره",
+     "explanation_fa": "آمازون ۴ نوامبر پنل رایگان «Shop Direct Merchant Workspace» را راه انداخت. با آن، فروشگاه‌های اینترنتی مستقل فهرست محصولاتشان را می‌فرستند تا در جست‌وجوی آمازون و دستیار خرید Alexa به خریداران آمریکایی نشان داده شود. خرید نهایی در سایت خود فروشنده انجام می‌شود. آمازون به این ابزار می‌گوید «اتصال مستقیم هوش مصنوعی».",
+     "why_iranians_care_fa": "رقابت غول‌ها برای اینکه ایجنت خریدشان «ورودی اصلی خرید» باشد مستقیم روی آینده فروشگاه‌ها اثر دارد. دیجی‌کالا و بازارهای ایرانی هم مسیر مشابهی می‌روند و دارند دستیار خرید هوشمند را جدی می‌گیرند.",
+     "life_angle_fa": "اگر فروشگاه اینترنتی داری، فایل محصول تمیز و استاندارد (اسم، قیمت، موجودی و عکس) دیگر کار اداری نیست. همین فایل تعیین می‌کند هوش مصنوعی محصولت را به مشتری نشان بدهد یا نه.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Shop Direct Merchant Workspace: free AI connector from stores to Alexa for Shopping and Amazon search",
+      "who": "Amazon",
+      "date": "2026-11-04",
+      "url": "https://www.aboutamazon.com/news/retail/amazon-shop-direct-merchant-workspace"
+     },
+     "sources": [
+      "https://www.aboutamazon.com/news/retail/amazon-shop-direct-merchant-workspace",
+      "https://chainstoreage.com/amazon-offers-direct-ai-connector-third-party-retailers",
+      "https://ppc.land/amazons-new-portal-lets-any-eligible-store-list-in-its-search-for-free/"
+     ]
+    },
+    {
+     "headline_fa": "بانکی که مشتری‌هاش ربات‌ها هستن پول گرفت",
+     "explanation_fa": "Griffin، بانک دارای مجوز کامل در بریتانیا، حدود ۱۱ و ۱۲ نوامبر ۲۰ میلیون دلار سرمایه سری B گرفت و ارزشش از ۱۰۰ میلیون دلار گذشت. Griffin خودش را «بانک ایجنتیک» می‌نامد و برای ایجنت‌های هوش مصنوعی سرور MCP ساخته تا بتوانند به حساب بانکی وصل شوند. این پول خرج صدور کارت و خدمات استیبل‌کوین می‌شود.",
+     "why_iranians_care_fa": "وقتی بانک‌ها درهایشان را رسماً برای ایجنت‌های هوش مصنوعی باز می‌کنند، مدیریت پول کم‌کم دست نرم‌افزار می‌افتد. ایرانی‌هایی که با استیبل‌کوین و پرداخت‌های مرزی کار می‌کنند هم ترکیب هوش مصنوعی و تتر را از نزدیک دنبال می‌کنند.",
+     "life_angle_fa": "آینده‌ای که در آن «دستیار هوش مصنوعی‌ات» قبض‌ها را بدهد و پول جابه‌جا کند دیگر ایده نیست؛ بانک‌های واقعی برایش زیرساخت می‌سازند.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Griffin raises $20M Series B to expand its agentic banking platform into cards and stablecoins",
+      "who": "Griffin",
+      "date": "2026-11-12",
+      "url": "https://www.fintechfutures.com/venture-capital-funding/griffin-20m-series-b"
+     },
+     "sources": [
+      "https://www.fintechfutures.com/venture-capital-funding/griffin-20m-series-b",
+      "https://thenextweb.com/news/griffin-bank-20m-series-b-cards-stablecoins",
+      "https://cryptorank.io/insights/deals/griffin-series-b-2026-11-12",
+      "https://thepaypers.com/fintech/news/griffin-debuts-mcp-server-for-ai-agent-banking"
+     ]
+    },
+    {
+     "headline_fa": "پول‌ها دارن می‌رن سمت کارهای پشت‌میزی تو",
+     "explanation_fa": "سایت Sifted در تحلیلی در ۱۶ نوامبر نوشت دورهای سرمایه‌گذاری اولیه در فین‌تک‌های «هوش‌مصنوعی‌محور» اروپا ۴۰ درصد بالا رفته است. بیشتر این استارتاپ‌ها نرم‌افزار کارهای پشت‌صحنه مالی می‌سازند: حسابداری، تطبیق، انطباق با قوانین و پردازش اسناد. این در حالی است که کل فین‌تک کمترین تعداد قرارداد را در بیش از یک دهه دارد.",
+     "why_iranians_care_fa": "سرمایه‌ها دقیقاً سراغ کارهایی رفته که هزاران حسابدار و کارمند اداری و بانکی ایرانی هر روز انجام می‌دهند. ابزارهایی که امروز در اروپا ساخته می‌شوند فردا وارد نرم‌افزارهای حسابداری و بانکی همه‌جا می‌شوند.",
+     "life_angle_fa": "اگر شغلت ورود داده، تطبیق حساب یا بررسی مدارک است، این همان بخشی است که سرمایه‌گذارها روی خودکارسازی‌اش شرط بسته‌اند. یاد گرفتن کار با همین ابزارها بهترین دفاع است.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Analysis: early-stage AI-native fintech rounds up 40%, crowding into back-office software",
+      "who": "Sifted",
+      "date": "2026-11-16",
+      "url": "https://sifted.eu/articles/ai-native-fintech-crowding/"
+     },
+     "sources": [
+      "https://sifted.eu/articles/ai-native-fintech-crowding/",
+      "https://sifted.eu/articles/european-fintech-h1-2026-funding/"
+     ]
+    }
+   ]
+  },
+  {
+   "desk": null,
+   "topics": [
+    {
+     "headline_fa": "شغلت امن‌تره؟ اخراج‌های «تقصیر AI» کم شد",
+     "explanation_fa": "گزارش ماهانه شرکت Challenger, Gray & Christmas که ۱۴ آبان منتشر شد نشان می‌دهد کارفرماهای آمریکایی در اکتبر ۴۳٬۹۹۴ تعدیل اعلام کرده‌اند و فقط ۱٬۲۶۵ مورد آن را به هوش مصنوعی نسبت داده‌اند. این کمترین رقم ماهانه امسال است؛ اوج آن ۳۸٬۵۷۹ نفر در ماه مه بود. با این حال در ده ماه اول ۲۰۲۶ هوش مصنوعی دلیل ۱۲۱٬۴۰۱ تعدیل بوده، یعنی بیشتر از دو برابر کل سال ۲۰۲۵ (۵۴٬۸۳۶). حالا «شرایط اقتصادی» با ۱۳۰٬۵۳۱ مورد جای هوش مصنوعی را در صدر دلایل اخراج گرفته است.",
+     "why_iranians_care_fa": "بیشتر چیزهایی که درباره «هوش مصنوعی شغل‌ها را می‌گیرد» می‌شنویم از همین آمار آمریکا می‌آید. این گزارش نشان می‌دهد موج اخراج به اسم هوش مصنوعی یک‌طرفه بالا نمی‌رود و گاهی اقتصاد مقصر اصلی است.",
+     "life_angle_fa": "دفعه بعد که کسی گفت «هوش مصنوعی همه را بیکار کرد»، می‌توانی بپرسی منظورش کدام آمار است. ترس از هوش مصنوعی را با عدد بسنج، نه با تیتر.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Challenger October 2026 job-cuts report: AI cited for 1,265 cuts, lowest month of 2026; 121,401 AI-cited cuts year to date",
+      "who": "Challenger, Gray & Christmas",
+      "date": "2026-11-05",
+      "url": "https://www.hcamag.com/us/specialization/transformation/ai-blamed-for-121401-job-cuts-but-the-labor-data-isnt-buying-it/594129"
+     },
+     "sources": [
+      "https://www.hcamag.com/us/specialization/transformation/ai-blamed-for-121401-job-cuts-but-the-labor-data-isnt-buying-it/594129",
+      "https://www.cpapracticeadvisor.com/?p=193395",
+      "https://pro.thestreet.com/market-commentary/october-job-cuts-at-3-year-low-as-focus-turns-to-economic-conditions"
+     ]
+    },
+    {
+     "headline_fa": "پشتیبانی مشتری کار می‌کنی؟ بلاک دوباره تعدیل کرد",
+     "explanation_fa": "طبق گزارش Business Insider که NewsBytes و رسانه‌های دیگر هم منتشرش کردند، Block (شرکت مادر Square و Cash App به مدیریت جک دورسی) در دومین دور تعدیل امسال تیم‌های عملیات مشتری، عملیات ریسک و عملیات آموزش و محتوا را کوچک می‌کند. در ایمیل داخلی آمده که «تعداد نقش‌ها کم می‌شود، بعضی مسئولیت‌ها عوض می‌شود و زنجیره گزارش‌دهی جابه‌جا می‌شود». این شرکت در فوریه هم با استناد به هوش مصنوعی نیرویش را از بیش از ۱۰ هزار به کمتر از ۶ هزار نفر رسانده بود، و هم‌زمان پیش‌بینی سود ناخالص ۲۰۲۶ را تا ۱۲٫۶ میلیارد دلار بالا برد.",
+     "why_iranians_care_fa": "پشتیبانی مشتری، کنترل ریسک و تولید محتوای آموزشی همان کارهایی هستند که در فین‌تک‌ها، بانک‌ها و فروشگاه‌های اینترنتی ایران هم هزاران نفر انجامشان می‌دهند. معمولاً چیزی که در فین‌تک‌های آمریکا امتحان می‌شود، چند سال بعد به ایران هم می‌رسد.",
+     "life_angle_fa": "اگر کارت جواب‌دادن به تیکت یا بررسی تراکنش است، این خبر نشان می‌دهد ارزش اصلی‌ات در حل پرونده‌های پیچیده و مدیریت ابزارهای هوشمند است، نه در جواب‌دادن به سؤال‌های تکراری.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Block begins second 2026 layoff round hitting Customer Ops, Risk Ops and Learning & Content Operations amid AI-driven consolidation",
+      "who": "Block (Jack Dorsey)",
+      "date": "2026-11-06",
+      "url": "https://www.newsbytesapp.com/news/business/jack-dorsey-s-block-fires-employees-for-2nd-time-this-year/story"
+     },
+     "sources": [
+      "https://www.newsbytesapp.com/news/business/jack-dorsey-s-block-fires-employees-for-2nd-time-this-year/story",
+      "https://business-news-today.com/block-xyz-cuts-jobs-again-as-profits-soar-is-jack-dorseys-leaner-model-working/",
+      "https://techstory.in/jack-dorseys-block-plans-second-major-layoff-round-in-2026/"
+     ]
+    },
+    {
+     "headline_fa": "قبل از آمدن AI، خودشان استعفا می‌دهند",
+     "explanation_fa": "گاردین ۱۵ آبان گزارشی با عنوان «از ترس هوش مصنوعی، کارمندان یقه‌سفید شغلشان را رها می‌کنند» منتشر کرد. این گزارش درباره متخصصانی است که پیش از اینکه اتوماسیون به نقششان برسد، خودشان کار و حتی رشته‌شان را عوض می‌کنند. گاردین پیش‌تر هم از کارمندان دفتری‌ای نوشته بود که سراغ حرفه‌های فنی و یدی رفته‌اند.",
+     "why_iranians_care_fa": "در ایران هم خیلی‌ها در تصمیم‌هایی مثل انتخاب رشته کنکور، مهاجرت کاری یا رفتن از کارمندی سراغ کار آزاد، «آینده هوش مصنوعی» را حساب می‌کنند. این روایت نشان می‌دهد ترس از هوش مصنوعی حتی قبل از خود فناوری، بازار کار را تکان می‌دهد.",
+     "life_angle_fa": "قبل از اینکه از ترس استعفا بدهی یا رشته عوض کنی، ببین در کار خودت دقیقاً کدام وظیفه‌ها خودکار می‌شوند و کدام نه. تصمیم شغلی را با این فهرست بگیر، نه با هیجان خبرها.",
+     "mix": "story",
+     "ai_anchor": {
+      "what": "Guardian report: fearing AI disruption, white-collar workers are quitting their jobs",
+      "who": "The Guardian",
+      "date": "2026-11-06",
+      "url": "https://www.theguardian.com/technology/2026/nov/06/ai-disruption-job-quitting"
+     },
+     "sources": [
+      "https://biztoc.com/x/dcead5970644a9d2",
+      "https://emergent.sh/news/white-collar-workers-quit-jobs-over-ai",
+      "https://www.inkl.com/news/the-big-ai-job-swap-why-white-collar-workers-are-ditching-their-careers"
+     ]
+    },
+    {
+     "headline_fa": "کارمند دفتری هستی؟ آمار تازه امیدوارکننده است",
+     "explanation_fa": "واشنگتن‌پست ۱۸ آبان نوشت آمار تازه وزارت کار آمریکا هنوز نشانی از اخراج گسترده کارمندان دفتری به‌خاطر هوش مصنوعی ندارد. بخش «خدمات حرفه‌ای و تجاری» که وکلا، حسابداران و مشاوران را هم شامل می‌شود، در اکتبر ۷۰ هزار شغل اضافه کرد که بیشترین رشد در چند سال اخیر است. در عوض، شرکت‌هایی که برای کسب‌وکارهای دیگر سیستم کامپیوتری طراحی می‌کنند حدود ۲۶ هزار نفر کمتر از پارسال نیرو دارند و یک اقتصاددان بخش زیادی از این افت را به برنامه‌نویسی برون‌سپاری‌شده با کمک هوش مصنوعی نسبت داده است.",
+     "why_iranians_care_fa": "حسابدارها، مشاورها و کارمندان اداری ایران مدام می‌شنوند که «نوبت شماست». این داده می‌گوید فعلاً فشار اصلی روی بعضی کارهای برنامه‌نویسی پروژه‌ای است، و این برای برنامه‌نویس‌هایی که برای مشتری خارجی کار می‌کنند خبر مهمی است.",
+     "life_angle_fa": "اگر فریلنسر برنامه‌نویسی هستی و پروژه‌های تکراری می‌گیری، رقیب تازه‌ات ابزارهای هوش مصنوعی‌اند. سراغ کارهایی برو که فهم کسب‌وکار مشتری می‌خواهد. اگر حسابدار یا مشاوری، آمار فعلاً طرف توست.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Washington Post analysis of October US jobs data: professional and business services added 70,000 jobs; computer systems design employment down ~26,000 year over year",
+      "who": "The Washington Post / US Labor Department data",
+      "date": "2026-11-08",
+      "url": "https://dnyuz.com/2026/11/08/is-ai-taking-white-collar-jobs-latest-hiring-report-suggests-not-yet"
+     },
+     "sources": [
+      "https://dnyuz.com/2026/11/08/is-ai-taking-white-collar-jobs-latest-hiring-report-suggests-not-yet"
+     ]
+    },
+    {
+     "headline_fa": "جوانی و دنبال کار؟ بازار با باتجربه‌ها مهربان‌تر است",
+     "explanation_fa": "گزارشی که ۲۰ آبان با عنوان «بازار کار برای جوان‌ها سخت است، کارگران مسن‌تر وضعشان خوب است» منتشر شد، شکاف نسلی در استخدام را بررسی می‌کند. داده‌های استنفورد نشان می‌دهد اشتغال افراد ۲۲ تا ۲۵ ساله در شغل‌هایی که بیشتر در معرض هوش مصنوعی‌اند، از اواخر ۲۰۲۲ تا ژوئیه ۲۰۲۵ حدود ۶ درصد کم شده، در حالی که اشتغال افراد بالای ۳۰ سال در همان شغل‌ها ۶ تا ۹ درصد بیشتر شده است. فدرال رزرو دالاس هم گزارش کرده که «ارزش سابقه کار» در این شغل‌ها بالا رفته است.",
+     "why_iranians_care_fa": "در ایران فارغ‌التحصیلان جوان همین حالا هم برای اولین شغل مشکل دارند. اگر کارهای سطح پایه مثل ورود داده یا کدنویسی ساده به هوش مصنوعی سپرده شود، پله اول نردبان شغلی کوتاه‌تر می‌شود.",
+     "life_angle_fa": "اگر دانشجو یا تازه‌فارغ‌التحصیلی، تجربه واقعی را زودتر جمع کن: کارآموزی، پروژه واقعی برای یک کسب‌وکار کوچک یا همکاری داوطلبانه. چیزی که هوش مصنوعی ندارد، دانش ضمنی از کار واقعی است.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Report on US job market: tough for young people, older workers thriving, amid AI-exposure evidence from Stanford and Dallas Fed",
+      "who": "Anchorage Daily News (syndicated report)",
+      "date": "2026-11-11",
+      "url": "https://www.adn.com/business-economy/2026/11/11/the-job-market-is-tough-for-young-people-older-workers-are-thriving/"
+     },
+     "sources": [
+      "https://www.adn.com/business-economy/2026/11/11/the-job-market-is-tough-for-young-people-older-workers-are-thriving/",
+      "https://fortune.com/2026/03/04/gen-z-lack-of-experience-job-wage-loss-older-worker-experience-dallas-fed/",
+      "https://gizmodo.com/the-young-are-being-battered-by-ai-as-hiring-shifts-to-older-workers-2000759608"
+     ]
+    },
+    {
+     "headline_fa": "فدرال رزرو: سهم دستمزد تو کوچک‌تر می‌شود",
+     "explanation_fa": "مایکل بار، عضو هیئت‌مدیره فدرال رزرو آمریکا، ۲۱ آبان در دانشگاه ییل سخنرانی‌ای با عنوان «نابرابری آمریکایی و آینده هوش مصنوعی» داشت. او گفت نشانه‌هایی هست که هوش مصنوعی در بعضی بخش‌ها، به‌خصوص برای کارگران جوان‌تر، جای نیروی کار را می‌گیرد و باید برای «اختلال‌های جدی کوتاه‌مدت» آماده بود. به گفته او سهم دستمزدها از درآمد ملی آمریکا در سه‌ماهه دوم ۲۰۲۶ به رکورد پایین ۵۲٫۸ درصد رسیده است.",
+     "why_iranians_care_fa": "این حرف یکی از مقام‌های اصلی بانک مرکزی آمریکاست، نه یک فعال رسانه‌ای. اگر سود هوش مصنوعی بیشتر به جیب صاحبان سرمایه برود، فاصله درآمدی در همه کشورها، از جمله ایران، بیشتر می‌شود.",
+     "life_angle_fa": "اگر فقط با «ساعت کار» پول درمی‌آوری، در اقتصاد هوش مصنوعی سهمت کمتر می‌شود. فکر کن چطور مالک بخشی از خروجی کارت شوی: محصول خودت، درصد از فروش، یا مهارتی که ابزارها را می‌گرداند.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Speech 'American Inequality and the Future of AI': warns of short-term labor disruption from AI, labor share at record low 52.8%",
+      "who": "Michael Barr, Federal Reserve Board Governor",
+      "date": "2026-11-12",
+      "url": "https://www.federalreserve.gov/newsevents/speech/barr20261112a.htm"
+     },
+     "sources": [
+      "https://www.federalreserve.gov/newsevents/speech/barr20261112a.htm",
+      "https://www.newstribune.com/news/2026/nov/13/feds-barr-says-us-should-prepare-for-serious-ai/",
+      "https://insurancenewsnet.com/oarticle/fed-gov-barr-issues-what-will-artificial-intelligence-mean-for-the-labor-market-and-the-economy"
+     ]
+    },
+    {
+     "headline_fa": "برنامه‌نویسی؟ آگهی‌های استخدام دوباره زیاد شده",
+     "explanation_fa": "طبق گزارش‌ها، به‌روزرسانی سه‌ماهه سوم Indeed Hiring Lab که ۲۱ آبان منتشر شد نشان می‌دهد آگهی‌های شغلی توسعه نرم‌افزار در آمریکا نسبت به پارسال ۲۳٫۸ درصد بیشتر شده است. تحلیل قبلی همین مؤسسه نشان داده بود ۷۱ درصد رشد آگهی‌های برنامه‌نویسی مربوط به نقش‌های ارشد بوده و ۳۷ درصد آن مربوط به عنوان‌هایی است که اسم هوش مصنوعی در آن‌هاست. البته آگهی‌ها هنوز حدود ۲۷٫۵ درصد پایین‌تر از سطح قبل از کرونا هستند.",
+     "why_iranians_care_fa": "برنامه‌نویس‌های ایرانی که برای شرکت‌های خارجی دورکاری می‌کنند یا قصد مهاجرت کاری دارند، مستقیم به این بازار وابسته‌اند. بازار برگشته، ولی بیشتر برای ارشدها و کسانی که با هوش مصنوعی کار می‌کنند.",
+     "life_angle_fa": "قدم‌به‌قدم: ۱) در رزومه انگلیسی‌ات یک بخش «AI-assisted development» بساز و پروژه‌هایی را که با Copilot یا Claude Code یا Cursor جلو برده‌ای با عدد بنویس (مثلاً زمان تحویل نصف شد). ۲) یک پروژه کوچک که از API یک مدل زبانی استفاده می‌کند روی GitHub بگذار. ۳) در LinkedIn و Jobinja و جاب‌ویژن عنوان پروفایلت را با مهارت هوش مصنوعی به‌روز کن. ۴) برای آگهی‌های میانی و ارشد اقدام کن، نه فقط Junior.",
+     "mix": "practice",
+     "ai_anchor": {
+      "what": "Indeed Hiring Lab Q3 2026 labor market update: US software development postings up 23.8% year over year",
+      "who": "Indeed Hiring Lab",
+      "date": "2026-11-12",
+      "url": "https://www.4cornerresources.com/?p=211460"
+     },
+     "sources": [
+      "https://www.4cornerresources.com/?p=211460",
+      "https://www.hiringlab.org/?p=20708",
+      "https://officechai.com/ai/us-software-job-postings-are-up-15-since-launch-of-claude-code-while-overall-job-postings-are-down-7-indeed-data/"
+     ]
+    },
+    {
+     "headline_fa": "نصف کارکنان آمریکا با هوش مصنوعی کار می‌کنند",
+     "explanation_fa": "فیلیپ جفرسون، نایب‌رئیس فدرال رزرو، ۲۲ آبان در دانشگاه کالیفرنیا سن‌دیگو سخنرانی‌ای با عنوان «فناوری جدید، پرسش‌های قدیمی» داشت. طبق گزارش‌های خبری از این سخنرانی، نظرسنجی‌ها نشان می‌دهد ۴۰ تا ۵۰ درصد بزرگسالان شاغل آمریکا در کارشان از هوش مصنوعی استفاده می‌کنند. با این حال او گفت هنوز زود است که جهش بهره‌وری اخیر را به هوش مصنوعی نسبت بدهیم: سود هوش مصنوعی در کارهای مشخص دیده می‌شود، ولی اغلب با هزینه یا گلوگاه تازه‌ای در جای دیگر همراه است.",
+     "why_iranians_care_fa": "وقتی نزدیک نیمی از نیروی کار یک اقتصاد بزرگ با این ابزارها کار می‌کند، استفاده از هوش مصنوعی برای کارفرماهای خارجی و حتی شرکت‌های ایرانی به یک مهارت پایه تبدیل می‌شود، مثل کار با اکسل.",
+     "life_angle_fa": "اگر هنوز هوش مصنوعی را فقط برای سرگرمی امتحان کرده‌ای، عقب افتاده‌ای. یک کار تکراری هفتگی‌ات را انتخاب کن و ببین با یک دستیار هوش مصنوعی چقدر زودتر تمام می‌شود.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Speech 'New Technology, Old Questions: Productivity Puzzles and the Macroeconomy' on AI adoption and productivity",
+      "who": "Philip N. Jefferson, Federal Reserve Vice Chair",
+      "date": "2026-11-13",
+      "url": "https://www.federalreserve.gov/newsevents/speech/jefferson20261113a.htm"
+     },
+     "sources": [
+      "https://www.federalreserve.gov/newsevents/speech/jefferson20261113a.htm",
+      "https://pro.edgex.exchange/en-US/news/article/fed-jefferson-ai-productivity-gains-lag",
+      "https://cryptobriefing.com/fed-jefferson-ai-productivity-monetary-policy/"
+     ]
+    },
+    {
+     "headline_fa": "بازار کار سرپاست، ولی اخراج‌ها ادامه دارد",
+     "explanation_fa": "خبرگزاری آناتولی ۲۰ آبان گزارش داد بازار کار آمریکا با وجود موج اخراج‌ها هنوز مقاوم است. تعدیل‌های بزرگ در فناوری، مالی، خرده‌فروشی و رسانه با فشار برای خودکارسازی و بهره‌وری با هوش مصنوعی ادامه دارد، اما به گفته اقتصاددان‌ها نیروهای اخراجی تقریباً به همان سرعتی که شغل تازه باز می‌شود دوباره جذب بازار می‌شوند. بعضی کارشناسان هم از «AI washing» حرف می‌زنند، یعنی وقتی شرکت‌ها کاهش هزینه را گردن هوش مصنوعی می‌اندازند.",
+     "why_iranians_care_fa": "ایرانی‌هایی که برای شرکت‌های خارجی دورکاری می‌کنند یا قصد مهاجرت کاری دارند باید بدانند کدام بخش‌ها در حال تعدیل‌اند. فناوری و مالی دقیقاً همان حوزه‌هایی هستند که بیشتر متخصصان ایرانی در آن‌ها اقدام می‌کنند.",
+     "life_angle_fa": "وقتی شرکتی می‌گوید «به‌خاطر هوش مصنوعی» تعدیل می‌کند، همیشه حرفش را دربست قبول نکن. پیش از تصمیم شغلی، وضعیت مالی همان شرکت را هم بررسی کن.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Report: US labor market remains resilient though AI-driven layoffs continue across tech, finance, retail and media",
+      "who": "Anadolu Agency",
+      "date": "2026-11-11",
+      "url": "https://aa.com.tr/en/americas/us-labor-market-remains-resilient-though-ai-driven-layoffs-continue/4120784"
+     },
+     "sources": [
+      "https://aa.com.tr/en/americas/us-labor-market-remains-resilient-though-ai-driven-layoffs-continue/4120784"
+     ]
+    },
+    {
+     "headline_fa": "۲۰۷ هزار اخراج؛ همه‌اش تقصیر هوش مصنوعی است؟",
+     "explanation_fa": "طبق ردیاب TrueUp، تا ۲۵ آبان (۱۶ نوامبر) در سال ۲۰۲۶ حدود ۲۰۶٬۸۷۷ نفر در ۷۱۵ مورد تعدیل از شرکت‌های فناوری اخراج شده‌اند. این یعنی روزی حدود ۶۴۶ نفر، در مقایسه با ۵۷۹ نفر در ۲۰۲۵. اما تحلیلی که ۱۴ آبان روی داده‌های Layoffs.fyi منتشر شد نشان داد از ۱۱۹ تعدیلی که برچسب «هوش مصنوعی» خورده‌اند، فقط در ۲۷ مورد خود شرکت گفته که هوش مصنوعی نیازش به نیرو را کم کرده است.",
+     "why_iranians_care_fa": "رسانه‌های فارسی معمولاً همین عددهای بزرگ را با تیتر «هوش مصنوعی شغل‌ها را بلعید» تکرار می‌کنند. دانستن اینکه فقط بخشی از این اخراج‌ها واقعاً به خاطر جایگزینی با هوش مصنوعی بوده، کمک می‌کند تصویر درست‌تری داشته باشی.",
+     "life_angle_fa": "اگر در شرکت فناوری کار می‌کنی، خطر واقعی معمولاً کندشدن رشد شرکت و تغییر اولویت‌هاست، نه یک ربات که جایت بنشیند. بودجه و جهت‌گیری شرکتت را زیر نظر داشته باش.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "TrueUp tracker: 206,877 tech layoffs in 2026 across 715 events as of Nov 16; Layoffs.fyi-based analysis finds only 27 of 119 AI-tagged layoffs said AI reduced staffing needs",
+      "who": "TrueUp / Layoffs.fyi",
+      "date": "2026-11-16",
+      "url": "https://www.trueup.io/layoffs?year=2026"
+     },
+     "sources": [
+      "https://www.trueup.io/layoffs?year=2026",
+      "https://beinsure.com/news/tech-layoffs-2026-more-than-200k-jobs-cut-amid-ai-investment/",
+      "https://ryandoser.com/research/ai-layoffs-2026/"
+     ]
+    }
+   ]
+  },
+  {
+   "desk": null,
+   "topics": [
+    {
+     "headline_fa": "آهنگ‌هایی که دوست داری، علیه هوش مصنوعی شاکی شدند",
+     "explanation_fa": "شرکت نشر موسیقی Reservoir روز ۱۱ نوامبر شکایت‌های خود علیه Suno (سازنده آهنگ با هوش مصنوعی) و Anthropic را گسترش داد. به گزارش Music Business Worldwide، پرونده‌ها حالا روی هم بیش از ۲۵۰۰ آهنگ و متن ترانه را در بر می‌گیرند. پرونده Suno شامل ۳۴ نمونه خروجی است که به ادعای شاکی مستقیماً از آثار کپی شده‌اند.",
+     "why_iranians_care_fa": "خیلی از موزیسین‌ها و تولیدکننده‌های محتوای ایرانی با Suno آهنگ و موسیقی متن می‌سازند. نتیجه این دعواها مشخص می‌کند این ابزارها با چه داده‌ای آموزش ببینند و خروجی‌شان چقدر از نظر حقوقی امن است.",
+     "life_angle_fa": "اگر برای ریلز، تیزر یا مشتری‌ات با Suno آهنگ می‌سازی، این پرونده می‌تواند روی قوانین استفاده تجاری و حتی دسترسی به این ابزارها اثر بگذارد.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Reservoir amended copyright complaints against Suno and Anthropic, expanding to 2,500+ songs and lyrics",
+      "who": "Reservoir Media",
+      "date": "2026-11-11",
+      "url": "https://www.musicbusinessworldwide.com/reservoir-expands-copyright-lawsuits-against-suno-and-anthropic-to-more-than-2500-songs-combined/"
+     },
+     "sources": [
+      "https://www.musicbusinessworldwide.com/reservoir-expands-copyright-lawsuits-against-suno-and-anthropic-to-more-than-2500-songs-combined/",
+      "https://www.aimusicpreneur.com/ai-music-news/reservoir-amended-suno-anthropic-lawsuits-445-million-november-2026/"
+     ]
+    },
+    {
+     "headline_fa": "ساخت ویدیو با هوش مصنوعی برایت ارزان‌تر شد",
+     "explanation_fa": "بایت‌دنس، مالک تیک‌تاک، روز ۱۲ نوامبر مدل Seedance 2.5 Flash را معرفی کرد؛ نسخه سریع‌تر و ارزان‌تر مدل ویدیوساز Seedance 2.5. طبق ادعای خود شرکت، سرعت ساخت تقریباً دو برابر و قیمت در کیفیت 720p حدود ۳۴ درصد کمتر است. این ادعاها هنوز مستقل سنجیده نشده‌اند.",
+     "why_iranians_care_fa": "تولیدکننده‌های محتوای ایرانی با بودجه دلاری محدود کار می‌کنند. هر افت قیمت در ساخت ویدیو یعنی کلیپ و تبلیغ بیشتر با همان پول.",
+     "life_angle_fa": "اگر پیج یا کسب‌وکار کوچک داری، ساخت ویدیوی تبلیغاتی کوتاه با هوش مصنوعی دارد از کار گران به کار روزمره تبدیل می‌شود.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Seedance 2.5 Flash, a faster and cheaper tier of ByteDance's Seedance 2.5 video model",
+      "who": "ByteDance / BytePlus",
+      "date": "2026-11-12",
+      "url": "https://www.llmreference.com/model/seedance-2.5-flash/byteplus"
+     },
+     "sources": [
+      "https://www.llmreference.com/model/seedance-2.5-flash/byteplus",
+      "https://www.cometapi.com/models/doubao/seedance-2-5-flash/",
+      "https://the-decoder.com/bytedances-seedance-2-5-generates-30-second-video-clips-with-built-in-audio/"
+     ]
+    },
+    {
+     "headline_fa": "عکس‌سازی ChatGPT برایت تندتر شد",
+     "explanation_fa": "به گزارش Thurrott در ۵ نوامبر، OpenAI مدل تصویری تازه‌ای به نام Image 2.6 را در ChatGPT و Codex در دسترس گذاشت. به گفته OpenAI، این مدل ۵۰ درصد سریع‌تر از قبل تصویر می‌سازد و خروجی حرفه‌ای‌تری دارد. این خبر فعلاً از یک منبع گزارش شده است.",
+     "why_iranians_care_fa": "طراح‌ها، ادمین‌های پیج و فروشنده‌های آنلاین ایرانی برای پوستر، کاور و عکس محصول زیاد از ChatGPT استفاده می‌کنند.",
+     "life_angle_fa": "زمان انتظار برای ساختن یک کاور یا پوستر کوتاه‌تر می‌شود، و این برای کسی که روزی چند پست می‌سازد معنی‌دار است.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Image 2.6 image generation model made available in ChatGPT and Codex, 50% faster per OpenAI",
+      "who": "OpenAI",
+      "date": "2026-11-05",
+      "url": "https://www.thurrott.com/?p=343546"
+     },
+     "sources": [
+      "https://www.thurrott.com/?p=343546"
+     ]
+    },
+    {
+     "headline_fa": "مدیر Suno: آهنگ هوش مصنوعی جرم نیست",
+     "explanation_fa": "مایکی شولمن، مدیرعامل Suno، در قسمتی از پادکست Trapital که ۱۲ نوامبر منتشر شد گفت «موسیقی هوش مصنوعی جرم نیست». این حرف در حالی زده شد که Suno درگیر چند شکایت حق نشر از ناشران موسیقی است.",
+     "why_iranians_care_fa": "Suno یکی از پرطرفدارترین ابزارهای آهنگ‌سازی بین جوان‌های ایرانی است. موضع سازنده‌اش نشان می‌دهد این ابزار در دعوای حقوقی چه مسیری می‌رود.",
+     "life_angle_fa": "اگر با Suno آهنگ می‌سازی، داری وسط یک دعوای بزرگ بین شرکت‌های هوش مصنوعی و صنعت موسیقی کار می‌کنی، و نتیجه‌اش روی کار تو هم اثر دارد.",
+     "mix": "story",
+     "ai_anchor": {
+      "what": "Suno CEO Mikey Shulman says 'AI music is not a crime' on the Trapital podcast",
+      "who": "Suno",
+      "date": "2026-11-12",
+      "url": "https://blog.mean.ceo/ai-music-news-november-2026/"
+     },
+     "sources": [
+      "https://blog.mean.ceo/ai-music-news-november-2026/"
+     ]
+    },
+    {
+     "headline_fa": "آهنگ‌سازها: «آهنگ هوش مصنوعی را دوباره بساز»",
+     "explanation_fa": "آنتونی پارتوس و نایجل وستلیک، آهنگ‌سازان استرالیایی، ۸ نوامبر به Australian Financial Review گفتند آژانس‌های تبلیغاتی از آن‌ها می‌خواهند آهنگی را که با هوش مصنوعی ساخته شده دستی بازسازی کنند تا مشتری بتواند حق نشرش را ثبت کند. دلیلش این است که خروجی خالص هوش مصنوعی معمولاً حق نشر نمی‌گیرد.",
+     "why_iranians_care_fa": "آهنگ‌سازها و تدوین‌گرهای ایرانی هم سفارش تبلیغاتی می‌گیرند. این ماجرا نشان می‌دهد نقش آدم‌ها در کار با هوش مصنوعی دارد از «سازنده» به «ثبت‌کننده» تغییر می‌کند.",
+     "life_angle_fa": "اگر کارت آهنگ‌سازی یا تولید صداست، ممکن است سفارش بعدی‌ات کپی کردن خروجی یک ماشین باشد. باید بدانی دستمزد این کار را چطور حساب کنی.",
+     "mix": "story",
+     "ai_anchor": {
+      "what": "Australian composers say ad agencies ask them to recreate AI-generated tracks so clients can secure copyright",
+      "who": "Antony Partos and Nigel Westlake (via The Australian Financial Review)",
+      "date": "2026-11-08",
+      "url": "https://blog.mean.ceo/ai-music-news-november-2026/"
+     },
+     "sources": [
+      "https://blog.mean.ceo/ai-music-news-november-2026/"
+     ]
+    },
+    {
+     "headline_fa": "صنعت موسیقی: کپی‌رایت را برای هوش مصنوعی شل نکنید",
+     "explanation_fa": "ویکتوریا اوکلی، مدیر اجرایی IFPI (فدراسیون جهانی صنعت ضبط موسیقی)، ۸ نوامبر به گاردین استرالیا گفت تضعیف قانون کپی‌رایت به نفع شرکت‌های هوش مصنوعی «فاجعه‌ای برای خلاقیت» است. این در میانه بحث جهانی درباره آموزش مدل‌ها با آثار هنرمندان بدون اجازه مطرح شد.",
+     "why_iranians_care_fa": "آثار هنرمندان ایرانی هم روی اینترنت است و می‌تواند بدون اجازه به داده آموزشی مدل‌ها تبدیل شود. قانون‌هایی که الان در دنیا نوشته می‌شوند روی این آثار هم اثر دارند.",
+     "life_angle_fa": "اگر آهنگ، عکس یا متن منتشر می‌کنی، این بحث تعیین می‌کند شرکت‌های هوش مصنوعی برای استفاده از کار تو باید اجازه بگیرند و پول بدهند یا نه.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "IFPI chief warns weakening copyright for AI companies would be a 'disaster for creativity'",
+      "who": "IFPI (Victoria Oakley)",
+      "date": "2026-11-08",
+      "url": "https://blog.mean.ceo/ai-music-news-november-2026/"
+     },
+     "sources": [
+      "https://blog.mean.ceo/ai-music-news-november-2026/"
+     ]
+    },
+    {
+     "headline_fa": "اسپاتیفای کاور هوش مصنوعی می‌سازد؛ کاربرها عصبانی‌اند",
+     "explanation_fa": "اسپاتیفای و یونیورسال موزیک در ماه مه ابزاری برای ساخت کاور و ریمیکس مجاز با هوش مصنوعی معرفی کردند و طبق گزارش فایننشال تایمز، هدف عرضه‌اش سه‌ماهه اول ۲۰۲۷ است. به گزارش Mashable در ۸ نوامبر، گروهی از مشترکان در ایکس و ردیت گفتند اگر این ابزار عرضه شود اشتراکشان را لغو می‌کنند. Future of Music Coalition هم درباره رضایت و اعتبار هنرمندان سؤال مطرح کرده است.",
+     "why_iranians_care_fa": "شنونده‌های ایرانی اسپاتیفای کم نیستند. این ماجرا نشان می‌دهد پلتفرم‌های بزرگ دارند هوش مصنوعی را مستقیم داخل اپ موسیقی می‌برند.",
+     "life_angle_fa": "شاید به‌زودی صدای خواننده محبوبت را در کاوری بشنوی که نه او خوانده و نه یک انسان ساخته؛ و این بحث تعیین می‌کند هنرمند از آن سهمی ببرد یا نه.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Backlash among Spotify subscribers over planned AI covers and remix tool built with UMG",
+      "who": "Spotify / Universal Music Group",
+      "date": "2026-11-08",
+      "url": "https://blog.mean.ceo/ai-music-news-november-2026/"
+     },
+     "sources": [
+      "https://blog.mean.ceo/ai-music-news-november-2026/",
+      "https://www.musicbusinessworldwide.com/spotify-and-universal-music-group-strike-landmark-deal-to-let-fans-create-ai-covers-and-remixes-as-a-paid-premium-add-on/",
+      "https://routenote.com/blog/?p=109015"
+     ]
+    },
+    {
+     "headline_fa": "چهره بازیگر را در ویدیو عوض کن",
+     "explanation_fa": "Luma AI در هفته منتهی به ۹ نوامبر قابلیت‌های Character Swap (جابه‌جایی شخصیت) و Insert (افزودن عنصر به ویدیو) را به ابزار ویدیویی‌اش اضافه کرد. همچنین اتصال MCP آن در اپ‌های چت فعال شد. این جزئیات از یک گزارش هفتگی خبرهای خلاقانه آمده است.",
+     "why_iranians_care_fa": "تدوین‌گرها و تبلیغات‌سازهای ایرانی با بودجه کم نمی‌توانند دوباره فیلم‌برداری کنند. ابزاری که شخصیت یا شیء را بعد از فیلم‌برداری عوض می‌کند هزینه را پایین می‌آورد.",
+     "life_angle_fa": "کلیپی که یک بار گرفته‌ای را می‌توانی با بازیگر یا جزئیات دیگری دوباره بسازی، ولی همین یعنی دیگر به هیچ ویدیویی نمی‌شود چشم‌بسته اعتماد کرد.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Luma adds Character Swap and Insert video features; Luma MCP live in chat apps",
+      "who": "Luma AI",
+      "date": "2026-11-09",
+      "url": "https://oakgen.ai/blog/ai-creative-news-week-of-2026-11-09"
+     },
+     "sources": [
+      "https://oakgen.ai/blog/ai-creative-news-week-of-2026-11-09"
+     ]
+    }
+   ]
+  },
+  {
+   "desk": null,
+   "topics": []
+  },
+  {
+   "desk": null,
+   "topics": [
+    {
+     "headline_fa": "هوش مصنوعی گوگل ژن‌های خانواده‌ت را می‌خواند",
+     "explanation_fa": "گوگل دیپ‌مایند در ۱۱ نوامبر مدل AlphaGenome 2 را معرفی کرد. این مدل پیش‌بینی می‌کند هر تغییر کوچک در DNA در هر نوع سلول مشخص چه اثری دارد، نه فقط در میانگین یک بافت. دیپ‌مایند می‌گوید نسخهٔ جدید تقریباً دو برابر نسخهٔ قبلی جهش‌هایی را پیدا می‌کند که بیان ژن را تغییر می‌دهند. استفادهٔ پژوهشی غیرتجاری از آن رایگان است، ولی برای تشخیص بالینی تأیید نشده است.",
+     "why_iranians_care_fa": "در ایران ازدواج فامیلی و بیماری‌های ارثی مثل تالاسمی کم نیستند. ابزارهایی که معنی جهش‌های ژنتیکی را روشن‌تر کنند، در نهایت به آزمایشگاه‌های ژنتیک و مشاورهٔ پیش از ازدواج هم می‌رسند.",
+     "life_angle_fa": "امروز جواب آزمایش ژنتیک خیلی وقت‌ها «جهش با اهمیت نامشخص» است. مدل‌هایی مثل این قرار است همین ابهام را کم کنند. هنوز ابزار تشخیصی نیست و فعلاً فقط دست پژوهشگرهاست.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "AlphaGenome 2، مدل پیش‌بینی اثر جهش‌های DNA در هر نوع سلول",
+      "who": "Google DeepMind",
+      "date": "2026-11-11",
+      "url": "https://deepmind.google/blog/alphagenome-2-deciphering-how-cells-read-dna-to-better-understand-disease/"
+     },
+     "sources": [
+      "https://deepmind.google/blog/alphagenome-2-deciphering-how-cells-read-dna-to-better-understand-disease/",
+      "https://neurohive.io/en/news/alphagenome-2-deepmind-cell-type-dna-variant-model/",
+      "https://siliconangle.com/?p=853854"
+     ]
+    },
+    {
+     "headline_fa": "داروی بعدی‌ت را شاید هوش مصنوعی طراحی کند",
+     "explanation_fa": "استارتاپ Chai Discovery که OpenAI هم در آن سرمایه‌گذاری کرده، در ۵ نوامبر همکاری با غول دارویی Roche را اعلام کرد. قرار است مدل Chai-3 در چند برنامهٔ کشف داروی Roche برای طراحی داروهای پروتئینی، مثل آنتی‌بادی‌ها، به کار برود. مبلغ قرارداد و بیماری‌های هدف اعلام نشده است.",
+     "why_iranians_care_fa": "بسیاری از داروهای گران و کمیاب در ایران، مثل داروهای سرطان و بیماری‌های خودایمنی، از همین دستهٔ پروتئینی‌اند. اگر طراحی‌شان سریع‌تر و ارزان‌تر شود، بیوسیمیلارها هم زودتر ساخته می‌شوند.",
+     "life_angle_fa": "تا حالا Lilly، Pfizer، BMS و حالا Roche سراغ این شرکت رفته‌اند. یعنی بخشی از داروهای چند سال بعد احتمالاً روی کامپیوتر طراحی شده‌اند، نه با سال‌ها آزمون و خطا در آزمایشگاه.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "همکاری Chai Discovery با Roche برای طراحی دارو با هوش مصنوعی (مدل Chai-3)",
+      "who": "Chai Discovery و Roche",
+      "date": "2026-11-05",
+      "url": "https://biospace.com/press-releases/chai-discovery-announces-collaboration-with-roche-in-ai-driven-drug-discovery"
+     },
+     "sources": [
+      "https://biospace.com/press-releases/chai-discovery-announces-collaboration-with-roche-in-ai-driven-drug-discovery",
+      "https://dealroom.co/news/170229-chai-discovery-partners-with-roche-to-apply-ai-drug-design-across-its-pi/",
+      "https://hlth.com/insights/news/chai-discovery-and-roche-partner-to-advance-ai-driven-drug-discovery"
+     ]
+    },
+    {
+     "headline_fa": "شرکت داروسازی گوگل ۵۰ میلیارد دلار می‌ارزد؟",
+     "explanation_fa": "بلومبرگ در ۴ نوامبر گزارش داد Isomorphic Labs، شرکت کشف داروی جداشده از دیپ‌مایند، در حال مذاکره برای جذب حدود ۵ میلیارد دلار با ارزش‌گذاری نزدیک ۵۰ میلیارد دلار است. این شرکت در ماه مه هم ۲.۱ میلیارد دلار جذب کرده بود. معامله هنوز نهایی نشده و شرکت آن را رسماً تأیید نکرده است.",
+     "why_iranians_care_fa": "این عدد نشان می‌دهد پول جهانی کجا می‌رود: کشف دارو با هوش مصنوعی. برای دانشجوها و پژوهشگرهای داروسازی و بیوانفورماتیک ایرانی، این یعنی بازار کار و مهاجرت تحصیلی در این حوزه داغ است.",
+     "life_angle_fa": "اگر رشته‌ت داروسازی، زیست یا کامپیوتر است، ترکیب این دو همین حالا یکی از گران‌ترین مهارت‌های دنیاست. البته هنوز هیچ داروی ساخت این شرکت به آزمایش انسانی نرسیده است.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "مذاکره Isomorphic Labs برای جذب ۵ میلیارد دلار با ارزش ۵۰ میلیارد دلار",
+      "who": "Isomorphic Labs (گزارش Bloomberg)",
+      "date": "2026-11-04",
+      "url": "https://thenextweb.com/news/isomorphic-labs-5bn-funding-talks-50bn-valuation"
+     },
+     "sources": [
+      "https://thenextweb.com/news/isomorphic-labs-5bn-funding-talks-50bn-valuation",
+      "https://dealroom.co/news/161156-deepmind-spinout-isomorphic-labs-in-talks-to-raise-about-5b-at-a-50b-val/",
+      "https://www.resultsense.com/news/2026-11-05-isomorphic-labs-5bn-funding-talks/"
+     ]
+    },
+    {
+     "headline_fa": "اپل می‌خواهد بداند به دکتر هوش مصنوعی اعتماد داری",
+     "explanation_fa": "اپل در ۱۵ نوامبر یک مطالعهٔ مجازی در آمریکا با همکاری OpenEvidence راه انداخت که تا ۲۰۰ هزار نفر را ثبت‌نام می‌کند. مطالعه می‌سنجد مردم چطور از چت‌بات‌های سلامت سؤال می‌پرسند، چقدر به جواب‌ها اعتماد می‌کنند و آیا جواب را درست می‌فهمند. شرکت‌کننده‌ها باید آیفون ۱۵ پرو یا جدیدتر داشته باشند و تا ۱۲ ماه در مطالعه بمانند.",
+     "why_iranians_care_fa": "خیلی از ایرانی‌ها، به‌خاطر هزینهٔ ویزیت یا نوبت‌های طولانی، علائمشان را اول از ChatGPT می‌پرسند. این اولین مطالعهٔ بزرگ است که همین رفتار را علمی اندازه می‌گیرد.",
+     "life_angle_fa": "سؤال اصلی این مطالعه دربارهٔ خود توست: وقتی جواب هوش مصنوعی را می‌خوانی، واقعاً می‌فهمی‌اش و بر اساسش کاری می‌کنی؟ نتیجه‌اش شکل دستیارهای سلامت آینده، احتمالاً در Siri و اپ Health، را تعیین می‌کند.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "Apple Health AI Usage Study، مطالعهٔ ۲۰۰ هزار نفری استفاده از هوش مصنوعی برای سلامت",
+      "who": "Apple و OpenEvidence",
+      "date": "2026-11-15",
+      "url": "https://apple.com/newsroom/2026/11/apple-launches-research-study-to-explore-the-use-of-ai-for-health/"
+     },
+     "sources": [
+      "https://apple.com/newsroom/2026/11/apple-launches-research-study-to-explore-the-use-of-ai-for-health/",
+      "https://www.mobihealthnews.com/news/apple-launches-research-study-openevidence",
+      "https://fiercehealthcare.com/ai-and-machine-learning/hlth26-apple-kicks-new-study-examine-use-ai-chatbots-health"
+     ]
+    },
+    {
+     "headline_fa": "اگر هوش مصنوعی اشتباه کرد، تقصیر دکترت نیست؟",
+     "explanation_fa": "انجمن پزشکی آمریکا (AMA) در هفتهٔ منتهی به ۱۳ نوامبر خواستار قانون‌گذاری شد تا اگر یک ابزار هوش مصنوعی، با وجود استفادهٔ درست پزشک، به بیمار آسیب زد، مسئولیت با سازنده و فروشنده باشد. AMA همچنین می‌خواهد شرکت‌های هوش مصنوعی بیمهٔ مسئولیت داشته باشند و محدودیت‌های محصولشان را اعلام کنند. این فعلاً درخواست است و هنوز قانون نشده است.",
+     "why_iranians_care_fa": "بیمارستان‌ها و مطب‌های ایرانی هم کم‌کم از نرم‌افزارهای هوشمند برای رادیولوژی و نسخه‌نویسی استفاده می‌کنند، ولی تقریباً هیچ قانونی نمی‌گوید اگر خطا شد مسئول کیست.",
+     "life_angle_fa": "سؤالی که بزودی به تو هم می‌رسد: اگر تشخیص اشتباه از نرم‌افزار بود، از چه کسی شکایت می‌کنی؟ بحثی که الان در آمریکا شروع شده، الگوی قانون‌گذاری بقیهٔ دنیا خواهد شد.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "درخواست AMA برای سپر حقوقی پزشکان در برابر خطاهای هوش مصنوعی",
+      "who": "American Medical Association (گزارش Axios)",
+      "date": "2026-11-13",
+      "url": "https://axios.com/2026/11/13/doctors-ai-mistakes-liability-shield"
+     },
+     "sources": [
+      "https://axios.com/2026/11/13/doctors-ai-mistakes-liability-shield",
+      "https://letsdatascience.com/news/ama-urges-liability-shield-for-physicians-over-ai-mistakes-fe7f011a",
+      "https://citoday.com/news/ama-advances-framework-for-clinical-ai-liability"
+     ]
+    },
+    {
+     "headline_fa": "جمینی وارد پروندهٔ پزشکی بیمارستان‌ها شد",
+     "explanation_fa": "گوگل کلود در ۱۰ نوامبر «Gemini for Healthcare» را در حالت پیش‌نمایش در آمریکا عرضه کرد. این یک پلتفرم عامل هوش مصنوعی برای بیمارستان‌ها و بیمه‌هاست که به پرونده‌های الکترونیک سلامت مثل Epic و Oracle Health، سیستم‌های صورت‌حساب و راهنماهای بالینی وصل می‌شود. هدفش خودکار کردن کارهای اداری و بالینی است.",
+     "why_iranians_care_fa": "بخش بزرگی از وقت پزشک و پرستار در ایران صرف کاغذبازی، پروندهٔ سلامت و تأیید بیمه می‌شود. این همان چیزی است که غول‌های فناوری حالا با هوش مصنوعی هدف گرفته‌اند.",
+     "life_angle_fa": "صف تأیید بیمه و نسخه را تجربه کرده‌ای. اینجا هوش مصنوعی به‌جای حرف زدن با بیمار، کار کارمند بیمارستان را انجام می‌دهد. این موج دیر یا زود به سامانه‌های سلامت ایران هم می‌رسد.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "عرضهٔ پیش‌نمایش Gemini for Healthcare برای بیمارستان‌ها و بیمه‌ها",
+      "who": "Google Cloud",
+      "date": "2026-11-10",
+      "url": "https://www.googlecloudpresscorner.com/2026-11-10-Google-Cloud-Launches-Gemini-for-Healthcare"
+     },
+     "sources": [
+      "https://www.googlecloudpresscorner.com/2026-11-10-Google-Cloud-Launches-Gemini-for-Healthcare",
+      "https://hlth.com/insights/news/google-cloud-launches-gemini-for-healthcare-integrating-ai-workflows-across-epic-oracle-health-and-enterprise-systems",
+      "https://www.digitalhealthnews.com/google-cloud-launches-gemini-for-healthcare-to-connect-clinical-and-administrative-workflows"
+     ]
+    },
+    {
+     "headline_fa": "هوش مصنوعی حالا دنبال تخفیف داروی تو می‌گردد",
+     "explanation_fa": "OpenEvidence، پرکاربردترین هوش مصنوعی پزشکی بین پزشکان آمریکا، در ۱۱ نوامبر ابزار رایگان «Access Intelligence» را عرضه کرد. این ابزار برنامه‌های تخفیف دارو، کمک‌هزینه و پوشش بیمه را با به‌روزرسانی روزانه به پزشک نشان می‌دهد. همچنین در نوشتن نامهٔ درخواست مجوز بیمه و اعتراض به رد آن، بر اساس راهنماهای بالینی، کمک می‌کند. درآمد این سرویس عمدتاً از تبلیغات داروسازها است.",
+     "why_iranians_care_fa": "در ایران هم بزرگ‌ترین دغدغهٔ بیمار بعد از تشخیص، پیدا کردن دارو و پوشش بیمه‌اش است. این خبر نشان می‌دهد هوش مصنوعی پزشکی از «تشخیص» به سمت «هزینه و دسترسی» رفته است.",
+     "life_angle_fa": "دکتری که هوش مصنوعی دارد، بزودی فقط نمی‌گوید چه دارویی بخوری، بلکه ارزان‌ترین راه گرفتنش را هم پیدا می‌کند. فعلاً این ابزار فقط برای پزشکان تأییدشدهٔ آمریکاست.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "عرضهٔ رایگان OpenEvidence Access Intelligence برای هزینه و پوشش بیمهٔ دارو",
+      "who": "OpenEvidence",
+      "date": "2026-11-11",
+      "url": "https://www.webull.com/news/15906235572547584"
+     },
+     "sources": [
+      "https://www.webull.com/news/15906235572547584",
+      "https://www.iatrox.com/blog/openevidence-access-intelligence-affordability-prior-authorisation",
+      "https://www.unite.ai/?p=513896"
+     ]
+    },
+    {
+     "headline_fa": "آزمایشگاهی که انسان فقط سطل آشغالش را خالی می‌کند",
+     "explanation_fa": "پژوهشگران دانشگاه شانگهای جیائوتونگ در مقاله‌ای در Nature آزمایشگاه AutoDNA را معرفی کردند. در این آزمایشگاه چند عامل هوش مصنوعی آزمایش‌های زیستی را طراحی می‌کنند و بازوهای رباتیک بیش از ۲۰ نوع دستگاه را به کار می‌گیرند. این سیستم یک چرخهٔ کامل ذخیره و بازیابی داده در DNA را بی‌خطا انجام داد و انسان‌ها فقط برای پر کردن مواد و نگهداری دستگاه‌ها دخالت کردند. این گزارش ۱۰ نوامبر در Singularity Hub منتشر شد.",
+     "why_iranians_care_fa": "ایران آزمایشگاه‌های زیستی و دانشجوهای بیوتکنولوژی زیادی دارد. آزمایشگاه خودران یعنی شکل کار پژوهشی، و این‌که کدام مهارت‌ها در آن ارزش دارند، در حال تغییر است.",
+     "life_angle_fa": "اگر تو یا بچه‌ات در رشته‌های آزمایشگاهی هستید، کار تکراری پشت میز آزمایشگاه اولین چیزی است که خودکار می‌شود. طراحی آزمایش و فهم نتیجه ارزشمندتر می‌شود. البته این نتیجه هنوز در آزمایشگاه‌های دیگر تکرار نشده است.",
+     "mix": "story",
+     "ai_anchor": {
+      "what": "AutoDNA، آزمایشگاه زیستی که عامل‌های هوش مصنوعی اداره‌اش می‌کنند",
+      "who": "دانشگاه شانگهای جیائوتونگ (گزارش Singularity Hub)",
+      "date": "2026-11-10",
+      "url": "https://singularityhub.com/2026/11/10/ai-agents-ran-a-biology-lab-humans-popped-in-to-empty-the-trash/"
+     },
+     "sources": [
+      "https://singularityhub.com/2026/11/10/ai-agents-ran-a-biology-lab-humans-popped-in-to-empty-the-trash/",
+      "https://techenclave.com/news/items/ai-controlled-biology-lab-completes-a-dna-data-storage-round-trip",
+      "https://www.arxiv.org/pdf/2507.02379"
+     ]
+    },
+    {
+     "headline_fa": "ChatGPT دستیار مطب دکترت می‌شود",
+     "explanation_fa": "طبق گزارش Unite.ai، OpenAI در ۱۶ نوامبر بیش از ۲۰ افزونهٔ سلامت جدید به ChatGPT for Healthcare و ChatGPT for Clinicians اضافه کرد و جست‌وجوی بالینی را هم بهتر کرد تا جواب‌ها منبع دقیق‌تری داشته باشند. این به‌روزرسانی ادامهٔ اتصال ChatGPT به سیستم Epic در سپتامبر است. OpenAI می‌گوید هر هفته بیش از ۳۰۰ میلیون سؤال سلامت در ChatGPT پرسیده می‌شود.",
+     "why_iranians_care_fa": "ChatGPT در ایران با فیلترشکن پراستفاده‌ترین چت‌بات است و خیلی از پزشکان و دانشجوهای پزشکی ایرانی هم از آن کمک می‌گیرند. نسخه‌های پزشکی‌اش استاندارد جواب‌های سلامت را بالا می‌برند.",
+     "life_angle_fa": "فاصلهٔ ChatGPT معمولی با ChatGPT مخصوص پزشک در حال زیاد شدن است. جوابی که تو می‌گیری با جوابی که پزشک با ابزارهای تخصصی می‌گیرد یکی نیست.",
+     "mix": "news",
+     "ai_anchor": {
+      "what": "افزودن بیش از ۲۰ افزونهٔ سلامت به ChatGPT for Healthcare و ChatGPT for Clinicians",
+      "who": "OpenAI (گزارش Unite.ai)",
+      "date": "2026-11-16",
+      "url": "https://www.unite.ai/?p=518995"
+     },
+     "sources": [
+      "https://www.unite.ai/?p=518995",
+      "https://openai.com/index/health-in-chatgpt/"
+     ]
+    }
+   ]
+  },
+  {
+   "desk": null,
+   "topics": []
+  }
+ ]
+}
