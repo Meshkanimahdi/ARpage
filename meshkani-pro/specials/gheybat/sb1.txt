@@ -1,0 +1,13 @@
+Storyboard sheet for a comedy animated short, using the FIVE characters from the reference image exactly as designed (same heads, clothes and colours): SARA = woman in a dark blazer with a smoked-glass orb head and amber face; NIMA = man in a rumpled shirt and loose tie with an overheating graphics-card head, two red fan eyes; AMIR = man in a dark hoodie with a retro green CRT monitor head, deadpan; KAVEH = man with a colourful scarf and paint-stained denim jacket, rainbow light-bulb head; NOVA = woman in a pink cardigan with a mint clock-and-calendar device head. They all sit around ONE round wooden table in the same cosy night cafe (amber lamps, espresso cups, digital glitch rain on the window). Same stylised 3D animated-film look as the reference. One wide 16:9 image with TWELVE vertical 9:16 panels in a grid of 6 columns and 2 rows, separated by thin pure-black gutters, read left to right, top row first. Each panel is one film shot with clear acting and a different camera angle. No text, no letters, no numbers, no captions, no speech bubbles, no logos anywhere.
+Panel 1: wide establishing shot of the cafe at night, the five characters seated around the round table with coffee cups, warm light, rain outside.
+Panel 2: close shot, NIMA slams his graphics-card head down on the table in despair, cups jumping, sparks.
+Panel 3: AMIR, deadpan, points one finger at the table edge where a few glowing square pixels are popping off the wood.
+Panel 4: NOVA, calm and sweet, holding a small glowing calendar tablet, a tiny teasing smile, one hand on her cheek.
+Panel 5: SARA leans back with her cup and a mischievous smile, the other four lean in toward her to gossip.
+Panel 6: NIMA panicking with both hands up, begging, his fans glowing brighter red.
+Panel 7: NIMA counts on his fingers very fast while four small holographic meeting cards float around his head.
+Panel 8: AMIR holds up a phone with an empty glowing message bubble on its screen, his monitor face horrified with wide green eyes.
+Panel 9: KAVEH proudly shows a tablet with a colourful abstract design, sparkles flying from his bulb head.
+Panel 10: SARA with one palm raised, firm and defending, the others looking sceptical with crossed arms.
+Panel 11: NIMA with his head resting on the table, smoke rising from the fans, SARA scolding him with a pointing finger.
+Panel 12: the whole group laughing hard, KAVEH slapping the table, cups shaking.
