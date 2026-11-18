@@ -26,6 +26,14 @@ calls were REEL-034 and POST-031). `Week Plan` rows are drawn from Topic Bank ID
 **Covers (Mahdi 2026-11-10):** a realistic photo with a headline on it, not a graphic YouTube-style thumbnail: little
 or no pills/boxes/strokes; when the reel calls out a group (e.g. «نجارها»), the cover shows a real-looking person of that
 group (hands/back/three-quarter, no real person's likeness) and the group's name is in the headline.
+**Cover text placement (Mahdi 2026-11-18, blocking):** «تیتر کاورها رو اینقدر پایین یا خیلی بالا ننویس تو طراحی، بعضی‌ها دیگه
+خیلی به لبه‌ها نزدیکه». On the grid of REEL-056…061 the headlines sat at the very top or bottom (cover_real.html put them at
+top 300 px or bottom 230 px), under the view counter and partly outside the 4:5 crop. Now the headline and the handle are one
+block inside the **safe band: y 500–1420 (26 %–74 % of the height), 90 px from the sides**, `pos` = center (default) | upper |
+lower inside that band, ≥ 120 px, ≤ 3 lines. Render every realistic cover with `node news-reel/cover_real.mjs covers.json`
+(writes `cover_report.json`; exit 5 = shorten the headline, never move it to an edge); write the background prompt so the
+subject's face is not in the band where the text goes. `reel_gate.py` fails a cover outside the band or with a hand-written
+report. The same band applies to carousel slide 1 and to the 8 cover candidates (§00.23).
 **Topics that win (Mahdi 2026-11-13, blocking):** «برو تو موضوع‌های جذاب‌تر… همش داری زندگی رو وصل می‌کنی به چت‌بات‌ها؛
 دنبال موضوعاتی باش مثل اون‌هایی که ریچ خوبی گرفتند و فالوور آوردند». The page's real hits (Performance tab): «همه می‌دونن… ولی
 یه هوش مصنوعی می‌پرسه: از کجا؟» (296k reach, 45.8k shares), «خودتو برای جنگ آماده کردی؟» (144k, 33k), «شغلت امن بمونه… لوله‌کش

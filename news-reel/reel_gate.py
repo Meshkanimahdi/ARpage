@@ -73,6 +73,14 @@ def main():
     else:
         rep = json.loads(rep_p.read_text()); info['cover'] = {k: rep.get(k) for k in ('font_px', 'words', 'pos', 'title')}
         if rep.get('issues'): fails.append('cover issues: ' + '; '.join(rep['issues']))
+        # user rule 2026-11-18: cover text sits in the middle band, never at the top/bottom edge. Only the two renderers
+        # write a valid report: cover_render.mjs (pos center) or cover_real.mjs (safe_band + top/bottom).
+        if rep.get('safe_band'):
+            lo, hi = rep['safe_band']
+            if not (lo <= (rep.get('top') or 0) and (rep.get('bottom') or 9999) <= hi):
+                fails.append(f"cover headline at y {rep.get('top')}–{rep.get('bottom')} is outside the safe band {lo}–{hi}: re-render with cover_real.mjs")
+        elif rep.get('pos') != 'center':
+            fails.append('cover_report.json was not written by cover_render.mjs or cover_real.mjs (no centred stack, no safe band): re-render the cover')
         if (rep.get("font_px") or 0) < 120: fails.append(f"cover headline too small ({rep.get('font_px')} px < 120)")
         if (rep.get('words') or 99) > 9: fails.append(f"cover headline too long ({rep.get('words')} words > 9)")
         if not cover.exists(): fails.append('cover file missing')

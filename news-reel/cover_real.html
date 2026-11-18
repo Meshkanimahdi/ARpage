@@ -1,21 +1,42 @@
 <!doctype html><html dir="rtl"><head><meta charset="utf-8"><style>
+/* Realistic photo cover (Mahdi 2026-11-10: a real-looking photo with a headline, no pills or boxes).
+   Text placement (Mahdi 2026-11-18, on the grid of REEL-056…061): «تیتر کاورها رو اینقدر پایین یا خیلی بالا ننویس…
+   بعضی‌ها دیگه خیلی به لبه‌ها نزدیکه». The headline and the handle are ONE block inside the safe band: 26 %–74 % of
+   the height (y 500–1420) and 90 px from the sides, so nothing is cut in the 4:5 / 3:4 grid crops or hidden by the
+   view counter. pos = center (default) | upper | lower; the old top/bottom values map to upper/lower inside the band. */
 @font-face{font-family:V;font-weight:900;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2)}
-@font-face{font-family:V;font-weight:600;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2)}
+@font-face{font-family:V;font-weight:900;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2);unicode-range:U+0000-00FF}
+@font-face{font-family:V;font-weight:600;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-600-normal.woff2);unicode-range:U+0000-00FF}
 html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000}
 #bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-#sh{position:absolute;left:0;right:0;height:900px}
-#t{position:absolute;left:70px;right:70px;font:900 128px/1.2 V;color:#fff;text-shadow:0 4px 24px rgba(0,0,0,.55),0 2px 4px rgba(0,0,0,.5)}
+#sh{position:absolute;left:0;right:0;top:0;bottom:0}
+#blk{position:absolute;left:90px;right:90px;text-align:center}
+#t{font:900 128px/1.2 V;color:#fff;text-shadow:0 4px 26px rgba(0,0,0,.65),0 2px 5px rgba(0,0,0,.6)}
 #t b{color:var(--a,#FFC86B);font-weight:900}
-#h{position:absolute;left:0;right:0;bottom:60px;text-align:center;font:600 34px V;color:rgba(255,255,255,.75);letter-spacing:3px}
-</style></head><body><img id="bg"><div id="sh"></div><div id="t"></div><div id="h" dir="ltr">MESHKANI.PRO</div>
+#h{margin-top:26px;font:600 30px V;color:rgba(255,255,255,.8);letter-spacing:3px;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+</style></head><body><img id="bg"><div id="sh"></div><div id="blk"><div id="t"></div><div id="h" dir="ltr">MESHKANI.PRO</div></div>
 <script>
-const Q=new URLSearchParams(location.search);
-document.getElementById('bg').src=Q.get('bg');
-const pos=Q.get('pos')||'top', t=document.getElementById('t'), sh=document.getElementById('sh');
-t.innerHTML=Q.get('title').replace(/\*([^*]+)\*/g,'<b>$1</b>').replace(/\|/g,'<br>');
+const Q=new URLSearchParams(location.search), $=id=>document.getElementById(id);
+window.ISSUES=[]; const TOP=500, BOT=1420;
+$('bg').src=Q.get('bg');
+let pos=Q.get('pos')||'center'; pos={top:'upper',bottom:'lower',middle:'center'}[pos]||pos; if(!['center','upper','lower'].includes(pos))pos='center';
+const t=$('t'), blk=$('blk');
+t.innerHTML=(Q.get('title')||'').replace(/[<>&]/g,'').replace(/\*([^*]+)\*/g,'<b>$1</b>').replace(/\|/g,'<br>');
 if(Q.get('a'))document.documentElement.style.setProperty('--a',Q.get('a'));
-t.style.textAlign=Q.get('align')||'center';
-if(pos==='top'){t.style.top='300px';sh.style.top='0';sh.style.background='linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,0))';}
-else {t.style.bottom='230px';sh.style.bottom='0';sh.style.background='linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.6))';}
-window.ok=document.fonts.ready;
+window.ok=(async()=>{ await document.fonts.ready; await Promise.all(['900 120px V','600 30px V'].map(f=>document.fonts.load(f,'آزمایش AI')));
+  await $('bg').decode().catch(()=>ISSUES.push('background image failed'));
+  let fs=+(Q.get('fs')||128); const min=120;
+  const place=()=>{ const h=blk.offsetHeight; let y = pos==='upper' ? TOP+20 : pos==='lower' ? BOT-20-h : Math.round((1920-h)/2); blk.style.top=y+'px'; return [y,y+h]; };
+  const lines=()=>Math.round(t.offsetHeight/(fs*1.2));
+  const bad=()=>{ const [a,b]=place(); return a<TOP||b>BOT||lines()>3||t.scrollWidth>t.clientWidth+1; };
+  t.style.fontSize=fs+'px';
+  while(bad()&&fs>min){ fs-=4; t.style.fontSize=fs+'px'; }
+  const [a,b]=place();
+  if(bad()) ISSUES.push(`headline does not fit the safe band (y ${TOP}–${BOT}, ≤ 3 lines) at ${fs}px: shorten it (4–7 words)`);
+  // a soft dark band behind the text only; the photo stays clear above and below
+  const c=(a+b)/2/1920*100, r=Math.max(18,(b-a)/1920*100*0.85);
+  $('sh').style.background=`linear-gradient(180deg, rgba(0,0,0,0) ${Math.max(0,c-r-12)}%, rgba(0,0,0,.5) ${c-r/2}%, rgba(0,0,0,.5) ${c+r/2}%, rgba(0,0,0,0) ${Math.min(100,c+r+12)}%)`;
+  const words=(Q.get('title')||'').replace(/[*|]/g,' ').trim().split(/\s+/).length;
+  if(words>9) ISSUES.push(`headline has ${words} words (max 9)`);
+  window.REPORT={font_px:fs,pos,top:a,bottom:b,lines:lines(),words,title:Q.get('title'),safe_band:[TOP,BOT]}; })();
 </script></body></html>
