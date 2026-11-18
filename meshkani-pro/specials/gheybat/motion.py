@@ -414,7 +414,7 @@ def titles(fr, T):
             for j, (ct, txt, ic) in enumerate(reversed(shown)):            # newest at the bottom, older ones rise
                 if j >= mx + 1: break
                 cx_ = T - ct; spr = chip(txt, ic)
-                yb = 1350 - j * 112 + 112 * (1 - eout(min(1, (T - shown[-1][0]) / 0.3))) * (j > 0)
+                yb = 1250 - j * 112 + 112 * (1 - eout(min(1, (T - shown[-1][0]) / 0.3))) * (j > 0)
                 a = (1 - fade) * (1 - clamp(j - mx + 1)) if j >= mx else (1 - fade)
                 xo = 900 * (1 - eout(cx_ / 0.35))
                 w3 = warp3d(spr, 1.0, 0, -55 * (1 - eout(cx_ / 0.45)))
