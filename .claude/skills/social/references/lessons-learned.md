@@ -33,3 +33,8 @@ designing a new pipeline; most of these are invisible until they cost a week.
 | Next series part came the next day, before comments arrived | One week between parts, same weekday and slot; real vote count |
 | Carousels: median reach 38, 1 save in 26 posts | Utility carousels (checklists, prompts, comparisons), slide 2 delivers, save/send ask, story push |
 | "Life impact first" turned an AI-news page into household and scam tips (12 of 15 reels) | The niche development is the topic, life is the angle: ai_anchor required, weekly mix, advice families capped at 1 in 14 |
+| An 11-minute edit drifted 1.2 s behind its audio (each shot rendered alone, rounded to whole frames) | Cut on one global frame clock: every boundary is `round(t × fps)`; best, render each frame as a pure function of time |
+| Short replies ("yes", "how many?") kept the previous speaker's face on screen | A cut for every line, 0.1 s before its first word; never merge a line away because it is short |
+| Persian subtitles burned with libass put the colon and full stop on the wrong side | ASS style `Encoding: -1` (libass detects RTL); right-align; break lines by hand at punctuation; check a frame |
+| A "Vazirmatn" file without Latin or punctuation dropped `: … « » ! ? @` from titles | Check a font's cmap for the characters you set; use the full family (npm `vazirmatn`) |
+| Flat 2D emoji looked cheap on a 3D animated short | Generate a sticker sheet in the film's own render style on a transparent background; animate in 3D (perspective swing, squash, shadow, glow, trails) |

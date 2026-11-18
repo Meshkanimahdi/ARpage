@@ -9,11 +9,11 @@ Edit logic: the black title cover plays under the intro voice, fades to black, t
 cuts to its speaker (a pool of panels per character); the key storyboard panels land on their timecodes; every moment
 that talks about Mahdi cuts to a Mahdi panel; shots never hold more than ~5 s and always move (slow pan/push).
 """
-import argparse, json, os, re, subprocess
+import argparse, json, os, re, subprocess, sys
 from concurrent.futures import ThreadPoolExecutor
 
-ap = argparse.ArgumentParser(); ap.add_argument('--dir', required=True); a = ap.parse_args()
-D = a.dir.rstrip('/') + '/'; OUT = D + 'out/'; os.makedirs(OUT + 'shots', exist_ok=True)
+ap = argparse.ArgumentParser(); ap.add_argument('--dir', required=True); ap.add_argument('--plan-only', action='store_true'); a = ap.parse_args()
+D = a.dir.rstrip('/') + '/'; OUT = D + 'out/'; os.makedirs(OUT, exist_ok=True)
 INTRO = float(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', D + 'audio/intro.mp3'], capture_output=True, text=True).stdout)
 EP = float(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', D + 'audio/ep1.mp3'], capture_output=True, text=True).stdout)
 OFF = round(INTRO + 0.25, 2)            # episode audio starts here
@@ -52,98 +52,137 @@ for w in W:
     if not ev: cur['words'].append(w)
 U.append(cur)
 
-# ---- shot list: a cut at every line start, key panels win when they fall inside a line
-used_keys, rot, shots = set(), {k: 0 for k in POOL}, []
+# ---- shot list. Each line cuts to its speaker 0.12 s before the first word; short replies get their own shot;
+# key storyboard panels land on their timecodes; the word «مهدی/مشکانی/رئیس» cuts to Mahdi for ~2.6 s; long speeches
+# stay on the speaker (another angle every ~4.5 s). Short audio events (< 1.2 s laughs, knocks) do not cut.
+U = [u for u in U if not (u['ev'] and u['end'] - u['start'] < 1.2)]
+LEAD, rot = 0.12, {k: 0 for k in POOL}
+MAHDI = re.compile(r'مهدی|مهدیه|مشکانی|مشگانی|رئیس|رییس')
 def pick(pool, avoid):
     for _ in range(len(POOL[pool])):
         img = POOL[pool][rot[pool] % len(POOL[pool])]; rot[pool] += 1
         if img != avoid: return img
     return POOL[pool][0]
-cuts = []
+keys_left = list(KEYS)
+raw, prev = [], None
+def fill(s, e, pool):
+    global prev
+    t = s
+    while e - t > 5.6:
+        im = pick(pool, prev); raw.append([t, t + 4.5, im]); prev = im; t += 4.5
+    if e - t > 0.01:
+        im = pick(pool, prev); raw.append([t, e, im]); prev = im
 for i, u in enumerate(U):
-    t0 = u['start'] if i else 0.0
-    t1 = U[i + 1]['start'] if i + 1 < len(U) else EP
-    keys_in = [(kt, k) for kt, k in KEYS if (kt, k) not in used_keys and t0 - 0.9 <= kt < t1]
-    seg_start = t0
-    for kt, k in keys_in:
-        used_keys.add((kt, k))
-        if kt - seg_start > 1.2: cuts.append([seg_start, None, u])
-        cuts.append([max(seg_start, kt - 0.2), k, u]); seg_start = max(seg_start, kt - 0.2)
-    if not keys_in: cuts.append([seg_start, None, u])
-# merge tiny segments, fill pool images, split long holds
-for j, c in enumerate(cuts): c.append(cuts[j + 1][0] if j + 1 < len(cuts) else EP)
-merged = []
-for c in cuts:
-    if merged and c[3] - c[0] < 1.4 and c[1] is None: merged[-1][3] = c[3]; continue
-    merged.append(c)
-prev = None
-for s, img, u, e in merged:
+    s = 0.0 if i == 0 else max(0.0, u['start'] - LEAD)
+    e = EP if i + 1 == len(U) else max(s + 0.3, U[i + 1]['start'] - LEAD)
     pool = 'group' if u['ev'] else u['sp']
-    if img is None and u['words'] and re.search(r'مهدی|مشکانی|مشگانی|رئیس|رییس', ' '.join(w['text'] for w in u['words'])) and pool != 'group':
-        img = pick('mahdi', prev)   # every line that talks about Mahdi shows him
-    seq, t = [], s
-    first = img or pick(pool, prev)
-    while e - t > 5.6:                          # split: speaker → listener/group → speaker …
-        seq.append((t, t + 4.2, first)); t += 4.2
-        alt = 'group' if len(seq) % 2 else pool
-        first = pick(alt, first)
-    seq.append((t, e, first))
-    for a0, a1, im in seq:
-        shots.append({'start': round(a0 + OFF, 3), 'end': round(a1 + OFF, 3), 'img': im}); prev = im
-shots[0]['start'] = OFF
-clean = []                                   # no flash shots: anything under 0.9 s joins the shot before it
-for s in shots:
-    if clean and s['end'] - s['start'] < 0.9: clean[-1]['end'] = s['end']; continue
-    if clean and s['img'] == clean[-1]['img']: clean[-1]['end'] = s['end']; continue
-    clean.append(s)
-shots = clean
+    sp = []                                                     # specials: (at, img, dur)
+    for kt, k in list(keys_left):
+        if s - 0.9 <= kt < e:
+            sp.append((max(s, kt - 0.2), k, 4.2)); keys_left.remove((kt, k))
+    if pool != 'group':
+        last = -9
+        for w in u['words']:
+            if MAHDI.search(w['text']) and w['start'] - last > 2.6 and not any(a <= w['start'] < a + dd for a, _, dd in sp):
+                sp.append((max(s, w['start'] - 0.1), None, 2.6)); last = w['start']
+    sp.sort(key=lambda x: x[0])
+    cur = s
+    for at, img, dur in sp:
+        if at < cur: at = cur
+        if at >= e - 0.3: break
+        if at - cur >= 0.6: fill(cur, at, pool)
+        elif raw and at > cur: raw[-1][1] = at               # tiny gap: previous shot holds
+        else: at = cur
+        im = img or pick('mahdi', prev)
+        end = min(at + dur, e); raw.append([at, end, im]); prev = im; cur = end
+    if e - cur >= 0.6 or not raw: fill(cur, e, pool)
+    else: raw[-1][1] = e
+shots = []
+for a0, a1, im in raw:
+    if shots and (a1 - a0 < 0.45 or shots[-1]['img'] == im): shots[-1]['end'] = round(a1 + OFF, 3); continue
+    shots.append({'start': round(a0 + OFF, 3), 'end': round(a1 + OFF, 3), 'img': im})
+shots[0]['start'] = OFF; shots[-1]['end'] = round(OFF + EP, 3)
 json.dump(shots, open(OUT + 'shots.json', 'w'), indent=0)
 
-# ---- render each shot with a slow move (crop on a 1.14x scaled panel)
-MOVES = [('(iw-ow)*t/{d}', '(ih-oh)/2'), ('(iw-ow)*(1-t/{d})', '(ih-oh)/2'), ('(iw-ow)/2', '(ih-oh)*t/{d}'), ('(iw-ow)/2', '(ih-oh)*(1-t/{d})')]
-def render(i_s):
-    i, s = i_s; d = s['end'] - s['start']; f = f"{OUT}shots/{i:04d}.mp4"
-    if os.path.exists(f): return
-    mx, my = MOVES[i % 4]
-    vf = f"scale=1232:2190,crop=1080:1920:'{mx.format(d=d)}':'{my.format(d=d)}',fps=30,format=yuv420p"
-    if i == 0: vf += ",fade=t=in:st=0:d=0.7"
-    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-loop', '1', '-t', f'{d:.3f}', '-i', f"{D}panels/{s['img']}.jpg", '-vf', vf,
-                    '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-r', '30', f], check=True)
-with ThreadPoolExecutor(4) as ex: list(ex.map(render, enumerate(shots)))
-# cover segment: title cover under the intro voice, then fade to black
-subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-loop', '1', '-t', f'{COVER_END:.3f}', '-i', D + 'cover_2_emoji.jpg', '-vf',
-                f"scale=1080:1920,fps=30,format=yuv420p,fade=t=out:st={COVER_END - 0.6:.3f}:d=0.6", '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-r', '30', OUT + 'shots/cover.mp4'], check=True)
-with open(OUT + 'concat.txt', 'w') as f:
-    f.write(f"file 'shots/cover.mp4'\n" + ''.join(f"file 'shots/{i:04d}.mp4'\n" for i in range(len(shots))))
-subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', OUT + 'concat.txt', '-c', 'copy', OUT + 'video_raw.mp4'], check=True)
-
-# ---- subtitles (ASS, RTL via libass/fribidi): ≤ 5 words a line, timed by word, speaker name in colour
+# ---- subtitles (ASS). Encoding -1 = libass detects the paragraph direction, so Persian lines are RTL (name and
+# punctuation on the right side) and right-aligned. Phrases break at punctuation, ≤ 7 words, ≤ 2 lines of ≤ 5 words.
 FIX = [('مشگانی', 'مشکانی'), ('نووا', 'نُوا'), ('هووou', 'هوووو'), ('رییس', 'رئیس')]
 def ts(t): h = int(t // 3600); m = int(t % 3600 // 60); s = t % 60; return f"{h}:{m:02d}:{s:05.2f}"
+PUNC = ('.', '،', ',', '!', '?', '؟', '…', ':')
+def phrases(ws):
+    out, cur = [], []
+    for w in ws:
+        cur.append(w)
+        if w['text'].strip().endswith(PUNC) or len(cur) >= 7: out.append(cur); cur = []
+    if cur: out.append(cur)
+    merged = []
+    for p in out:
+        if merged and len(p) <= 2 and len(merged[-1]) + len(p) <= 9: merged[-1] += p
+        elif merged and len(merged[-1]) <= 1 and len(merged[-1]) + len(p) <= 9: merged[-1] += p
+        else: merged.append(p)
+    return merged
+def two_lines(words):
+    if len(words) <= 5: return ' '.join(words)
+    k = len(words) // 2
+    for j in range(len(words) - 1, 0, -1):                     # prefer a break after punctuation near the middle
+        if abs(j - k) <= 1 and words[j - 1].endswith(PUNC): k = j; break
+    return ' '.join(words[:k]) + r'\N' + ' '.join(words[k:])
 ev = []
 for u in U:
     if u['ev'] or not u['words']: continue
-    ws = u['words']; chunks = [ws[k:k + 5] for k in range(0, len(ws), 5)]
-    for n, ch in enumerate(chunks):
-        txt = ' '.join(w['text'] for w in ch)
+    ps = phrases(u['words'])
+    for n, ch in enumerate(ps):
+        words = [w['text'].strip() for w in ch]
+        txt = two_lines(words)
         for x, y in FIX: txt = txt.replace(x, y)
-        t0, t1 = ch[0]['start'] + OFF, (chunks[n + 1][0]['start'] if n + 1 < len(chunks) else ch[-1]['end'] + 0.25) + OFF
+        t0 = ch[0]['start'] + OFF - 0.05
+        t1 = (min(ps[n + 1][0]['start'], ch[-1]['end'] + 0.6) if n + 1 < len(ps) else ch[-1]['end'] + 0.35) + OFF
         lead = f"{{\\c{COL[u['sp']]}}}{NAME[u['sp']]}{{\\c&HFFFFFF&}}: " if n == 0 else ''
-        ev.append(f"Dialogue: 0,{ts(t0)},{ts(t1)},Sub,,0,0,0,,{lead}{txt}")
-ass = f"""[Script Info]
+        ev.append([t0, t1, f"{lead}{txt}"])
+for j in range(len(ev) - 1): ev[j][1] = min(ev[j][1], ev[j + 1][0])      # never two cues at once
+HDR = """[Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
 PlayResY: 1920
-WrapStyle: 0
+WrapStyle: 2
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Sub,Vazirmatn Bold,64,&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,-1,0,0,0,100,100,0,0,1,6,2,2,90,90,430,1
+Style: Sub,Vazirmatn Bold,62,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,{bord},0,3,80,80,400,-1
+Style: Box,Vazirmatn Bold,62,&H00000000,&H00000000,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-""" + '\n'.join(ev) + '\n'
+"""
+# Highlight box: semi-transparent black, rounded corners. libass has no rounded box, so measure each cue as libass
+# draws it (one frame per cue on black, no outline) and draw a rounded rectangle under it as a vector shape.
+X, Y, PADX, PADY, R, LH = 1000, 1520, 30, 18, 22, 58
+POS = f"{{\\an3\\pos({X},{Y})}}"
+open(OUT + 'measure.ass', 'w').write(HDR.format(bord=0) + '\n'.join(
+    f"Dialogue: 0,{ts(j)},{ts(j + 0.5)},Sub,,0,0,0,,{POS}{t}" for j, (_, _, t) in enumerate(ev)) + '\n')
+import numpy as np
+raw = subprocess.run(['ffmpeg', '-v', 'error', '-f', 'lavfi', '-i', f'color=c=black:s=1080x1920:r=1:d={len(ev)}', '-vf',
+                      f"ass={OUT}measure.ass:fontsdir={D}fonts", '-f', 'rawvideo', '-pix_fmt', 'gray', '-'], capture_output=True, check=True).stdout
+fr = np.frombuffer(raw, np.uint8).reshape(-1, 1920, 1080)
+def rbox(x0, y0, x1, y1, r):
+    return (f"m {x0 + r} {y0} l {x1 - r} {y0} b {x1} {y0} {x1} {y0} {x1} {y0 + r} l {x1} {y1 - r} b {x1} {y1} {x1} {y1} {x1 - r} {y1} "
+            f"l {x0 + r} {y1} b {x0} {y1} {x0} {y1} {x0} {y1 - r} l {x0} {y0 + r} b {x0} {y0} {x0} {y0} {x0 + r} {y0}")
+lines = []
+for j, (a0, a1, t) in enumerate(ev):
+    cols = np.where((fr[j] > 60).any(axis=0))[0]
+    left = int(cols.min()) if len(cols) else X - 200
+    n = t.count(r'\N') + 1
+    x0, x1 = left - PADX, X + PADX
+    y1 = Y - 13 + PADY; y0 = Y - 13 - 50 - LH * (n - 1) - PADY
+    lines.append(f"Dialogue: 0,{ts(a0)},{ts(a1)},Box,,0,0,0,,{{\\an7\\pos(0,0)\\1a&H5A&\\bord0\\shad0\\p1}}{rbox(x0, y0, x1, y1, R)}")
+    lines.append(f"Dialogue: 1,{ts(a0)},{ts(a1)},Sub,,0,0,0,,{POS}{t}")
+ass = HDR.format(bord=2) + '\n'.join(lines) + '\n'
 open(OUT + 'subs.ass', 'w').write(ass)
+
+if a.plan_only: print('plan only: shots', len(shots), 'subtitle cues', len(ev)); sys.exit(0)
+# ---- picture: motion.py renders every frame (camera, 3D stickers, titles, light FX) on the global 30 fps clock
+subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'motion.py'), '--dir', D,
+                '--off', str(OFF), '--ep', str(EP)], check=True)
 
 # ---- audio: intro at 0, episode at OFF, mastered to −14 LUFS; burn subtitles; ~4.5 Mbps for Instagram
 af = (f"[1:a]aresample=48000,loudnorm=I=-16:TP=-2[i];[2:a]aresample=48000,adelay={int(OFF * 1000)}|{int(OFF * 1000)}[e];"
