@@ -71,6 +71,37 @@ publish twice, never publish late, never publish unverified content.
 
 ---
 
+## 00.0 Page purpose — AI news and the role of AI in people's lives (user rule 2026-11-18, overrides §00.1–3, §00.13 and §4.0a "proven formulas" where they differ)
+Mahdi: «به نظرت موضوعات خیلی احمقانه پشت هم جلو نمیره؟ همش توصیه به مردم در مورد موارد خانگی، کلاهبرداری و…
+این پیج هدفش این نبود، قرار بود اطلاع‌رسانی اخبار هوش مصنوعی باشه بیشتر، یعنی نقش هوش مصنوعی در زندگی انسان‌ها،
+ولی الان همش توصیه‌های تکراری، هی می‌گه کد اومد قبول نکن، صدای جعلی و…».
+The record agrees: of REEL-045…059, about twelve were household and safety advice (gas leak, winter heating, freezer
+food in a blackout, antibiotics for a cold, messenger scams, a fake photo of your child, water cuts) and none stood
+on a real AI development. The §00 "viewer's own life" rule had turned "life impact" into the topic itself.
+- **Every reel stands on a real, recent AI development:** a launch, a study, a company or government move, a
+  real case of people or businesses using AI, a statement by a key figure, a viral AI demo. `concept.json →
+  story.ai_anchor {what, who, date, url}`, dated within 14 days (30 for `story` reels). The life impact is the
+  **angle** on that news (what it changes for your job, money, family, mind), never the topic.
+- **Weekly mix** (`story.mix`): about 60 % `news` (AI news told through its effect on people, e.g. «یه شرکت
+  ایجنتی ساخت که به‌جات تلفن می‌زنه — این یعنی چی برای تو؟»), about 25 % `practice` (a real AI use or tool that
+  works in Iran, shown step by step, tied to a recent release or case), about 15 % `story` (series and AI-POV
+  stories, still built on real AI facts). The gate needs ≥ 4 `news` reels in every 7.
+- **Out:** generic household, health and safety advice (gas, heating, food, medicine, water, blackout tips) and
+  generic scam warnings («کد رو به کسی نده»، «صدای جعلی»). A scam or deepfake topic is allowed **at most once in 14
+  reels**, only as `news`, and only when it is about a new AI development (a new technique seen in the wild, a new
+  detection tool, a new law), never as "be careful" advice.
+- **Sources:** AI newsrooms and labs (OpenAI, Anthropic, Google DeepMind, Meta, Microsoft, Nvidia, Apple,
+  Chinese labs), reputable tech press (The Verge, TechCrunch, Wired, Reuters, Bloomberg, MIT Technology Review),
+  studies (arXiv with a reputable group, Nature, Science), and Iranian tech news for what reaches Iran.
+- **Topic Bank:** the Friday research team becomes an AI news desk: launches and models, agents and
+  automation, AI and jobs, AI in money and business, AI in health and science, AI in creative work and
+  entertainment, AI policy and big-company moves, AI tools that work in Iran. Every row carries its `ai_anchor`.
+  Rows from the old bank without an AI anchor are retired (Status `Retired`), and Mahdi ticks the new ones.
+- §00 points 3–11 (share value, follow trigger, real faces, clarity, calm tone, metrics, Iranian audience,
+  series) still apply to how the AI story is told.
+- Enforced: `concept_gate.py` (ai_anchor, mix, age, the advice-drift cap, the 4-in-7 news share);
+  `reel_gate.py` history records `mix` and `ai_anchor`.
+
 ## 00. North star — read first, it overrides everything below (user rule 2026-11-01)
 Mahdi: «تقریباً تمام فالوورهای پیج از همون دو ریلز اومدن… نتیجه‌ای که فعلاً از همین سه پست می‌گیریم باید این باشه که
 پست‌هایی دست‌به‌دست میشه، ذخیره میشن و ویو می‌خورن که یه نقشی در زندگی روزمره‌ی مردم داشته باشند».
@@ -82,11 +113,11 @@ routine in Iran — told so that people **send it to someone they care about**.
    people share it. Mahdi: «باید سناریوها جذاب باشه و حتماً هم به تکنولوژی و هوش مصنوعی ربط داشته باشه، ما قراره از
    نقش هوش مصنوعی تو زندگی حرف بزنیم، پس موضوعات به‌تنهایی اجتماعی مد نظر نیست». Every topic links life AND
    AI/tech: what AI changes in your job, money, family, safety, health or mind, or what AI can do for you there. A
-   purely social or purely tech topic is out, except when Mahdi asks for one (like the 2026-11-01 readiness reel).
-2. **Topic test (concept.json → `story.life`, `story.life_impact`):** whose money, job, safety, health, family or
-   daily routine changes, and what should they do about it? At least **2 of every 3 reels** are `life: true`
-   (concept_gate.py enforces it); corporate/tech news only when it changes the viewer's life, framed that way
-   («شغلت…»، «پولت…»، «خانواده‌ت…»).
+   purely social topic is out, except when Mahdi asks for one. **2026-11-18: superseded by §00.0** — the AI
+   development is the topic, the life impact is the angle; household and safety advice is out.
+2. **Topic test (2026-11-18, §00.0):** `story.ai_anchor` (the real AI development) + `story.life_impact` (what it
+   changes for the viewer, framed «شغلت…»، «پولت…»، «خانواده‌ت…»). The old "2 of 3 reels are life stories" rule is
+   retired; the gate now checks the AI anchor and the news share instead.
 3. **Share value first:** the critic scores `share_value` (would a viewer send this to family or a friend?). Every
    reel and carousel ends with one share ask that fits the topic («برای خانواده‌ت بفرست»، «برای اون دوستت که… بفرست»),
    and gives one concrete thing to do or keep (a checklist, a step, a number, a prompt).
@@ -989,8 +1020,8 @@ Mahdi: «اینی که میگی یه ریلز ۸ بار اصلاح شده… ف�
   one per free slot) without another review.
 - **Proven formulas (2026-11-01):** our two biggest reels were «اگه می‌خوای شغلت امن بمونه… لوله‌کش شو؟» (89k reach)
   and the petrol/Pezeshkian reel (45k): both hit Iranians' own money, job or daily life, with a famous face or a
-  clear threat/benefit. At least one reel a day follows that formula (job safety, prices, money, everyday
-  Iranian life), using the radar (§4.2 step 0) for proven topics.
+  clear threat/benefit. Keep their *framing* (the viewer's stake, a famous face) and apply it to AI news (§00.0):
+  the topic is always a real AI development.
 
 ### 4.0 Reel visual rules (user rule 2026-10-24, after REEL-007; these override any older rule below)
 Mahdi on REEL-007: «سبک بد، قلاب افتضاح، صدا با تصاویر همخوانی نداره، همش صفحه خالیه و راوی حرف می‌زنه، بدون هیچ

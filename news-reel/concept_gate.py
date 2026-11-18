@@ -46,14 +46,35 @@ def lint(d, kind, hist_path):
     if any(w in h for w in AI_WORDS): f.append('no «هوش مصنوعی» on the cover (HEADLINES.md)')
     for k in ('summary', 'source', 'date', 'field'):
         if not (c.get('story') or {}).get(k): f.append(f'story.{k} missing')
-    # north star (RUNBOOK §00, 2026-11-01): everyday life of Iranians; 2 of every 3 reels must be "life" stories
+    # page purpose (user rule 2026-11-18, RUNBOOK §00.0, replaces the 2026-11-01 "2 of 3 life reels" rule):
+    # «قرار بود اطلاع‌رسانی اخبار هوش مصنوعی باشه، یعنی نقش هوش مصنوعی در زندگی انسان‌ها، ولی الان همش توصیه‌های
+    # تکراری…». Every reel stands on a real, recent AI development; the life impact is the angle, never the topic.
     st = c.get('story') or {}
-    if st.get('life') is None or not st.get('life_impact'):
-        f.append('story.life (true/false) and story.life_impact ("whose money/job/safety/health/family/daily life, and how") are required')
-    if kind == 'reel' and not st.get('life') and hist_path and Path(hist_path).exists():
-        prev = json.loads(Path(hist_path).read_text())[-2:]
-        if len(prev) == 2 and not any(x.get('life') for x in prev):
-            f.append('the last 2 reels were not "life" stories: this one must be (RUNBOOK §00)')
+    an = st.get('ai_anchor') or {}
+    miss = [k for k in ('what', 'who', 'date', 'url') if not an.get(k)]
+    if miss: f.append(f'story.ai_anchor {miss} missing: name the real AI development this stands on (what happened, who, date, source URL) — RUNBOOK §00.0')
+    mix = st.get('mix')
+    if mix not in ('news', 'practice', 'story'): f.append('story.mix must be news | practice | story (RUNBOOK §00.0)')
+    import datetime as _dt
+    try:
+        age = (_dt.date.fromisoformat(str(st.get('date', ''))[:10]) - _dt.date.fromisoformat(str(an.get('date', ''))[:10])).days
+        lim = 14 if mix in ('news', 'practice') else 30
+        if age > lim: f.append(f'ai_anchor is {age} days old (max {lim} for mix={mix}): find a newer AI development')
+    except ValueError:
+        if an.get('date'): f.append('ai_anchor.date / story.date must be YYYY-MM-DD')
+    if not st.get('life_impact'): f.append('story.life_impact missing: what this AI development changes for the viewer (the angle, not the topic)')
+    # household/safety advice drift (REEL-050…059: gas, heating, freezer food, antibiotics, scams, fake photos, blackouts)
+    ADVICE = r'scam|fraud|phish|otp|verification code|voice clon|deepfake|fake (photo|shop|cure)|safety|readiness|emergenc|gas|heating|blackout|power cut|water shortage|food safety|freezer|antibiotic|medicine|health myth'
+    blob = ' '.join(str(st.get(k, '')) for k in ('field', 'summary', 'life_impact')).lower()
+    if kind == 'reel' and re.search(ADVICE, blob):
+        hist_ = json.loads(Path(hist_path).read_text()) if hist_path and Path(hist_path).exists() else []
+        recent = [x for x in hist_[-14:] if re.search(ADVICE, (str(x.get('field', '')) + ' ' + str(x.get('life', ''))).lower())]
+        if recent: f.append(f'safety/scam/household-advice topic: at most 1 in 14 reels, last was {recent[-1].get("reel")} (RUNBOOK §00.0)')
+        if mix != 'news': f.append('a safety/scam topic is allowed only as mix=news, built on a new AI development (a new scam technique, a new detection tool), never generic advice')
+    # the mix: at least 4 of every 7 reels are mix=news
+    if kind == 'reel' and mix and mix != 'news' and hist_path and Path(hist_path).exists():
+        last6 = [x.get('mix') for x in json.loads(Path(hist_path).read_text())[-6:]]
+        if len(last6) == 6 and last6.count('news') < 4: f.append(f'only {last6.count("news")} of the last 6 reels were AI news: this one must be mix=news (RUNBOOK §00.0)')
     cv = c.get('cover') or {}
     # user rule 2026-11-03 (RUNBOOK §00.20): no AI word or «از دید…» label anywhere on the cover, no repeated label
     cov_txt = ' '.join(str(cv.get(k) or '') for k in ('kicker', 'sub', 'twist', 'logo_label')) + ' ' + h
