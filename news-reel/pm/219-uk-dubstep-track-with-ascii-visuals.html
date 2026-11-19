@@ -48,9 +48,9 @@ const K = 'var(--k)', P = 'var(--p)';
 const svg = inner => `<svg width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;left:0;top:0;overflow:visible">${inner}</svg>`;
 // halftone dot field: dot radius follows the kick; every other row offset; under every shot
 function dots(t) {
-  const r = 3 + 5 * kickEnv(t), off = (beatN(t) % 2) * 18; let d = '';
-  for (let y = 18; y < 1920; y += 36) for (let x = 18 + ((y / 36) % 2) * 18; x < 1080; x += 36) d += `<circle cx="${(x + off) % 1080}" cy="${y}" r="${r.toFixed(1)}"/>`;
-  return svg(`<g fill="${K}" opacity=".22">${d}</g>`);
+  const r = 6 + 5 * kickEnv(t), off = (beatN(t) % 2) * 14; let d = '';
+  for (let y = 14; y < 1920; y += 28) for (let x = 14 + ((y / 28) % 2) * 14; x < 1080; x += 28) d += `<circle cx="${(x + off) % 1080}" cy="${y}" r="${(r * (.6 + .4 * Math.abs(Math.sin(x * .013 + y * .009 + t * 2)))).toFixed(1)}"/>`;
+  return svg(`<g fill="${K}" opacity=".42">${d}</g>`);
 }
 // equaliser bars at the bottom edge: heights from kick + wobble (the bass you can see)
 function eq(t, y = 1440, h = 120) { let s = ''; for (let i = 0; i < 18; i++) { const v = .25 + .55 * kickEnv(t - i * .012) + .2 * (1 + wob(t + i * .05)) / 2; s += `<rect x="${30 + i * 58}" y="${(y - h * v).toFixed(1)}" width="44" height="${(h * v).toFixed(1)}" fill="${K}"/>`; } return svg(s); }
@@ -72,20 +72,20 @@ function scene(b, t) {
       // intro: headline on frame 0; a giant plus sign (the health mark) built from two bars that slam in on the first
       // kicks; «۳۰۰ میلیون» lands on its word; the plus turns a quarter on every kick
       const tn = W(b, 'سیصد'), L = S.hook_lines || ['', ''];
-      r += svg(plus(540, 900, 520 + 40 * kE, 150, (beatN(t) % 2) * 45 * ex(pr(t % BEAT, 0, .15)), K) + ring(540, 900, 330 + 30 * sE, 24));
+      r += svg(plus(540, 820, 460 + 50 * kE, 140, 0, K) + ring(540, 820, 300 + 30 * sE, 24));
       r += `<div class="t" style="top:150px;font-size:110px;color:${K}">${acc(L[0])}</div><div class="t" style="top:290px;font-size:110px;color:${K}">${acc(L[1])}</div>`;
-      r += slam(`<span style="background:${P};padding:0 .2em .08em">${fa(300)} میلیون</span>`, 830, 120, pr(t, q(tn) - .05, q(tn) + .2), t);
-      r += slam('نفر در هفته', 1230, 64, pr(t, q(tn) + BEAT, q(tn) + BEAT + .2), t) + eq(t);
+      r += slam(`<span style="background:${K};color:${P};padding:0 .2em .08em">${fa(300)} میلیون</span>`, 1160, 120, pr(t, q(tn) - .05, q(tn) + .2), t);
+      r += slam('نفر در هفته', 1310, 60, pr(t, q(tn) + BEAT, q(tn) + BEAT + .2), t) + eq(t, 1460, 90);
       return r;
     }
     case 'h_news': {
       // build: two circles, «تو» and «دکترت»; the doctor's circle grows on «جدا»; an ≠ slams between them on «یکی»
-      const tj = W(b, 'جدا'), ty = W(b, 'یکی'), tO = W(b, 'OpenAI'), kd = ex(pr(t, q(tj) - .05, q(tj) + .3));
+      const tj = W(b, 'پزشک‌ها'), ty = W(b, 'فرق'), tO = W(b, 'OpenAI'), kd = ex(pr(t, q(tj) - .05, q(tj) + .3));
       r += svg(`<circle cx="300" cy="820" r="${(190 + 20 * kE).toFixed(1)}" fill="${K}"/>` + `<circle cx="790" cy="820" r="${(mix(190, 250, kd) + 20 * sE).toFixed(1)}" fill="none" stroke="${K}" stroke-width="28"/>` +
         (t > q(ty) - .05 ? box(470, 760 + 0, 140, 34, K) + box(470, 850, 140, 34, K) + `<rect x="${530}" y="700" width="30" height="230" fill="${K}" transform="rotate(25 545 815)"/>` : ''));
       r += `<div class="a" style="left:300px;top:790px;transform:translateX(-50%);font-size:76px;color:${P}">تو</div><div class="a" style="left:790px;top:790px;transform:translateX(-50%);font-size:70px;color:${K}">دکترت</div>`;
-      r += slam('OpenAI', 230, 120, pr(t, q(tO) - .05, q(tO) + .2), t, K, true) + slam('نسخه‌ی *جدا* برای پزشک'.replace(/\*([^*]+)\*/g, '<span style="text-decoration:underline;text-decoration-thickness:12px">$1</span>'), 400, 80, pr(t, q(tj) - .05, q(tj) + .2), t);
-      r += slam('جست‌وجوی بالینی + منبع', 1150, 60, pr(t, q(tj) + 2 * BEAT, q(tj) + 2 * BEAT + .2), t) + eq(t);
+      r += slam('OpenAI', 230, 120, pr(t, q(tO) - .05, q(tO) + .2), t, K, true) + slam('نسخه‌ی *پزشک‌ها* قوی‌تر شد'.replace(/\*([^*]+)\*/g, '<span style="text-decoration:underline;text-decoration-thickness:12px">$1</span>'), 400, 80, pr(t, q(tj) - .05, q(tj) + .2), t);
+      r += slam('جست‌وجوی بالینی + منبع · فقط پزشک‌های آمریکا'.replace(' · ', ' – '), 1150, 54, pr(t, q(tj) + 2 * BEAT, q(tj) + 2 * BEAT + .2), t) + eq(t);
       return r;
     }
     case 'h_three': {
@@ -98,11 +98,11 @@ function scene(b, t) {
     }
     case 'h_list': {
       // step 1: three bars slam in on «سن / داروها / سابقه»; their widths wobble with the bass
-      const keys = [['سن', 'سن'], ['داروها', 'داروها'], ['سابقه', 'سابقه']], tc = W(b, 'کلیه');
+      const keys = [['سن', 'سن'], ['داروها', 'داروها'], ['سابقه', 'سابقه']], tc = W(b, 'عمومی');
       r += slam('<span style="font-size:200px">۱</span>', 160, 200, pr(t, A, A + .2), t);
       keys.forEach(([k0, lab], i) => { const tw = W(b, k0), k = ex(pr(t, q(tw) - .05, q(tw) + .15)); if (k <= 0) return; const w = 760 * k + 40 * wob(t + i * .1);
         r += svg(box(1080 - 160 - w, 560 + i * 190, w, 140, K)) + `<div class="a" style="right:200px;top:${580 + i * 190}px;font-size:80px;color:${P}">${lab}</div>`; });
-      r += slam('بدون اینا، جواب *کلیه*'.replace(/\*([^*]+)\*/g, `<span style="text-decoration:line-through;text-decoration-thickness:10px">$1</span>`), 1180, 76, pr(t, q(tc) - .2, q(tc)), t) + eq(t);
+      r += slam('تا جواب عمومی نگیری', 1180, 70, pr(t, q(tc) - .2, q(tc)), t) + slam('اسم و کد ملی؟ هرگز', 1290, 64, pr(t, q(W(b, 'هرگز')) - .05, q(W(b, 'هرگز')) + .2), t) + eq(t);
       return r;
     }
     case 'h_source': {
@@ -110,13 +110,13 @@ function scene(b, t) {
       const tm = W(b, 'منبعش'), tk = W(b, 'تکیه'), brk = t > q(tk) - .05;
       r += slam('<span style="font-size:200px">۲</span>', 160, 200, pr(t, A, A + .2), t);
       r += svg(brk ? plus(540, 860, 520, 90, 45, K) : `<g transform="rotate(${(beatN(t) * 90 + 90 * ex(pr(t % BEAT, 0, .12))).toFixed(1)} 540 860)">${ring(540, 860, 300 + 25 * kE, 60)}<rect x="510" y="530" width="60" height="120" fill="${P}"/></g>`);
-      r += slam(brk ? '' : 'منبعش؟', 790, 130, pr(t, q(tm) - .05, q(tm) + .2), t) + slam('منبع نداشت؟ تکیه نکن', 1240, 70, pr(t, q(tk) - .05, q(tk) + .2), t) + eq(t);
+      r += slam(brk ? '' : 'منبعش؟', 790, 130, pr(t, q(tm) - .05, q(tm) + .2), t) + slam('خودت چکش کن – منبع نداشت؟ تکیه نکن', 1240, 60, pr(t, q(tk) - .05, q(tk) + .2), t) + eq(t);
       return r;
     }
     case 'h_stop': {
       // the drop (strongest moment): a diamond fills the frame on the downbeat of «نشون»; the capsule splits; colours
       // invert on every kick; «نشون دکترت بده» slams, «نه جای دکتر» lands on «بنشونیش»
-      const tc = W(b, 'نشون'), to = W(b, 'بنشونیش'), drop = q(tc), inv = t > drop && beatN(t) % 2 === 0;
+      const tc = W(b, 'نشون'), to = W(b, 'بنشونیش'), drop = q(tc), inv = false;
       const fg = inv ? P : K, bgc = inv ? K : P;
       if (t > drop) r += `<div class="a" style="left:0;top:0;width:1080px;height:1920px;background:${bgc}"></div>` + dots(t).replace(`fill="${K}"`, `fill="${fg}"`);
       const ds = t > drop ? 720 + 60 * kE : 380 + 40 * kE, gap = t > drop ? 50 * ex(pr(t, drop, drop + .3)) + 20 * sE : 0;
@@ -147,7 +147,7 @@ function scene(b, t) {
 }
 function endCard(u, t) {
   const qx = acc(S.end_text || '');
-  return dots(t) + svg(plus(540, 620, 360 + 40 * kickEnv(t), 110, (beatN(t) % 2) * 45, K)) +
+  return dots(t) + svg(plus(540, 620, 360 + 40 * kickEnv(t), 110, 0, K)) +
     `<div class="t" style="top:930px;font-size:96px;color:${K};opacity:${pr(u, .1, .4)}">${qx}</div>` +
     `<div class="t" style="top:1080px;font-size:54px;font-weight:600;color:${K};opacity:${pr(u, .3, .6)}">${S.end_sub || ''}</div>` +
     (S.end_chips || []).map((c, i) => `<div class="t" style="top:${1190 + i * 80}px;font-size:46px;color:${K};opacity:${pr(u, .5 + i * .2, .7 + i * .2)}">${c}</div>`).join('') +
@@ -189,7 +189,7 @@ window.ready = (async () => {
 function seek(t) {
   if (!B.length) return;
   // the two colours swap on every bar (ink ↔ paper)
-  const sw = barN(t) % 2 === 1, R_ = document.documentElement.style, pal = S.palette || ['#F2EEE4', '#E2412B'];
+  const sw = Math.floor(barN(t) / 2) % 2 === 1, R_ = document.documentElement.style, pal = S.palette || ['#F2EEE4', '#E2412B'];
   R_.setProperty('--p', sw ? pal[1] : pal[0]); R_.setProperty('--k', sw ? pal[0] : pal[1]);
   let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
   const endOn = t >= TL.end_start, b = B[bi];
