@@ -85,7 +85,7 @@ function scene(b, t) {
         (t > q(ty) - .05 ? box(470, 760 + 0, 140, 34, K) + box(470, 850, 140, 34, K) + `<rect x="${530}" y="700" width="30" height="230" fill="${K}" transform="rotate(25 545 815)"/>` : ''));
       r += `<div class="a" style="left:300px;top:790px;transform:translateX(-50%);font-size:76px;color:${P}">تو</div><div class="a" style="left:790px;top:790px;transform:translateX(-50%);font-size:70px;color:${K}">دکترت</div>`;
       r += slam('OpenAI', 230, 120, pr(t, q(tO) - .05, q(tO) + .2), t, K, true) + slam('نسخه‌ی *پزشک‌ها* قوی‌تر شد'.replace(/\*([^*]+)\*/g, '<span style="text-decoration:underline;text-decoration-thickness:12px">$1</span>'), 400, 80, pr(t, q(tj) - .05, q(tj) + .2), t);
-      r += slam('جست‌وجوی بالینی + منبع · فقط پزشک‌های آمریکا'.replace(' · ', ' – '), 1150, 54, pr(t, q(tj) + 2 * BEAT, q(tj) + 2 * BEAT + .2), t) + eq(t);
+      r += slam('جست‌وجوی بالینی + منبع', 1120, 60, pr(t, q(tj) + 2 * BEAT, q(tj) + 2 * BEAT + .2), t) + slam('فقط پزشک‌های تأییدشده‌ی آمریکا', 1210, 50, pr(t, q(tj) + 3 * BEAT, q(tj) + 3 * BEAT + .2), t) + eq(t);
       return r;
     }
     case 'h_three': {
@@ -93,7 +93,7 @@ function scene(b, t) {
       const t3 = W(b, 'سه'), t0 = q(A + .1);
       r += svg([0, 1, 2].map(i => { const k = ex(pr(t, t0 + i * BEAT, t0 + i * BEAT + .15)); return k <= 0 ? '' : box(150 + i * 290, mix(-300, 700, k) + 18 * kE * (i % 2 ? -1 : 1), 220, 220, K, rot90 * (i === 1 ? 1 : 0)); }).join(''));
       [0, 1, 2].forEach(i => { const k = pr(t, t0 + i * BEAT + .1, t0 + i * BEAT + .2); if (k > 0) r += `<div class="a" style="left:${260 + i * 290}px;top:740px;transform:translateX(-50%);font-size:130px;color:${P};opacity:${k}">${fa(i + 1)}</div>`; });
-      r += slam('<span style="font-size:180px">۳ کار</span>', 1030, 180, pr(t, q(t3) - .05, q(t3) + .2), t) + slam('قبل از اینکه بپرسی', 300, 84, pr(t, A, A + .2), t) + eq(t);
+      r += slam('<span style="font-size:180px">۳ کار</span>', 1030, 180, pr(t, q(t3) - .05, q(t3) + .2), t) + slam('وقتی ازش می‌پرسی', 300, 84, pr(t, A, A + .2), t) + eq(t);
       return r;
     }
     case 'h_list': {
@@ -102,7 +102,8 @@ function scene(b, t) {
       r += slam('<span style="font-size:200px">۱</span>', 160, 200, pr(t, A, A + .2), t);
       keys.forEach(([k0, lab], i) => { const tw = W(b, k0), k = ex(pr(t, q(tw) - .05, q(tw) + .15)); if (k <= 0) return; const w = 760 * k + 40 * wob(t + i * .1);
         r += svg(box(1080 - 160 - w, 560 + i * 190, w, 140, K)) + `<div class="a" style="right:200px;top:${580 + i * 190}px;font-size:80px;color:${P}">${lab}</div>`; });
-      r += slam('تا جواب عمومی نگیری', 1180, 70, pr(t, q(tc) - .2, q(tc)), t) + slam('اسم و کد ملی؟ هرگز', 1290, 64, pr(t, q(W(b, 'هرگز')) - .05, q(W(b, 'هرگز')) + .2), t) + eq(t);
+      { const th = q(W(b, 'هرگز')), kc = ex(pr(t, th - .05, th + .2)); if (kc > 0) r += svg(`<g transform="translate(905 1345) scale(${(.55 * kc * (1 + .05 * kE)).toFixed(3)})"><rect x="-110" y="-70" width="220" height="140" rx="18" fill="none" stroke="${K}" stroke-width="14"/><circle cx="-50" cy="-10" r="26" fill="${K}"/><rect x="0" y="-30" width="80" height="14" fill="${K}"/><rect x="0" y="0" width="60" height="14" fill="${K}"/><line x1="-130" y1="-90" x2="130" y2="90" stroke="${K}" stroke-width="18"/></g>`); }
+      r += slam('تا جواب عمومی نگیری', 1180, 70, pr(t, q(tc) - .2, q(tc)), t) + slam('اسم و کد ملی؟ هرگز', 1310, 64, pr(t, q(W(b, 'هرگز')) - .05, q(W(b, 'هرگز')) + .2), t) + eq(t);
       return r;
     }
     case 'h_source': {
@@ -119,11 +120,11 @@ function scene(b, t) {
       const tc = W(b, 'نشون'), to = W(b, 'بنشونیش'), drop = q(tc), inv = false;
       const fg = inv ? P : K, bgc = inv ? K : P;
       if (t > drop) r += `<div class="a" style="left:0;top:0;width:1080px;height:1920px;background:${bgc}"></div>` + dots(t).replace(`fill="${K}"`, `fill="${fg}"`);
-      const ds = t > drop ? 720 + 60 * kE : 380 + 40 * kE, gap = t > drop ? 50 * ex(pr(t, drop, drop + .3)) + 20 * sE : 0;
+      const ds = t > drop ? 500 + 40 * kE : 380 + 40 * kE, gap = t > drop ? 50 * ex(pr(t, drop, drop + .3)) + 20 * sE : 0;
       r += svg(`<rect x="${540 - ds / 2}" y="${880 - ds / 2}" width="${ds}" height="${ds}" fill="${fg}" transform="rotate(45 540 880)"/>` +
         `<rect x="${330 - gap}" y="820" width="200" height="140" rx="70" fill="${bgc}"/><rect x="${550 + gap}" y="820" width="200" height="140" rx="70" fill="none" stroke="${bgc}" stroke-width="22"/>`);
-      r += slam(t > drop ? 'نشون دکترت بده' : 'جوابش رو…', 1180, t > drop ? 110 : 90, pr(t, t > drop ? drop : A, (t > drop ? drop : A) + .2), t, fg);
-      r += slam('نه جای دکتر', 1330, 70, pr(t, q(to) - .05, q(to) + .2), t, fg) + slam('۳', 160, 200, pr(t, A, A + .2), t, fg);
+      r += slam(t > drop ? 'نشون دکترت بده' : 'جوابش رو…', 1270, t > drop ? 100 : 90, pr(t, t > drop ? drop : A, (t > drop ? drop : A) + .2), t, fg);
+      r += slam('نه جای دکتر', 1385, 64, pr(t, q(to) - .05, q(to) + .2), t, fg) + slam('۳', 160, 200, pr(t, A, A + .2), t, fg);
       return r;
     }
     case 'h_doctor': {
