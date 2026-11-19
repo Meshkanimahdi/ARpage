@@ -57,7 +57,7 @@ window.ready = (async () => {
     B.push({bt, sc: bt.scene || {}, L, words, wt});
   }
   B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
-  await Promise.all(['h1.jpg', 'h6.jpg', 'h7.jpg'].map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + f); })));
+  await Promise.all((S.preload || ['h1.jpg', 'h6.jpg', 'h7.jpg']).map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U('el/' + f); })));
   await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'تصمیم رفتن Mirror')));
   window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
   const SC = [];
@@ -109,6 +109,7 @@ const people = (x, y, n, lit, k, size = 64) => { let s = ''; for (let i = 0; i <
 function scene(b, t) {
   const s = b.sc, A = b.a, Bb = b.b, u = t - A;
   let r = '';
+  if ((s.type || '').startsWith('b_')) { const rb = sceneB(b, t); if (rb !== null) return rb; }
   if (!['hook', 'mirror', 'limbo'].includes(s.type)) { const big = {poll: '1300', bars: '33%', gap: '≠', study: '71', report: '✓', ask: '?'}[s.type] || '';
     r += `<div class="a" dir="ltr" style="left:${(-120 - 60 * pr(t, A, Bb)).toFixed(1)}px;top:${(1180 - 30 * pr(t, A, Bb)).toFixed(1)}px;font:900 460px/1 V;color:transparent;-webkit-text-stroke:4px rgba(226,114,91,.2)">${big}</div><div class="a" style="left:140px;top:1080px;width:800px;height:60px;border-radius:50%;background:radial-gradient(rgba(30,42,63,.14),rgba(30,42,63,0) 70%)"></div>`; }
   switch (s.type) {
@@ -222,12 +223,120 @@ function scene(b, t) {
   }
   ISSUES.push('unknown scene ' + s.type); return r;
 }
+// ===== REEL-062 set (Bale AI packs: 347k toman a month?) — scene types b_* =====
+// through-line object: the round price coin (the prompt's one accent object). It sits on the hook photo, becomes the
+// revenue counter's ring, the cheaper-pack selector, the week dial, the renew toggle knob and the lock.
+Object.assign(OPEN, {b_hook: 'riser', b_news: 'typing', b_price: 'pop', b_s1: 'tap', b_s2: 'click', b_s3: 'typing', b_priv: 'notify', b_ask: 'notify'});
+Object.assign(MOM, {
+  b_hook: b => [[W(b, 'دویست'), 'counter_tick'], [W(b, 'پول'), 'pop']],
+  b_news: b => [[W(b, 'چهارده'), 'counter_tick'], [b.a + 1.2, 'click'], [W(b, 'نصف'), 'tap']],
+  b_price: b => [[W(b, 'قیمت'), 'pop'], [W(b, 'سه'), 'notify']],
+  b_s1: b => [[W(b, 'هفته'), 'tap'], [W(b, 'چند'), 'counter_tick'], [W(b, 'ده'), 'notify']],
+  b_s2: b => [[W(b, 'ارزون‌تر'), 'click'], [W(b, 'ارتقا'), 'tap']],
+  b_s3: b => [[W(b, 'کار'), 'typing'], [W(b, 'تمدید'), 'click']],
+  b_priv: b => [[W(b, 'بانکی'), 'tap'], [W(b, 'هیچ'), 'notify']],
+  b_ask: b => [[W(b, 'چقدر'), 'tap'], [W(b, 'کامنت'), 'notify'], [W(b, 'بفرست'), 'pop']],
+});
+const coin = (cx, cy, r, txt, k = 1, fill = ACC, size = 0) => k <= 0 ? '' : `<div class="a" style="left:${cx - r}px;top:${cy - r}px;width:${2 * r}px;height:${2 * r}px;border-radius:50%;background:${fill};color:#fff;display:flex;align-items:center;justify-content:center;font:900 ${size || r * .42}px/1 V;box-shadow:0 20px 50px rgba(30,42,63,.28),inset 0 0 0 10px rgba(255,255,255,.25);transform:scale(${sp(k).toFixed(3)});white-space:nowrap">${txt}</div>`;
+const pulse = (cx, cy, r0, u, col = ACC) => { let s = ''; for (let i = 0; i < 3; i++) { const ph = ((u * .7 + i / 3) % 1); s += `<circle cx="${cx}" cy="${cy}" r="${r0 + 200 * ph}" fill="none" stroke="${col}" stroke-width="${8 * (1 - ph) + 1}" opacity="${(1 - ph).toFixed(2)}"/>`; } return `<svg class="a" style="left:0;top:0" width="1080" height="1920">${s}</svg>`; };
+const plate = (img, x, y, w, h, t, A, Bb, pos = '50% 50%', z0 = 1.04, z1 = 1.12) => card(x, y, w, h, `<img src="${U('el/' + img)}" style="width:100%;height:100%;object-fit:cover;object-position:${pos};transform:scale(${mix(z0, z1, pr(t, A, Bb)).toFixed(3)})">`);
+// REEL-062 ground: a receipt roll of monthly AI-pack lines scrolls behind every scene on a light graph grid, so the
+// cream page is never empty (the prompt's "something changes on every beat")
+const RCPT = ['بسته‌ی ماهانه ۳۴۷٬۰۰۰ ت', 'تمدید خودکار ✓', 'بسته‌ی ویژه ۸۳۷٬۰۰۰ ت', 'پرداخت موفق', 'سهمیه‌ی عکس', 'شارژ کیف پول', 'تمدید ماه بعد'];
+function btex(t) {
+  const off = (t * 40) % 50; let rows = '';
+  for (let i = 0; i < 42; i++) { const n = i + Math.floor(t * 40 / 50); rows += `<div style="height:50px;display:flex;gap:60px;justify-content:space-between"><span>${RCPT[n % RCPT.length]}</span><span>${fa(String(1400 + (n * 37) % 600))}</span><span>${RCPT[(n * 3 + 2) % RCPT.length]}</span></div>`; }
+  return `<div class="a" style="left:0;top:0;width:1080px;height:1920px;background-image:linear-gradient(rgba(30,42,63,.08) 2px,transparent 2px),linear-gradient(90deg,rgba(30,42,63,.08) 2px,transparent 2px);background-size:72px 72px"></div>` +
+    `<div class="a" style="left:30px;right:30px;top:${(-off).toFixed(1)}px;font:900 30px/50px V;color:rgba(30,42,63,.16);white-space:nowrap">${rows}</div>`;
+}
+function sceneB(b, t) {
+  const s = b.sc, A = b.a, Bb = b.b, u = t - A; let r = '';
+  r += btex(t);
+  const big = {b_news: '250', b_price: '347', b_s1: '7', b_s2: '2', b_s3: '?', b_priv: '✕', b_ask: '؟'}[s.type] || '';
+  if (big) r += `<div class="a" dir="ltr" style="left:${(-120 - 60 * pr(t, A, Bb)).toFixed(1)}px;top:${(1180 - 30 * pr(t, A, Bb)).toFixed(1)}px;font:900 460px/1 V;color:transparent;-webkit-text-stroke:4px rgba(226,114,91,.2)">${big}</div>`;
+  switch (s.type) {
+    case 'b_hook': {
+      // frame 0: headline from frame 0; a screen-filling 250bn counter on the coin ring already rolling; a small café
+      // photo card pushes in behind; the 347k price question chip slams on «سیصد»
+      const tq = W(b, 'پول'), n = counter(250, pr(t, -.6, Math.max(1.2, W(b, 'دویست') + .5))), z = 1.04 + .1 * pr(t, A, Bb);
+      r += card(560, 1040, 440, 520, `<img src="${U('el/b1.jpg')}" style="width:100%;height:100%;object-fit:cover;object-position:40% 55%;transform:scale(${z.toFixed(3)})">`, 'transform:rotate(4deg)');
+      const L = S.hook_lines || ['', '']; r += C(170, L[0], 104, INK) + C(310, L[1].replace(/\*([^*]+)\*/g, `<span style="display:inline-block;background:${ACC};color:#fff;padding:0 .2em .1em;border-radius:.18em">$1</span>`), 104, INK);
+      r += pulse(400, 830, 250, u) + coin(400, 830, 250, `<div style="text-align:center;line-height:1"><div style="font-size:150px">${fa(n)}</div><div style="font-size:52px;margin-top:14px">میلیارد تومن</div></div>`, 1, ACC, 150);
+      r += chip(110, 1150, '۶ ماه اول ۱۴۰۵', INK, '#fff', 52, pr(t, .3, .6));
+      r += chip(80, 1300, `تو هم ماهی ${fa(347)} هزار تومن؟`, '#fff', INK, 62, pr(t, tq - .1, tq + .25));
+      return r;
+    }
+    case 'b_news': {
+      const td = W(b, 'دیجیاتو'), tu = W(b, 'چهارده'), tp = A + 1.2, th = W(b, 'نصف'), nu = 13.9 * ex(pr(t, tu - .3, tu + .8)), kh = ex(pr(t, th - .2, th + .8));
+      r += card(90, 330, 900, 860, '', `transform:scale(${sp(pr(t, A, A + .5)).toFixed(3)});transform-origin:540px 700px`);
+      r += chip(140, 370, 'دیجیاتو – ۲۱ آبان', INK, '#fff', 46, pr(t, td - .1, td + .25));
+      r += ring(300, 680, 150, '#fff', '', ACC) + `<div class="a" style="left:150px;top:610px;width:300px;text-align:center;font:900 110px/1 V;color:${ACC}">${fa(nu.toFixed(1)).replace('.', '٫')}</div><div class="a" style="left:150px;top:728px;width:300px;text-align:center;font:900 34px/1.2 V;color:${INK}">میلیون کاربر<br>ماهانه</div>`;
+      r += chip(500, 560, `+${fa('69,000')} بسته در شهریور`, '#EFE9E0', INK, 46, pr(t, tp - .1, tp + .25));
+      r += T(140, 910, 'سهم از کل درآمد عملیاتی ۱۴۰۴ شرکت', 38, '#7A8494') + `<div class="a" style="left:140px;top:980px;width:800px;height:60px;border-radius:30px;background:#EFE9E0"></div><div class="a" style="left:140px;top:980px;width:${(800 * .56 * kh).toFixed(0)}px;height:60px;border-radius:30px;background:${ACC}"></div>` + T(140, 1060, fa(Math.round(56 * kh)) + '٪', 80, ACC);
+      r += chip(560, 1070, 'بیشتر از نصف', ACC, '#fff', 52, pr(t, th - .1, th + .25));
+      r += head('چند نفر، چقدر؟', pr(t, A, A + .4), 200, 80);
+      return r;
+    }
+    case 'b_price': {
+      const t1 = W(b, 'دو'), t2 = W(b, 'قیمت'), t3 = W(b, 'سه'), k1 = pr(t, t1 - .15, t1 + .3), k2 = pr(t, t2 - .15, t2 + .3);
+      const pk = (x, price, sub, k, on) => k <= 0 ? '' : card(x, 420, 420, 620, `<div class="a" style="left:0;right:0;top:60px;text-align:center;font:900 46px V;color:#7A8494">بسته‌ی ماهانه</div><div class="a" style="left:0;right:0;top:170px;text-align:center;font:900 120px V;color:${on ? ACC : INK}">${fa(price)}</div><div class="a" style="left:0;right:0;top:320px;text-align:center;font:900 48px V;color:${INK}">هزار تومن</div><div class="a" style="left:30px;right:30px;top:430px;text-align:center;font:600 38px/1.4 V;color:#7A8494;white-space:normal">${sub}</div>`, `transform:scale(${sp(k).toFixed(3)});transform-origin:${x + 210}px 730px;${on ? 'outline:10px solid ' + ACC : ''}`);
+      r += pk(560, 347, 'پایه', k1, t > t3) + pk(100, 837, 'مدل‌های قوی‌تر + عکس بیشتر', k2, false);
+      if (t > t3 - .3) r += coin(770, 420, 70, '✓', pr(t, t3 - .2, t3 + .2), ACC, 64) + cursor(mix(980, 820, ex(pr(t, t3 - .6, t3))), mix(1500, 900, ex(pr(t, t3 - .6, t3))), t, t3);
+      r += chip(250, 1120, 'قبل از خرید: ۳ کار', INK, '#fff', 66, pr(t, t3 - .1, t3 + .25)) + head('چقدر می‌دی؟', pr(t, A, A + .4), 220);
+      return r;
+    }
+    case 'b_s1': {
+      const th = W(b, 'هفته'), tc = W(b, 'چند'), uses = [3, 0, 5, 1, 0, 2, 4], days = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+      r += coin(170, 300, 90, fa(1), pr(t, A - .05, A + .3), ACC, 100);
+      r += card(90, 460, 900, 640, days.map((d, i) => { const k = pr(t, th - .2 + i * .18, th + .1 + i * .18), h = 60 * uses[i] * ex(k); return `<div class="a" style="left:${70 + i * 115}px;top:${470 - h}px;width:80px;height:${h.toFixed(0)}px;border-radius:16px 16px 0 0;background:${uses[i] ? ACC : '#EFE9E0'}"></div><div class="a" style="left:${70 + i * 115}px;top:500px;width:80px;text-align:center;font:900 44px V;color:#7A8494">${d}</div>`; }).join('') + `<div class="a" style="left:60px;right:60px;top:470px;height:4px;background:#E4DED5"></div>`);
+      const tot = counter(15, pr(t, tc - .2, tc + .8));
+      const t10 = W(b, 'ده'); r += chip(560, 1150, `این هفته: ${fa(tot)} بار`, INK, '#fff', 60, pr(t, tc - .1, tc + .2)) + chip(110, 1150, 'مثال', '#EFE9E0', '#7A8494', 46, pr(t, A + .3, A + .6)) + chip(200, 370, 'کمتر از ۱۰ بار؟ شاید لازمش نداری', ACC, '#fff', 50, pr(t, t10 - .1, t10 + .25)) + `<div class="a" style="left:150px;right:150px;top:${(930 - 60 * 10 / 5).toFixed(0)}px;border-top:6px dashed ${ACC};opacity:${pr(t, t10 - .1, t10 + .2)}"></div>`;
+      r += head('یه هفته بشمار', pr(t, A, A + .4), 240, 92);
+      return r;
+    }
+    case 'b_s2': {
+      const tc = W(b, 'ارزون‌تر'), tg = W(b, 'ارتقا') - .2, ti = W(b, 'ارتقا') + .3, on = ex(pr(t, tc, tc + .35));
+      r += coin(170, 300, 90, fa(2), pr(t, A - .05, A + .3), ACC, 100);
+      r += card(90, 460, 900, 300, toggle(50, 60, on, 'بسته‌ی ارزون‌تر اول') + T(50, 190, `${fa(347)} هزار تومن – کم آوردی؟ ارتقا`, 44, ACC));
+      r += card(90, 800, 900, 420, T(50, 40, 'گرون‌تره بیشتر برای:', 46, '#7A8494') + [['🧠 مدل‌های قوی‌تر', tg], ['🖼 عکس‌سازی بیشتر', ti]].map(([c, tq], i) => `<div class="a" style="left:50px;top:${130 + i * 120}px;padding:10px 30px 18px;border-radius:30px;background:#EFE9E0;font:900 52px V;color:${INK};transform:scale(${sp(pr(t, tq - .1, tq + .25)).toFixed(3)});opacity:${cl(pr(t, tq - .1, tq + .2) * 5).toFixed(2)}">${c}</div>`).join(''));
+      r += cursor(mix(980, 300, ex(pr(t, tc - .6, tc))), mix(1500, 600, ex(pr(t, tc - .6, tc))), t, tc) + head('اول ارزون‌تر', pr(t, A, A + .4), 240, 92);
+      return r;
+    }
+    case 'b_s3': {
+      const tk = W(b, 'کار'), tf = W(b, 'کار') + 1.1, tr = W(b, 'تمدید'), q = 'این قرارداد رو خلاصه کن و ریسک‌هاش رو بگو', kq = pr(t, tk - .2, tk + 1.4), off = 1 - ex(pr(t, tr, tr + .35));
+      r += coin(170, 300, 90, fa(3), pr(t, A - .05, A + .3), ACC, 100);
+      r += card(90, 440, 900, 500, `<div class="a" style="right:40px;top:40px;max-width:760px;padding:24px 34px 34px;border-radius:36px 36px 10px 36px;background:${ACC};color:#fff;font:900 52px/1.4 V;white-space:normal">${q.slice(0, Math.round(q.length * cl(kq)))}${kq < 1 ? '▌' : ''}</div>` +
+        `<div class="a" style="left:40px;top:300px;padding:18px 30px 28px;border-radius:30px;background:#EFE9E0;font:900 46px V;color:#7A8494;opacity:${(1 - .5 * pr(t, tf, tf + .3)).toFixed(2)}">«یه شعر درباره‌ی گربه بگو»${t > tf ? `<div style="position:absolute;left:20px;right:20px;top:50%;height:8px;background:#E5322D;transform:scaleX(${ex(pr(t, tf, tf + .3)).toFixed(3)});transform-origin:100% 50%"></div>` : ''}</div>`);
+      r += card(90, 990, 900, 180, toggle(50, 45, off, 'تمدید خودکار'));
+      r += cursor(mix(980, 230, ex(pr(t, tr - .6, tr))), mix(1500, 1090, ex(pr(t, tr - .6, tr))), t, tr) + head('سؤال کار خودت', pr(t, A, A + .4), 240, 92);
+      return r;
+    }
+    case 'b_priv': {
+      const tb2 = W(b, 'بانکی'), th = W(b, 'هیچ');
+      const fields = [['شماره کارت', '۶۰۳۷ •••• •••• ••••'], ['رمز دوم', '••••••'], ['کد ملی', '••••••••••']];
+      r += card(90, 380, 900, 620, fields.map((f, i) => { const k = pr(t, tb2 - .3 + i * .25, tb2 + i * .25); return `<div class="a" style="left:50px;right:50px;top:${50 + i * 180}px;height:140px;border-radius:30px;background:#EFE9E0;opacity:${cl(k * 4).toFixed(2)}"><div style="position:absolute;right:30px;top:20px;font:900 38px V;color:#7A8494">${f[0]}</div><div dir="ltr" style="position:absolute;left:30px;top:70px;font:900 46px V;color:${INK}">${f[1]}</div></div>`; }).join(''));
+      if (t > th - .1) r += `<div class="a" style="left:300px;top:560px;padding:14px 46px 26px;border:12px solid #E5322D;border-radius:24px;color:#E5322D;font:900 110px V;background:rgba(255,255,255,.9);transform:rotate(-7deg) scale(${mix(1.8, 1, ex(pr(t, th - .1, th + .25))).toFixed(3)})">ننویس</div>`;
+      r += coin(840, 1150, 100, '🔒', pr(t, A + .2, A + .5), INK, 90) + chip(110, 1110, 'تو هیچ چت‌باتی', ACC, '#fff', 60, pr(t, th, th + .3)) + head('اطلاعات حساس؟', pr(t, A, A + .4), 220, 92);
+      return r;
+    }
+    case 'b_ask': {
+      const tq = W(b, 'چقدر'), tc = W(b, 'کامنت'), ts = W(b, 'بفرست'), ky = pr(t, tc + .1, tc + 1.1);
+      r += pulse(540, 440, 120, u) + coin(540, 440, 120, '؟', pr(t, A, A + .4), ACC, 120);
+      [['۳۴۷ هزار', 0], ['۸۳۷ هزار', .3], ['هیچی، مجانی', .6]].forEach(([c, d], i) => { r += chip(150 + (i % 2) * 60, 640 + i * 130, c, '#fff', INK, 62, pr(t, tq - .1 + d, tq + .2 + d)); });
+      r += card(110, 1060, 860, 120, `<div class="a" style="right:40px;top:30px;font:900 50px V;color:${INK}">${'من ماهی ۳۴۷ می‌دم'.slice(0, Math.round(17 * cl(ky)))}${ky > 0 && ky < 1 ? '▌' : ''}</div><div class="a" style="left:24px;top:18px;padding:10px 26px 18px;border-radius:30px;background:${ky >= 1 ? ACC : '#D9D3CA'};color:#fff;font:900 44px V">ارسال</div>`);
+      r += chip(90, 1220, 'بفرست برای کسی که تازه بسته خریده ↗', INK, '#fff', 46, pr(t, ts - .1, ts + .25)) + head('تو چقدر می‌دی؟', pr(t, A, A + .4), 220);
+      return r;
+    }
+  }
+  return null;
+}
+
 function endCard(u) {
   const k = ex(pr(u, 0, .5)), q = (S.end_text || '').replace(/\*([^*]+)\*/g, `<span style="color:${ACC}">$1</span>`);
   let pul = ''; for (let i = 0; i < 3; i++) { const ph = ((u * .7 + i / 3) % 1); pul += `<circle cx="540" cy="620" r="${160 + 220 * ph}" fill="none" stroke="${ACC}" stroke-width="${8 * (1 - ph) + 1}" opacity="${(1 - ph).toFixed(2)}"/>`; }
-  return `<svg class="a" style="left:0;top:0" width="1080" height="1920">${pul}</svg>` + photoRing('h6.jpg', 540, 620, mix(60, 170, k), 1.1, '45% 30%') +
+  return `<svg class="a" style="left:0;top:0" width="1080" height="1920">${pul}</svg>` + photoRing(S.end_img || 'h6.jpg', 540, 620, mix(60, 170, k), 1.1, '45% 30%') +
     C(860, (S.brand || ''), 96, INK, `direction:ltr;opacity:${pr(u, .1, .5)}`) + C(1000, q, 84, INK, `opacity:${pr(u, .3, .7)}`) +
-    C(1140, S.end_sub || '', 56, ACC, `direction:ltr;opacity:${pr(u, .5, .9)}`) + C(1250, (S.handle || '').replace('@', '').toUpperCase(), 44, '#7A8494', `direction:ltr;letter-spacing:4px;opacity:${pr(u, .7, 1)}`) + ['۱ رفتم', '۲ موندم', '۳ نیمه‌رفته'].map((c, i) => chip(110 + i * 300, 1330, c, '#fff', INK, 50, pr(u, .8 + i * .2, 1.1 + i * .2))).join('');
+    C(1140, S.end_sub || '', 56, ACC, `direction:ltr;opacity:${pr(u, .5, .9)}`) + C(1250, (S.handle || '').replace('@', '').toUpperCase(), 44, '#7A8494', `direction:ltr;letter-spacing:4px;opacity:${pr(u, .7, 1)}`) + (S.end_chips || ['۱ رفتم', '۲ موندم', '۳ نیمه‌رفته']).map((c, i) => chip(S.end_chips ? 220 : 110 + i * 300, S.end_chips ? 1330 + i * 110 : 1330, c, '#fff', INK, 50, pr(u, .8 + i * .2, 1.1 + i * .2))).join('');
 }
 function seek(t) {
   if (!B.length) return;
