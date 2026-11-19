@@ -71,17 +71,17 @@ def active(T, kinds, span):
 # ---------------------------------------------------------------- shots: moves and entries
 MAHDI_IMGS = {'m1', 'm2', 'm3', 'm4', 'A4', 'A7', 'A10', 'A11', 'B3', 'B5', 'B9', 'B12', 'C2', 'C3', 'C4', 'C5', 'C6', 'C9', 'C12', 'A9', 'B1', 'B7'}
 MOVES = ['in', 'panL', 'out', 'arc', 'tiltU', 'in', 'panR', 'outarc', 'tiltD']
-tags = 0
 for i, s in enumerate(SH):
     d = s['end'] - s['start']; prev = SH[i - 1] if i else None
     s['move'] = 'push' if d < 2.0 else MOVES[i % len(MOVES)]
-    if s['img'] in MAHDI_IMGS: s['entry'] = 'focus'
+    if s.get('sub', 0) > 0: s['move'] = 'close' if s['sub'] % 2 else 'wide'      # same image, new framing
+    if s.get('sub', 0) > 0: s['entry'] = 'cut'
+    elif s.get('mahdi') or s['img'] in MAHDI_IMGS: s['entry'] = 'focus'
     elif i > 1 and (prev['end'] - prev['start'] < 1.7 or d < 1.7): s['entry'] = 'whip'
     elif i and i % 5 == 0: s['entry'] = 'zoomblur'
     else: s['entry'] = 'cut'
     s['whipdir'] = 1 if i % 2 else -1
-    s['tag'] = s['img'].startswith('m') and tags < 2
-    if s['tag']: tags += 1
+    s['tag'] = bool(s.get('tag'))
     s['leak'] = s['entry'] == 'focus' or i == 0
 SH_START = [s['start'] for s in SH]
 
@@ -252,6 +252,8 @@ def camera(T, s, i):
     elif m in ('tiltU', 'tiltD'): sc = 1.14; ty = (1 if m == 'tiltU' else -1) * (0.5 - u) * 0.8 * (sc - 1) * H
     elif m == 'arc': sc = 1.06 + 0.07 * u; rot = -1.4 + 2.8 * u; tx = (u - 0.5) * 40
     elif m == 'outarc': sc = 1.15 - 0.08 * u; rot = 1.2 - 2.4 * u
+    elif m == 'close': sc = 1.30 + 0.06 * u; ty = 0.30 * (sc - 1) * H; tx = (u - 0.5) * 30
+    elif m == 'wide': sc = 1.10 - 0.05 * u; tx = (0.5 - u) * 0.6 * (sc - 1) * W
     # entries
     e, blur, mblur = s['entry'], 0.0, 0
     if e == 'whip' and dt < 0.22:
