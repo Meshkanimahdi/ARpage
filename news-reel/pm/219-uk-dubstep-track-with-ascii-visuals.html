@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — bass-hit geometry (prompt 219)</title>
+<!-- Skill motion-graphy-2026, prompt 219 "UK dubstep track with ASCII visuals" (MUSIC), built as its own engine (RUNBOOK §00.24).
+     Kept from the prompt: bold geometric shapes and type in TWO colours, hit hard by the bass; every visual move comes from
+     the music grid at 140 BPM — kicks (every beat) punch scale, snares (beats 2 and 4) slide, the wobble (1/8 notes) bends
+     widths; intro → build that tightens → drop on a downbeat → short outro; holds never longer than half a second.
+     Banned (kept): particle bursts, glows, lens flares, camera shake, RGB split, crossfades, generic gradients, bouncy easing.
+     Allowed edits (page standard): 30 s → the voiced length; 1080x1080 → 1080x1920; the code-written track → a library music
+     bed plus per-hit SFX cues in SCENES (the hit times stay data: BEAT grid + word keys); 60 fps → the page's 30 fps.
+     The two colours swap (ink ↔ paper) on every bar (4 beats). A halftone dot field in the ink colour sits under every shot
+     so no frame is an empty slab; dot size follows the kick envelope.
+     Data: story.json beats[{id, text, scene{type: h_hook|h_news|h_three|h_list|h_source|h_stop|h_doctor|h_ask, big?, items?}}],
+     hook_lines, end_text, end_sub, palette [paper, ink]. Pure seek(t): every style computed from t. -->
+<style>
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  :root { --p: #F2EEE4; --k: #E2412B; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
+  #root { position: absolute; inset: 0; overflow: hidden; background: var(--p); font-family: V; font-weight: 900; color: var(--k); }
+  #stage { position: absolute; inset: 0; }
+  .t { position: absolute; left: 0; right: 0; text-align: center; line-height: 1.05; white-space: nowrap; }
+  .a { position: absolute; white-space: nowrap; }
+  #sub { position: absolute; left: 60px; right: 60px; top: 1500px; height: 130px; display: flex; align-items: center; justify-content: center; }
+  #sub .ln { font: 900 60px/1.3 V; white-space: nowrap; background: var(--k); color: var(--p); padding: 6px 30px 18px; }
+  #sub .w { display: inline-block; margin: 0 .12em; }
+</style>
+</head>
+<body>
+<div id="root"><div id="stage"></div><div id="sub"></div></div>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const U = s => s.startsWith('/') ? s : DIR + s, $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), mix = (a, b, k) => a + (b - a) * k, pr = (t, a, b) => cl((t - a) / (b - a));
+const ex = k => 1 - Math.pow(2, -10 * cl(k));
+const fa = s => String(s).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const BPM = 140, BEAT = 60 / BPM, BAR = 4 * BEAT;
+const ISSUES = [], B = []; let S, TL, END;
+// ---- the hit data (the track's grid): kick every beat, snare on 2 and 4, wobble on eighths ----
+const kickEnv = t => Math.exp(-11 * (((t % BEAT) + BEAT) % BEAT));                     // 1 on the kick, decays
+const snareEnv = t => { const p = ((t % (2 * BEAT)) + 2 * BEAT) % (2 * BEAT); return p >= BEAT ? Math.exp(-9 * (p - BEAT)) : 0; };
+const wob = t => Math.sin(2 * Math.PI * t / (BEAT / 2));                               // wobble LFO on eighths
+const beatN = t => Math.floor(t / BEAT), barN = t => Math.floor(t / BAR);
+const K = 'var(--k)', P = 'var(--p)';
+const svg = inner => `<svg width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;left:0;top:0;overflow:visible">${inner}</svg>`;
+// halftone dot field: dot radius follows the kick; every other row offset; under every shot
+function dots(t) {
+  const r = 3 + 5 * kickEnv(t), off = (beatN(t) % 2) * 18; let d = '';
+  for (let y = 18; y < 1920; y += 36) for (let x = 18 + ((y / 36) % 2) * 18; x < 1080; x += 36) d += `<circle cx="${(x + off) % 1080}" cy="${y}" r="${r.toFixed(1)}"/>`;
+  return svg(`<g fill="${K}" opacity=".22">${d}</g>`);
+}
+// equaliser bars at the bottom edge: heights from kick + wobble (the bass you can see)
+function eq(t, y = 1440, h = 120) { let s = ''; for (let i = 0; i < 18; i++) { const v = .25 + .55 * kickEnv(t - i * .012) + .2 * (1 + wob(t + i * .05)) / 2; s += `<rect x="${30 + i * 58}" y="${(y - h * v).toFixed(1)}" width="44" height="${(h * v).toFixed(1)}" fill="${K}"/>`; } return svg(s); }
+// type that slams in on its word (scale from 1.6, exponential), punched by the kick afterwards
+const slam = (html, y, size, k, t, col = K, ltr = false) => k <= 0 ? '' : `<div class="t" ${ltr ? 'dir="ltr"' : ''} style="top:${y}px;font-size:${size}px;color:${col};transform:scale(${(mix(1.6, 1, ex(k)) * (1 + .05 * kickEnv(t))).toFixed(4)});opacity:${cl(k * 6).toFixed(2)}">${html}</div>`;
+const acc = s => s.replace(/\*([^*]+)\*/g, `<span style="background:${K};color:${P};padding:0 .14em .06em">$1</span>`);
+const plus = (cx, cy, s, th, rot, col = K) => `<g transform="rotate(${rot.toFixed(1)} ${cx} ${cy})" fill="${col}"><rect x="${cx - s / 2}" y="${cy - th / 2}" width="${s}" height="${th}"/><rect x="${cx - th / 2}" y="${cy - s / 2}" width="${th}" height="${s}"/></g>`;
+const ring = (cx, cy, r, w, col = K) => `<circle cx="${cx}" cy="${cy}" r="${Math.max(0, r).toFixed(1)}" fill="none" stroke="${col}" stroke-width="${w}"/>`;
+const box = (x, y, w, h, col = K, rot = 0) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${col}" transform="rotate(${rot} ${x + w / 2} ${y + h / 2})"/>`;
+const W = (b, s, n = 0) => { const hit = b.words.map((w, i) => [w, i]).filter(([w]) => w.w.includes(s)); if (!hit.length) { ISSUES.push(`${b.bt.id}: no word "${s}"`); return b.a + .5; } return b.wt(hit[Math.min(n, hit.length - 1)][1]); };
+// quantise a time to the next beat (visual moves land on the grid)
+const q = t => Math.ceil(t / BEAT - .001) * BEAT;
+
+function scene(b, t) {
+  const s = b.sc, A = b.a, Z = b.b, u = t - A, kE = kickEnv(t), sE = snareEnv(t), rot90 = (beatN(t) % 4) * 90 * ex(pr(t % BEAT, 0, .12));
+  let r = dots(t);
+  switch (s.type) {
+    case 'h_hook': {
+      // intro: headline on frame 0; a giant plus sign (the health mark) built from two bars that slam in on the first
+      // kicks; «۳۰۰ میلیون» lands on its word; the plus turns a quarter on every kick
+      const tn = W(b, 'سیصد'), L = S.hook_lines || ['', ''];
+      r += svg(plus(540, 900, 520 + 40 * kE, 150, (beatN(t) % 2) * 45 * ex(pr(t % BEAT, 0, .15)), K) + ring(540, 900, 330 + 30 * sE, 24));
+      r += `<div class="t" style="top:150px;font-size:110px;color:${K}">${acc(L[0])}</div><div class="t" style="top:290px;font-size:110px;color:${K}">${acc(L[1])}</div>`;
+      r += slam(`<span style="background:${P};padding:0 .2em .08em">${fa(300)} میلیون</span>`, 830, 120, pr(t, q(tn) - .05, q(tn) + .2), t);
+      r += slam('نفر در هفته', 1230, 64, pr(t, q(tn) + BEAT, q(tn) + BEAT + .2), t) + eq(t);
+      return r;
+    }
+    case 'h_news': {
+      // build: two circles, «تو» and «دکترت»; the doctor's circle grows on «جدا»; an ≠ slams between them on «یکی»
+      const tj = W(b, 'جدا'), ty = W(b, 'یکی'), tO = W(b, 'OpenAI'), kd = ex(pr(t, q(tj) - .05, q(tj) + .3));
+      r += svg(`<circle cx="300" cy="820" r="${(190 + 20 * kE).toFixed(1)}" fill="${K}"/>` + `<circle cx="790" cy="820" r="${(mix(190, 250, kd) + 20 * sE).toFixed(1)}" fill="none" stroke="${K}" stroke-width="28"/>` +
+        (t > q(ty) - .05 ? box(470, 760 + 0, 140, 34, K) + box(470, 850, 140, 34, K) + `<rect x="${530}" y="700" width="30" height="230" fill="${K}" transform="rotate(25 545 815)"/>` : ''));
+      r += `<div class="a" style="left:300px;top:790px;transform:translateX(-50%);font-size:76px;color:${P}">تو</div><div class="a" style="left:790px;top:790px;transform:translateX(-50%);font-size:70px;color:${K}">دکترت</div>`;
+      r += slam('OpenAI', 230, 120, pr(t, q(tO) - .05, q(tO) + .2), t, K, true) + slam('نسخه‌ی *جدا* برای پزشک'.replace(/\*([^*]+)\*/g, '<span style="text-decoration:underline;text-decoration-thickness:12px">$1</span>'), 400, 80, pr(t, q(tj) - .05, q(tj) + .2), t);
+      r += slam('جست‌وجوی بالینی + منبع', 1150, 60, pr(t, q(tj) + 2 * BEAT, q(tj) + 2 * BEAT + .2), t) + eq(t);
+      return r;
+    }
+    case 'h_three': {
+      // the tightening build: three squares drop one per kick and lock into a row; «۳ کار» slams on «سه»
+      const t3 = W(b, 'سه'), t0 = q(A + .1);
+      r += svg([0, 1, 2].map(i => { const k = ex(pr(t, t0 + i * BEAT, t0 + i * BEAT + .15)); return k <= 0 ? '' : box(150 + i * 290, mix(-300, 700, k) + 18 * kE * (i % 2 ? -1 : 1), 220, 220, K, rot90 * (i === 1 ? 1 : 0)); }).join(''));
+      [0, 1, 2].forEach(i => { const k = pr(t, t0 + i * BEAT + .1, t0 + i * BEAT + .2); if (k > 0) r += `<div class="a" style="left:${260 + i * 290}px;top:740px;transform:translateX(-50%);font-size:130px;color:${P};opacity:${k}">${fa(i + 1)}</div>`; });
+      r += slam('<span style="font-size:180px">۳ کار</span>', 1030, 180, pr(t, q(t3) - .05, q(t3) + .2), t) + slam('قبل از اینکه بپرسی', 300, 84, pr(t, A, A + .2), t) + eq(t);
+      return r;
+    }
+    case 'h_list': {
+      // step 1: three bars slam in on «سن / داروها / سابقه»; their widths wobble with the bass
+      const keys = [['سن', 'سن'], ['داروها', 'داروها'], ['سابقه', 'سابقه']], tc = W(b, 'کلیه');
+      r += slam('<span style="font-size:200px">۱</span>', 160, 200, pr(t, A, A + .2), t);
+      keys.forEach(([k0, lab], i) => { const tw = W(b, k0), k = ex(pr(t, q(tw) - .05, q(tw) + .15)); if (k <= 0) return; const w = 760 * k + 40 * wob(t + i * .1);
+        r += svg(box(1080 - 160 - w, 560 + i * 190, w, 140, K)) + `<div class="a" style="right:200px;top:${580 + i * 190}px;font-size:80px;color:${P}">${lab}</div>`; });
+      r += slam('بدون اینا، جواب *کلیه*'.replace(/\*([^*]+)\*/g, `<span style="text-decoration:line-through;text-decoration-thickness:10px">$1</span>`), 1180, 76, pr(t, q(tc) - .2, q(tc)), t) + eq(t);
+      return r;
+    }
+    case 'h_source': {
+      // step 2: a ring spins a quarter turn per kick around «منبع؟»; on «تکیه» the ring breaks into a cross
+      const tm = W(b, 'منبعش'), tk = W(b, 'تکیه'), brk = t > q(tk) - .05;
+      r += slam('<span style="font-size:200px">۲</span>', 160, 200, pr(t, A, A + .2), t);
+      r += svg(brk ? plus(540, 860, 520, 90, 45, K) : `<g transform="rotate(${(beatN(t) * 90 + 90 * ex(pr(t % BEAT, 0, .12))).toFixed(1)} 540 860)">${ring(540, 860, 300 + 25 * kE, 60)}<rect x="510" y="530" width="60" height="120" fill="${P}"/></g>`);
+      r += slam(brk ? '' : 'منبعش؟', 790, 130, pr(t, q(tm) - .05, q(tm) + .2), t) + slam('منبع نداشت؟ تکیه نکن', 1240, 70, pr(t, q(tk) - .05, q(tk) + .2), t) + eq(t);
+      return r;
+    }
+    case 'h_stop': {
+      // the drop (strongest moment): a diamond fills the frame on the downbeat of «نشون»; the capsule splits; colours
+      // invert on every kick; «نشون دکترت بده» slams, «نه جای دکتر» lands on «بنشونیش»
+      const tc = W(b, 'نشون'), to = W(b, 'بنشونیش'), drop = q(tc), inv = t > drop && beatN(t) % 2 === 0;
+      const fg = inv ? P : K, bgc = inv ? K : P;
+      if (t > drop) r += `<div class="a" style="left:0;top:0;width:1080px;height:1920px;background:${bgc}"></div>` + dots(t).replace(`fill="${K}"`, `fill="${fg}"`);
+      const ds = t > drop ? 720 + 60 * kE : 380 + 40 * kE, gap = t > drop ? 50 * ex(pr(t, drop, drop + .3)) + 20 * sE : 0;
+      r += svg(`<rect x="${540 - ds / 2}" y="${880 - ds / 2}" width="${ds}" height="${ds}" fill="${fg}" transform="rotate(45 540 880)"/>` +
+        `<rect x="${330 - gap}" y="820" width="200" height="140" rx="70" fill="${bgc}"/><rect x="${550 + gap}" y="820" width="200" height="140" rx="70" fill="none" stroke="${bgc}" stroke-width="22"/>`);
+      r += slam(t > drop ? 'نشون دکترت بده' : 'جوابش رو…', 1180, t > drop ? 110 : 90, pr(t, t > drop ? drop : A, (t > drop ? drop : A) + .2), t, fg);
+      r += slam('نه جای دکتر', 1330, 70, pr(t, q(to) - .05, q(to) + .2), t, fg) + slam('۳', 160, 200, pr(t, A, A + .2), t, fg);
+      return r;
+    }
+    case 'h_doctor': {
+      // outro start: a capsule (the pill) splits in two halves on «دکتر»; the halves slide on the snares
+      const td = W(b, 'دکتر'), k = ex(pr(t, q(td) - .05, q(td) + .3)), gap = 60 * k + 20 * sE;
+      r += svg(`<rect x="${200 - gap}" y="760" width="340" height="240" rx="120" fill="${K}"/><rect x="${540 + gap}" y="760" width="340" height="240" rx="120" fill="none" stroke="${K}" stroke-width="28"/>`);
+      r += slam('تصمیم دارو', 420, 110, pr(t, A, A + .2), t) + slam('با *دکتر* خودت'.replace(/\*([^*]+)\*/g, `<span style="background:${K};color:${P};padding:0 .14em .06em">$1</span>`), 1150, 100, pr(t, q(td) - .05, q(td) + .2), t) + eq(t);
+      return r;
+    }
+    case 'h_ask': {
+      // short outro: the plus returns small and pulses; the comment line types on the beat grid; recipient line on «بفرست»
+      const tc = W(b, 'کامنت'), ts = W(b, 'بفرست'), msg = 'من آخرین بار درباره‌ی سردرد پرسیدم', n = Math.floor(cl((t - q(tc)) / (BEAT / 2), 0, 99));
+      r += svg(plus(540, 640, 300 + 40 * kE, 90, rot90, K));
+      r += slam('تو آخرین بار چی پرسیدی؟', 250, 84, pr(t, A, A + .2), t);
+      if (t > q(tc)) r += `<div class="a" style="left:90px;right:90px;top:960px;padding:24px 34px 34px;border:10px solid ${K};font-size:58px;color:${K};white-space:normal">${msg.split(' ').slice(0, Math.min(6, Math.ceil(n / 1.5))).join(' ')}</div>`;
+      r += slam('بفرست برای مامان‌بابات', 1260, 74, pr(t, q(ts) - .05, q(ts) + .2), t) + eq(t);
+      return r;
+    }
+  }
+  ISSUES.push('unknown scene ' + s.type); return r;
+}
+function endCard(u, t) {
+  const qx = acc(S.end_text || '');
+  return dots(t) + svg(plus(540, 620, 360 + 40 * kickEnv(t), 110, (beatN(t) % 2) * 45, K)) +
+    `<div class="t" style="top:930px;font-size:96px;color:${K};opacity:${pr(u, .1, .4)}">${qx}</div>` +
+    `<div class="t" style="top:1080px;font-size:54px;font-weight:600;color:${K};opacity:${pr(u, .3, .6)}">${S.end_sub || ''}</div>` +
+    (S.end_chips || []).map((c, i) => `<div class="t" style="top:${1190 + i * 80}px;font-size:46px;color:${K};opacity:${pr(u, .5 + i * .2, .7 + i * .2)}">${c}</div>`).join('') +
+    `<div class="t" dir="ltr" style="top:1440px;font-size:42px;letter-spacing:6px;color:${K};opacity:${pr(u, .8, 1)}">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;
+}
+
+window.ready = (async () => {
+  S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json();
+  END = TL.total;
+  if (S.palette) { document.documentElement.style.setProperty('--p', S.palette[0]); document.documentElement.style.setProperty('--k', S.palette[1]); }
+  const shown = t => t.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/);
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) { ISSUES.push('no timing for ' + bt.id); continue; }
+    let on = false;
+    const words = shown(bt.text).map(w => { if (w.startsWith('*')) on = true; const k = on || /\*/.test(w); if (/\*[.…،؛!؟?]*$/.test(w)) on = false; return {w: w.replace(/\*/g, ''), k}; });
+    const wt = j => { const i = Math.round(cl(j / Math.max(1, words.length - 1)) * (L.words.length - 1)); return (L.words[i] || [L.start])[0]; };
+    const kis = words.map((w, i) => w.k && (i === 0 || !words[i - 1].k) ? i : -1).filter(i => i >= 0);
+    B.push({bt, sc: bt.scene || {}, L, words, wt, kt: kis.map(wt)});
+  }
+  B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'سلامت ChatGPT OpenAI 115')));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  // SCENES: a shot per accent word, snapped to the beat grid; plus one per bar so no idea holds long (the colour swap)
+  const SC = [];
+  for (const b of B) {
+    let pts = [b.a, ...b.kt.map(q).filter(h => h > b.a + .8 && h < b.b - .6)];
+    for (let x = q(b.a + BAR); x < b.b - .6; x += BAR) if (pts.every(p => Math.abs(p - x) > .7)) pts.push(x);
+    pts = [...new Set(pts.map(x => +x.toFixed(2)))].sort((p, qq) => p - qq);
+    const pal = S.sfx_palette || ['tick'];
+    pts.forEach((p, i) => SC.push({t0: p, t1: +(i + 1 < pts.length ? pts[i + 1] : b.b).toFixed(2), type: b.sc.type, bg: b.bt.id + (i ? '.' + i : ''),
+      sfx: i ? [[p, pal[(SC.length) % pal.length], .32]] : [[p, (S.sfx_open || {})[b.sc.type] || pal[b.i % pal.length], .3]]}));
+  }
+  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .1, S.sfx_end || 'hit', .5]]});
+  window.SCENES = SC;
+  for (const s of SC) if (s.t1 - s.t0 > 3.2) ISSUES.push(`idea ${s.bg} holds ${(s.t1 - s.t0).toFixed(1)} s (> 3): add a hit`);
+  seek(0);
+})();
+
+function seek(t) {
+  if (!B.length) return;
+  // the two colours swap on every bar (ink ↔ paper)
+  const sw = barN(t) % 2 === 1, R_ = document.documentElement.style, pal = S.palette || ['#F2EEE4', '#E2412B'];
+  R_.setProperty('--p', sw ? pal[1] : pal[0]); R_.setProperty('--k', sw ? pal[0] : pal[1]);
+  let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
+  const endOn = t >= TL.end_start, b = B[bi];
+  const h = endOn ? endCard(t - TL.end_start, t) : scene(b, t);
+  const st = $('stage'); if (st._h !== h) { st._h = h; st.innerHTML = h; }
+  caption(b, t, endOn);
+}
+function caption(b, t, endOn) {
+  const sub = $('sub');
+  if (endOn || t > b.L.end + .3 || (b.i === 0 && t < 1.6)) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  let j = 0; for (let qq = 0; qq < b.words.length; qq++) if (t >= b.wt(qq) - .04) j = qq;
+  const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + c0;
+  if (sub._k !== key) { sub._k = key; const lat = w => /^[A-Za-z0-9.\-&]+[،,.!?؟…؛]*$/.test(w.w);
+    sub.innerHTML = `<span class="ln">${ch.map((w, qq) => `<span class="w" data-i="${qq}" ${lat(w) ? 'dir="ltr"' : ''} style="${w.k ? 'text-decoration:underline;text-decoration-thickness:6px' : ''}">${w.w}</span>`).join(' ')}</span>`; }
+  sub.querySelectorAll('.w').forEach(el => { const tw = b.wt(c0 + +el.dataset.i); el.style.opacity = .35 + .65 * ex(pr(t, tw - .05, tw + .2)); });
+}
+window.seek = seek;
+</script>
+</body>
+</html>
