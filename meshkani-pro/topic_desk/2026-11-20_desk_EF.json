@@ -1,0 +1,249 @@
+{
+  "desks": [
+    {
+      "desk": "health_edu",
+      "topics": [
+        {
+          "headline_fa": "دستیار هوش مصنوعی پزشک حالا «ترمز ایمنی» دارد",
+          "explanation_fa": "سایت MDCalc که خیلی از پزشکان دنیا برای ماشین‌حساب‌های پزشکی ازش استفاده می‌کنند، ابزاری به اسم CrossCover را عرضه کرد. این ابزار بین پزشک و چت‌بات قرار می‌گیرد؛ قبل از ارسال، اطلاعات شناسایی بیمار را از سؤال جدا می‌کند و بعد جواب چت‌بات را با منابع پزشکی چک می‌کند. خود شرکت هم می‌گوید نبودن هشدار به این معنی نیست که جواب حتماً درست است.",
+          "why_iranians_care_fa": "خیلی از پزشک‌ها و دانشجوهای پزشکی در ایران هم برای سرعت دادن به کار از چت‌بات استفاده می‌کنند و این ابزار نشان می‌دهد دنیا دارد برای این استفاده، لایه کنترل می‌سازد.",
+          "life_angle_fa": "اگر دکترت سر ویزیت از هوش مصنوعی کمک می‌گیرد، حق داری بپرسی جواب را با چه منبعی چک کرده و اسم و مشخصاتت کجا رفته است.",
+          "mix": "news",
+          "format_hint": "کاروسل ۵ اسلایدی: سؤال پزشک ← فیلتر حریم خصوصی ← چت‌بات ← بررسی با منبع ← جواب",
+          "series_fa": "دکتر و هوش مصنوعی",
+          "ai_anchor": {
+            "what": "Launch of CrossCover, a safety layer that screens clinician questions for patient identifiers and checks AI chatbot answers against medical references",
+            "who": "MDCalc",
+            "date": "2026-11-11",
+            "url": "https://www.statnews.com/2026/11/11/mdcalc-launches-crosscover-rumble-strip-for-clinical-ai-chatbots/"
+          },
+          "sources": [
+            "https://www.statnews.com/2026/11/11/mdcalc-launches-crosscover-rumble-strip-for-clinical-ai-chatbots/",
+            "https://www.mdcalc.com/crosscover",
+            "https://www.statnews.com/2026/11/11/mdcalc-cofounder-graham-walker-on-crosscover-ai-prognosis/"
+          ]
+        },
+        {
+          "headline_fa": "جواب درست چت‌بات هم می‌تواند ضرر بزند",
+          "explanation_fa": "پژوهشگران بیمارستان کودکان فیلادلفیا (CHOP) و دانشگاه پنسیلوانیا سؤال‌های واکسن را از ChatGPT، جمینای و Claude پرسیدند. جواب‌ها از نظر علمی خیلی دقیق بود، اما بعضی جمله‌ها طوری بیان شده بود که طبق پژوهش‌ها ممکن است تمایل به واکسن زدن را کم کند. آن‌ها پیشنهاد یک استاندارد ایمنی تازه به اسم «محک رفتاری» را داده‌اند که اثر روانی جواب را هم بسنجد، نه فقط درستی‌اش را.",
+          "why_iranians_care_fa": "پدر و مادرهای ایرانی هم این روزها سؤال واکسن و داروی بچه را از چت‌بات می‌پرسند؛ این مطالعه نشان می‌دهد دقیق بودن جواب به‌تنهایی کافی نیست.",
+          "life_angle_fa": "وقتی برای تصمیم سلامتی بچه‌ات از هوش مصنوعی جواب می‌گیری، فقط درست بودنش را نبین؛ ببین آن جواب چه حسی در تو ساخت و تصمیم نهایی را با پزشک بگیر.",
+          "mix": "practice",
+          "format_hint": "ریل گفت‌وگومحور: یک سؤال واکسن، جواب چت‌بات، و توضیح اینکه کدام جمله‌اش از نظر پژوهشگران مشکل‌ساز است",
+          "series_fa": "سلامت خانواده با AI",
+          "ai_anchor": {
+            "what": "Study by CHOP's Vaccine Education Center and Penn's Message Effects Lab finds chatbot vaccine answers accurate but sometimes counterproductive; authors propose 'behavioral benchmarking'",
+            "who": "CHOP and University of Pennsylvania researchers",
+            "date": "2026-11-10",
+            "url": "https://www.statnews.com/2026/11/10/ai-health-advice-accuracy-messaging-risk-behavioral-benchmarking/"
+          },
+          "sources": [
+            "https://www.statnews.com/2026/11/10/ai-health-advice-accuracy-messaging-risk-behavioral-benchmarking/",
+            "https://www.asc.upenn.edu/news-events/news/testing-ai-against-public-healths-existing-tools",
+            "https://www.engineering.upenn.edu/stories/testing-ai-against-public-healths-existing-tools/"
+          ]
+        },
+        {
+          "headline_fa": "دانشمند هوش مصنوعی متن‌باز در نیچر مدیسن",
+          "explanation_fa": "مجله Nature Medicine مقاله‌ای درباره OpenScientist منتشر کرد؛ یک «هم‌دانشمند» هوش مصنوعی متن‌باز که سؤال پژوهشگر را می‌گیرد، مقاله‌ها را در PubMed می‌گردد، کد تحلیل می‌نویسد و اجرا می‌کند. به گفته نویسندگان، در چهار مطالعه موردی بالینی، از جمله داده‌های نشانگرهای آلزایمر، تحلیل‌هایی را در چند دقیقه انجام داد که برای انسان هفته‌ها تا ماه‌ها طول می‌کشد. کد آن با مجوز Apache 2.0 آزاد است.",
+          "why_iranians_care_fa": "چون متن‌باز و رایگان است، دانشجوهای ارشد و دکتری و آزمایشگاه‌های ایرانی که به ابزارهای گران خارجی دسترسی ندارند می‌توانند از آن استفاده کنند.",
+          "life_angle_fa": "اگر فرزندت پایان‌نامه یا پروژه پژوهشی پزشکی دارد، ابزارهای متن‌باز این‌چنینی می‌توانند بخش خسته‌کننده جست‌وجوی مقاله و تحلیل داده را کوتاه کنند؛ ولی همان مقاله تأکید دارد که کار هوش مصنوعی باید با بررسی متخصص همراه باشد.",
+          "mix": "news",
+          "format_hint": "کاروسل: «یک روز کاری OpenScientist» در ۴ مرحله: سؤال، جست‌وجوی مقاله، نوشتن کد، گزارش",
+          "series_fa": "علم با هوش مصنوعی",
+          "ai_anchor": {
+            "what": "Nature Medicine publishes OpenScientist, an open-source agentic AI co-scientist for clinical and biomedical discovery",
+            "who": "Washington University in St. Louis, Harvard Medical School and partners",
+            "date": "2026-11-16",
+            "url": "https://www.nature.com/articles/s41591-026-04808-6"
+          },
+          "sources": [
+            "https://www.nature.com/articles/s41591-026-04808-6",
+            "https://ukdri.ac.uk/publications/openscientist-evaluating-open-agentic-ai-co-scientist-accelerate-biomedical-discovery",
+            "https://scripps-ai-enablement.github.io/sci-ai-enabler/autonomous-science/systems/openscientist.html"
+          ]
+        },
+        {
+          "headline_fa": "هاروارد: بچه‌ات در چه سنی هوش مصنوعی استفاده کند؟",
+          "explanation_fa": "دانشکده آموزش هاروارد ابزار رایگانی به اسم «راهنمای هوش مصنوعی بر اساس سن» را در قالب طرح Compass منتشر کرد. این ابزار بر پایه مرور بیش از ۵ هزار پژوهش درباره رشد و یادگیری ساخته شده است. پدر و مادر سن بچه را انتخاب می‌کنند و می‌بینند پژوهش‌ها درباره اثر احتمالی هوش مصنوعی بر مهارت‌هایی که بچه در آن سن یاد می‌گیرد چه می‌گویند. سؤال اصلی‌اش این است: بچه‌ات هنوز فرصت دارد آن مهارت را خودش تمرین کند؟",
+          "why_iranians_care_fa": "در ایران هم بچه‌ها خیلی زود و بدون هیچ راهنمای رسمی، برای مشق و انشا سراغ چت‌بات می‌روند و خانواده‌ها نمی‌دانند مرز کجاست.",
+          "life_angle_fa": "قبل از اینکه به بچه‌ات بگویی «با ChatGPT مشقت را ننویس» یا «بنویس»، با این ابزار ببین در سن او کدام مهارت‌ها باید بدون کمک تمرین شوند.",
+          "mix": "practice",
+          "format_hint": "ریل راهنمای قدم‌به‌قدم استفاده از سایت Compass با زیرنویس فارسی",
+          "series_fa": "بچه‌ها و هوش مصنوعی",
+          "ai_anchor": {
+            "what": "Harvard Graduate School of Education launches the Compass Collaborative and its free 'AI Guidance by Age' matrix built on 5,000+ studies",
+            "who": "Harvard Graduate School of Education",
+            "date": "2026-11-10",
+            "url": "https://www.edweek.org/technology/harvard-taps-5-000-studies-to-show-how-ai-helps-or-hinders-learning/2026/11"
+          },
+          "sources": [
+            "https://www.edweek.org/technology/harvard-taps-5-000-studies-to-show-how-ai-helps-or-hinders-learning/2026/11",
+            "https://www.bostonglobe.com/2026/11/13/lifestyle/harvard-ai-survival-guide-parents/"
+          ]
+        },
+        {
+          "headline_fa": "پدر و مادرها جلوی گوگل: جمینای را نمی‌خواهیم",
+          "explanation_fa": "گوگل به مدرسه‌ها گفته جست‌وجو و قابلیت‌های هوش مصنوعی‌اش دیگر جدا نمی‌شوند؛ یعنی مدرسه‌ای که هوش مصنوعی را برای دانش‌آموزان ببندد، ممکن است جست‌وجوی گوگل را هم از دست بدهد. حدود ۳۰ نفر از والدین، معلمان و دانش‌آموزان شیکاگو جلوی دفتر گوگل تجمع کردند و اعتراض‌هایی در شهرهای دیگر آمریکا هم برگزار شد. مدارس دولتی شیکاگو گفته‌اند اگر لازم باشد سراغ موتور جست‌وجوی دیگری می‌روند.",
+          "why_iranians_care_fa": "مدرسه‌ها و دانش‌آموزان ایرانی هم روز به روز به گوگل و جمینای وابسته‌تر می‌شوند و اختیار خانواده‌ها در این تصمیم‌ها کم است.",
+          "life_angle_fa": "این ماجرا نشان می‌دهد خانواده‌ها می‌توانند درباره اینکه هوش مصنوعی چطور و از چه سنی وارد کلاس بچه‌ها شود نظر بدهند؛ از مدرسه بچه‌ات بپرس چه سیاستی دارد.",
+          "mix": "story",
+          "format_hint": "ریل روایی: از تصمیم گوگل تا تجمع والدین شیکاگو، با تصاویر خبری",
+          "series_fa": "بچه‌ها و هوش مصنوعی",
+          "ai_anchor": {
+            "what": "Chicago parents, educators and students protest outside Google's office over its policy tying AI features to Search for K-12 schools",
+            "who": "Illinois Families for Public Schools, Schools Beyond Screens; Google; Chicago Public Schools",
+            "date": "2026-11-11",
+            "url": "https://www.chalkbeat.org/chicago/2026/11/12/chicago-ai-protest-against-google-removal-in-school-classrooms/"
+          },
+          "sources": [
+            "https://www.chalkbeat.org/chicago/2026/11/12/chicago-ai-protest-against-google-removal-in-school-classrooms/",
+            "https://www.axios.com/local/chicago/2026/11/09/google-wont-turn-off-artificial-intelligence-overview-on-school-search",
+            "https://www.wbez.org/education/2026/11/11/what-to-know-about-cps-and-ai-as-chicago-students-risk-losing-access-to-google-search",
+            "https://techcrunch.com/2026/11/04/google-faces-backlash-for-plan-that-would-turn-off-search-for-schools-that-restrict-ai/"
+          ]
+        },
+        {
+          "headline_fa": "پرستار هوش مصنوعی‌ای که با بیمار حرف می‌زند",
+          "explanation_fa": "شرکت Lumeris دستیار هوش مصنوعی‌اش به اسم Tom را در قالب یک شرکت مستقل به اسم Tom Health راه انداخت. Tom با بیمار حرف می‌زند، کمک می‌کند خدمات لازم را پیدا کند و هر جا لازم باشد او را به کادر درمان انسانی وصل می‌کند. این شرکت می‌گوید با مراکز درمانی در ۱۴ ایالت آمریکا کار می‌کند و هدفش برای ۲۰۲۷ اضافه کردن بیش از سه میلیون بیمار است.",
+          "why_iranians_care_fa": "کمبود پزشک عمومی و صف‌های طولانی نوبت فقط مشکل آمریکا نیست؛ این مدل نشان می‌دهد پیگیری بیمار بین دو ویزیت ممکن است به هوش مصنوعی سپرده شود.",
+          "life_angle_fa": "شاید به‌زودی تماس پیگیری بعد از ویزیت یا یادآوری آزمایش پدر و مادرت را یک صدای هوش مصنوعی انجام دهد؛ خوب است بدانی کی و چطور می‌شود به انسان وصل شد.",
+          "mix": "news",
+          "format_hint": "ریل کوتاه با سناریوی یک بیمار سالمند و تماس دستیار هوش مصنوعی",
+          "series_fa": "دکتر و هوش مصنوعی",
+          "ai_anchor": {
+            "what": "Lumeris spins out Tom Health as a standalone company built around its AI care team member Tom for primary care",
+            "who": "Tom Health (spun out of Lumeris)",
+            "date": "2026-11-16",
+            "url": "https://www.statnews.com/2026/11/16/ai-company-tom-health-fix-primary-care-new-tool/"
+          },
+          "sources": [
+            "https://www.statnews.com/2026/11/16/ai-company-tom-health-fix-primary-care-new-tool/",
+            "https://www.pymnts.com/healthcare/2026/ai-startup-tom-health-cuts-er-trips-by-28/"
+          ]
+        }
+      ]
+    },
+    {
+      "desk": "creative",
+      "topics": [
+        {
+          "headline_fa": "اسپاتیفای: آهنگ جعلی را از صفحه‌ات پاک کن",
+          "explanation_fa": "اسپاتیفای ابزار «محافظت از پروفایل هنرمند» را بعد از هشت ماه آزمایش برای همه هنرمندان فعال کرد. هنرمند می‌تواند وقتی آهنگ تازه‌ای به اسمش منتشر می‌شود ایمیل بگیرد و اگر مال او نیست حذفش کند، یا حتی تنظیم کند که هیچ آهنگی بدون تأیید خودش روی صفحه‌اش نرود. اسپاتیفای می‌گوید امسال بیش از ۵۰ میلیون آهنگ «بی‌کیفیت و اسپم» را از پیشنهادهایش کنار گذاشته است.",
+          "why_iranians_care_fa": "خواننده‌ها و آهنگسازهای ایرانی که آثارشان را از طریق دیستروبیوترها در اسپاتیفای منتشر می‌کنند، به‌راحتی ممکن است قربانی آهنگ‌های جعلی با صدای ساختگی خودشان شوند.",
+          "life_angle_fa": "اگر موزیسین هستی یا آهنگ منتشر کرده‌ای، همین امروز از Spotify for Artists این گزینه را روشن کن؛ فقط بدان که آهنگ حذف‌شده ممکن است هنوز در سرویس‌های دیگر به اسمت بماند.",
+          "mix": "practice",
+          "format_hint": "کاروسل آموزشی: ۴ قدم فعال کردن Artist Profile Protection",
+          "series_fa": "هنرمند و هوش مصنوعی",
+          "ai_anchor": {
+            "what": "Spotify opens Artist Profile Protection to all artists, letting them review and remove releases misattributed to them, including AI fakes",
+            "who": "Spotify",
+            "date": "2026-11-17",
+            "url": "https://techcrunch.com/2026/11/17/spotifys-new-tool-aims-to-stop-deepfakes-from-being-attributed-to-real-artists/"
+          },
+          "sources": [
+            "https://techcrunch.com/2026/11/17/spotifys-new-tool-aims-to-stop-deepfakes-from-being-attributed-to-real-artists/",
+            "https://www.musicbusinessworldwide.com/spotify-expands-access-to-artist-profile-protection-letting-all-artists-remove-their-name-from-ai-fakes-and-other-misattributed-releases/"
+          ]
+        },
+        {
+          "headline_fa": "موسیقی‌ات را به هوش مصنوعی اجاره می‌دهی؟",
+          "explanation_fa": "استارتاپ Sonilo که بنیان‌گذارانش از کارکنان سابق تیک‌تاک هستند، با Symphonic، یکی از توزیع‌کننده‌های مستقل موسیقی، قرارداد بست. طبق این قرارداد Sonilo مدل موسیقی‌سازش را فقط با آهنگ‌های هنرمندان مستقلی آموزش می‌دهد که خودشان داوطلبانه موافقت کنند. جزئیات مالی قرارداد اعلام نشده است.",
+          "why_iranians_care_fa": "این مدل «اجازه گرفتن و پول دادن» ممکن است یک راه درآمد تازه برای آهنگسازهای مستقل باشد، از جمله ایرانی‌هایی که آثارشان را از طریق توزیع‌کننده‌های بین‌المللی منتشر می‌کنند.",
+          "life_angle_fa": "اگر آهنگ منتشر می‌کنی، قرارداد توزیع‌کننده‌ات را بخوان و ببین درباره آموزش هوش مصنوعی چه گزینه‌ای داری؛ موافقت باید انتخاب خودت باشد نه پیش‌فرض.",
+          "mix": "news",
+          "format_hint": "پست تک‌اسلایدی با نمودار ساده: آهنگ تو ← اجازه تو ← آموزش مدل ← سهم تو؟",
+          "series_fa": "هنرمند و هوش مصنوعی",
+          "ai_anchor": {
+            "what": "Sonilo signs licensing deal with Symphonic to train its AI music model on opted-in indie recordings",
+            "who": "Sonilo and Symphonic",
+            "date": "2026-11-18",
+            "url": "https://www.musicbusinessworldwide.com/11m-backed-ai-startup-sonilo-founded-by-tiktok-veterans-inks-licensing-deal-with-symphonic-to-train-its-model-on-opted-in-indie-recordings/"
+          },
+          "sources": [
+            "https://www.musicbusinessworldwide.com/11m-backed-ai-startup-sonilo-founded-by-tiktok-veterans-inks-licensing-deal-with-symphonic-to-train-its-model-on-opted-in-indie-recordings/",
+            "https://symphonic.com/ai/"
+          ]
+        },
+        {
+          "headline_fa": "سازندگان بازی: بازی بدون هوش مصنوعی بخرید",
+          "explanation_fa": "اتحادیه‌های کارکنان صنعت بازی از شش کشور اروپایی، از جمله بریتانیا، ایرلند، اسپانیا، ایتالیا، فرانسه و آلمان، هم‌زمان با نشستشان در منچستر بیانیه مشترکی علیه استفاده بی‌ضابطه از هوش مصنوعی مولد منتشر کردند. آن‌ها از استودیوها خواسته‌اند تا حد ممکن از این فناوری استفاده نکنند و اگر کردند دقیق برچسب بزنند، و از گیمرها خواسته‌اند از بازی‌هایی که بدون هوش مصنوعی ساخته شده‌اند حمایت کنند.",
+          "why_iranians_care_fa": "بازی‌سازی یکی از رشته‌های محبوب جوان‌های ایرانی است و این بیانیه نشان می‌دهد بحث شغل و اعتبار کار انسانی در این صنعت داغ شده است.",
+          "life_angle_fa": "اگر بچه‌ات می‌خواهد بازی‌ساز یا طراح کاراکتر شود، این بحث روی بازار کار آینده‌اش اثر دارد؛ مهارت‌هایی که هوش مصنوعی راحت جایگزینشان نمی‌کند ارزش بیشتری پیدا می‌کنند.",
+          "mix": "news",
+          "format_hint": "ریل با کلیپ گیم‌پلی و نقل خواسته‌های اصلی بیانیه روی صفحه",
+          "series_fa": "گیم و هوش مصنوعی",
+          "ai_anchor": {
+            "what": "Joint manifesto 'On Generative AI Usage in the Games Industry' published by European game worker unions at the Manchester summit",
+            "who": "IWGB Game Workers and five other European game worker unions",
+            "date": "2026-11-16",
+            "url": "https://www.gamedeveloper.com/production/europe-s-game-worker-unions-publish-a-manifesto-warning-against-unchecked-ai-usage"
+          },
+          "sources": [
+            "https://www.gamedeveloper.com/production/europe-s-game-worker-unions-publish-a-manifesto-warning-against-unchecked-ai-usage",
+            "https://kotaku.com/video-game-union-manifesto-calls-on-consumers-to-support-games-made-without-genai-2000757423",
+            "https://www.gamebusiness.jp/article/2026/11/17/28720.html"
+          ]
+        },
+        {
+          "headline_fa": "سازنده بازیگر هوش مصنوعی سراغ کارگردان «شیرشاه» رفت",
+          "explanation_fa": "شرکت Particle 6، سازنده بازیگر هوش مصنوعی «تیلی نوروود»، پروژه سینمایی خانوادگی «Storm Dogs» را با راب مینکاف، کارگردان مشترک «شیرشاه»، پیش می‌برد و کلیپی از آن نشان داد. داستان درباره دختر بچه‌ای است که در یک توفان از بزرگ‌ترش جدا می‌شود و پنج سگ نجاتش می‌دهند. مینکاف گفته به هوش مصنوعی به‌عنوان جایگزین خلاقیت انسانی علاقه‌ای ندارد؛ پروژه در مرحله اولیه است و تولیدش برای ۲۰۲۷ هدف‌گذاری شده است.",
+          "why_iranians_care_fa": "انیمیشن و فیلم خانوادگی پرطرفدارترین محتوای خانه‌های ایرانی است و حالا اسم‌های بزرگ هالیوود هم وارد ساخت فیلم با کمک هوش مصنوعی شده‌اند.",
+          "life_angle_fa": "فیلم‌هایی که بچه‌هایت در سال‌های آینده می‌بینند ممکن است ترکیبی از بازیگر واقعی و تصویر ساخته هوش مصنوعی باشند؛ برای انیماتورها و جلوه‌های ویژه‌کارها هم معنی‌اش تغییر مهارت‌های لازم است.",
+          "mix": "story",
+          "format_hint": "ریل روایی: از جنجال تیلی نوروود تا همکاری با کارگردان شیرشاه",
+          "series_fa": "سینما و هوش مصنوعی",
+          "ai_anchor": {
+            "what": "Particle 6, creator of AI performer Tilly Norwood, teases family feature 'Storm Dogs' with 'The Lion King' co-director Rob Minkoff",
+            "who": "Particle 6 (Eline van der Velden) and Rob Minkoff",
+            "date": "2026-11-19",
+            "url": "https://deadline.com/2026/11/tilly-norwood-creator-teases-next-storm-dogs-clip-1237228854/"
+          },
+          "sources": [
+            "https://deadline.com/2026/11/tilly-norwood-creator-teases-next-storm-dogs-clip-1237228854/",
+            "https://thewrap.com/industry-news/business/tilly-norwood-lion-king-director-rob-minkoff-new-movie"
+          ]
+        },
+        {
+          "headline_fa": "بازیگران: اول حذف دیپ‌فیک، بعد خسارت",
+          "explanation_fa": "دانکن کرابتری-آیرلند، مدیرعامل اتحادیه بازیگران آمریکا (SAG-AFTRA)، در وب‌سامیت لیسبون گفت بیشتر بازیگرانی که چهره یا صدایشان با هوش مصنوعی سوءاستفاده شده، اول می‌خواهند آن محتوا حذف شود نه اینکه خسارت بگیرند. او از لایحه NO FAKES حمایت کرد و گفت حدود ۱۰ تا ۱۵ درصد اعضای اتحادیه می‌خواهند هوش مصنوعی کلاً ممنوع شود.",
+          "why_iranians_care_fa": "در ایران هم چهره بازیگرها، خواننده‌ها و حتی آدم‌های عادی در ویدیوهای دیپ‌فیک تبلیغاتی و شوخی استفاده می‌شود و راه حذف سریع آن مهم‌ترین نیاز قربانی‌هاست.",
+          "life_angle_fa": "اگر چهره یا صدای تو یا عزیزانت در ویدیوی ساختگی پخش شد، اولویت با گزارش و حذف سریع از پلتفرم است؛ حتی بزرگ‌ترین اتحادیه بازیگران دنیا هم همین را می‌گوید.",
+          "mix": "news",
+          "format_hint": "ریل نقل‌قول‌محور با تصویر سخنران و زیرنویس فارسی",
+          "series_fa": "چهره و صدای تو",
+          "ai_anchor": {
+            "what": "SAG-AFTRA chief says AI likeness takedowns matter more to performers than damages; backs NO FAKES Act at Web Summit",
+            "who": "Duncan Crabtree-Ireland, SAG-AFTRA",
+            "date": "2026-11-12",
+            "url": "https://www.hollywoodreporter.com/business/business-news/sag-aftra-duncan-crabtree-ireland-web-summit-ai-dan-neely-1236753936/"
+          },
+          "sources": [
+            "https://www.hollywoodreporter.com/business/business-news/sag-aftra-duncan-crabtree-ireland-web-summit-ai-dan-neely-1236753936/",
+            "https://deadline.com/2026/11/sag-aftra-ai-likeness-misuse-takedown-damages-1237222661/"
+          ]
+        },
+        {
+          "headline_fa": "یونیورسال و سونی نمی‌گذارند پرونده Suno بخوابد",
+          "explanation_fa": "شرکت Suno از دادگاه خواسته بود دومین شکایت یونیورسال و سونی، که درباره بیش از ۶۰ هزار قطعه ضبط‌شده است، تا روشن شدن پرونده اول متوقف شود. دو شرکت بزرگ موسیقی با توقف کامل مخالفت کردند و هشدار دادند که این توقف ممکن است تا ۲۰۲۸ طول بکشد و مدل‌های تازه Suno در این مدت از بررسی فرار کنند. آن‌ها در عوض توقف جزئی و حفظ داده‌های آموزشی و نسخه‌های مدل را پیشنهاد داده‌اند؛ قاضی هنوز تصمیم نگرفته است.",
+          "why_iranians_care_fa": "خیلی از جوان‌های ایرانی با Suno آهنگ می‌سازند و منتشر می‌کنند؛ نتیجه این پرونده تعیین می‌کند آهنگ‌هایی که با این ابزارها ساخته می‌شوند چقدر از نظر حقوقی امن هستند.",
+          "life_angle_fa": "اگر با Suno برای تیزر، تبلیغ یا پیج‌ات آهنگ می‌سازی، بدان که وضعیت حقوقی این ابزار هنوز در دادگاه باز است؛ برای کار تجاری مهم روی آن حساب بلندمدت نکن.",
+          "mix": "news",
+          "format_hint": "کاروسل خط زمانی پرونده‌های Suno با برچسب «هنوز رأی نداده»",
+          "series_fa": "هنرمند و هوش مصنوعی",
+          "ai_anchor": {
+            "what": "Universal Music and Sony Music file partial opposition to Suno's motion to stay their second copyright lawsuit",
+            "who": "Universal Music Group, Sony Music, Suno",
+            "date": "2026-11-13",
+            "url": "https://www.musicbusinessworldwide.com/universal-and-sony-fight-sunos-bid-to-freeze-second-lawsuit-warning-its-latest-ai-models-could-escape-scrutiny-until-at-least-2028/"
+          },
+          "sources": [
+            "https://www.musicbusinessworldwide.com/universal-and-sony-fight-sunos-bid-to-freeze-second-lawsuit-warning-its-latest-ai-models-could-escape-scrutiny-until-at-least-2028/",
+            "https://www.musicbusinessworldwide.com/files/2026/11/UMG-v-Suno-memorandum.pdf",
+            "https://www.aimusicpreneur.com/ai-music-news/umg-sony-oppose-suno-motion-to-stay-v6-discovery-november-2026/"
+          ]
+        }
+      ]
+    }
+  ]
+}
