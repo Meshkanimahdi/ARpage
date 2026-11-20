@@ -1,0 +1,259 @@
+{
+ "desks": [
+  {
+   "desk": "launches",
+   "topics": [
+    {
+     "headline_fa": "OpenAI دو مدل تازه داد؛ یکی ارزون‌تر",
+     "explanation_fa": "OpenAI روز ۱۷ نوامبر دو مدل GPT-6.2 Astra و GPT-6.2 Sol را منتشر کرد. Astra برای کارهای سنگین حرفه‌ای است و Sol برای کارهای روزمره. هر دو در پلن‌های پولی ChatGPT و Codex و از طریق API در دسترس‌اند و قیمت API نسخه Astra حدود ۲۰ درصد پایین‌تر از GPT-6 Astra شده است. OpenAI به‌خاطر توانایی بالاتر در امنیت سایبری، محدودیت‌های سخت‌گیرانه‌تری روی کمک‌های پرخطر سایبری گذاشته است.",
+     "why_iranians_care_fa": "خیلی از برنامه‌نویس‌ها و تولیدکننده‌های محتوای ایرانی با واسطه و حساب خارجی از ChatGPT و API آن استفاده می‌کنند. ارزان‌تر شدن API برای کسی که هر دلارش را با نرخ آزاد می‌خرد مستقیم روی جیبش اثر دارد. ولی OpenAI رسماً به ایران سرویس نمی‌دهد و دسترسی فقط با واسطه و ریسک بسته شدن حساب است.",
+     "life_angle_fa": "اگر محصولی ساخته‌ای که روی API کار می‌کند، وقت آن است که دوباره حساب کنی کدام کار را به مدل گران و کدام را به مدل ارزان‌تر بسپاری. یک تحلیل مستقل (Artificial Analysis) هم گفته امتیاز کدنویسی تغییر چشمگیری نکرده، پس قبل از مهاجرت روی کار خودت تست کن.",
+     "mix": "news",
+     "format_hint": "کاروسل «Astra یا Sol؟ کدام به کار تو می‌آید»",
+     "series_fa": "قسمت ۱: Astra و Sol چه فرقی دارند / قسمت ۲: هزینه واقعی یک ماه API برای یک فریلنسر ایرانی",
+     "ai_anchor": {
+      "what": "Release of GPT-6.2 Astra and GPT-6.2 Sol in ChatGPT, Codex and API, with Astra API price ~20% lower than GPT-6 Astra",
+      "who": "OpenAI",
+      "date": "2026-11-17",
+      "url": "https://openai.com/index/introducing-gpt-6-2-astra-sol"
+     },
+     "sources": [
+      "https://openai.com/index/introducing-gpt-6-2-astra-sol",
+      "https://9to5mac.com/2026/11/17/openai-upgrades-chatgpt-and-codex-with-new-gpt-6-2-astra-and-sol-models/",
+      "https://the-decoder.com/openai-launches-gpt-6-2-astra-and-sol-with-lower-api-prices-and-some-benchmark-gains/",
+      "https://www.digitaltrends.com/computing/openai-gpt-6-2-astra-sol-launch/"
+     ]
+    },
+    {
+     "headline_fa": "گوگل مدل وسطی‌اش را به جنگ رقبا فرستاد",
+     "explanation_fa": "گوگل ۱۸ نوامبر Gemini 4 Neon را معرفی کرد؛ مدل میانی خانواده Gemini 4 که بین Hydrogen سریع و Carbon سنگین قرار می‌گیرد. پنجره متنی‌اش یک میلیون توکن است و قیمت API آن ۳ دلار برای هر میلیون توکن ورودی و ۱۵ دلار برای خروجی اعلام شده است. این مدل برای مشترکان AI Pro و Ultra در اپ Gemini، در Antigravity و در نسخه پولی Gemini API فعال شده و در پلن رایگان API نیست.",
+     "why_iranians_care_fa": "رقابت سه شرکت بزرگ روی «مدل میانی» یعنی کیفیت نزدیک به بهترین‌ها با قیمت کمتر. برای استارتاپ ایرانی که هزینه API را با دلار آزاد می‌دهد، همین تفاوت قیمت تعیین می‌کند محصول سود می‌دهد یا نه. البته Gemini رسماً در ایران در دسترس نیست.",
+     "life_angle_fa": "گوگل در جدول خودش Neon را کمی بالاتر از Claude Opus 5.5 و GPT-6.2 Sol نشان داده، اما این عددها را خود گوگل منتشر کرده است. درس عملی برای کسب‌وکار: به یک مدل قفل نشو. کدت را طوری بنویس که عوض کردن مدل یک خط تغییر باشد.",
+     "mix": "news",
+     "format_hint": "پست تک‌تصویر: جدول قیمت سه مدل میانی",
+     "series_fa": "",
+     "ai_anchor": {
+      "what": "Gemini 4 Neon released: mid-tier Gemini 4 model with 1M-token context, $3/$15 per million tokens",
+      "who": "Google DeepMind",
+      "date": "2026-11-18",
+      "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/"
+     },
+     "sources": [
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/",
+      "https://9to5google.com/2026/11/18/gemini-4-neon-announcement/",
+      "https://www.digitaltrends.com/computing/google-says-gemini-4-neon-can-hang-with-claude-opus-5-5-and-gpt-6-2-sol-for-less/"
+     ]
+    },
+    {
+     "headline_fa": "Gemini رایگان یه‌شبه باهوش‌تر شد",
+     "explanation_fa": "گوگل ۱۲ نوامبر Gemini 4 Hydrogen را منتشر کرد؛ مدل سریع و کم‌هزینه خانواده Gemini 4 برای کدنویسی و کارهای روزمره که جای Gemini 3.8 Flash را می‌گیرد. کاربران رایگان اپ Gemini نمی‌توانند دستی انتخابش کنند، ولی وقتی حالت انتخاب خودکار مدل تشخیص بدهد، سؤالشان با Hydrogen جواب داده می‌شود. این مدل به جست‌وجوی گوگل و Gemini API هم آمده است.",
+     "why_iranians_care_fa": "بیشتر کاربران ایرانی پولی برای اشتراک هوش مصنوعی نمی‌دهند، چون پرداخت ارزی سخت است. وقتی مدل نسخه رایگان بهتر می‌شود، کیفیت ابزار مجانی‌شان هم بالا می‌رود. صادقانه بگوییم: Gemini رسماً برای ایران فعال نیست و بدون ابزار تغییر IP باز نمی‌شود.",
+     "life_angle_fa": "تمرین عملی برای اینکه از نسخه رایگان بیشترین استفاده را ببری: ۱) در اپ Gemini حالت انتخاب مدل را روی خودکار بگذار. ۲) یک کار واقعی بده، مثلاً «این متن آگهی استخدام را بخوان و بگو کدام مهارت‌هایش را در رزومه‌ام ندارم» و رزومه‌ات را پیوست کن. ۳) جواب را با همین سؤال در یک ابزار دیگر مقایسه کن. ۴) هر جا عدد یا اسم آورد، خودت چک کن. ۵) سؤال‌های خوب را در یک فایل نگه دار تا دفعه بعد سریع‌تر برسی.",
+     "mix": "practice",
+     "format_hint": "ریلز آموزشی با ضبط صفحه گوشی",
+     "series_fa": "",
+     "ai_anchor": {
+      "what": "Gemini 4 Hydrogen launched; free Gemini app users get it via automatic model selection; replaces Gemini 3.8 Flash",
+      "who": "Google",
+      "date": "2026-11-12",
+      "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-hydrogen/"
+     },
+     "sources": [
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-hydrogen/",
+      "https://9to5google.com/2026/11/12/gemini-4-hydrogen/",
+      "https://interestingengineering.com/ai-robotics/google-gemini-4-hydrogen-coding-benchmark",
+      "https://notebookcheck.net/gemini-4-hydrogen-what-free-users-and-google-ai-plus-get.1449493.0.html"
+     ]
+    },
+    {
+     "headline_fa": "یک مدل، دو اسم: Fable برای همه، Mythos برای خواص",
+     "explanation_fa": "آنتروپیک ۹ نوامبر Claude Fable 5.2 و Claude Mythos 5.2 را منتشر کرد. به گفته خود شرکت این دو یک مدل‌اند و فقط سطح دسترسی‌شان فرق دارد: Fable با محافظ‌های امنیت سایبری و زیستی برای همه کاربران پولی است و Mythos فقط برای سازمان‌های تأییدشده در برنامه‌های علوم زیستی و امنیت سایبری. قیمت API نسخه Fable، ۸ دلار برای هر میلیون توکن ورودی و ۴۰ دلار برای خروجی اعلام شده است.",
+     "why_iranians_care_fa": "این مدل نشان می‌دهد آینده هوش مصنوعی «لایه‌لایه» است: قوی‌ترین نسخه را فقط به سازمان‌های تأییدشده می‌دهند. کاربر و شرکت ایرانی تقریباً هیچ‌وقت در فهرست تأییدشده‌ها نیست. Claude هم رسماً در ایران در دسترس نیست.",
+     "life_angle_fa": "اگر متخصص امنیت یا پژوهشگر زیستی هستی، بدان که بهترین ابزارهای حوزه‌ات پشت درِ احراز هویت سازمانی می‌روند. یعنی فاصله ابزار بین تو و همکار خارجی‌ات ممکن است بیشتر شود، نه کمتر. بهتر است روی مدل‌های باز و مهارت‌هایی که به یک شرکت خاص وابسته نیستند هم سرمایه‌گذاری کنی.",
+     "mix": "news",
+     "format_hint": "ریلز توضیحی با استعاره «یک ماشین، دو سوئیچ»",
+     "series_fa": "",
+     "ai_anchor": {
+      "what": "Claude Fable 5.2 (generally available, with safeguards) and Claude Mythos 5.2 (vetted organizations) released; same underlying model",
+      "who": "Anthropic",
+      "date": "2026-11-09",
+      "url": "https://www.anthropic.com/news/claude-fable-and-mythos-5-2"
+     },
+     "sources": [
+      "https://www.anthropic.com/news/claude-fable-and-mythos-5-2",
+      "https://sdtimes.com/ai/anthropic-introduces-claude-fable-5-2-mythos-5-2/",
+      "https://www.constellationr.com/insights/news/anthropic-releases-mythos-52-fable-52"
+     ]
+    },
+    {
+     "headline_fa": "ویس‌های طولانی رو با هوش مصنوعی متن کن",
+     "explanation_fa": "ElevenLabs روز ۱۰ نوامبر دو مدل تبدیل گفتار به متن معرفی کرد: Scribe v3 برای فایل‌های ضبط‌شده و Scribe v3 Live برای صدای زنده. شرکت می‌گوید Scribe v3 حدود ۲۷ درصد خطای کمتر از نسخه قبل دارد و ۱۰۲ زبان را پوشش می‌دهد. نسخه Live یک حالت چندزبانه هم دارد برای گفت‌وگوهایی که وسط جمله زبان عوض می‌کنند.",
+     "why_iranians_care_fa": "ما ایرانی‌ها قهرمان ویس‌های طولانی تلگرام و واتس‌اپ هستیم؛ از جلسه کاری تا کلاس آنلاین و مصاحبه. ElevenLabs فارسی را در فهرست زبان‌های تبدیل گفتار به متنش دارد، هرچند عدد دقت فارسی نسخه v3 را منتشر نکرده است. این سرویس رسماً برای ایران نیست و پرداخت ارزی می‌خواهد.",
+     "life_angle_fa": "تمرین عملی: ۱) یک ویس یا فایل ضبط جلسه کوتاه (۲ تا ۳ دقیقه) انتخاب کن که اطلاعات محرمانه ندارد. ۲) در بخش Speech to Text سایت ElevenLabs آپلودش کن و زبان را فارسی بگذار. ۳) متن خروجی را با صدای اصلی مقایسه کن و ببین اسم‌ها و اعداد را درست نوشته یا نه. ۴) متن را به یک چت‌بات بده و بخواه «خلاصه و فهرست کارهای بعدی» بسازد. ۵) اگر خطای فارسی زیاد بود، برای کار جدی به آن تکیه نکن.",
+     "mix": "practice",
+     "format_hint": "ریلز قبل/بعد: ویس ۵ دقیقه‌ای به خلاصه ۵ خطی",
+     "series_fa": "قسمت ۱: ویس به متن / قسمت ۲: متن جلسه به فهرست کارها",
+     "ai_anchor": {
+      "what": "Scribe v3 and Scribe v3 Live speech-to-text models launched (102 languages, 27% fewer word errors claimed)",
+      "who": "ElevenLabs",
+      "date": "2026-11-10",
+      "url": "https://elevenlabs.io/blog/scribe-v3"
+     },
+     "sources": [
+      "https://elevenlabs.io/blog/scribe-v3",
+      "https://runtimewire.com/article/elevenlabs-scribe-v3-live-launch",
+      "https://letsdatascience.com/news/elevenlabs-launches-scribe-v3-and-v3-live-speech-to-text-mod-82ce234a",
+      "https://elevenlabs.io/speech-to-text/persian"
+     ]
+    },
+    {
+     "headline_fa": "متن‌های Claude حالا امضای نامرئی دارن",
+     "explanation_fa": "آنتروپیک از ۳ نوامبر به متن‌هایی که چند مدل جدید Claude می‌نویسند یک واترمارک نامرئی اضافه کرد و ۱۶ نوامبر این کار را به مدل‌های قدیمی‌تر مثل Opus 4.6، Sonnet 4.5 و Haiku 4.5 هم گسترش داد. این نشانه در خود مدل گذاشته می‌شود و کاربر نمی‌تواند خاموشش کند. ابزار تشخیص آن فعلاً فقط در اختیار محدود پلیس، پژوهشگرها و رسانه‌هاست و آنتروپیک دلیل این کار را رعایت قانون هوش مصنوعی اتحادیه اروپا گفته است.",
+     "why_iranians_care_fa": "خیلی از دانشجوها، مترجم‌ها و تولیدکننده‌های محتوای ایرانی متن را با هوش مصنوعی می‌نویسند و تحویل می‌دهند. حالا بخشی از این متن‌ها ردی دارند که با چشم دیده نمی‌شود. خود آنتروپیک می‌گوید ویرایش، بازنویسی یا ترجمه می‌تواند نشانه را ضعیف یا پاک کند.",
+     "life_angle_fa": "روایت: متنی که فکر می‌کنی فقط خودت و چت‌بات دیده‌اید، یک امضای پنهان دارد. آنتروپیک می‌گوید این نشانه هیچ اطلاعاتی از کاربر لو نمی‌دهد و فقط می‌گوید متن «ممکن است» از Claude رد شده باشد. نتیجه برای مخاطب: کار هوش مصنوعی را کار خودت جا نزن؛ از آن کمک بگیر و صادقانه بگو کجا کمک گرفته‌ای.",
+     "mix": "story",
+     "format_hint": "ریلز روایی با جلوه «جوهر نامرئی»",
+     "series_fa": "",
+     "ai_anchor": {
+      "what": "Invisible text watermark extended to older Claude models (Opus 4.6, Opus 4.5, Sonnet 4.5, Haiku 4.5) with no opt-out",
+      "who": "Anthropic",
+      "date": "2026-11-16",
+      "url": "https://www.anthropic.com/news/claude-text-watermark"
+     },
+     "sources": [
+      "https://www.anthropic.com/news/claude-text-watermark",
+      "https://notebookcheck.net/Claude-now-watermarks-text-from-older-models-with-no-opt-out.1444769.0.html",
+      "https://pcworld.com/article/3214192/claude-text-watermarks-nudge-its-word-choices-should-we-care.html",
+      "https://spectrum.ieee.org/ai-watermark-text-anthropic-openai"
+     ]
+    }
+   ]
+  },
+  {
+   "desk": "agents",
+   "topics": [
+    {
+     "headline_fa": "مایکروسافت یه همکار هوش مصنوعی همیشه‌بیدار ساخت",
+     "explanation_fa": "مایکروسافت ۱۷ نوامبر در کنفرانس Ignite 2026 از Autopilot رونمایی کرد؛ یک ایجنت شخصی که هدف را می‌گیرد و حتی وقتی لپ‌تاپ بسته است در فضای ابری روی آن کار می‌کند. هر Autopilot هویت جداگانه در Microsoft Entra و یک مدیر انسانی دارد و تیم IT می‌تواند دسترسی‌اش را محدود یا متوقفش کند. فعلاً فقط برای مشتری‌های برنامه دسترسی زودهنگام Frontier در حال عرضه است و قیمتش اعلام نشده.",
+     "why_iranians_care_fa": "خیلی از شرکت‌های ایرانی با Office و ویندوز کار می‌کنند، هرچند معمولاً بدون لایسنس رسمی. نسخه‌های ابری Copilot به‌خاطر تحریم برای ایران در دسترس نیست. ولی وقتی بزرگ‌ترین شرکت نرم‌افزار اداری دنیا «کارمند هوش مصنوعی با شناسه کاری» می‌سازد، تعریف کار دفتری همه‌جا عوض می‌شود.",
+     "life_angle_fa": "اگر کارمند اداری هستی، کارهای تکراری‌ات مثل پیگیری تأمین‌کننده، گزارش هفتگی و جمع‌کردن اطلاعات دقیقاً همان چیزی است که Autopilot برایش ساخته شده. مهارتی که ارزش پیدا می‌کند تعریف دقیق هدف و نظارت بر کار ایجنت است، نه انجام دستی همان کار.",
+     "mix": "news",
+     "format_hint": "ریلز «یک روز کاری با همکاری که نمی‌خوابد»",
+     "series_fa": "",
+     "ai_anchor": {
+      "what": "Microsoft Copilot Autopilot: always-on personal agent with its own Entra Agent ID, rolling out to Frontier customers",
+      "who": "Microsoft",
+      "date": "2026-11-17",
+      "url": "https://siliconangle.com/2026/11/18/at-ignite-2026-microsoft-reinvents-copilot-as-the-autonomous-engine-of-enterprise-work/"
+     },
+     "sources": [
+      "https://siliconangle.com/2026/11/18/at-ignite-2026-microsoft-reinvents-copilot-as-the-autonomous-engine-of-enterprise-work/",
+      "https://rcpmag.com/articles/2026/11/17/microsoft-ignite-2026-nadella-makes-the-case.aspx",
+      "https://news.microsoft.com/source/asia/2026/11/18/ignite2026/?lang=zh-hant"
+     ]
+    },
+    {
+     "headline_fa": "بانک‌های آمریکا: خطای ایجنتت گردن خودته",
+     "explanation_fa": "سیتی‌بانک در به‌روزرسانی نوامبر قرارداد بانکداری آنلاینش نوشته مشتری مسئول هر کاری است که ایجنت هوش مصنوعیِ شخص ثالث با حسابش می‌کند، حتی اگر رمزش بعداً لو برود. بانک Citizens هم این هفته به مشتری‌هایش ایمیل مشابهی داده است. TechCrunch روز ۱۸ نوامبر این خبر را گزارش کرد و طبق گزارش‌ها JPMorgan و Bank of America هم از اکتبر سیاست‌های مشابهی گذاشته‌اند.",
+     "why_iranians_care_fa": "در ایران هم کم‌کم ربات‌ها و دستیارهای هوشمند به اپ‌های بانکی و پرداخت نزدیک می‌شوند. سؤالی که آمریکا امروز جوابش را داده، فردا برای ما هم مطرح است: اگر ایجنت به‌جای من اشتباه پرداخت کرد، پول را چه کسی برمی‌گرداند؟",
+     "life_angle_fa": "پیش از هر چیز بدان قانون مسئولیت در عصر ایجنت‌ها هنوز در حال نوشته شدن است و فعلاً بانک‌ها بار را روی دوش مشتری گذاشته‌اند. اگر روزی ابزاری از تو رمز یا دسترسی کامل بانکی خواست تا «کارهایت را خودکار کند»، بدان در نمونه آمریکایی، بانک مسئولیتش را قبول نکرده است.",
+     "mix": "news",
+     "format_hint": "کاروسل «اگه ایجنت اشتباه پرداخت کنه، کی جواب می‌ده؟»",
+     "series_fa": "",
+     "ai_anchor": {
+      "what": "Citi and Citizens tell customers they are responsible for actions of third-party AI agents given access to their accounts",
+      "who": "Citi / Citizens (reported by TechCrunch)",
+      "date": "2026-11-18",
+      "url": "https://techcrunch.com/2026/11/18/more-banks-says-customers-using-ai-agents-are-on-their-own-even-if-they-get-hacked/"
+     },
+     "sources": [
+      "https://techcrunch.com/2026/11/18/more-banks-says-customers-using-ai-agents-are-on-their-own-even-if-they-get-hacked/",
+      "https://www.bankingdive.com/news/citi-takes-cautious-approach-ai-agent-access/833849/",
+      "https://www.retailbankerinternational.com/newsletters/us-banks-limit-ai-agents-access/"
+     ]
+    },
+    {
+     "headline_fa": "یونایتد به ربات‌ها گفت: بلیت نخرید!",
+     "explanation_fa": "شرکت هواپیمایی یونایتد ۱۱ نوامبر اعلام کرد ایجنت‌های هوش مصنوعی شخص ثالث دیگر اجازه ندارند از اپ و سایتش بلیت رزرو کنند یا وارد حساب مسافر شوند. ایجنت‌ها هنوز می‌توانند پرواز و قیمت را جست‌وجو و نمایش بدهند، ولی خرید ممنوع است و یونایتد گفته ممکن است رزروهای ساخته‌شده با ابزارهای ممنوع را بدون اطلاع لغو کند. دلیلش را حریم خصوصی، امنیت و مقررات اعلام کرده است.",
+     "why_iranians_care_fa": "ایرانی‌ها برای سفر و مهاجرت دائم دنبال بلیت ارزان‌اند و ایده «ایجنتی که خودش بهترین بلیت را بخرد» خیلی وسوسه‌کننده است. این خبر نشان می‌دهد شرکت‌ها هم می‌توانند جلوی ایجنت‌ها را بگیرند و خرید خودکار همیشه ممکن نیست.",
+     "life_angle_fa": "روایت: ایجنت‌ها می‌خواهند به‌جای ما خرید کنند و فروشنده‌ها می‌خواهند مشتری را مستقیم ببینند. یونایتد اولین ایرلاین بزرگ آمریکایی است که علناً در این دعوا طرف گرفته است. نتیجه برای مخاطب: برای خرید مهم مثل بلیت، تصمیم آخر و پرداخت را خودت انجام بده و از ایجنت فقط برای جست‌وجو و مقایسه کمک بگیر.",
+     "mix": "story",
+     "format_hint": "ریلز روایی: دعوای ایجنت و ایرلاین",
+     "series_fa": "",
+     "ai_anchor": {
+      "what": "United Airlines blocks unauthorized third-party AI agents from booking flights and accessing customer accounts",
+      "who": "United Airlines",
+      "date": "2026-11-11",
+      "url": "https://skift.com/2026/11/11/united-airlines-moves-to-block-personal-ai-agents-from-booking-flights/"
+     },
+     "sources": [
+      "https://skift.com/2026/11/11/united-airlines-moves-to-block-personal-ai-agents-from-booking-flights/",
+      "https://www.bostonglobe.com/2026/11/11/business/united-airlines-blocks-ai-agents-booking-flights/",
+      "https://www.techrepublic.com/article/news-united-airlines-ai-agents-flight-booking-ban/",
+      "https://cbsnews.com/news/united-airlines-bans-ai-agents-booking-flights"
+     ]
+    },
+    {
+     "headline_fa": "اپل به ایجنت‌ها روی مک افسار زد",
+     "explanation_fa": "اپل در نسخه بتای macOS 27.3 که ۱۶ نوامبر گزارش شد، وقتی یک اپ هوش مصنوعی دسترسی کامل به دیسک (Full Disk Access) بخواهد، هشدار می‌دهد و پیشنهاد می‌کند دسترسی را به اپ‌ها یا پوشه‌های مشخص محدود کنی. تنظیم قبلی کنترل دستگاه هم به دو بخش جدا تقسیم شده است. اپل نصب ایجنت‌ها را ممنوع نکرده، فقط انتخاب‌ها را دقیق‌تر و هشدارها را واضح‌تر کرده است.",
+     "why_iranians_care_fa": "طراح‌ها، برنامه‌نویس‌ها و تدوینگرهای ایرانی زیادی با مک کار می‌کنند و ایجنت‌های دسکتاپی را هم امتحان می‌کنند. این ایجنت‌ها با یک کلیک می‌توانند به پیام‌ها، فایل‌های مشتری و رمزهای ذخیره‌شده دسترسی پیدا کنند.",
+     "life_angle_fa": "تمرین عملی، چه macOS 27.3 را داشته باشی چه نه: ۱) برو به System Settings و بخش Privacy & Security. ۲) Full Disk Access را باز کن و ببین چه اپ‌هایی تیک دارند. ۳) تیک هر اپ هوش مصنوعی را که واقعاً به کل دیسک نیاز ندارد بردار. ۴) بخش Accessibility را هم همین‌طور بررسی کن، چون اجازه کنترل ماوس و کیبورد آنجاست. ۵) برای ایجنت یک پوشه کاری جدا بساز و فقط فایل‌های همان پروژه را آنجا بگذار.",
+     "mix": "practice",
+     "format_hint": "ریلز آموزشی با ضبط صفحه مک",
+     "series_fa": "قسمت ۱: مک / قسمت ۲: همین بررسی روی اندروید",
+     "ai_anchor": {
+      "what": "macOS 27.3 beta warns when AI apps request Full Disk Access and splits device-control permissions",
+      "who": "Apple",
+      "date": "2026-11-16",
+      "url": "https://macrumors.com/2026/11/16/macos-27-3-full-desk-access"
+     },
+     "sources": [
+      "https://macrumors.com/2026/11/16/macos-27-3-full-desk-access",
+      "https://www.scworld.com/brief/apple-updates-macos-security-to-address-risks-from-ai-agents",
+      "https://itdaily.com/news/software/ai-agents-mac-data-macos-27-3/"
+     ]
+    },
+    {
+     "headline_fa": "انویدیا برای دانشمندها ایجنت آزمایشگاهی آورد",
+     "explanation_fa": "انویدیا ۱۶ نوامبر در کنفرانس ابررایانه SC26 بسته Nemotron for Science را معرفی کرد. این بسته مدل باز Nemotron 3.5 Super VL، یک دیتاست باز با نزدیک ۵۰ هزار سؤال استدلال شیمی به نام LitmusBench و دستورالعمل‌های آموزش را کنار هم می‌گذارد تا پژوهشگرها ایجنت علمی مخصوص رشته خودشان بسازند. آزمایشگاه ملی Argonne و مرکز ابررایانه یولیش هم گفته‌اند آن را در ایجنت‌هایشان به کار می‌برند.",
+     "why_iranians_care_fa": "دانشگاه‌ها و پژوهشگاه‌های ایرانی به مدل‌های بسته آمریکایی دسترسی رسمی ندارند. یک مدل و دیتاست باز روی هاگینگ‌فیس یعنی می‌شود آن را روی سرور خود دانشگاه اجرا کرد. ولی مدل حدود ۱۲۰ میلیارد پارامتر دارد و سخت‌افزار جدی می‌خواهد.",
+     "life_angle_fa": "اگر دانشجوی ارشد یا دکترای شیمی، مواد یا داروسازی هستی، کار پژوهشی دارد از «من و نرم‌افزار» به «من و ایجنتی که نرم‌افزار را اجرا می‌کند» تغییر می‌کند. دیتاست باز LitmusBench دست‌کم برای سنجیدن مدل‌ها در پروژه‌ات بدون سخت‌افزار سنگین هم به کار می‌آید.",
+     "mix": "news",
+     "format_hint": "کاروسل «آزمایشگاهی که ایجنت می‌چرخاند»",
+     "series_fa": "",
+     "ai_anchor": {
+      "what": "Nemotron for Science: open Nemotron 3.5 Super VL model, LitmusBench v0.2 chemistry dataset and recipes for science agents",
+      "who": "NVIDIA",
+      "date": "2026-11-16",
+      "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Introduces-Nemotron-for-Science-to-Accelerate-Discoveries-With-Agents/default.aspx"
+     },
+     "sources": [
+      "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Introduces-Nemotron-for-Science-to-Accelerate-Discoveries-With-Agents/default.aspx",
+      "https://www.hpcwire.com/2026/11/17/nvidias-nemotron-for-science-challenges-larger-ai-models-on-cost-and-accuracy/",
+      "https://www.networkworld.com/article/4250303/nvidia-expands-ai-infrastructure-push-into-high-performance-computing.html"
+     ]
+    },
+    {
+     "headline_fa": "ابزار رایگان ایجنت‌سازی ۳ میلیارد دلار شد",
+     "explanation_fa": "استارتاپ LangChain، سازنده یکی از پراستفاده‌ترین فریم‌ورک‌های متن‌باز ساخت ایجنت، ۱۳ نوامبر اعلام کرد ۳۰۰ میلیون دلار در دور C با ارزش‌گذاری ۳ میلیارد دلار جذب کرده است. رهبری این دور با CapitalG بوده است. این شرکت می‌گوید بیش از ۷ هزار سازمان از پلتفرم LangSmith آن برای مدیریت ایجنت‌ها استفاده می‌کنند.",
+     "why_iranians_care_fa": "LangChain متن‌باز است و برنامه‌نویس‌های ایرانی بدون پرداخت ارزی می‌توانند از کتابخانه‌اش استفاده کنند. این پول نشان می‌دهد بازار جهانی ساخت ایجنت جدی است و مهارت کار با این ابزارها در آگهی‌های کار ریموت هم ارزش دارد.",
+     "life_angle_fa": "اگر برنامه‌نویس پایتون یا جاوااسکریپت هستی، یاد گرفتن ساخت یک ایجنت ساده با فریم‌ورک‌های متن‌باز هزینه ارزی ندارد و یک نمونه‌کار ملموس برای رزومه است. فقط یادت باشد سرویس‌های ابری پولی این شرکت‌ها جدا هستند و ممکن است برای ایران محدودیت داشته باشند.",
+     "mix": "news",
+     "format_hint": "پست تک‌تصویر: عدد بزرگ + یک خط معنی برای برنامه‌نویس ایرانی",
+     "series_fa": "",
+     "ai_anchor": {
+      "what": "LangChain raises $300M Series C at $3B valuation led by CapitalG",
+      "who": "LangChain",
+      "date": "2026-11-13",
+      "url": "https://techcrunch.com/2026/11/13/ai-agent-startup-langchain-hits-3b-valuation/"
+     },
+     "sources": [
+      "https://techcrunch.com/2026/11/13/ai-agent-startup-langchain-hits-3b-valuation/",
+      "https://finance.yahoo.com/news/open-source-agentic-startup-langchain-221246959.html",
+      "https://www.thesaasnews.com/news/langchain-raises-300m-series-c/"
+     ]
+    }
+   ]
+  }
+ ]
+}
