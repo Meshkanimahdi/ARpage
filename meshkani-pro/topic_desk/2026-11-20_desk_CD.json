@@ -1,0 +1,256 @@
+{
+ "desks": [
+  {
+   "desk": "jobs",
+   "topics": [
+    {
+     "headline_fa": "مایکروسافت به ۶۰ هزار نفر گفت: می‌خوای بری؟",
+     "explanation_fa": "مایکروسافت اواخر اکتبر به حدود ۶۰ هزار کارمندش در آمریکا، کانادا، هند و بریتانیا پیشنهاد بازخرید داوطلبانه داد؛ یعنی حدود یک‌چهارم نیرویش. ساتیا نادلا ۱۸ نوامبر توضیح داد هدف این است که شرکت طوری بازچینی شود که همه با هوش مصنوعی کار کنند و شغل‌ها بیشتر روی مدیریت همین هوش مصنوعی متمرکز شود. خود شرکت گفته انتظار دارد کمتر از ۵ درصد پیشنهاد را بپذیرند و مهلت تصمیم اوایل دسامبر است.",
+     "why_iranians_care_fa": "بزرگ‌ترین شرکت‌های نرم‌افزاری دنیا دارند تعریف «کارمند خوب» را عوض می‌کنند و این تعریف دیر یا زود به شرکت‌های ایرانی و کارفرماهای خارجیِ فریلنسرهای ایرانی هم می‌رسد.",
+     "life_angle_fa": "اگر برنامه‌نویس، پشتیبان یا کارمند اداری هستی، سؤال کارفرمای فردا این نیست که «چه کاری بلدی»، بلکه این است که «چند ایجنت هوش مصنوعی را می‌توانی هدایت و کنترل کنی». بخشی از رزومه‌ات باید نشان بدهد کارت را با هوش مصنوعی چطور انجام می‌دهی.",
+     "mix": "news",
+     "format_hint": "ریلز خبری با تیتر درشت عدد ۶۰٬۰۰۰ و نقل‌قول نادلا",
+     "series_fa": "هوش مصنوعی و شغل ما",
+     "ai_anchor": {
+      "what": "Satya Nadella explains Microsoft's voluntary buyout offer to about 60,000 employees as a reorganization around AI-managed work",
+      "who": "Microsoft (Satya Nadella)",
+      "date": "2026-11-18",
+      "url": "https://techcrunch.com/2026/11/18/microsoft-ceo-satya-nadella-explains-why-he-asked-60k-employees-to-quit/"
+     },
+     "sources": [
+      "https://techcrunch.com/2026/11/18/microsoft-ceo-satya-nadella-explains-why-he-asked-60k-employees-to-quit/",
+      "https://www.bloomberg.com/news/articles/2026-10-26/microsoft-to-offer-buyouts-to-60-000-workers-in-latest-cost-cut",
+      "https://www.cnbc.com/2026/10/26/microsoft-msft-voluntary-buyouts.html"
+     ]
+    },
+    {
+     "headline_fa": "گلدمن‌ساکس: موج اخراج هوش مصنوعی فقط عقب افتاده",
+     "explanation_fa": "اقتصاددان‌های گلدمن‌ساکس در چشم‌انداز ۲۰۲۷ آمریکا نوشته‌اند سال ۲۰۲۶ با ترس از موج اخراج به‌خاطر هوش مصنوعی شروع شد، اما نرخ اخراج در عمل تاریخی پایین ماند. به گفته آن‌ها بازار «کم‌استخدام، کم‌اخراج» احتمالاً یک سال دیگر ادامه دارد و اثر بزرگ‌تر هوش مصنوعی بعد از آن و بیشتر در دوره‌های رکود دیده می‌شود. جوزف بریگز، اقتصاددان این بانک، برآورد کرده تا ۹ درصد نیروی کار ممکن است در دوره گذار به هوش مصنوعی جابه‌جا شود.",
+     "why_iranians_care_fa": "اقتصاد ایران همین حالا هم با رکود و تورم دست‌وپنجه نرم می‌کند. اگر منطق گلدمن درست باشد، یعنی شرکت‌ها کوچک‌سازی با هوش مصنوعی را برای روزهای سخت نگه می‌دارند، و روزهای سخت در ایران کم نیست.",
+     "life_angle_fa": "«کم‌استخدام» یعنی سخت‌ترین ضربه به تازه‌واردها و فارغ‌التحصیل‌هاست، نه کسانی که الان سر کارند. این یک سال فرصت است که قبل از رسیدن موج، مهارت کار با هوش مصنوعی را در همان شغل فعلی‌ات جا بیندازی.",
+     "mix": "news",
+     "format_hint": "کاروسل نموداری: ترس ۲۰۲۶ در برابر واقعیت، و پیش‌بینی ۲۰۲۷",
+     "series_fa": "هوش مصنوعی و شغل ما",
+     "ai_anchor": {
+      "what": "Goldman Sachs 2027 US outlook: AI layoff wave delayed, low-hire low-fire market to persist about one more year; up to 9% of workers could be displaced",
+      "who": "Goldman Sachs",
+      "date": "2026-11-16",
+      "url": "https://fortune.com/2026/11/16/why-no-ai-layoff-wave-goldman-sachs-outlook-recession-jobs/"
+     },
+     "sources": [
+      "https://fortune.com/2026/11/16/why-no-ai-layoff-wave-goldman-sachs-outlook-recession-jobs/",
+      "https://www.ibtimes.co.uk/ai-labor-disruption-goldman-sachs-forecasts-layoffs-will-displace-nine-percent-staff-globally-1827666",
+      "https://fortune.com/2026/10/22/goldman-sachs-forecast-how-many-jobs-lost-to-ai-9-percent/"
+     ]
+    },
+    {
+     "headline_fa": "جایشان را هوش مصنوعی گرفت، بعد صدایشان کردند برگردند",
+     "explanation_fa": "شرکت ارزیابی استعداد SHL در نظرسنجی از ۲۰۳۶ شاغل در آمریکا و بریتانیا به پدیده‌ای رسیده که اسمش را «بازگشت از هوش مصنوعی» گذاشته است. ۱۹.۱ درصد پاسخ‌دهنده‌های آمریکایی گفته‌اند جایشان را هوش مصنوعی گرفته و بعد همان کارفرما از آن‌ها خواسته برگردند؛ در گروه ۱۸ تا ۲۴ ساله این رقم ۲۴ درصد است. ۵۱ درصد گفته‌اند فقط با افزایش حقوق قابل‌توجه برمی‌گردند و بخشی هم تضمین کتبی امنیت شغلی و شفافیت درباره استفاده از هوش مصنوعی می‌خواهند.",
+     "why_iranians_care_fa": "در ایران هم کارفرماها دارند پشتیبانی، تولید محتوا و ترجمه را به هوش مصنوعی می‌سپارند. این داده نشان می‌دهد جایگزینی کامل آدم‌ها همیشه جواب نمی‌دهد و کیفیت کار انسانی هنوز ارزش دارد.",
+     "life_angle_fa": "اگر کارت را به خاطر هوش مصنوعی از دست دادی، پل‌ها را خراب نکن. ممکن است همان کارفرما چند ماه بعد برگردد و آن لحظه، موقعیت چانه‌زنی دست توست.",
+     "mix": "story",
+     "format_hint": "ریلز روایی: داستان کارمندی که جایش را به ربات داد و برگشت",
+     "series_fa": "هوش مصنوعی و شغل ما",
+     "ai_anchor": {
+      "what": "SHL survey finds 19.1% of US workers replaced by AI were later asked back by the same employer ('AI rebounding')",
+      "who": "SHL",
+      "date": "2026-11-09",
+      "url": "https://fortune.com/2026/11/09/ai-rebounding-20-us-workers-replaced-higher-pay-job-security/"
+     },
+     "sources": [
+      "https://fortune.com/2026/11/09/ai-rebounding-20-us-workers-replaced-higher-pay-job-security/",
+      "https://itbrief.co.uk/story/shl-survey-finds-ai-replaced-workers-are-being-rehired",
+      "https://www.peoplematters.in/amp/news/business/nearly-1-in-5-workers-laid-off-due-to-ai-are-asked-to-return-survey-finds-53098"
+     ]
+    },
+    {
+     "headline_fa": "مهارت تازه بازار کار: به هوش مصنوعی شک کن",
+     "explanation_fa": "PwC آمریکا اعلام کرد برای بیش از ۸۵ هزار کارمند و شریکش یک گواهی «تفکر انتقادی» راه می‌اندازد که از دسامبر ۲۰۲۶ شروع می‌شود و تا ژوئن ۲۰۲۷ تمام می‌شود. کارمندها در شبیه‌سازی‌ها باید خروجی‌های هوش مصنوعی، مثل ارزیابی کنترل‌های داخلی، را به چالش بکشند و نتیجه در ارزیابی عملکردشان اثر دارد. این مؤسسه کل سرمایه‌گذاری این برنامه را بیش از ۱۰۰ میلیون دلار برآورد کرده است.",
+     "why_iranians_care_fa": "حسابدارها، حسابرس‌ها و کارمندهای اداری ایرانی هم دارند گزارش و تحلیل را از ChatGPT و ابزارهای مشابه می‌گیرند. یکی از بزرگ‌ترین مؤسسه‌های حسابرسی دنیا می‌گوید ارزش اصلی نیروی انسانی، تشخیص خطای همین خروجی‌هاست.",
+     "life_angle_fa": "تمرین این هفته: ۱) یک گزارش یا جدولی که هوش مصنوعی برایت ساخته بردار. ۲) سه عدد یا ادعای کلیدی‌اش را با منبع اصلی چک کن. ۳) از خود مدل بپرس «کدام بخش این جواب احتمالاً اشتباه است و چرا؟» ۴) اختلاف‌ها را یادداشت کن. همین چک‌لیست را در مصاحبه کاری بگو؛ این دقیقاً مهارتی است که شرکت‌های بزرگ دارند برایش پول خرج می‌کنند.",
+     "mix": "practice",
+     "format_hint": "کاروسل آموزشی ۴ قدمی «چطور خروجی هوش مصنوعی را بازرسی کنیم»",
+     "series_fa": "مهارت‌های بقا در عصر هوش مصنوعی",
+     "ai_anchor": {
+      "what": "PwC US to roll out a critical-thinking certification for 85,000+ staff focused on challenging AI-generated work",
+      "who": "PwC US",
+      "date": "2026-11-09",
+      "url": "https://news.bloomberglaw.com/esg/pwc-us-to-roll-out-certification-on-critical-thinking-in-ai-era"
+     },
+     "sources": [
+      "https://news.bloomberglaw.com/esg/pwc-us-to-roll-out-certification-on-critical-thinking-in-ai-era",
+      "https://www.inc.com/andrea-olson/pwc-is-spending-100-million-to-teach-employees-critical-thinking-will-it-work/91435645",
+      "https://builtin.com/articles/pwc-launches-critical-thinking-certification-20261112"
+     ]
+    },
+    {
+     "headline_fa": "پزشک و وکیل حالا گیگ‌ورکر هوش مصنوعی‌اند",
+     "explanation_fa": "Rest of World در گزارشی تحلیلی نوشته شرکت‌هایی مثل Scale AI حالا پزشک، وکیل و دکترا استخدام می‌کنند تا برای مدل‌ها داده بسازند، جواب‌ها را رتبه‌بندی و صحت‌سنجی کنند؛ مثلاً پلتفرم Outlier به پزشکان آمریکایی تا ۱۸۰ دلار در ساعت پیشنهاد داده است. نویسنده هشدار می‌دهد این پلتفرم‌ها اول با نرخ بالا متخصص جذب می‌کنند و بعد دستمزد را پایین می‌آورند. هم‌زمان در آمریکا شکایت‌هایی علیه شرکت‌هایی مثل Mercor به اتهام قرارداد پیمانکاری به‌جای استخدام در جریان است.",
+     "why_iranians_care_fa": "ایران پر از متخصص تحصیل‌کرده با درآمد ریالی است و کار آموزش هوش مصنوعی با دستمزد دلاری وسوسه‌انگیز به نظر می‌رسد. اما این پلتفرم‌ها معمولاً پرداخت دلاری بین‌المللی دارند و به خاطر قوانین تحریم، کاربر ساکن ایران را نمی‌پذیرند یا ریسک بسته شدن حساب دارد.",
+     "life_angle_fa": "اگر پزشک، مهندس یا وکیل هستی، دانش تخصصی‌ات حالا خودش یک کالای قابل‌فروش به شرکت‌های هوش مصنوعی شده است. قبل از دل بستن به این بازار، بدان که هم مسیر دسترسی برای ایرانی‌ها بسته‌تر است و هم خود کار ثبات ندارد؛ شاید ارزشمندتر این باشد که همین تخصص را برای ساختن یا ارزیابی ابزارهای هوش مصنوعی داخلی به کار ببری.",
+     "mix": "news",
+     "format_hint": "ریلز توضیحی با مقایسه «شغل ثابت» و «گیگ آموزش هوش مصنوعی»",
+     "series_fa": "هوش مصنوعی و شغل ما",
+     "ai_anchor": {
+      "what": "Rest of World essay: AI companies recruit physicians, lawyers and PhDs as gig workers to generate and grade training data",
+      "who": "Rest of World (Scale AI / Outlier, Mercor)",
+      "date": "2026-11-19",
+      "url": "https://restofworld.org/2026/ai-jobs-skills-gig-work/"
+     },
+     "sources": [
+      "https://restofworld.org/2026/ai-jobs-skills-gig-work/",
+      "https://news.bloomberglaw.com/daily-labor-report/ai-data-trainers-suits-open-new-misclassification-fight-frontier",
+      "https://restofworld.org/2026/china-expert-ai-trainers/"
+     ]
+    },
+    {
+     "headline_fa": "پول می‌دهند که از کارهای روزمره‌ات فیلم بگیری",
+     "explanation_fa": "استارتاپ Memories.ai که بنیان‌گذارانش از پژوهشگران سابق متا هستند، پلتفرمی به نام Memories Upload راه انداخته که به آدم‌ها پول می‌دهد تا با یک دوربین کوچک پوشیدنی از کارهای دستی مثل آشپزی، چیدن قفسه و تعمیر فیلم اول‌شخص بگیرند. این ویدیوها برای آموزش ربات‌ها استفاده می‌شود. به گفته شرکت، شبکه‌اش در ماه اول بیش از یک میلیون ساعت ویدیو ضبط کرده و می‌خواهد تا مارس ۲۰۲۷ به ۱۰ میلیون ساعت برسد.",
+     "why_iranians_care_fa": "این یعنی حتی کارهای یدی و خانگی هم به داده برای آموزش ربات تبدیل شده‌اند. برای ایرانی‌ها فعلاً این بازار به خاطر تحریم و پرداخت دلاری عملاً در دسترس نیست، اما نشان می‌دهد ربات‌ها دقیقاً از روی چه شغل‌هایی دارند یاد می‌گیرند.",
+     "life_angle_fa": "اگر شغلت دستی است، مثل آشپز، تعمیرکار یا انباردار، امروز داده کار تو دارد جای دیگری جمع می‌شود تا ربات‌ها همان کار را یاد بگیرند. این زنگ خطر فوری نیست، اما یادآوری است که مهارت‌هایی مثل حل مسئله و ارتباط با مشتری را کنار مهارت دست تقویت کنی.",
+     "mix": "story",
+     "format_hint": "ریلز POV: «یک روز من، از دید دوربینی که به ربات درس می‌دهد»",
+     "series_fa": "هوش مصنوعی و شغل ما",
+     "ai_anchor": {
+      "what": "Memories.ai's Memories Upload pays gig workers to record first-person video of physical tasks for robot training",
+      "who": "Memories.ai",
+      "date": "2026-11-10",
+      "url": "https://fortune.com/2026/11/10/exclusive-in-the-race-for-robot-training-data-ex-meta-researchers-startup-turns-to-gig-workers-with-cameras/"
+     },
+     "sources": [
+      "https://fortune.com/2026/11/10/exclusive-in-the-race-for-robot-training-data-ex-meta-researchers-startup-turns-to-gig-workers-with-cameras/",
+      "https://www.therobotreport.com/memories-ai-builds-standardized-egocentric-video-pipeline/",
+      "https://cryptobriefing.com/memories-ai-launches-memories-upload-robot-training/"
+     ]
+    }
+   ]
+  },
+  {
+   "desk": "money",
+   "topics": [
+    {
+     "headline_fa": "آنتروپیک، سازنده Claude، رسماً وارد بورس شد",
+     "explanation_fa": "آنتروپیک ۱۸ نوامبر قیمت عرضه اولیه سهامش را ۸۳ دلار تعیین کرد؛ بالاتر از بازه ۷۰ تا ۷۸ دلاری که اعلام کرده بود. سهام از ۱۹ نوامبر با نماد ANT در نزدک معامله می‌شود. فورچون ارزش شرکت را با این قیمت حدود ۱.۵ تریلیون دلار گزارش کرده، و این عرضه در حالی انجام شد که سهام هوش مصنوعی از اوایل اکتبر افت کرده بودند.",
+     "why_iranians_care_fa": "خیلی از ایرانی‌ها هر روز با Claude کار می‌کنند، اما خرید مستقیم سهام آمریکایی برای ساکنان ایران به خاطر تحریم عملاً ممکن نیست و کارگزاری‌های آمریکایی حساب ایرانی باز نمی‌کنند.",
+     "life_angle_fa": "وقتی تیتر «سهم هوش مصنوعی» داغ می‌شود، تبلیغ «سرمایه‌گذاری در آنتروپیک» از طریق واسطه‌های نامعلوم هم زیاد می‌شود. واقعیت این است که مسیر قانونی و امن برای ساکن ایران تقریباً وجود ندارد؛ این خبر را بیشتر نشانه‌ای بدان از اینکه پول جهان کجا دارد می‌رود.",
+     "mix": "news",
+     "format_hint": "پست تک‌تصویر با اعداد کلیدی: قیمت، نماد، تاریخ",
+     "series_fa": "پول و هوش مصنوعی",
+     "ai_anchor": {
+      "what": "Anthropic prices its IPO at $83 per share; Class A shares begin trading on Nasdaq under ticker ANT on Nov 19",
+      "who": "Anthropic",
+      "date": "2026-11-18",
+      "url": "https://www.anthropic.com/news/anthropic-prices-initial-public-offering"
+     },
+     "sources": [
+      "https://www.anthropic.com/news/anthropic-prices-initial-public-offering",
+      "https://fortune.com/2026/11/18/anthropic-prices-ipo-83-per-share-1-5-trillion/",
+      "https://www.cnbc.com/2026/11/16/anthropic-ipo-date-price-range.html",
+      "https://thenextweb.com/news/anthropic-ipo-prices-83-share-1-5-trillion-record-raise"
+     ]
+    },
+    {
+     "headline_fa": "انویدیا رکورد زد، ولی سهمش پایین آمد",
+     "explanation_fa": "انویدیا ۱۷ نوامبر اعلام کرد درآمد فصل سوم مالی ۲۰۲۷ به ۱۱۵.۸ میلیارد دلار رسیده که ۱۰۳ درصد بیشتر از سال قبل است و ۱۰۷.۶ میلیارد دلارش از بخش مراکز داده بوده است. شرکت برای فصل بعد درآمد حدود ۱۳۰ میلیارد دلار پیش‌بینی کرده و در این پیش‌بینی روی فروش تراشه‌های مرکز داده به چین حساب نکرده است. این اولین گزارش بعد از کناره‌گیری جنسن هوانگ بود و کولت کرس به‌عنوان مدیرعامل موقت آن را ارائه کرد؛ با این حال سهام روز بعد حدود ۲.۹ درصد افت کرد.",
+     "why_iranians_care_fa": "قیمت کارت گرافیک و سرورهایی که شرکت‌ها و ماینرهای ایرانی از بازار خاکستری می‌خرند به همین تقاضای جهانی گره خورده است. حذف چین از پیش‌بینی هم نشان می‌دهد محدودیت صادرات تراشه چقدر جدی است؛ ایران حتی پشت‌سر چین در این صف ایستاده است.",
+     "life_angle_fa": "وقتی غول‌های جهان هر فصل بیش از ۱۰۰ میلیارد دلار تراشه هوش مصنوعی می‌خرند، سخت‌افزار ارزان‌تر نمی‌شود. اگر کسب‌وکارت به GPU نیاز دارد، روی سرویس‌های ابری و مدل‌های سبک‌تر حساب کن، نه روی ارزان شدن کارت گرافیک.",
+     "mix": "news",
+     "format_hint": "کاروسل عددی: درآمد، رشد، پیش‌بینی، واکنش بازار",
+     "series_fa": "پول و هوش مصنوعی",
+     "ai_anchor": {
+      "what": "NVIDIA reports Q3 fiscal 2027 revenue of $115.8B (+103% YoY); Q4 outlook $130B excluding China data center compute",
+      "who": "NVIDIA",
+      "date": "2026-11-17",
+      "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2027/default.aspx"
+     },
+     "sources": [
+      "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Third-Quarter-Fiscal-2027/default.aspx",
+      "https://www.kiplinger.com/news/live/nvidia-earnings-live-updates-and-commentary-november-2026",
+      "https://finance.yahoo.com/technology/live/nvidia-earnings-live-nvidia-posts-q3-beat-board-says-it-will-not-reinstate-jensen-huang-as-ceo-221428433.html"
+     ]
+    },
+    {
+     "headline_fa": "ایجنت‌های هوش مصنوعی خرید ارز را آزمایش کردند",
+     "explanation_fa": "واحد بلاکچینی جی‌پی‌مورگان به نام Kinexys و شرکت کره‌ای Hyundai Card در جشنواره فین‌تک سنگاپور آزمایشی را نشان دادند که در آن یک ایجنت هوش مصنوعی موجودی یورو را زیر نظر گرفت، نرخ ارز چند بانک را مقایسه کرد و از ایجنت Kinexys خواست تبدیل ارز و انتقال را انجام دهد. این فقط یک آزمایش شبیه‌سازی‌شده بود و طبق گزارش‌ها پول واقعی جابه‌جا نشد. هر ایجنت فقط در محدوده سقف‌ها و قواعد از پیش تعیین‌شده می‌تواند کار کند و مرحله پیچیده‌تر برای نیمه اول ۲۰۲۷ برنامه‌ریزی شده است.",
+     "why_iranians_care_fa": "برای ایرانی‌ها خرید ارز و حواله یعنی صرافی، واسطه، کارمزد بالا و نگرانی. در دنیای بیرون، بانک‌ها دارند همین کار را به ایجنت‌هایی می‌سپارند که خودشان بهترین نرخ را پیدا می‌کنند؛ شکاف خدمات مالی ایران با جهان از این هم بیشتر می‌شود.",
+     "life_angle_fa": "اگر صراف، حسابدار شرکت یا مسئول مالی واردات هستی، این خبر نشان می‌دهد «مقایسه نرخ و زمان‌بندی تبدیل ارز» از کارهایی است که زودتر از بقیه خودکار می‌شود. دانستن منطق این کار، یعنی سقف، قاعده و تأیید، از خود عملیات مهم‌تر می‌شود.",
+     "mix": "news",
+     "format_hint": "ریلز توضیحی با انیمیشن ساده: ایجنت در برابر صراف",
+     "series_fa": "پول و هوش مصنوعی",
+     "ai_anchor": {
+      "what": "JPMorgan's Kinexys and Hyundai Card test AI agents executing a simulated FX transaction under predefined limits",
+      "who": "JPMorgan Kinexys and Hyundai Card",
+      "date": "2026-11-18",
+      "url": "https://www.cnbc.com/2026/11/18/jpmorgan-hyundai-card-ai-agents-payments.html"
+     },
+     "sources": [
+      "https://www.cnbc.com/2026/11/18/jpmorgan-hyundai-card-ai-agents-payments.html",
+      "https://www.jpmorgan.com/payments/newsroom/hyundai-card-kinexys-agentic-payments",
+      "https://www.digitaltoday.co.kr/en/view/127416/jpmorgan-hyundai-card-validate-ai-agent-financial-transaction-technology"
+     ]
+    },
+    {
+     "headline_fa": "ویزا فروشگاه‌ها را برای مشتری‌های رباتی آماده می‌کند",
+     "explanation_fa": "ویزا ۱۷ و ۱۸ نوامبر برنامه Agentic Ready را به سمت پذیرنده‌ها گسترش داد؛ یعنی شرکت‌هایی که پرداخت را برای فروشگاه‌ها پردازش می‌کنند. بیش از ۱۴۰ شرکت، از جمله Adyen، Stripe، PayPal و Fiserv، در این مرحله عضو شده‌اند تا یاد بگیرند خریدی را که یک ایجنت هوش مصنوعی از طرف مشتری انجام می‌دهد تشخیص بدهند و با امنیت بپذیرند. آزمایش پذیرش این پرداخت‌ها از ۲۰۲۷ شروع می‌شود.",
+     "why_iranians_care_fa": "ویزا و مسترکارت در ایران کار نمی‌کنند و فروشگاه‌های اینترنتی ایرانی به این شبکه‌ها وصل نیستند. وقتی خرید جهانی به سمت ایجنت‌ها می‌رود، فروشنده ایرانی نه‌تنها از مشتری خارجی جاست، بلکه از مشتری‌های رباتی هم جا می‌ماند.",
+     "life_angle_fa": "اگر فروشگاه آنلاین داری، فردا ممکن است مشتری‌ات یک ایجنت باشد که فقط اطلاعات ساختاریافته را می‌خواند. تمرین این هفته: ۱) یکی از صفحه‌های محصولت را باز کن. ۲) چک کن قیمت دقیق، موجودی، ابعاد، جنس و شرایط ارسال به‌صورت متن نوشته شده باشد، نه فقط داخل عکس. ۳) لینک صفحه را به ChatGPT یا Gemini بده و بپرس «این محصول چیست، چند است و کی می‌رسد؟» ۴) هر جا جواب غلط یا ناقص بود، همان‌جا متن صفحه را اصلاح کن. حتی در بازار داخلی، صفحه‌ای که برای ماشین خوانا باشد زودتر دیده می‌شود.",
+     "mix": "practice",
+     "format_hint": "کاروسل آموزشی «مشتری بعدی تو ممکن است آدم نباشد»",
+     "series_fa": "پول و هوش مصنوعی",
+     "ai_anchor": {
+      "what": "Visa expands Agentic Ready program to the acceptance ecosystem with 140+ initial participants including Adyen, Stripe, PayPal and Fiserv",
+      "who": "Visa",
+      "date": "2026-11-17",
+      "url": "https://investor.visa.com/news/news-details/2026/Visa-Expands-Agentic-Ready-to-Help-Scale-Trusted-AI-Commerce-Globally/default.aspx"
+     },
+     "sources": [
+      "https://investor.visa.com/news/news-details/2026/Visa-Expands-Agentic-Ready-to-Help-Scale-Trusted-AI-Commerce-Globally/default.aspx",
+      "https://usa.visa.com/about-visa/newsroom/press-releases.releaseId.22986.html",
+      "https://finance.yahoo.com/sectors/technology/articles/visa-widens-agentic-ready-payments-120021782.html",
+      "https://paymentexpert.com/2026/11/18/visas-agentic-ecosystem-expands-ai/"
+     ]
+    },
+    {
+     "headline_fa": "کلارنا دستیاری ساخت که برایت خرید و مرجوع می‌کند",
+     "explanation_fa": "کلارنا، شرکت سوئدی «حالا بخر، بعداً پرداخت کن»، ۱۷ نوامبر همراه با گزارش فصل سومش از یک دستیار هوش مصنوعی رونمایی کرد که خرید، مرجوعی، رزرو و کارهای اداری روزمره را از داخل اپ انجام می‌دهد. فعلاً فقط گروه کوچکی از کاربران به آن دسترسی دارند و بقیه باید در فهرست انتظار ثبت‌نام کنند. به گفته شرکت، هر پرداختی که دستیار انجام می‌دهد باید توسط خود کاربر تأیید شود.",
+     "why_iranians_care_fa": "کلارنا در ایران در دسترس نیست، اما خرید قسطی در ایران با اپ‌هایی مثل دیجی‌پی و اسنپ‌پی محبوب شده است. مدلی که کلارنا می‌سازد، یعنی ترکیب اعتبار خرید با دستیار هوش مصنوعی، احتمالاً الگوی بعدی همین اپ‌های داخلی است.",
+     "life_angle_fa": "وقتی یک دستیار هم پیشنهاد خرید بدهد و هم اعتبار قسطی، خرج کردن از همیشه راحت‌تر می‌شود. قانون شخصی‌ات را از الان بنویس: هیچ خرید قسطی‌ای که یک دستیار پیشنهاد داده، بدون یک شب فکر کردن تأیید نشود.",
+     "mix": "news",
+     "format_hint": "ریلز «اگر کلارنا ایرانی بود»: مقایسه با اپ‌های قسطی داخلی",
+     "series_fa": "پول و هوش مصنوعی",
+     "ai_anchor": {
+      "what": "Klarna launches personal AI assistant for shopping, returns and bookings via waitlist, with human authorization for payments",
+      "who": "Klarna",
+      "date": "2026-11-17",
+      "url": "https://www.paymentsdive.com/news/klarna-launches-ai-concierge/875033/"
+     },
+     "sources": [
+      "https://www.paymentsdive.com/news/klarna-launches-ai-concierge/875033/",
+      "https://www.bankingdive.com/news/klarna-launches-ai-concierge/875099/",
+      "https://www.pymnts.com/earnings/2026/klarna-tests-agentic-commerce-as-card-volume-jumps-111/",
+      "https://finance.yahoo.com/technology/ai/articles/returns-restaurant-bookings-klarna-ai-142600253.html"
+     ]
+    },
+    {
+     "headline_fa": "کسب‌وکار تک‌نفره با هوش مصنوعی رونق گرفته",
+     "explanation_fa": "CNBC در ۷ نوامبر گزارش داد کسب‌وکارهای تازه‌ای که هیچ کارمندی ندارند، در دوران هوش مصنوعی شروع پرقدرتی داشته‌اند. طبق تحلیل مرکز مرکاتوس روی آمار رسمی آمریکا، درخواست ثبت این نوع کسب‌وکارها در صنایعی که بیشتر در معرض هوش مصنوعی‌اند از سه‌ماهه اول ۲۰۲۴ تا سه‌ماهه اول ۲۰۲۶ حدود ۲۶.۸ درصد رشد کرده، در حالی که در گروه مقایسه تقریباً ثابت مانده است. یکی از صاحبان این کسب‌وکارها به CNBC گفته بدون هوش مصنوعی به یک کارمند تمام‌وقت و چند پیمانکار برای عکاسی، طراحی، حسابداری و تبلیغات نیاز داشت.",
+     "why_iranians_care_fa": "در ایران هزینه استخدام و بیمه بالاست و خیلی‌ها کسب‌وکار کوچک اینستاگرامی را تنها می‌چرخانند. بیشتر ابزارهای لازم برای این مدل، از نسخه رایگان ChatGPT تا Gemini، با کمی دردسر برای ایرانی‌ها قابل استفاده‌اند.",
+     "life_angle_fa": "تمرین این هفته: ۱) فهرست کارهایی را بنویس که برایشان به آدم دیگری پول می‌دهی، مثل عکس محصول، کپشن یا حساب‌وکتاب. ۲) کنار هر کدام بنویس کدام ابزار هوش مصنوعی پیش‌نویس اولش را می‌سازد. ۳) یکی را این هفته امتحان کن و زمان و هزینه را با قبل مقایسه کن. هدف حذف آدم‌ها نیست؛ این است که پولت را برای کارهایی نگه داری که واقعاً تخصص می‌خواهند.",
+     "mix": "practice",
+     "format_hint": "کاروسل چک‌لیست «تیم یک‌نفره من»",
+     "series_fa": "پول و هوش مصنوعی",
+     "ai_anchor": {
+      "what": "CNBC report: new US no-employee small businesses off to a hot start in the AI era; Mercatus finds nonemployer-type applications in AI-exposed sectors up 26.8%",
+      "who": "CNBC / Mercatus Center",
+      "date": "2026-11-07",
+      "url": "https://www.cnbc.com/2026/11/07/americas-new-no-employee-small-business-owners-start-hot-in-ai-era.html"
+     },
+     "sources": [
+      "https://www.cnbc.com/2026/11/07/americas-new-no-employee-small-business-owners-start-hot-in-ai-era.html",
+      "https://www.mercatus.org/research/research-papers/artificial-intelligence-and-rise-independent-work"
+     ]
+    }
+   ]
+  }
+ ]
+}
