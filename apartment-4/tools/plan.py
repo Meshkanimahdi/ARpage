@@ -21,6 +21,9 @@ ROOMS = [
     ("bed1", "اتاق خواب ۱", [(9.95, 3.76), (12.9, 3.76), (12.9, 7.6), (8.96, 7.6), (8.96, 4.75)], (10.6, 5.9)),
     ("bed2", "اتاق خواب ۲", [(12.3, 2.4), (13.1, 2.4), (13.1, 1.1), (16.5, 1.1), (16.5, 4.6), (16.9, 4.6), (16.9, 5.6), (13.1, 5.6), (13.1, HS), (12.3, HS)], (14.9, 3.2)),
 ]
+# where the room names sit on the final sheet, clear of the 360 points
+FINAL_LABEL = {"living": (6.0, 1.2), "kitchen": (2.3, 0.95), "entry": (7.9, 6.2), "wc": (5.95, 5.14), "hall": (10.55, 3.1),
+               "bath": (11.13, -0.1), "bed1": (10.9, 6.6), "bed2": (14.8, 2.2)}
 # openings cut into the drawn walls: (x0, y0, x1, y1, kind)
 DOORS = [
     (7.45, 6.4, 8.45, 6.4, "front"),          # front door, bottom wall of the entry
@@ -55,10 +58,10 @@ def area(p):
     return abs(sum(p[i][0] * p[(i + 1) % len(p)][1] - p[(i + 1) % len(p)][0] * p[i][1] for i in range(len(p)))) / 2
 
 
-def main(out):
+def svg(final=False):
     o = []
     add = o.append
-    add('<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.4 -2.6 20 12.6" font-family="Vazirmatn, Tahoma, sans-serif">')
+    add('<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.4 -2.6 20 12.6" direction="rtl" font-family="Vazirmatn, Tahoma, sans-serif">')
     add('<rect x="-1.4" y="-2.6" width="20" height="12.6" fill="#ffffff"/>')
     # light well and terrace (outside the flat, sizes unknown)
     add('<rect x="13.1" y="5.76" width="3.4" height="1.84" fill="#eef3f8" stroke="#9db2c8" stroke-width="0.03" stroke-dasharray="0.12 0.08"/>')
@@ -85,18 +88,22 @@ def main(out):
         add('<line x1="%g" y1="%g" x2="%g" y2="%g" stroke="#ffffff" stroke-width="%g"/>' % (x0, y0, x1, y1, T + 0.02))
         add('<line x1="%g" y1="%g" x2="%g" y2="%g" stroke="#3f7fd0" stroke-width="0.06"/>' % (x0, y0, x1, y1))
     (cx0, cy0), (cx1, cy1) = CHAMFER
-    add('<line x1="%g" y1="%g" x2="%g" y2="%g" stroke="#d23b2a" stroke-width="0.05"/>' % (cx0, cy0, cx1, cy1))
-    add('<text x="8.75" y="3.95" font-size="0.2" text-anchor="end" fill="#d23b2a">برش مورب</text>')
+    if not final:   # the draft points the diagonal cut out in red; in the final sheet it is an ordinary wall
+        add('<line x1="%g" y1="%g" x2="%g" y2="%g" stroke="#d23b2a" stroke-width="0.05"/>' % (cx0, cy0, cx1, cy1))
+        add('<text x="8.75" y="3.95" font-size="0.2" text-anchor="start" fill="#d23b2a">برش مورب</text>')
     total = 0
     for key, name, poly, (lx, ly) in ROOMS:
         small = key in ("wc", "hall", "bath", "entry")
+        if final:               # the final sheet carries the tour points, so the names step aside
+            lx, ly = FINAL_LABEL[key]
         add('<text x="%g" y="%g" font-size="%g" font-weight="700" text-anchor="middle" fill="#1f2321">%s</text>' % (lx, ly, 0.25 if small else 0.36, name))
         if poly:
             a = area(poly) - (1.8 * 1.7 if key == "living" else 0)
             total += area(poly)
+        if poly and not (final and small):
             add('<text x="%g" y="%g" font-size="%g" text-anchor="middle" fill="#6a6f6c">≈ %s م²</text>' % (lx, ly + (0.3 if small else 0.42), 0.2 if small else 0.26, fa(round(a, 1))))
     # walk-through order from the narration
-    for x, y, n, _ in STEPS:
+    for x, y, n, _ in ([] if final else STEPS):
         add('<circle cx="%g" cy="%g" r="0.24" fill="#2e58c4"/><text x="%g" y="%g" font-size="0.28" font-weight="700" text-anchor="middle" fill="#fff">%s</text>' % (x, y, x, y + 0.1, n))
     # dimensions
     def dim(x0, y0, x1, y1, txt, off):
@@ -107,12 +114,18 @@ def main(out):
             add('<text x="%g" y="%g" font-size="0.24" text-anchor="middle" fill="#6a6f6c" transform="rotate(-90 %g %g)">%s</text>' % (x0 + off, (y0 + y1) / 2, x0 + off, (y0 + y1) / 2, txt))
     dim(0, -1.75, XE, -1.75, "≈ %s متر" % fa(XE), -0.12)
     dim(-0.7, 0, -0.7, W, "≈ %s متر" % fa(W), -0.12)
-    add('<text x="18.4" y="-2.0" font-size="0.42" font-weight="700" text-anchor="end" fill="#1f2321">پلان پیش‌نویس — برای تأیید</text>')
-    add('<text x="18.4" y="-1.5" font-size="0.25" text-anchor="end" fill="#6a6f6c">ابعاد تخمینی است · جمع تقریبی %s متر مربع · دایره‌های آبی: ترتیب مسیر در ویدئو</text>' % fa(round(total)))
+    if not final:
+        add('<text x="18.4" y="-2.0" font-size="0.42" font-weight="700" text-anchor="start" fill="#1f2321">پلان پیش‌نویس — برای تأیید</text>')
+        add('<text x="18.4" y="-1.5" font-size="0.25" text-anchor="start" fill="#6a6f6c">ابعاد تخمینی است · جمع تقریبی %s متر مربع · دایره‌های آبی: ترتیب مسیر در ویدئو</text>' % fa(round(total)))
     add('<line x1="0" y1="8.6" x2="2" y2="8.6" stroke="#1f2321" stroke-width="0.04"/><text x="1" y="9.0" font-size="0.24" text-anchor="middle" fill="#6a6f6c">۲ متر</text>')
-    add('<text x="18.4" y="8.7" font-size="0.24" text-anchor="end" fill="#6a6f6c">آبی: پنجره · قهوه‌ای: در ورودی · نارنجی: رادیاتور · خط‌چین: بازشو بدون در</text>')
+    add('<text x="18.4" y="8.7" font-size="0.24" text-anchor="start" fill="#6a6f6c">آبی: پنجره · قهوه‌ای: در ورودی · نارنجی: رادیاتور · خط‌چین: بازشو بدون در</text>')
     add("</svg>")
-    open(out, "w", encoding="utf-8").write("\n".join(o))
+    return "\n".join(o), total
+
+
+def main(out):
+    markup, total = svg()
+    open(out, "w", encoding="utf-8").write(markup)
     print(out, "total", round(total, 1))
 
 

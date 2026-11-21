@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.4 -2.6 20 12.6" font-family="Vazirmatn, Tahoma, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.4 -2.6 20 12.6" direction="rtl" font-family="Vazirmatn, Tahoma, sans-serif">
 <rect x="-1.4" y="-2.6" width="20" height="12.6" fill="#ffffff"/>
 <rect x="13.1" y="5.76" width="3.4" height="1.84" fill="#eef3f8" stroke="#9db2c8" stroke-width="0.03" stroke-dasharray="0.12 0.08"/>
 <text x="14.8" y="6.8" font-size="0.26" text-anchor="middle" fill="#5d7388">نورگیر (برآورد)</text>
@@ -60,7 +60,7 @@
 <line x1="13.4" y1="5.6" x2="14.8" y2="5.6" stroke="#ffffff" stroke-width="0.18"/>
 <line x1="13.4" y1="5.6" x2="14.8" y2="5.6" stroke="#3f7fd0" stroke-width="0.06"/>
 <line x1="9.8" y1="3.6" x2="8.8" y2="4.6" stroke="#d23b2a" stroke-width="0.05"/>
-<text x="8.75" y="3.95" font-size="0.2" text-anchor="end" fill="#d23b2a">برش مورب</text>
+<text x="8.75" y="3.95" font-size="0.2" text-anchor="start" fill="#d23b2a">برش مورب</text>
 <text x="5.6" y="1.9" font-size="0.36" font-weight="700" text-anchor="middle" fill="#1f2321">پذیرایی و نشیمن</text>
 <text x="5.6" y="2.32" font-size="0.26" text-anchor="middle" fill="#6a6f6c">≈ ۴۶٫۲ م²</text>
 <text x="2.2" y="2.2" font-size="0.36" font-weight="700" text-anchor="middle" fill="#1f2321">آشپزخانه (اپن)</text>
@@ -88,8 +88,8 @@
 <text x="5" y="-1.87" font-size="0.24" text-anchor="middle" fill="#6a6f6c">≈ ۱۰٫۰ متر</text>
 <line x1="-0.7" y1="0" x2="-0.7" y2="4.7" stroke="#9a9f9c" stroke-width="0.02"/>
 <text x="-0.82" y="2.35" font-size="0.24" text-anchor="middle" fill="#6a6f6c" transform="rotate(-90 -0.82 2.35)">≈ ۴٫۷ متر</text>
-<text x="18.4" y="-2.0" font-size="0.42" font-weight="700" text-anchor="end" fill="#1f2321">پلان پیش‌نویس — برای تأیید</text>
-<text x="18.4" y="-1.5" font-size="0.25" text-anchor="end" fill="#6a6f6c">ابعاد تخمینی است · جمع تقریبی ۹۰ متر مربع · دایره‌های آبی: ترتیب مسیر در ویدئو</text>
+<text x="18.4" y="-2.0" font-size="0.42" font-weight="700" text-anchor="start" fill="#1f2321">پلان پیش‌نویس — برای تأیید</text>
+<text x="18.4" y="-1.5" font-size="0.25" text-anchor="start" fill="#6a6f6c">ابعاد تخمینی است · جمع تقریبی ۹۰ متر مربع · دایره‌های آبی: ترتیب مسیر در ویدئو</text>
 <line x1="0" y1="8.6" x2="2" y2="8.6" stroke="#1f2321" stroke-width="0.04"/><text x="1" y="9.0" font-size="0.24" text-anchor="middle" fill="#6a6f6c">۲ متر</text>
-<text x="18.4" y="8.7" font-size="0.24" text-anchor="end" fill="#6a6f6c">آبی: پنجره · قهوه‌ای: در ورودی · نارنجی: رادیاتور · خط‌چین: بازشو بدون در</text>
+<text x="18.4" y="8.7" font-size="0.24" text-anchor="start" fill="#6a6f6c">آبی: پنجره · قهوه‌ای: در ورودی · نارنجی: رادیاتور · خط‌چین: بازشو بدون در</text>
 </svg>
