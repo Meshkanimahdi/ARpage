@@ -72,13 +72,17 @@ NODES = [
     dict(n=2, room="wc", x=5.95, y=5.6, a=180, cap="سرویس مهمان", refs=["p58", "p55", "p57", "p56"],
          note="This small room has no window and no radiator. The squat toilet pan is in the floor where the render shows the flat "
               "white rectangle, the flush tank on the wall above it; the vanity stands only in front of the dark grey panel."),
-    dict(n=3, room="living", x=7.4, y=2.5, a=180, cap="پذیرایی، رو به آشپزخانه", refs=["p49", "p10", "p09", "p04", "v17"]),
-    dict(n=4, room="living", x=4.6, y=2.2, a=0, cap="نشیمن، رو به راهرو و ورودی", refs=["p09", "p10", "p02", "p49", "v32"]),
+    dict(n=3, room="living", x=7.4, y=2.5, a=180, cap="پذیرایی، رو به آشپزخانه", refs=["p49", "p10", "p09", "p04", "v17"],
+         note="The kitchen is at the far end of this long room, about 5 m away, so it is small in the frame: exactly as small as its "
+              "blocks in the render. All three windows are on the one long wall, as wide as the render shows them."),
+    dict(n=4, room="living", x=4.6, y=2.2, a=0, cap="نشیمن، رو به راهرو و ورودی", refs=["p09", "p10", "p02", "p49", "v32"],
+         note="There is no door and no door leaf next to the kitchen: the row of cabinets ends in a plain grey stone-look panel."),
     dict(n=5, room="living", x=2.3, y=1.8, a=90, cap="آشپزخانه و در تراس", refs=["v30", "v32", "p05", "p06", "v17"]),
     dict(n=6, room="hall", x=11.2, y=3.0, a=0, cap="راهرو", refs=["p01", "p36", "p38", "p04"],
          note="Three doorways open off this corridor; what is behind each one is fixed by the render and the list above. Only the "
               "doorway whose inside is dark grey and pale grey in the render is the bathroom (stone slabs, pedestal sink). The other "
-              "two are empty bedrooms with cream painted walls: no tiles, no sink, no wardrobe visible in them from here."),
+              "two are empty bedrooms with cream painted walls: no tiles, no sink, no wardrobe visible in them from here. Between the "
+              "doorways the corridor walls are plain cream paint: no niche, no extra frame, no extra door."),
     dict(n=7, room="bath", x=11.0, y=1.45, a=-90, cap="حمام و سرویس", refs=["p38", "p50", "p46", "p37", "p47"],
          note="All four walls of this room are clad in slabs from floor to ceiling; there is no painted wall here. One floor drain."),
     dict(n=8, room="bed1", x=10.9, y=5.7, a=90, cap="اتاق خواب ۱", refs=["p07", "p19", "p18", "p03", "p17"]),
