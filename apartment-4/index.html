@@ -148,7 +148,7 @@ html, body { height: 100%; margin: 0; background: #0e1211; color: var(--hud-fg);
   function tex(n) {
     if (!texCache[n]) texCache[n] = new Promise((res) => loader.load(panoSrc(n), (t) => {
       t.encoding = THREE.sRGBEncoding; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter;
-      t.anisotropy = renderer.capabilities.getMaxAnisotropy(); res(t);
+      res(t);   // no anisotropic filtering: it smears a thin line where the panorama wraps around
     }, undefined, () => res(null)));
     return texCache[n];
   }
