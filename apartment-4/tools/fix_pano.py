@@ -37,7 +37,7 @@ def main(src, dst, x0, x1, y0, y1, what):
     im = np.roll(im, shift, 1)
     bw, bh = (x1 - x0) / 100 * W, (y1 - y0) / 100 * H
     k = float(os.environ.get("CONTEXT", "2.4"))          # how much surrounding the model sees; less = more magnification
-    cw = int(min(W, H * 16 / 9, max(bw * k, bh * k * 16 / 9, 1100))) // 2 * 2; ch = int(cw * 9 / 16)
+    cw = int(min(W, H * 16 / 9, max(bw * k, bh * k * 16 / 9, float(os.environ.get("MINW", "1100"))))) // 2 * 2; ch = int(cw * 9 / 16)
     cx, cy = W // 2, int(np.clip((y0 + y1) / 200 * H, ch / 2, H - ch / 2))
     L, T = cx - cw // 2, cy - ch // 2
     crop = im[T:T + ch, L:L + cw]
