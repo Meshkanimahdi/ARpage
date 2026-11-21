@@ -102,7 +102,9 @@ def cast(node, W):
                     k = np.clip((z - z0) / (z1 - z0), 0, 1)[..., None]
                     c = np.float32(GLASS_LOW) * (1 - k) + np.float32(GLASS_TOP) * k
                     d = 0.06 / L                  # frame and middle post
-                    fr = (s < s0 + d) | (s > s1 - d) | (z < z0 + 0.06) | (z > z1 - 0.06) | (np.abs(s - (s0 + s1) / 2) < d / 2)
+                    fr = (s < s0 + d) | (s > s1 - d) | (z < z0 + 0.06) | (z > z1 - 0.06)
+                    if z0 > 0.3:                  # a window has a middle post; a glazed door is one leaf
+                        fr |= np.abs(s - (s0 + s1) / 2) < d / 2
                     c = np.where(fr[..., None], np.float32((250, 250, 250)), c)
                     put(ok, t, i, c)
                 elif kind == "front":
