@@ -212,6 +212,7 @@ function seek(t) {
   W.setAttribute('transform', `translate(${540 - c.x * c.z} ${960 - c.y * c.z}) scale(${c.z})`);
   $('svg').style.filter = c.v > .15 ? `blur(${(c.v * 2.2).toFixed(2)}px)` : '';   // stands in for the prompt's subframe motion blur on fast moves
   let b = BEATS[0]; for (const x of BEATS) if (t >= x.a - .3) b = x;
+  if (S.paper_grid) { const st = $('stage'), gs = 44 * c.z; st.style.backgroundImage = `radial-gradient(circle, rgba(30,34,38,.5) 0 4px, transparent 5px), linear-gradient(rgba(217,101,59,.22) 3px, transparent 3px), linear-gradient(90deg, rgba(217,101,59,.22) 3px, transparent 3px)`; st.style.backgroundSize = `${gs}px ${gs}px, ${gs * 3}px ${gs * 3}px, ${gs * 3}px ${gs * 3}px`; const bi = CAM.filter(k => t >= k.t + .45).length, tint = ['#F4F1EA', '#DDEBE4', '#F6E3D2', '#DEE3F2'][Math.max(0, bi) % 4]; st.style.backgroundColor = tint; const ox = (540 - c.x * c.z + t * 26).toFixed(1), oy = (960 - c.y * c.z - t * 40).toFixed(1); st.style.backgroundPosition = `${ox}px ${oy}px, ${ox}px ${oy}px, ${ox}px ${oy}px`; }
   const active = new Set(b.labels), nextA = BEATS[BEATS.indexOf(b) + 1];
   // items draw themselves once, then stay: the diagram layout never reshuffles
   for (const [id, o] of Object.entries(IT)) {
