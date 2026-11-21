@@ -233,7 +233,7 @@ function seek(t) {
       br.val.setAttribute('x', G.x + G.w - w - 70); br.val.setAttribute('opacity', br.nm.getAttribute('opacity')); }
     for (const [key, el] of Object.entries(o.labels)) { if (key.endsWith('.val')) continue;   // a label shows only in beats that name it, after its thing is drawn
       const on = active.has(key) && t >= o.t0 + .35 && (!key.includes('.') || !o.bars || (o.bars[key.split('.')[1]] && t >= (o.bars[key.split('.')[1]].t0 ?? Infinity)) || key.endsWith('.base'));
-      const fin = on ? clamp((t - Math.max(b.a, o.t0 + .35)) / .3) : 0, fout = nextA && active.has(key) ? 1 - clamp((t - (nextA.a - .35)) / .25) : 1;
+      const hk = S.hook_instant && b === BEATS[0] && o.t0 < 0 && active.has(key), fin = hk ? 1 : on ? clamp((t - Math.max(b.a, o.t0 + .35)) / .3) : 0, fout = nextA && active.has(key) ? 1 - clamp((t - (nextA.a - .35)) / .25) : 1;
       el.setAttribute('opacity', (fin * fout).toFixed(3)); }
     if (o.bars) for (const br of Object.values(o.bars)) br.val.setAttribute('opacity', br.nm.getAttribute('opacity'));
   }
