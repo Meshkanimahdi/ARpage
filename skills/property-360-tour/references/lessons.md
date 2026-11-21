@@ -142,6 +142,12 @@ The address for a local server is `http://localhost:8000/…`, not `www.localhos
   panoramas with teleport is what is wanted.
 - Do not commit home interiors to a public repository without asking.
 
+- **Spending without asking.** On apartment 4 about $9.2 went on images (about $3 of it on method trials and second
+  candidates) with no estimate up front and no question before each round; the owner found out only by asking and
+  was rightly upset. "Start, show me your best" was read as approval of any spend. It is not. → SKILL.md "Money needs
+  the owner's approval": estimate first, ask before every paid round, report spend after each, trial new methods on
+  one or two points at 1K.
+
 ## H. Approaches tried and dropped
 
 - **Photogrammetry / SfM from the photos** (pycolmap): too few overlaps; global mapper registers frames but puts them
@@ -153,6 +159,8 @@ The address for a local server is `http://localhost:8000/…`, not `www.localhos
   locally.
 
 ## Changelog
+
+- v1.1 — paid steps need the owner's approval each round; spend reported after each round (lesson G, last entry).
 
 - v1.0 — first version, distilled from five properties (Airbnb flat, apartments 2–4). Apartment 4 is the worked
   example: plan confirmed after two corrections (chamfer, kitchen recess); tour accepted after three rounds of fixes,

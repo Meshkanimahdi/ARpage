@@ -46,9 +46,16 @@ a property; add to it whenever the owner reports something new. That file is how
   test. Image generation and transcription go through OpenRouter: `OPENROUTER_API_KEY` must be set. Default image model
   is `google/gemini-3.1-flash-image` (`IMAGE_MODEL` overrides); model names change, so if a call fails with an unknown
   model, look up the current image-capable model rather than guessing.
-- Money: about $0.15 per 4K panorama, $0.10 per local fix, well under a cent for transcription. A 9-point home costs
-  $1.5–2.5 when the plan is right first time and $5–9 when it is not. Check the remaining credit
-  (`GET https://openrouter.ai/api/v1/credits`) before the render phase and report spend at the end.
+- **Money needs the owner's approval, every time.** Nothing that costs money runs without it:
+  1. Before the first paid call of a project, give an estimate (references/costs.md) and wait for a clear yes.
+  2. Before every further paid round (re-renders, a batch of fixes, second candidates), say what it is for and what it
+     will cost, and wait for a yes. "Start", "do your best" or "fix it" approve the work, not unlimited spending.
+  3. Stop and ask as soon as a project's spend would pass the approved amount.
+  4. After every paid round, report what it cost and the running total. Never let the owner find the total by asking.
+  5. Try a new method on one or two points at 1K first ($0.07 each), never on the whole tour at 4K.
+  Reference prices: about $0.15 per 4K panorama, $0.10 per local fix, well under a cent for transcription; a 9-point
+  home costs $1.5–2.5 in images when the plan is right first time and $5–9 when it is not. Check the remaining credit
+  (`GET https://openrouter.ai/api/v1/credits`) before asking for approval, and say if it will not cover the job.
 - Work in a per-property folder: `input/photos`, `input/frames`, `guides`, `guides4k`, `work` (candidates and checks),
   `tour/panos`. Keep `home.json` at its root.
 - Privacy: the photos show the inside of someone's home. Do not commit panoramas or source photos to a public
