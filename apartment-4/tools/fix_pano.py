@@ -1,10 +1,10 @@
 """Correct one spot of a finished panorama without touching the rest.
 
-  OPENROUTER_API_KEY=... python3 tools/fix_pano.py IN.jpg OUT.jpg X0 X1 Y0 Y1 "what to change"
+  OPENROUTER_API_KEY=... [REFS=photo.jpg,photo.jpg] python3 tools/fix_pano.py IN.jpg OUT.jpg X0 X1 Y0 Y1 "what to change"
 
 X and Y are the box to correct, in percent of the panorama (X0 > X1 means the box crosses the left/right edge). A 16:9
 window around the box goes to the image model with the instruction; only the box, feathered, is pasted back, so nothing
-outside it can change.
+outside it can change. REFS are real photos of the same place for the model to match.
 """
 import base64
 import io
@@ -20,7 +20,8 @@ from PIL import Image
 PROMPT = ("This is a crop from a 360-degree equirectangular panorama of an empty apartment, so straight lines look slightly curved; "
           "keep that. Make exactly one change: {what} Fill the freed area with what is naturally there (the same wall paint and white "
           "baseboard, the same floor tiles with their reflections), matching the surroundings seamlessly. Keep everything else exactly "
-          "as it is: same framing, same geometry, same colours and lighting. Return the whole image.")
+          "as it is: same framing, same geometry, same colours and lighting. Return the whole image. If more images follow, they are real "
+          "photos of this same place: they show what the changed area really looks like; the first image stays the one you edit.")
 
 
 def main(src, dst, x0, x1, y0, y1, what):
@@ -39,7 +40,9 @@ def main(src, dst, x0, x1, y0, y1, what):
             "image_config": {"aspect_ratio": "16:9", "image_size": os.environ.get("SIZE", "2K")},
             "messages": [{"role": "user", "content": [
                 {"type": "text", "text": PROMPT.format(what=what)},
-                {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()}}]}]}
+                {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()}}]
+                + [{"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(open(r, "rb").read()).decode()}}
+                   for r in os.environ.get("REFS", "").split(",") if r]}]}
     req = urllib.request.Request("https://openrouter.ai/api/v1/chat/completions", json.dumps(body).encode(),
                                  {"Authorization": "Bearer " + os.environ["OPENROUTER_API_KEY"], "Content-Type": "application/json"})
     res = json.load(urllib.request.urlopen(req, timeout=480))

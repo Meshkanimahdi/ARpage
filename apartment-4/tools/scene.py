@@ -17,8 +17,8 @@ ROOM_EN = {"living": "living room with open kitchen", "wc": "guest toilet", "hal
 
 # openings: endpoints on the plan, kind, head height, English label for the prompt
 OPENINGS = [
-    dict(a=(7.45, 6.4), b=(8.45, 6.4), kind="front", head=2.1, label="the front door (closed, dark brown wood)", rooms=["living"]),
-    dict(a=(7.0, 5.1), b=(7.0, 5.9), kind="door", head=2.1, label="open door to the guest toilet", rooms=["living", "wc"]),
+    dict(a=(7.45, 6.4), b=(8.45, 6.4), kind="front", head=2.1, label="the front door (closed, brown wood with carved panels)", rooms=["living"]),
+    dict(a=(7.0, 4.9), b=(7.0, 5.7), kind="door", head=2.1, label="open door to the guest toilet", rooms=["living", "wc"]),
     dict(a=(10.25, 2.4), b=(11.05, 2.4), kind="door", head=2.1, label="open door to the bathroom", rooms=["hall", "bath"]),
     dict(a=(10.15, 3.6), b=(11.05, 3.6), kind="door", head=2.1, label="open door to bedroom 1", rooms=["hall", "bed1"]),
     dict(a=(12.3, 2.55), b=(12.3, 3.45), kind="door", head=2.1, label="open door to bedroom 2", rooms=["hall", "bed2"]),
@@ -37,15 +37,30 @@ WINDOWS = [
 PANELS = [dict(a=(13.1, 1.2), b=(13.1, 2.3), head=2.6, label="a white built-in wardrobe (two tall doors, black handles)")]
 # boxes: x0, y0, x1, y1, z0, z1, kind, label
 BOXES = [
-    (0.06, 4.1, 4.5, 4.64, 0, 0.9, "cab", "kitchen base cabinets (white, gray counter, built-in hob)"),
-    (0.06, 4.3, 4.5, 4.64, 1.5, 2.35, "cab", None),
-    (4.5, 4.1, 4.62, 4.64, 0, 2.35, "cab", None),
-    (0.06, 2.9, 0.66, 4.1, 0, 2.35, "cab", "the tall white cabinet with the fridge niche"),
-    (1.5, 2.75, 3.1, 3.45, 0, 0.9, "island", "the kitchen island (gray stone-look, white drawers)"),
+    # kitchen, U-shaped in its recess (x 0..4.65, y 4.7..6.0). "cab" is white, "stone" is grey stone-look
+    (0.65, 5.4, 4.05, 6.0, 0, 0.9, "cab", "kitchen base cabinets on the back wall (white doors, cream counter: sink on the left part, gas hob on the right part)"),
+    (2.85, 5.65, 4.05, 6.0, 1.45, 2.35, "cab", "white upper cabinets above the sink"),
+    (2.4, 5.4, 2.85, 6.0, 0, 2.35, "stone", "a tall grey stone-look column between the sink part and the hob part"),
+    (0.65, 5.65, 2.4, 6.0, 1.75, 2.35, "stone", "grey stone-look upper cabinets above the hob"),
+    (0.65, 5.6, 2.4, 6.0, 1.45, 1.75, "cab", None),
+    (0.65, 5.97, 4.05, 6.0, 0.9, 1.45, "stone", None),                       # backsplash
+    (4.05, 4.7, 4.65, 5.4, 0, 0.9, "cab", "the end of the kitchen counter beside the radiator wall (white end panel)"),
+    (4.05, 4.7, 4.65, 4.75, 0.9, 2.35, "stone", None),                        # tall grey end panel
+    (4.3, 4.75, 4.65, 5.65, 1.35, 2.35, "cab", "white wall cabinets above the counter (flat doors with black handles; cabinets, not a door)"),
+    (0.0, 5.4, 0.65, 6.0, 0, 2.35, "cab", None),                              # corner unit
+    (0.0, 4.55, 0.65, 5.4, 1.75, 2.35, "cab", "the tall white fridge unit: an open fridge niche framed in grey, white cabinets above"),
+    (0.0, 4.55, 0.08, 5.4, 0, 1.75, "niche", None),                           # back of the empty fridge niche
+    (0.0, 4.5, 0.7, 4.55, 0, 2.4, "stone", None),                             # its grey end panel
+    (0.95, 3.55, 2.45, 4.35, 0.84, 0.9, "island", "the kitchen island (grey stone-look top and end panel, white drawers under its far half)"),
+    (2.4, 3.55, 2.45, 4.35, 0, 0.84, "island", None),
+    (0.95, 3.6, 1.75, 4.3, 0, 0.84, "cab", None),
     (12.3, 3.86, 12.84, 5.6, 0, 2.6, "wardrobe", "a white built-in wardrobe (tall flat doors, black handles)"),
-    (8.68, 4.85, 8.8, 6.15, 0.15, 0.75, "rad", "a white panel radiator (intercom above it)"),
-    (5.1, 4.58, 6.5, 4.7, 0.15, 0.75, "rad", "a white panel radiator"),
-    (0.0, 1.3, 0.12, 2.6, 0.15, 0.75, "rad", "a white panel radiator (white split air conditioner high above it)"),
+    (8.68, 4.9, 8.8, 6.1, 0.15, 0.75, "rad", "a white panel radiator"),
+    (8.75, 4.9, 8.8, 5.1, 1.4, 1.66, "fix", "a white video intercom handset on the wall"),
+    (4.8, 4.58, 6.0, 4.7, 0.15, 0.75, "rad", "a white panel radiator"),
+    (0.0, 0.75, 0.12, 2.0, 0.15, 0.75, "rad", "a white panel radiator"),
+    (0.0, 2.4, 0.22, 3.6, 2.0, 2.32, "fix", "a white split air conditioner high on the wall"),
+    (7.0, 6.0, 7.04, 6.3, 1.45, 1.72, "fix", "a small fuse-box cover on the wall"),
     (10.26, 0.26, 10.86, 0.7, 0, 0.85, "fix", "a white pedestal sink"),
     (11.5, 0.3, 12.04, 0.95, 0, 0.78, "fix", "a white one-piece toilet"),
     (5.0, 5.9, 5.5, 6.34, 0.35, 0.85, "fix", "a small white vanity sink with a white-framed mirror above"),
@@ -54,7 +69,7 @@ BOXES = [
     (9.62, 0, 10.0, 0.36, 0, CEIL, "col", None), (0, 0, 0.34, 0.4, 0, CEIL, "col", None),
 ]
 # door leaves standing open inside their rooms: hinge, tip
-LEAVES = [((6.84, 5.12), (6.06, 5.0)),     # guest toilet
+LEAVES = [((6.84, 4.93), (6.06, 4.9)),     # guest toilet, against its side wall
           ((10.27, 2.24), (10.22, 1.46)),  # bathroom, against its side wall
           ((10.17, 3.76), (10.0, 4.64)),   # bedroom 1
           ((12.3, 2.57), (13.18, 2.47))]   # bedroom 2, against the wall of its short entry
@@ -66,23 +81,36 @@ DARK = [(11.9, 0.0, 12.3, 2.4),      # bathroom: the wall behind the toilet and 
         (4.7, 6.2, 5.7, 6.6)]        # guest toilet: the panel behind the vanity
 # 360 points: a = heading shown first (0 right, 90 down on the plan); refs = photos (pNN) or video frames (vNN = second)
 NODES = [
-    dict(n=1, room="living", x=7.9, y=5.7, a=-90, cap="ورودی، رو به پنجره‌ها", refs=["p49", "p48", "p59", "v01", "p10"],
+    dict(n=1, room="living", x=7.9, y=5.7, a=-90, cap="ورودی، رو به پنجره‌ها", refs=["n04", "n03", "n02", "n05", "p49"],
          note="The camera stands just inside the entrance: the dark brown front door is very close and fills the place the render "
-              "shows in brown; the plain cream wall with the radiator and the intercom is very close on the other side."),
+              "shows in brown; the plain cream wall with the radiator and the intercom is very close on the other side. The radiator "
+              "is one complete panel, as long as its block in the render."),
     dict(n=2, room="wc", x=5.95, y=5.6, a=180, cap="سرویس مهمان", refs=["p58", "p55", "p57", "p56"],
          note="This small room has no window and no radiator. The squat toilet pan is in the floor where the render shows the flat "
               "white rectangle, the flush tank on the wall above it; the vanity stands only in front of the dark grey panel."),
-    dict(n=3, room="living", x=7.4, y=2.5, a=180, cap="پذیرایی، رو به آشپزخانه", refs=["p49", "p10", "p09", "p04", "v17"],
-         note="The kitchen is at the far end of this long room, about 5 m away, so it is small in the frame: exactly as small as its "
-              "blocks in the render. All three windows are on the one long wall, as wide as the render shows them."),
-    dict(n=4, room="living", x=4.6, y=2.2, a=0, cap="نشیمن، رو به راهرو و ورودی", refs=["p09", "p10", "p02", "p49", "v32"],
-         note="There is no door and no door leaf next to the kitchen: the row of cabinets ends in a plain grey stone-look panel."),
-    dict(n=5, room="living", x=2.3, y=1.8, a=90, cap="آشپزخانه و در تراس", refs=["v30", "v32", "p05", "p06", "v17"]),
-    dict(n=6, room="hall", x=11.2, y=3.0, a=0, cap="راهرو", refs=["p01", "p36", "p38", "p04"],
+    dict(n=3, room="living", x=7.4, y=2.5, a=180, cap="پذیرایی، رو به آشپزخانه", refs=["p49", "n14", "k5", "k3", "v17"],
+         note="The far end wall of this long room is a plain cream wall with an air conditioner high up, a radiator below and the "
+              "glazed terrace door beside it: there are NO kitchen cabinets on that end wall. The kitchen stands to the side, in a "
+              "recess behind the cream wall with the radiator, and is seen from the side and only partly: the tall white fridge "
+              "unit at the far corner, a piece of the cabinet row, and the island in front, exactly as small as their blocks in "
+              "the render. All three windows are on the one long wall; that wall is one flat wall with one smooth baseboard, no "
+              "fold or joint in it. The corridor ends in an open white doorway to a cream room, not in a brown door."),
+    dict(n=4, room="living", x=4.6, y=2.2, a=0, cap="نشیمن، رو به راهرو و ورودی", refs=["n14", "k1", "k4", "n15", "n06"],
+         note="There is no door and no doorway in the cream wall with the radiator, and no intercom on it: the intercom hangs only "
+              "where the render shows its small white block. The terrace door is one glazed white uPVC door, closed, with no "
+              "second leaf. The corridor ends in an open white doorway to a cream room, not in a brown door; no brown door is "
+              "visible from here."),
+    dict(n=5, room="living", x=3.3, y=4.1, a=120, cap="آشپزخانه", refs=["k1", "k5", "k3", "k4", "k2"],
+         note="The camera stands at the open side of the U-shaped kitchen, next to the island. There is no door and no doorway "
+              "among or beside the kitchen cabinets: every tall white panel there is a cabinet. The cream wall next to the kitchen "
+              "carries only a radiator. The corridor ends in an open white doorway to a cream room; no brown door is visible "
+              "from here."),
+    dict(n=6, room="hall", x=11.2, y=3.0, a=0, cap="راهرو", refs=["n10", "n11", "p38", "n08"],
          note="Three doorways open off this corridor; what is behind each one is fixed by the render and the list above. Only the "
               "doorway whose inside is dark grey and pale grey in the render is the bathroom (stone slabs, pedestal sink). The other "
-              "two are empty bedrooms with cream painted walls: no tiles, no sink, no wardrobe visible in them from here. Between the "
-              "doorways the corridor walls are plain cream paint: no niche, no extra frame, no extra door."),
+              "two are empty bedrooms with cream painted walls: no tiles, no sink. Between the doorways the corridor walls are plain "
+              "cream paint: no niche, no extra frame, no extra door. Through the wide opening the long living room is seen, and at "
+              "its far end the kitchen island and the tall fridge unit, as small as the render shows them."),
     dict(n=7, room="bath", x=11.0, y=1.45, a=-90, cap="حمام و سرویس", refs=["p38", "p50", "p46", "p37", "p47"],
          note="All four walls of this room are clad in slabs from floor to ceiling; there is no painted wall here. One floor drain."),
     dict(n=8, room="bed1", x=10.9, y=5.7, a=90, cap="اتاق خواب ۱", refs=["p07", "p19", "p18", "p03", "p17"]),
@@ -95,9 +123,10 @@ FINISH = {
     "living": ("An empty, unfurnished new apartment. Floor: glossy large-format light cream marble-look porcelain tiles (about 80 cm) "
                "with thin joints and soft reflections. Walls: plain cream-white paint, white baseboard. Ceiling: white gypsum with a "
                "rectangular recessed tray and small round recessed spotlights. White uPVC windows with a hazy low-rise city skyline in "
-               "daylight. Kitchen at one end: white lower cabinets with a gray counter, gray stone-look upper cabinets and tall panels, "
-               "a tall white cabinet with an empty fridge niche, an island in gray stone-look with white drawers. Interior doors: white, "
-               "classic raised panels, brass handles."),
+               "daylight. The kitchen is U-shaped: white base cabinets with black handles and a cream counter, a grey stone-look "
+               "backsplash, white upper cabinets over the sink, a tall grey stone-look column, grey stone-look upper cabinets over the "
+               "gas hob, and a tall white fridge unit with an empty niche framed in grey; the island has a grey stone-look top and "
+               "end panel and white drawers. Interior doors: white, classic raised panels, brass handles."),
     "wc": ("A small guest toilet. Walls clad in large white marble-look slabs with grey veins (pale grey in the render), one dark "
            "grey stone-look panel behind a small white wall-hung vanity sink with a white-framed mirror; a squat toilet set in the "
            "light grey floor tiles with a white flush tank on the wall above it and a chrome bidet tap; white ceiling with one "

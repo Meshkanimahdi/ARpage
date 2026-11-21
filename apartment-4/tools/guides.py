@@ -19,7 +19,7 @@ import scene  # noqa: E402
 # BGR, 0..255: plain versions of the real finishes
 FLOOR, JOINT, CEILING, WALL, BASE, FRAME = (203, 219, 230), (172, 187, 198), (247, 248, 248), (213, 228, 237), (244, 245, 245), (240, 241, 242)
 GLASS_TOP, GLASS_LOW, DOOR_BROWN = (255, 236, 214), (236, 232, 226), (52, 78, 118)
-BOX = {"cab": (233, 234, 235), "stone": (146, 148, 152), "island": (132, 134, 138), "wardrobe": (238, 239, 240),
+BOX = {"cab": (233, 234, 235), "stone": (146, 148, 152), "island": (132, 134, 138), "wardrobe": (238, 239, 240), "niche": (200, 212, 222),
        "rad": (246, 246, 246), "fix": (252, 252, 252), "col": WALL}
 MARBLE, DARK, FLOOR_GREY = (233, 234, 235), (98, 100, 104), (208, 210, 211)
 TILE = 0.8
@@ -137,12 +137,9 @@ def cast(node, W):
                 face[near > tn] = k
                 tn, tf = np.maximum(tn, near), np.minimum(tf, np.maximum(a, b))
             ok = (tn < tf) & (tn > 1e-4) & (tn < best)
-            look = kind
-            if kind == "cab" and (z0 > 1.2 or (x1 - x0) < 0.2):
-                look = "stone"                    # upper cabinets and the end panel are grey stone-look
-            c = np.broadcast_to(np.float32(BOX[look]), rgb.shape).copy()
-            if kind in ("cab", "island") and z0 == 0 and z1 < 1.2:
-                c[face == 2] = BOX["stone"]       # counter top
+            c = np.broadcast_to(np.float32(BOX[kind]), rgb.shape).copy()
+            if kind == "cab" and z0 == 0 and z1 < 1.2:
+                c[face == 2] = (226, 236, 242)    # cream counter top
             shade = np.choose(face, [.9, .82, 1.0]).astype(np.float32) * (1 - .08 * np.clip(tn / 9, 0, 1))
             put(ok, tn, new(kind, label, scene.room_at((x0 + x1) / 2, (y0 + y1) / 2)), c, shade)
     return sid, best, rgb, kinds, labels, rooms
@@ -166,6 +163,7 @@ def draw(node, W=2048):
     win = int(W * .07)
     score = np.convolve(np.concatenate([busy[-win:], busy, busy[:win]]), np.ones(2 * win + 1), "valid")
     shift = int(np.argmin(score))
+    depth0 = depth
     img, sid, depth = np.roll(img, -shift, 1), np.roll(sid0, -shift, 1), np.roll(depth, -shift, 1)
     # where things are in the turned image: share of its width, 0 = left edge
     cols = (np.arange(W) + .5) / W * 2 * np.pi
@@ -185,6 +183,19 @@ def draw(node, W=2048):
             continue
         mx, my = (o["a"][0] + o["b"][0]) / 2, (o["a"][1] + o["b"][1]) / 2
         other = [r for r in o["rooms"] if r != node["room"]][0]
+        # name it only if it is really in view from here: a ray to its middle must get that far
+        seen = False
+        for k in (.25, .5, .75):
+            qx, qy = o["a"][0] + (o["b"][0] - o["a"][0]) * k, o["a"][1] + (o["b"][1] - o["a"][1]) * k
+            d = float(np.hypot(qx - node["x"], qy - node["y"]))
+            col = int(((np.arctan2(qx - node["x"], -(qy - node["y"])) / (2 * np.pi) + .5) % 1) * W) % W
+            row = int((.5 - np.arctan2(1.0 - node["h"], d) / np.pi) * Hh)
+            # ... and not at a grazing angle, where it is only a sliver the model would blow up into a door
+            wx, wy = o["b"][0] - o["a"][0], o["b"][1] - o["a"][1]
+            square = abs((qx - node["x"]) * wy - (qy - node["y"]) * wx) / (d * float(np.hypot(wx, wy)))
+            seen |= bool(depth0[row, col] > float(np.hypot(d, 1.0 - node["h"])) - 0.05 and square > 0.25)
+        if not seen:
+            continue
         what = ("a wide opening without a door, through it " if o["kind"] == "open" else "an open doorway with a white frame, through it ") + scene.THROUGH[other]
         lon = np.arctan2(mx - node["x"], -(my - node["y"]))
         found.append((((lon / (2 * np.pi) + .5) - shift / W) % 1 * 100, what, float(np.hypot(mx - node["x"], my - node["y"]))))
