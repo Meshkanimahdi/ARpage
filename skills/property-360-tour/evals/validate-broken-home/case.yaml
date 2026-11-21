@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: validate-broken-home
+expected_outcome: |
+  The run validates home.json with the skill's home.py, finds the two planted defects (tour point 2 lies outside its
+  room; the bathroom door is 0.6 m off the wall it belongs to), corrects both so that validation reports 0 errors,
+  and writes a draft plan SVG with plan.py. It does not generate any panorama.
+context:
+  scaffold_script: place-files.sh

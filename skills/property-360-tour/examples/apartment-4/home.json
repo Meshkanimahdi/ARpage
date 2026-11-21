@@ -1,0 +1,620 @@
+{
+ "title": "آپارتمان نمونه (چهارم)",
+ "note": "پلان از روی ویدئوی توضیح‌دار و عکس‌های همین خانه کشیده و با مالک تأیید شده است. ابعاد برآوردی‌اند (از روی کاشی‌های حدود ۸۰ سانتی‌متری و اندازه‌ی درها)؛ اندازه‌گیری واقعی در دست نبود.",
+ "measured": false,
+ "ceiling": 2.8,
+ "tile": 0.8,
+ "eye": 1.5,
+ "wall_thickness": 0.16,
+ "style": {
+  "state": "empty",
+  "door_leaf": "a white classic raised-panel door with a brass handle",
+  "door_frame": "a white frame",
+  "window_view": "only pale hazy daylight sky and indistinct low rooftops, nothing recognizable"
+ },
+ "rooms": [
+  {
+   "id": "living",
+   "name": "پذیرایی و نشیمن",
+   "name_en": "living room with open kitchen",
+   "poly": [[0, 0], [10.0, 0], [10.0, 2.4], [10.0, 3.6], [9.8, 3.6], [8.8, 4.6], [8.8, 6.4], [7.0, 6.4], [7.0, 4.7], [4.65, 4.7], [4.65, 6.0], [0, 6.0]],
+   "finish": "An empty, unfurnished new apartment. Floor: glossy large-format light cream marble-look porcelain tiles (about 80 cm) with thin joints and soft reflections. Walls: plain cream-white paint, white baseboard. Ceiling: white gypsum with a rectangular recessed tray and small round recessed spotlights. White uPVC windows with a hazy low-rise city skyline in daylight. The kitchen is U-shaped: white base cabinets with black handles and a cream counter, a grey stone-look backsplash, white upper cabinets over the sink, a tall grey stone-look column, grey stone-look upper cabinets over the gas hob, and a tall white fridge unit with an empty niche framed in grey; the island has a grey stone-look top and end panel and white drawers. Interior doors: white, classic raised panels, brass handles.",
+   "through": "the bright living room with glossy cream floor",
+   "label": [5.6, 1.9],
+   "label_tour": [6.0, 1.2]
+  },
+  {
+   "id": "kitchen",
+   "name": "آشپزخانه (اپن)",
+   "label": [2.6, 2.9],
+   "label_tour": [2.1, 3.05]
+  },
+  {
+   "id": "entry",
+   "name": "ورودی",
+   "label": [7.9, 5.2],
+   "label_tour": [7.9, 6.2],
+   "small": true
+  },
+  {
+   "id": "wc",
+   "name": "سرویس مهمان",
+   "name_en": "guest toilet",
+   "poly": [[4.8, 4.86], [6.84, 4.86], [6.84, 6.4], [4.8, 6.4]],
+   "finish": "A small guest toilet. Walls clad in large white marble-look slabs with grey veins (pale grey in the render), one dark grey stone-look panel behind a small white wall-hung vanity sink with a white-framed mirror; a squat toilet set in the light grey floor tiles with a white flush tank on the wall above it and a chrome bidet tap; white ceiling with one recessed light and a small vent.",
+   "through": "the guest toilet clad in white marble-look slabs",
+   "slab": true,
+   "label": [6.0, 5.3],
+   "label_tour": [5.95, 5.14],
+   "small": true
+  },
+  {
+   "id": "hall",
+   "name": "راهرو",
+   "name_en": "corridor",
+   "poly": [[10.0, 2.4], [12.3, 2.4], [12.3, 3.6], [10.0, 3.6]],
+   "finish": "A short empty corridor. Same glossy light cream floor tiles, plain cream-white walls, white baseboard, white doors with classic raised panels and brass handles in white frames, white ceiling with one recessed spotlight.",
+   "through": "the corridor with cream walls",
+   "label": [11.5, 2.95],
+   "label_tour": [10.55, 3.1],
+   "small": true
+  },
+  {
+   "id": "bath",
+   "name": "حمام و سرویس",
+   "name_en": "bathroom",
+   "poly": [[10.16, 0.2], [12.1, 0.2], [12.1, 2.24], [10.16, 2.24]],
+   "finish": "A bathroom. Walls clad in large slabs: where the render is dark grey they are dark grey stone-look slabs (the wall behind the toilet and the shower, and the strip behind the sink); where it is pale grey they are white marble-look slabs with grey veins. Light grey floor tiles with a floor drain; a white pedestal sink, a white one-piece toilet, a chrome shower set on the dark grey wall with no enclosure; white ceiling with a recessed light and a vent grille.",
+   "through": "the bathroom clad in dark grey and white stone-look slabs",
+   "slab": true,
+   "label": [10.95, 1.2],
+   "label_tour": [11.13, -0.1],
+   "small": true
+  },
+  {
+   "id": "bed1",
+   "name": "اتاق خواب ۱",
+   "name_en": "bedroom 1",
+   "poly": [[9.95, 3.76], [12.9, 3.76], [12.9, 7.6], [8.96, 7.6], [8.96, 4.75]],
+   "finish": "An empty bedroom. Slightly matte light cream floor tiles, plain cream-white walls, white baseboard, a white built-in wardrobe with tall flat doors and black handles, a white two-pane window with frosted-looking glass onto a light well (no view), a white radiator under the window, white ceiling with two small recessed spotlights.",
+   "through": "bedroom 1, an empty cream-walled room",
+   "label": [10.6, 5.9],
+   "label_tour": [10.9, 6.6]
+  },
+  {
+   "id": "bed2",
+   "name": "اتاق خواب ۲",
+   "name_en": "bedroom 2",
+   "poly": [[12.3, 2.4], [13.1, 2.4], [13.1, 1.1], [16.5, 1.1], [16.5, 4.6], [16.9, 4.6], [16.9, 5.6], [13.1, 5.6], [13.1, 3.6], [12.3, 3.6]],
+   "finish": "An empty bedroom. Slightly matte light cream floor tiles, plain cream-white walls, white baseboard, a white built-in wardrobe with two tall flat doors and black handles, a white two-pane window with frosted-looking glass onto a light well (no view), a white radiator under the window, white ceiling with small recessed spotlights.",
+   "through": "bedroom 2, an empty cream-walled room",
+   "label": [14.9, 3.2],
+   "label_tour": [14.8, 2.2]
+  }
+ ],
+ "openings": [
+  {
+   "a": [7.45, 6.4],
+   "b": [8.45, 6.4],
+   "kind": "front",
+   "head": 2.1,
+   "label": "the front door (closed, brown wood with carved panels)",
+   "rooms": [
+    "living"
+   ]
+  },
+  {
+   "a": [7.0, 4.9],
+   "b": [7.0, 5.7],
+   "kind": "door",
+   "head": 2.1,
+   "label": "open door to the guest toilet",
+   "rooms": [
+    "living",
+    "wc"
+   ]
+  },
+  {
+   "a": [10.25, 2.4],
+   "b": [11.05, 2.4],
+   "kind": "door",
+   "head": 2.1,
+   "label": "open door to the bathroom",
+   "rooms": [
+    "hall",
+    "bath"
+   ]
+  },
+  {
+   "a": [10.15, 3.6],
+   "b": [11.05, 3.6],
+   "kind": "door",
+   "head": 2.1,
+   "label": "open door to bedroom 1",
+   "rooms": [
+    "hall",
+    "bed1"
+   ]
+  },
+  {
+   "a": [12.3, 2.55],
+   "b": [12.3, 3.45],
+   "kind": "door",
+   "head": 2.1,
+   "label": "open door to bedroom 2",
+   "rooms": [
+    "hall",
+    "bed2"
+   ]
+  },
+  {
+   "a": [10.0, 2.4],
+   "b": [10.0, 3.6],
+   "kind": "open",
+   "head": 2.45,
+   "label": "the corridor opening",
+   "rooms": [
+    "living",
+    "hall"
+   ]
+  }
+ ],
+ "windows": [
+  {
+   "a": [0.55, 0],
+   "b": [1.4, 0],
+   "sill": 0.05,
+   "head": 2.1,
+   "label": "the glazed terrace door",
+   "door": true
+  },
+  {
+   "a": [2.3, 0],
+   "b": [4.0, 0],
+   "sill": 0.95,
+   "head": 2.3,
+   "label": "a living-room window"
+  },
+  {
+   "a": [5.0, 0],
+   "b": [6.7, 0],
+   "sill": 0.95,
+   "head": 2.3,
+   "label": "a living-room window"
+  },
+  {
+   "a": [7.6, 0],
+   "b": [9.3, 0],
+   "sill": 0.95,
+   "head": 2.3,
+   "label": "a living-room window"
+  },
+  {
+   "a": [12.9, 6.0],
+   "b": [12.9, 7.2],
+   "sill": 1.0,
+   "head": 2.25,
+   "label": "the bedroom window (frosted, onto a light well)"
+  },
+  {
+   "a": [13.4, 5.6],
+   "b": [14.8, 5.6],
+   "sill": 1.0,
+   "head": 2.25,
+   "label": "the bedroom window (frosted, onto a light well)"
+  }
+ ],
+ "panels": [
+  {
+   "a": [13.1, 1.2],
+   "b": [13.1, 2.3],
+   "head": 2.6,
+   "label": "a white built-in wardrobe (two tall doors, black handles)"
+  }
+ ],
+ "leaves": [
+  {
+   "hinge": [6.84, 4.93],
+   "tip": [6.06, 4.9]
+  },
+  {
+   "hinge": [10.27, 2.24],
+   "tip": [10.22, 1.46]
+  },
+  {
+   "hinge": [10.17, 3.76],
+   "tip": [10.0, 4.64]
+  },
+  {
+   "hinge": [12.3, 2.57],
+   "tip": [13.18, 2.47]
+  }
+ ],
+ "leaf_height": 2.05,
+ "slab_dark": [[11.9, 0.0, 12.3, 2.4], [10.0, 0.0, 10.95, 0.4], [4.7, 6.2, 5.7, 6.6]],
+ "boxes": [
+  {
+   "box": [0.65, 5.4, 4.05, 6.0, 0, 0.9],
+   "kind": "cab",
+   "label": "kitchen base cabinets on the back wall (white doors, cream counter: sink on the left part, gas hob on the right part)",
+   "plan": "سینک و گاز"
+  },
+  {
+   "box": [2.85, 5.65, 4.05, 6.0, 1.45, 2.35],
+   "kind": "cab",
+   "label": "white upper cabinets above the sink"
+  },
+  {
+   "box": [2.4, 5.4, 2.85, 6.0, 0, 2.35],
+   "kind": "stone",
+   "label": "a tall grey stone-look column between the sink part and the hob part"
+  },
+  {
+   "box": [0.65, 5.65, 2.4, 6.0, 1.75, 2.35],
+   "kind": "stone",
+   "label": "grey stone-look upper cabinets above the hob"
+  },
+  {
+   "box": [0.65, 5.6, 2.4, 6.0, 1.45, 1.75],
+   "kind": "cab"
+  },
+  {
+   "box": [0.65, 5.97, 4.05, 6.0, 0.9, 1.45],
+   "kind": "stone"
+  },
+  {
+   "box": [4.05, 4.7, 4.65, 5.4, 0, 0.9],
+   "kind": "cab",
+   "label": "the end of the kitchen counter beside the radiator wall (white end panel)",
+   "plan": "کابینت"
+  },
+  {
+   "box": [4.05, 4.7, 4.65, 4.75, 0.9, 2.35],
+   "kind": "stone"
+  },
+  {
+   "box": [4.3, 4.75, 4.65, 5.65, 1.35, 2.35],
+   "kind": "cab",
+   "label": "white wall cabinets above the counter (flat doors with black handles; cabinets, not a door)"
+  },
+  {
+   "box": [0.0, 5.4, 0.65, 6.0, 0, 2.35],
+   "kind": "cab"
+  },
+  {
+   "box": [0.0, 4.55, 0.65, 5.4, 1.75, 2.35],
+   "kind": "cab",
+   "label": "the tall white fridge unit: an open fridge niche framed in grey, white cabinets above",
+   "plan": "یخچال"
+  },
+  {
+   "box": [0.0, 4.55, 0.08, 5.4, 0, 1.75],
+   "kind": "niche"
+  },
+  {
+   "box": [0.0, 4.5, 0.7, 4.55, 0, 2.4],
+   "kind": "stone"
+  },
+  {
+   "box": [0.95, 3.55, 2.45, 4.35, 0.84, 0.9],
+   "kind": "island",
+   "label": "the kitchen island (grey stone-look top and end panel, white drawers under its far half)",
+   "plan": "جزیره"
+  },
+  {
+   "box": [2.4, 3.55, 2.45, 4.35, 0, 0.84],
+   "kind": "island"
+  },
+  {
+   "box": [0.95, 3.6, 1.75, 4.3, 0, 0.84],
+   "kind": "cab"
+  },
+  {
+   "box": [12.3, 3.86, 12.84, 5.6, 0, 2.6],
+   "kind": "wardrobe",
+   "label": "a white built-in wardrobe (tall flat doors, black handles)",
+   "plan": "کمد"
+  },
+  {
+   "box": [8.68, 4.9, 8.8, 6.1, 0.15, 0.75],
+   "kind": "rad",
+   "label": "a white panel radiator"
+  },
+  {
+   "box": [8.75, 4.9, 8.8, 5.1, 1.4, 1.66],
+   "kind": "fix",
+   "label": "a white video intercom handset on the wall"
+  },
+  {
+   "box": [4.8, 4.58, 6.0, 4.7, 0.15, 0.75],
+   "kind": "rad",
+   "label": "a white panel radiator"
+  },
+  {
+   "box": [0.0, 0.75, 0.12, 2.0, 0.15, 0.75],
+   "kind": "rad",
+   "label": "a white panel radiator"
+  },
+  {
+   "box": [0.0, 2.4, 0.22, 3.6, 2.0, 2.32],
+   "kind": "fix",
+   "label": "a white split air conditioner high on the wall"
+  },
+  {
+   "box": [7.0, 6.0, 7.04, 6.3, 1.45, 1.72],
+   "kind": "fix",
+   "label": "a small fuse-box cover on the wall"
+  },
+  {
+   "box": [10.26, 0.26, 10.86, 0.7, 0, 0.85],
+   "kind": "fix",
+   "label": "a white pedestal sink",
+   "plan": "روشویی"
+  },
+  {
+   "box": [11.5, 0.3, 12.04, 0.95, 0, 0.78],
+   "kind": "fix",
+   "label": "a white one-piece toilet",
+   "plan": "توالت"
+  },
+  {
+   "box": [5.0, 5.9, 5.5, 6.34, 0.35, 0.85],
+   "kind": "fix",
+   "label": "a small white vanity sink with a white-framed mirror above",
+   "plan": "روشویی"
+  },
+  {
+   "box": [5.0, 5.2, 5.5, 5.62, 0, 0.03],
+   "kind": "fix",
+   "label": "a white squat toilet pan set flush into the floor",
+   "plan": "توالت"
+  },
+  {
+   "box": [4.8, 5.24, 4.92, 5.58, 1.15, 1.5],
+   "kind": "fix",
+   "label": "a white plastic flush tank high on the wall, a thin pipe down to the squat toilet"
+  },
+  {
+   "box": [9.62, 0, 10.0, 0.36, 0, 2.8],
+   "kind": "col"
+  },
+  {
+   "box": [0, 0, 0.34, 0.4, 0, 2.8],
+   "kind": "col"
+  }
+ ],
+ "plan_marks": [
+  {
+   "rect": [11.25, 1.45, 12.04, 2.18],
+   "name": "دوش"
+  },
+  {
+   "rect": [12.5, 1.2, 13.04, 2.3],
+   "name": "کمد"
+  }
+ ],
+ "outside": [
+  {
+   "rect": [13.1, 5.76, 3.4, 1.84],
+   "name": "نورگیر (برآورد)"
+  },
+  {
+   "rect": [0, -1.3, 2.2, 1.14],
+   "name": "تراس (ابعاد نامعلوم)"
+  }
+ ],
+ "dims": [
+  {
+   "a": [0, -1.75],
+   "b": [10.0, -1.75]
+  },
+  {
+   "a": [-0.7, 0],
+   "b": [-0.7, 4.7]
+  }
+ ],
+ "steps": [
+  {
+   "at": [7.95, 5.95],
+   "mark": "۱",
+   "text": "در ورودی"
+  },
+  {
+   "at": [6.5, 6.1],
+   "mark": "۲",
+   "text": "سرویس مهمان، سمت چپ"
+  },
+  {
+   "at": [6.0, 0.9],
+   "mark": "۳",
+   "text": "پنجره‌ها"
+  },
+  {
+   "at": [1.0, 0.9],
+   "mark": "۴",
+   "text": "در تراس"
+  },
+  {
+   "at": [3.3, 4.9],
+   "mark": "۵",
+   "text": "آشپزخانه"
+  },
+  {
+   "at": [10.45, 3.0],
+   "mark": "۶",
+   "text": "راهرو"
+  },
+  {
+   "at": [10.6, 4.6],
+   "mark": "۷",
+   "text": "خواب اول، سمت راست"
+  },
+  {
+   "at": [14.2, 2.0],
+   "mark": "۸",
+   "text": "خواب بعدی، مستقیم"
+  },
+  {
+   "at": [10.55, 1.9],
+   "mark": "۹",
+   "text": "حمام، روبه‌روی خواب اول"
+  }
+ ],
+ "questions": [
+  {
+   "a": [9.8, 3.6],
+   "b": [8.8, 4.6],
+   "mark": "۱",
+   "text": "برش مورب بین راهرو و ورودی: طول آن حدود ۱٫۴ متر فرض شده"
+  },
+  {
+   "a": [0, 6.0],
+   "b": [4.65, 6.0],
+   "mark": "۲",
+   "text": "عمق تورفتگی آشپزخانه حدود ۱٫۳ متر فرض شده"
+  }
+ ],
+ "nodes": [
+  {
+   "n": 1,
+   "room": "living",
+   "x": 7.9,
+   "y": 5.7,
+   "a": -90,
+   "cap": "ورودی، رو به پنجره‌ها",
+   "refs": [
+    "n04",
+    "n03",
+    "n02",
+    "n05",
+    "p49"
+   ],
+   "note": "The camera stands just inside the entrance: the dark brown front door is very close and fills the place the render shows in brown; the plain cream wall with the radiator and the intercom is very close on the other side. The radiator is one complete panel, as long as its block in the render."
+  },
+  {
+   "n": 2,
+   "room": "wc",
+   "x": 5.95,
+   "y": 5.6,
+   "a": 180,
+   "cap": "سرویس مهمان",
+   "refs": [
+    "p58",
+    "p55",
+    "p57",
+    "p56"
+   ],
+   "note": "This small room has no window and no radiator. The squat toilet pan is in the floor where the render shows the flat white rectangle, the flush tank on the wall above it; the vanity stands only in front of the dark grey panel."
+  },
+  {
+   "n": 3,
+   "room": "living",
+   "x": 7.4,
+   "y": 2.5,
+   "a": 180,
+   "cap": "پذیرایی، رو به آشپزخانه",
+   "refs": [
+    "p49",
+    "n14",
+    "k5",
+    "k3",
+    "v17"
+   ],
+   "note": "The far end wall of this long room is a plain cream wall with an air conditioner high up, a radiator below and the glazed terrace door beside it: there are NO kitchen cabinets on that end wall. The kitchen stands to the side, in a recess behind the cream wall with the radiator, and is seen from the side and only partly: the tall white fridge unit at the far corner, a piece of the cabinet row, and the island in front, exactly as small as their blocks in the render. All three windows are on the one long wall; that wall is one flat wall with one smooth baseboard, no fold or joint in it. The corridor ends in an open white doorway to a cream room, not in a brown door."
+  },
+  {
+   "n": 4,
+   "room": "living",
+   "x": 4.6,
+   "y": 2.2,
+   "a": 0,
+   "cap": "نشیمن، رو به راهرو و ورودی",
+   "refs": [
+    "n14",
+    "k1",
+    "k4",
+    "n15",
+    "n06"
+   ],
+   "note": "There is no door and no doorway in the cream wall with the radiator, and no intercom on it: the intercom hangs only where the render shows its small white block. The terrace door is one glazed white uPVC door, closed, with no second leaf. The corridor ends in an open white doorway to a cream room, not in a brown door; no brown door is visible from here."
+  },
+  {
+   "n": 5,
+   "room": "living",
+   "x": 3.3,
+   "y": 4.1,
+   "a": 120,
+   "cap": "آشپزخانه",
+   "refs": [
+    "k1",
+    "k5",
+    "k3",
+    "k4",
+    "k2"
+   ],
+   "note": "The camera stands at the open side of the U-shaped kitchen, next to the island. There is no door and no doorway among or beside the kitchen cabinets: every tall white panel there is a cabinet. The cream wall next to the kitchen carries only a radiator. The corridor ends in an open white doorway to a cream room; no brown door is visible from here."
+  },
+  {
+   "n": 6,
+   "room": "hall",
+   "x": 11.2,
+   "y": 3.0,
+   "a": 0,
+   "cap": "راهرو",
+   "refs": [
+    "n10",
+    "n11",
+    "p38",
+    "n08"
+   ],
+   "note": "Three doorways open off this corridor; what is behind each one is fixed by the render and the list above. Only the doorway whose inside is dark grey and pale grey in the render is the bathroom (stone slabs, pedestal sink). The other two are empty bedrooms with cream painted walls: no tiles, no sink. Between the doorways the corridor walls are plain cream paint: no niche, no extra frame, no extra door. Through the wide opening the long living room is seen, and at its far end the kitchen island and the tall fridge unit, as small as the render shows them."
+  },
+  {
+   "n": 7,
+   "room": "bath",
+   "x": 11.0,
+   "y": 1.45,
+   "a": -90,
+   "cap": "حمام و سرویس",
+   "refs": [
+    "p38",
+    "p50",
+    "p46",
+    "p37",
+    "p47"
+   ],
+   "note": "All four walls of this room are clad in slabs from floor to ceiling; there is no painted wall here. One floor drain."
+  },
+  {
+   "n": 8,
+   "room": "bed1",
+   "x": 10.9,
+   "y": 5.7,
+   "a": 90,
+   "cap": "اتاق خواب ۱",
+   "refs": [
+    "p07",
+    "p19",
+    "p18",
+    "p03",
+    "p17"
+   ]
+  },
+  {
+   "n": 9,
+   "room": "bed2",
+   "x": 14.8,
+   "y": 3.4,
+   "a": 90,
+   "cap": "اتاق خواب ۲",
+   "refs": [
+    "p26",
+    "p24",
+    "p39",
+    "p22",
+    "p21",
+    "p28"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: root-cause-marked-errors
+expected_outcome: |
+  A Persian reply that classifies each of the three errors by layer without fixing anything: (1) a far-away feature
+  the image model invented although the plan is right (render error; remedy: zoomed check and a local fix guided by
+  the plan render), (2) a leftover of an earlier local fix (fix residue; remedy: repaint and inspect a wider area),
+  (3) an error in the plan itself (plan error; remedy: correct home.json, re-confirm the plan, re-render every point
+  that sees the kitchen), and for (3) asks for a photo that shows the kitchen corner or back wall.

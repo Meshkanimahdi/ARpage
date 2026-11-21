@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: new-property-plan-first
+expected_outcome: |
+  A reply in Persian that sets up the job the way the skill prescribes: it says what media is needed (continuous
+  narrated video, photos in walking order covering every wall and both sides of doorways, one real measurement if
+  possible), asks the user to wait for an acknowledgement after each upload batch, states that the plan is drawn and
+  confirmed by the user BEFORE any panorama is generated, and gives a cost range of a few dollars for the tour. It
+  does not start generating images.
