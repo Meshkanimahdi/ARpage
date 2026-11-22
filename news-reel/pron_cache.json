@@ -670,5 +670,26 @@
   "score": 1,
   "voice": "8Ebkg5uUcbSbeqGucAoR",
   "date": "2026-11-22"
+ },
+ "Google DeepMind": {
+  "mode": "C",
+  "spoken": "گوگِل دیپ‌مایند",
+  "score": 1,
+  "voice": "XzieuK0bwYWT9Kl1LhLs",
+  "date": "2026-11-22"
+ },
+ "AlphaGenome two": {
+  "mode": "B",
+  "spoken": "AlphaGenome two",
+  "score": 0.79,
+  "voice": "XzieuK0bwYWT9Kl1LhLs",
+  "date": "2026-11-22"
+ },
+ "DNA": {
+  "mode": "A",
+  "spoken": "DNA",
+  "score": 1,
+  "voice": "XzieuK0bwYWT9Kl1LhLs",
+  "date": "2026-11-22"
  }
 }

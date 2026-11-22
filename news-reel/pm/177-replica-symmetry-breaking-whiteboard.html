@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="fa">
+<head>
+<meta charset="utf-8">
+<!-- Engine 177 "Replica symmetry breaking whiteboard" (catalog 177-replica-symmetry-breaking-whiteboard, EXPL).
+     The prompt's look, kept: the whole explanation is ONE diagram in ONE continuous space on a whiteboard; a marker
+     draws each diagram as it is explained; the camera zooms into a part to explain it and pulls back to show how it
+     fits; every idea gets a picture before words; labels sit on the thing they name; one thing moves at a time;
+     arrows animate in the direction things move; ≤ 7 words on screen at once; no glows, no crossfades, no stock icons.
+     Story data: story.json (beats[].scene.type picks the board part) + timeline.json (word times). -->
+<style>
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: M; font-weight: 400; src: url(/logo-motion/node_modules/@fontsource/lalezar/files/lalezar-arabic-400-normal.woff2); }
+  @font-face { font-family: M; font-weight: 400; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #F4F2EC; }
+  #root { position: absolute; inset: 0; overflow: hidden; background: #F4F2EC; }
+  #board { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  #scr { position: absolute; inset: 0; pointer-events: none; }
+  .a { position: absolute; }
+  .w { position: absolute; white-space: nowrap; font-family: M; line-height: 1.15; }
+  #sub { position: absolute; left: 40px; right: 40px; top: 1500px; height: 150px; display: flex; align-items: center; justify-content: center; }
+  #sub .pill { direction: rtl; unicode-bidi: plaintext; padding: 10px 34px 20px; border-radius: 22px; font: 900 58px/1.3 V; white-space: nowrap; background: #1C1C1C; color: #fff; }
+  #sub .k { color: #FFD23F; }
+</style>
+</head>
+<body>
+<div id="root"><div id="board"></div><div id="scr"></div><div id="sub"></div></div>
+<script>
+const Q = new URLSearchParams(location.search), DIR = Q.get('dir') || '/work/story/';
+const U = s => s.startsWith('/') ? s : DIR + s, $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), mix = (a, b, k) => a + (b - a) * k, pr = (t, a, b) => cl((t - a) / (b - a));
+const eio = k => { k = cl(k); return k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; };
+const eo = k => 1 - Math.pow(1 - cl(k), 3);
+const fa = n => String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const INK = '#1C1C1C', BLUE = '#1F5FD1', RED = '#D93025', GREEN = '#1E8E3E', ORANGE = '#E8710A';
+const ISSUES = [];
+let S, TL, B = [], END = 50, EL = [], CAM = [];
+
+// seeded wobble so every marker line looks hand-drawn but renders the same each frame
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const wob = (pts, a = 3) => pts.map(([x, y]) => [x + (rnd() - .5) * a, y + (rnd() - .5) * a]);
+const seg = (p, q, n = 6) => [...Array(n + 1)].map((_, i) => [mix(p[0], q[0], i / n), mix(p[1], q[1], i / n)]);
+const line = (p, q, a = 3) => wob(seg(p, q, 8), a);
+const circ = (cx, cy, r, a = 4, from = -1.9) => wob([...Array(41)].map((_, i) => { const th = from + i / 40 * 2 * Math.PI * 1.04; return [cx + r * Math.cos(th), cy + r * Math.sin(th)]; }), a);
+const rect = (x, y, w, h, a = 4) => wob([[x, y], ...seg([x, y], [x + w, y], 6).slice(1), ...seg([x + w, y], [x + w, y + h], 6).slice(1), ...seg([x + w, y + h], [x, y + h], 6).slice(1), ...seg([x, y + h], [x, y - 6], 6).slice(1)], a);
+const arrowPts = (p, q, bend = 0) => { const n = 16, mx = (p[0] + q[0]) / 2 - (q[1] - p[1]) * bend, my = (p[1] + q[1]) / 2 + (q[0] - p[0]) * bend;
+  return [...Array(n + 1)].map((_, i) => { const u = i / n; return [(1 - u) * (1 - u) * p[0] + 2 * u * (1 - u) * mx + u * u * q[0], (1 - u) * (1 - u) * p[1] + 2 * u * (1 - u) * my + u * u * q[1]]; }); };
+const plen = pts => { let L = [0]; for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1])); return L; };
+
+// ---- element kinds: 'path' (marker stroke), 'head' (arrow head after its path), 'text' (written right-to-left), 'img', 'fill' (marker hatch) ----
+const P = (pts, col, w, t0, t1, o = {}) => EL.push({k: 'path', pts, L: plen(pts), col, w, t0, t1, ...o});
+const T = (x, y, s, size, col, t0, t1, o = {}) => EL.push({k: 'text', x, y, s, size, col, t0, t1, snd: 'tick', ...o});
+const A = (p, q, col, w, t0, t1, bend = .12) => { const pts = arrowPts(p, q, bend); P(pts, col, w, t0, t1); const n = pts.length, d = [pts[n - 1][0] - pts[n - 3][0], pts[n - 1][1] - pts[n - 3][1]], a = Math.atan2(d[1], d[0]), L = 34;
+  P([[q[0] - L * Math.cos(a - .45), q[1] - L * Math.sin(a - .45)], q, [q[0] - L * Math.cos(a + .45), q[1] - L * Math.sin(a + .45)]], col, w, t1, t1 + .15); };
+
+window.ready = (async () => {
+  S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json();
+  END = TL.total;
+  const shown = t => t.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/);
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) { ISSUES.push('no timing for ' + bt.id); continue; }
+    const raw = shown(bt.text); let on = false;
+    const words = raw.map(w => { const st = w.startsWith('*') || w.startsWith('«*'); if (st) on = true; const k = on || /\*/.test(w); if (/\*[.…،؛!؟?»]*$/.test(w)) on = false; return {w: w.replace(/\*/g, ''), k}; });
+    const wt = j => { const i = Math.round(cl(j / Math.max(1, words.length - 1)) * (L.words.length - 1)); return (L.words[i] || [L.start])[0]; };
+    B.push({bt, type: (bt.scene || {}).type, L, words, wt});
+  }
+  B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
+  await Promise.all(['el/alphagenome.svg'].map(f => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = U(f); })));
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V', '400 40px M'].map(f => document.fonts.load(f, 'ژن AI DNA')));
+  build();
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  // one idea per drawing moment; each moment opens with its own matching sound (marker tap / pop / tick…), never a whoosh
+  const SC = [], starts = [...new Set(EL.filter(e => e.snd).map(e => +e.t0.toFixed(2)))].sort((p, q) => p - q);
+  let last = -9; const pts = [];
+  for (const t0 of starts) if (t0 - last >= .9) { pts.push([t0, EL.find(e => e.snd && +e.t0.toFixed(2) === t0).snd]); last = t0; }
+  pts.forEach((p, i) => SC.push({t0: +p[0].toFixed(2), t1: +(i + 1 < pts.length ? pts[i + 1][0] : TL.end_start).toFixed(2), type: 'board', bg: 'm' + i, sfx: [[p[0] + .02, p[1], .3]]}));
+  SC.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .1, 'pop', .35]]});
+  if (SC.length > 1 && SC[0].t0 > 0) SC.unshift({t0: 0, t1: SC[0].t0, type: 'board', bg: 'm_', sfx: [[.05, 'tap', .3]]});
+  window.SCENES = SC;
+  for (const s of SC) if (s.t1 - s.t0 > 3.2 && s.type !== 'end') ISSUES.push(`idea ${s.bg} holds ${(s.t1 - s.t0).toFixed(1)} s (> 3): add a moment`);
+  seek(0);
+})();
+const bt = type => B.find(b => b.type === type);
+const W = (b, s) => { const i = b.words.findIndex(w => w.w.includes(s)); return b.wt(i < 0 ? 0 : i); };
+
+// ---- the one board: every part drawn in place; parts and camera keys come from the beats ----
+// world layout (px): tree at (0,0); news (1000,0); cells (1000,1000); switch (0,1000); bars (-1000,1000);
+// limit (-1000,0); three (0,2000); one/two/app (-1000/0/1000, 2900)
+function build() {
+  const g = (type, f) => { const b = bt(type); if (b) f(b); };
+  // ---- hook: the family tree (half drawn at frame 0), red «?» on grandpa, DNA strand under «تو» with one letter circled ----
+  g('hook', b => {
+    const node = (x, y, s, t0, col = INK) => { P(circ(x, y, 62), col, 9, t0, t0 + .35, {snd: 'tap'}); T(x, y + 82, s, 58, col, t0 + .1, t0 + .4); };
+    node(-260, -560, 'پدربزرگ', -1); node(260, -560, 'مادربزرگ', -1);
+    P(line([-198, -560], [198, -560]), INK, 8, -1, -.9);
+    P(line([0, -560], [0, -330]), INK, 8, -1, -.9);
+    node(-260, -250, 'مامان', -1); node(260, -250, 'بابا', -1);
+    P(line([-198, -250], [198, -250]), INK, 8, -1, -.9);
+    P(line([0, -250], [0, 0]), INK, 8, 0, .2, {snd: 'tap'});
+    node(0, 70, 'تو', .15, BLUE);
+    T(-370, -640, '؟', 150, RED, 0, .15, {snd: 'pop'});
+    P(rect(85, 20, 350, 100, 5), RED, 8, 2.7, 3.0); T(260, 32, 'بیماری ارثی؟', 50, RED, 2.8, 3.1, {snd: 'pop'}); A([85, 70], [65, 70], RED, 6, 3.0, 3.1, 0);
+    // DNA strand: letter boxes
+    const L = ['A', 'T', 'G', 'C', 'C', 'A', 'T', 'G'];
+    L.forEach((c, i) => { const x = -350 + i * 100; P(rect(x - 40, 250, 80, 90, 3), INK, 6, i < 4 ? -1 : i * .05, i < 4 ? -.9 : .12 + i * .05); T(x, 260, c, 64, BLUE, i < 4 ? -1 : .03 + i * .05, i < 4 ? -.9 : .15 + i * .05, {latin: true}); });
+    P(circ(-50, 295, 70, 5), RED, 9, .8, 1.1, {snd: 'tick'});
+    T(0, 370, 'یه حرف عوض شه؟', 64, RED, W(b, 'حرف') - .2, W(b, 'حرف') + .3, {snd: 'pop'});
+    CAM.push([b.a, 0, -530, 1.22], [.75, -50, 110, 1.75], [2.5, 0, -260, 1.12], [W(b, 'حرف') - .3, 0, 80, 1.3]);
+    T(330, 160, 'AI', 90, BLUE, W(b, 'AI') - .1, W(b, 'AI') + .2, {latin: true, snd: 'pop'}); A([300, 200], [120, 270], BLUE, 7, W(b, 'AI') + .1, W(b, 'AI') + .4);
+  });
+  // ---- news: real AlphaGenome mark, name, date; arrow from the strand ----
+  g('news', b => {
+    A([420, 300], [680, 360], INK, 8, b.a + .1, b.a + .6, -.1);
+    EL.push({k: 'img', src: 'el/alphagenome.svg', x: 1000, y: -120, s: 300, t0: b.a + .4, t1: b.a + .8, snd: 'pop'});
+    T(1000, 70, 'Google DeepMind', 70, INK, W(b, 'DeepMind') - .1, W(b, 'DeepMind') + .5, {latin: true});
+    T(1000, 170, 'AlphaGenome 2', 96, BLUE, W(b, 'AlphaGenome') - .2, W(b, 'AlphaGenome') + .5, {latin: true, snd: 'tap'});
+    P(rect(800, 300, 400, 120, 5), RED, 8, W(b, 'نوامبر') - .3, W(b, 'نوامبر'), {snd: 'tick'}); T(1000, 315, '۱۱ نوامبر', 76, RED, W(b, 'نوامبر') - .1, W(b, 'نوامبر') + .3);
+    CAM.push([b.a, 900, 100, 1.1], [W(b, 'AlphaGenome') - .3, 1000, 120, 1.3]);
+  });
+  // ---- cells: dots drawn row by row, counter to 107 million, 68 tissues ----
+  g('cells', b => {
+    for (let r = 0; r < 5; r++) for (let c = 0; c < 8; c++) { const t0 = b.a + .2 + (r * 8 + c) * .03; P(circ(720 + c * 80, 760 + r * 80, 26, 3), r % 2 ? BLUE : INK, 5, t0, t0 + .2, r === 0 && c === 0 ? {snd: 'tap'} : {}); }
+    EL.push({k: 'count', x: 1000, y: 1180, size: 110, col: INK, to: 107, unit: ' میلیون سلول', t0: W(b, 'میلیون') - .8, t1: W(b, 'میلیون') + .2, snd: 'counter_tick'});
+    P(rect(800, 1340, 400, 110, 5), GREEN, 8, W(b, 'بافت') - .3, W(b, 'بافت')); T(1000, 1352, '۶۸ بافت بدن', 70, GREEN, W(b, 'بافت') - .1, W(b, 'بافت') + .3, {snd: 'pop'});
+    A([1000, 480], [1000, 680], INK, 7, b.a, b.a + .3, 0);
+    CAM.push([b.a, 1000, 900, 1.12], [W(b, 'میلیون') - .4, 1000, 1150, 1.25]);
+  });
+  // ---- switch: one letter swapped → arrow into a cell → the gene switch flips on ----
+  g('switch', b => {
+    ['A', 'T', 'G', 'C'].forEach((c, i) => { const x = -150 + i * 100; P(rect(x - 40, 700, 80, 90, 3), INK, 6, b.a + .1 + i * .05, b.a + .25 + i * .05, i ? {} : {snd: 'tap'}); T(x, 710, c, 64, i === 2 ? RED : BLUE, b.a + .15 + i * .05, b.a + .3 + i * .05, {latin: true}); });
+    P(circ(50, 745, 66, 5), RED, 8, W(b, 'کوچیک') - .3, W(b, 'کوچیک'), {snd: 'tick'});
+    A([50, 830], [50, 1000], INK, 7, W(b, 'ژنی') - .3, W(b, 'ژنی'), 0);
+    P(circ(0, 1180, 170, 6), INK, 9, W(b, 'سلول') - .4, W(b, 'سلول'), {snd: 'tap'}); T(0, 1360, 'سلول', 60, INK, W(b, 'سلول') - .2, W(b, 'سلول') + .2);
+    EL.push({k: 'switch', x: 0, y: 1180, t0: W(b, 'روشن') - .2, t1: W(b, 'خاموش'), snd: 'click'});
+    CAM.push([b.a, 0, 850, 1.2], [W(b, 'ژنی') - .3, 0, 1080, 1.18]);
+  });
+  // ---- bars: old model vs AlphaGenome 2 (about ×2) ----
+  g('bars', b => {
+    P(line([-1300, 1300], [-700, 1300]), INK, 8, b.a, b.a + .3, {snd: 'tap'});
+    const bar = (x, h, col, t0, lab) => { P(rect(x - 70, 1300 - h, 140, h, 4), col, 8, t0, t0 + .45); EL.push({k: 'fill', x: x - 70, y: 1300 - h, w: 140, h, col, t0: t0 + .3, t1: t0 + .7}); T(x, 1320, lab, 52, INK, t0, t0 + .3); };
+    bar(-1150, 230, INK, b.a + .3, 'مدل قبلی'); bar(-850, 460, BLUE, W(b, 'دو') - .3, 'AlphaGenome 2');
+    T(-1000, 700, '×۲', 150, RED, W(b, 'برابر') - .1, W(b, 'برابر') + .3, {snd: 'pop'});
+    A([-1150, 1020], [-870, 780], RED, 8, b.a + 1.5, b.a + 1.9, -.2); EL[EL.length - 2].snd = 'tap';
+    P(line([-1110, 610], [-890, 610], 5), RED, 9, b.a + 2.9, b.a + 3.2, {snd: 'tick'});
+    CAM.push([b.a, -1000, 1050, 1.25]);
+  });
+  // ---- limit: «فقط پژوهش» boxed; «تشخیص بیماری» struck out in red ----
+  g('limit', b => {
+    P(rect(-1250, -500, 500, 150, 6), GREEN, 9, b.a + .1, b.a + .5, {snd: 'tap'}); T(-1000, -485, 'فقط پژوهش', 90, GREEN, b.a + .3, b.a + .7);
+    T(-1000, -240, 'تشخیص بیماری', 90, INK, W(b, 'تشخیص') - .3, W(b, 'تشخیص') + .2);
+    P(line([-1290, -180], [-710, -160], 6), RED, 14, W(b, 'تأیید') - .1, W(b, 'تأیید') + .3, {snd: 'hit'});
+    T(-1000, -80, 'تأیید نشده', 64, RED, W(b, 'تأیید') + .1, W(b, 'تأیید') + .4);
+    CAM.push([b.a, -1000, -280, 1.25]);
+  });
+  // ---- three: title + three boxes with an arrow path through them ----
+  g('three', b => {
+    T(0, 1700, 'امشب، ۳ کار', 120, INK, b.a, b.a + .4, {snd: 'pop'});
+    [-1000, 0, 1000].forEach((x, i) => { P(rect(x - 330, 2050, 660, 680, 6), INK, 7, b.a + .3 + i * .15, b.a + .6 + i * .15); T(x, 2560, ['اپ‌های تشخیص', 'مشاوره', 'سابقه‌ی خانواده'][i], 62, [RED, GREEN, BLUE][i], b.a + .5 + i * .2, b.a + .8 + i * .2, {until: (bt(['app', 'two', 'one'][i]) || {a: 1e9}).a + .6}); });
+    CAM.push([b.a, 0, 2330, .5]);
+  });
+  // ---- one: the family-history note: names with ages and illnesses ----
+  g('one', b => {
+    T(1000, 2090, '۱', 110, BLUE, b.a, b.a + .2, {snd: 'tap'});
+    T(1000, 2260, 'پدربزرگ – ۶۲ – دیابت', 60, INK, b.a + .5, b.a + 1.2);
+    T(1000, 2380, 'مادربزرگ – ۷۰ – فشار', 60, INK, W(b, 'خانواده') - .1, W(b, 'خانواده') + .6, {snd: 'typing'});
+    T(1000, 2500, 'بابا – ؟', 60, INK, W(b, 'سن') - .2, W(b, 'سن') + .3);
+    P(circ(820, 2290, 70, 5), RED, 7, W(b, 'سن') - .2, W(b, 'سن') + .1, {snd: 'tick'});
+    CAM.push([b.a, 1000, 2380, 1.3]);
+  });
+  // ---- two: two rings, a DNA strand and a counsellor's check ----
+  g('two', b => {
+    T(0, 2090, '۲', 110, BLUE, b.a, b.a + .2, {snd: 'tap'});
+    P(circ(-70, 2330, 80, 5), ORANGE, 9, b.a + .3, b.a + .6); P(circ(70, 2330, 80, 5), ORANGE, 9, b.a + .5, b.a + .8, {snd: 'pop'});
+    T(0, 2470, 'قبل از ازدواج', 64, INK, W(b, 'ازدواج') - .2, W(b, 'ازدواج') + .3);
+    T(0, 2570, 'مشاوره‌ی ژنتیک', 74, GREEN, W(b, 'مشاوره') - .2, W(b, 'مشاوره') + .3, {snd: 'tick'});
+    P([[-150, 2660], [-60, 2710], [130, 2610]].map(([x, y]) => [x, y]), GREEN, 12, W(b, 'مشاوره') + .3, W(b, 'مشاوره') + .6);
+    CAM.push([b.a, 0, 2380, 1.3]);
+  });
+  // ---- app: a phone outline promising «AI تشخیص ژنتیک»; a big red X ----
+  g('app', b => {
+    T(-1000, 2090, '۳', 110, BLUE, b.a, b.a + .2, {snd: 'tap'});
+    P(rect(-1200, 2200, 400, 480, 8), INK, 9, b.a + .2, b.a + .7);
+    T(-1000, 2320, 'AI', 80, BLUE, W(b, 'AI') - .2, W(b, 'AI') + .1, {latin: true});
+    T(-1000, 2430, 'تشخیص ژنتیک!', 46, INK, W(b, 'تشخیص') - .2, W(b, 'تشخیص') + .3, {snd: 'typing'});
+    P(line([-1220, 2200], [-780, 2680], 6), RED, 16, W(b, 'اعتماد') - .2, W(b, 'اعتماد'), {snd: 'hit'}); P(line([-780, 2200], [-1220, 2680], 6), RED, 16, W(b, 'اعتماد'), W(b, 'اعتماد') + .2);
+    CAM.push([b.a, -1000, 2400, 1.3]);
+  });
+  // ---- share: pull back to the tree; mum circled green; takeaway ----
+  g('share', b => {
+    P(circ(-260, -250, 100, 6), GREEN, 11, W(b, 'مامان') - .3, W(b, 'مامان') + .1, {snd: 'pop'});
+    T(-260, -420, 'بفرست براش', 60, GREEN, W(b, 'مامان'), W(b, 'مامان') + .4);
+    T(0, -760, 'تاریخچه‌ی خانواده', 90, INK, W(b, 'تاریخچه') - .2, W(b, 'تاریخچه') + .4, {snd: 'tap'});
+    P(line([-260, -650], [260, -650], 5), RED, 9, b.a + 2.6, b.a + 2.9, {snd: 'tick'});
+    P(circ(0, 70, 95, 5), BLUE, 9, b.a + 3.6, b.a + 3.9, {snd: 'tap'});
+    CAM.push([b.a, 0, 900, .32], [b.a + 1.6, 0, 900, .32], [W(b, 'مامان') - .5, -120, -300, .9]);
+  });
+  CAM.sort((p, q) => p[0] - q[0]);
+}
+
+// ---- camera: holds a key with a slow push, then moves to the next with a pull-back dip (zoom into a part, pull back to the whole) ----
+function camAt(t) {
+  if (!CAM.length) return {x: 0, y: 0, z: 1};
+  let i = 0; for (let j = 0; j < CAM.length; j++) if (t >= CAM[j][0]) i = j;
+  const c = CAM[i], p = CAM[Math.max(0, i - 1)], k = i ? eio(pr(t, c[0], c[0] + .32)) : 1;
+  const dist = Math.hypot(c[1] - p[1], c[2] - p[2]), dip = Math.min(.55, dist / 2600);
+  const lz = mix(Math.log(p[3]), Math.log(c[3]), k) - dip * Math.sin(Math.PI * k);
+  const push = 1 + .05 * pr(t, c[0] + .4, (CAM[i + 1] || [END])[0]);
+  // a snap zoom on every drawing moment (screen-studio punch): 12% in over 0.12 s, settling over 0.5 s
+  let kick = 1; for (const s of (window.SCENES || [])) if (t >= s.t0 && t < s.t0 + .6 && s.type === 'board') { const u = t - s.t0; kick = 1 + .28 * (u < .07 ? u / .07 : 1 - eo((u - .07) / .5)); }
+  return {x: mix(p[1], c[1], k), y: mix(p[2], c[2], k), z: Math.exp(lz) * push * kick};
+}
+const SC_Y = 760;
+
+// ---- draw ----
+function pathSvg(e, k) {
+  const total = e.L[e.L.length - 1], upto = total * k; const pts = [];
+  for (let i = 0; i < e.pts.length; i++) { if (e.L[i] <= upto) pts.push(e.pts[i]); else { const j = i - 1, f = (upto - e.L[j]) / (e.L[i] - e.L[j] || 1); pts.push([mix(e.pts[j][0], e.pts[i][0], f), mix(e.pts[j][1], e.pts[i][1], f)]); break; } }
+  if (pts.length < 2) return ['', null];
+  return [`<polyline points="${pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ')}" fill="none" stroke="${e.col}" stroke-width="${e.w}" stroke-linecap="round" stroke-linejoin="round" opacity=".93"/>`, k < 1 ? pts[pts.length - 1] : null];
+}
+const OX = 2000, OY = 1200;      // board svg origin offset (world → svg px)
+function seek(t) {
+  if (!B.length) return;
+  let svg = '', html = '', pen = null;
+  for (const e of EL) {
+    if (t < e.t0 || (e.until && t >= e.until)) continue;
+    const k = pr(t, e.t0, e.t1);
+    if (e.k === 'path') { const [s, hd] = pathSvg(e, k); svg += s; if (hd) pen = [hd, e.col]; }
+    else if (e.k === 'fill') { const h = e.h * k; svg += `<rect x="${e.x + 10}" y="${e.y + e.h - h}" width="${e.w - 20}" height="${Math.max(0, h - 10)}" fill="${e.col}" opacity=".28"/>`; }
+    else if (e.k === 'text') {
+      // written right-to-left (left-to-right for Latin): a clip wipes the word on in the writing direction
+      const c = (1 - k) * 100;
+      html += `<div class="w" ${e.latin ? 'dir="ltr"' : ''} style="left:${e.x + OX}px;top:${e.y + OY}px;font-size:${e.size}px;color:${e.col};transform:translateX(-50%);clip-path:inset(0 ${e.latin ? c : 0}% 0 ${e.latin ? 0 : c}%)">${e.s}</div>`;
+    }
+    else if (e.k === 'img') { const s = e.s * (.7 + .3 * eo(k)); html += `<img class="a" src="${U(e.src)}" style="left:${e.x + OX - s / 2}px;top:${e.y + OY - s / 2}px;width:${s}px;height:${s}px;opacity:${cl(k * 3)}">`; }
+    else if (e.k === 'count') { const n = Math.round(e.to * eo(k)); html += `<div class="w" style="left:${e.x + OX}px;top:${e.y + OY}px;font-size:${e.size}px;color:${e.col};transform:translateX(-50%)">${fa(n)}${e.unit}</div>`; }
+    else if (e.k === 'switch') {
+      const on = t >= e.t0 + .3 && t < e.t1 - .1;
+      svg += `<rect x="${e.x - 70}" y="${e.y - 110}" width="140" height="220" rx="30" fill="none" stroke="${INK}" stroke-width="8"/>` +
+        `<rect x="${e.x - 46}" y="${on ? e.y - 86 : e.y + 6}" width="92" height="80" rx="20" fill="${on ? '#FFD23F' : '#B9B6AE'}" stroke="${INK}" stroke-width="6"/>`;
+      html += `<div class="w" style="left:${e.x + 230 + OX}px;top:${e.y - 60 + OY}px;font-size:76px;color:${on ? GREEN : RED};transform:translateX(-50%)">${on ? 'روشن' : t >= e.t1 - .1 ? 'خاموش' : ''}</div>`;
+    }
+  }
+  // the marker pen at the drawing head (one thing moves at a time)
+  if (pen) { const [[x, y], col] = pen; svg += `<g transform="translate(${x},${y}) rotate(-35)"><rect x="-6" y="-150" width="40" height="150" rx="10" fill="${col}"/><rect x="-6" y="-170" width="40" height="34" rx="8" fill="#ECEAE3" stroke="${INK}" stroke-width="3"/><polygon points="-6,0 34,0 14,26" fill="${col}"/></g>`; }
+  // faint ghosts of old marker on the board (a real whiteboard is never blank)
+  const bd = $('board');
+  const html2 = `<div style="position:absolute;left:0;top:0;width:4000px;height:4800px;background:#F4F2EC"></div><svg style="position:absolute;left:0;top:0" width="4000" height="4800"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 .35  0 0 0 0 .34  0 0 0 0 .32  0 0 0 1.6 -.55"/></filter><rect width="4000" height="4800" filter="url(#gr)" opacity=".36"/></svg>${GHOST}<svg style="position:absolute;left:0;top:0" width="4000" height="4800"><g transform="translate(${OX},${OY})">${svg}</g></svg>${html}`;
+  if (bd._h !== html2) { bd._h = html2; bd.innerHTML = html2; }
+  const c = camAt(t);
+  bd.style.transform = `translate(${(540 - (c.x + OX) * c.z).toFixed(2)}px,${(SC_Y - (c.y + OY) * c.z).toFixed(2)}px) scale(${c.z.toFixed(4)})`;
+  // screen layer: the headline written over the hook, then the end card
+  let s = '';
+  const h = B[0];
+  if (t < h.b + .2) {
+    const k1 = pr(t, 0, .22), out = pr(t, h.b - .2, h.b + .2);
+    const head = (S.headline || '').replace(/\*([^*]+)\*/g, `<span style="color:${RED}">$1</span>`).replace(/\|/g, '<br>');
+    s += `<div class="a" style="left:40px;right:40px;top:90px;padding:22px 16px 34px;border-radius:30px;background:rgba(244,242,236,.96);border:9px solid ${INK};text-align:center;font:400 138px/1.18 M;color:${INK};transform:scale(${((1.1 - .1 * eo(k1)) * (1 + .03 * Math.sin(t * 4))).toFixed(3)}) rotate(${(-1.5 * Math.sin(t * 2.5)).toFixed(2)}deg);opacity:${(1 - out).toFixed(2)}">${head}</div>`;
+  }
+  if (t >= TL.end_start) s += endCard(t - TL.end_start);
+  const sc = $('scr'); if (sc._h !== s) { sc._h = s; sc.innerHTML = s; }
+  let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
+  caption(B[bi], t, t >= TL.end_start);
+}
+let GHOST = '';
+{ let sd = 99; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647; let g = '';
+  for (let i = 0; i < 70; i++) { const x = r() * 4000, y = r() * 4800, w = 200 + r() * 500, a = (r() - .5) * 30;
+    g += `<div style="position:absolute;left:${x.toFixed(0)}px;top:${y.toFixed(0)}px;width:${w.toFixed(0)}px;height:${(30 + r() * 60).toFixed(0)}px;border-radius:40px;background:#8A877F;opacity:${(.05 + r() * .06).toFixed(3)};transform:rotate(${a.toFixed(1)}deg);filter:blur(6px)"></div>`; }
+  for (let i = 0; i < 40; i++) { const x = r() * 4000, y = r() * 4800;
+    g += `<svg style="position:absolute;left:${x.toFixed(0)}px;top:${y.toFixed(0)}px" width="260" height="120"><path d="M10 ${60 + r() * 40} Q 80 ${r() * 120} 140 ${50 + r() * 30} T 250 ${r() * 110}" fill="none" stroke="#6F6C64" stroke-width="7" stroke-linecap="round" opacity="${(.08 + r() * .07).toFixed(3)}"/></svg>`; }
+  GHOST = g; }
+function endCard(u) {
+  const k = eo(pr(u, 0, .5)), q = (S.end_text || '').replace(/\*([^*]+)\*/g, `<span style="color:${RED}">$1</span>`);
+  return `<div class="a" style="left:60px;right:60px;top:${mix(820, 700, k)}px;padding:40px 30px 50px;border-radius:34px;background:#F4F2EC;border:9px solid ${INK};text-align:center;opacity:${cl(k * 3)}">` +
+    `<div style="font:400 96px/1.25 M;color:${INK}">${q}</div><div style="margin-top:20px;font:900 60px V;color:${GREEN}">${S.end_sub || ''} ↗</div>` +
+    `<div dir="ltr" style="margin-top:22px;font:900 40px V;letter-spacing:4px;color:${BLUE}">${(S.handle || '').replace('@', '').toUpperCase()}</div></div>`;
+}
+function caption(b, t, endOn) {
+  const sub = $('sub');
+  if (endOn || t > b.L.end + .3 || (b.i === 0 && t < b.L.end + .3)) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
+  if (!b.chunks) { b.chunks = []; let cur = []; b.words.forEach((w, q) => { cur.push(q); if (cur.length >= 5 || (cur.length >= 2 && /[،؛.!؟?:]$/.test(w.w))) { b.chunks.push(cur); cur = []; } }); if (cur.length) { if (cur.length === 1 && b.chunks.length) b.chunks[b.chunks.length - 1].push(...cur); else b.chunks.push(cur); } }
+  const chn = b.chunks.find(c => c.includes(j)) || b.chunks[0], c0 = chn[0], ch = chn.map(q => b.words[q]), key = b.bt.id + c0;
+  if (sub._k !== key) { sub._k = key; const gs = []; ch.forEach(w => { const l = /^[A-Za-z0-9]/.test(w.w), g = gs[gs.length - 1]; if (g && l && g.l) { g.w += ' ' + w.w; g.k = g.k || w.k; } else gs.push({w: w.w, k: w.k, l}); });
+    sub.innerHTML = `<span class="pill">${gs.map(w => { const m = w.l ? w.w.match(/^(.*?)([،؛.!؟?:]*)$/) : null; return w.l ? `<span class="${w.k ? 'k' : ''}" dir="ltr">${m[1]}</span>${m[2]}` : `<span class="${w.k ? 'k' : ''}">${w.w}</span>`; }).join(' ')}</span>`; }
+}
+window.seek = seek;
+</script>
+</body>
+</html>
