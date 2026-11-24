@@ -64,6 +64,16 @@ const KEYS = {
   hook: x => [x.at('شصت'), x.at('بفرست')], cut: x => [x.at('نود'), x.at('داخلی'), x.at('پیام')], sheet: x => [x.at('برگه')],
   step: x => (x.s.n === 3 ? [x.at('محل'), x.at('چهار'), x.at('دارو')] : [x.at(x.s.key || 'ثابت')]), ask: x => [x.at('گروه')]
 };
+Object.assign(KEYS, {
+  g_hook: x => [x.at('اقتصاددان')], g_wave: x => [x.at('ولی')], g_low: x => [x.at('سال')], g_storm: x => [x.at('رکود'), x.at('زیاد')],
+  g_nine: x => [x.at('درصد'), x.at('یکی')], g_list: x => [x.at('سه'), x.at('AI')], g_share: x => [x.at('همکاری')]
+});
+const GCUES = {
+  g_hook: x => [[1.0, 'hit', .4], [2.5, 'pop', .3]], g_wave: x => [[x.a + .15, 'sweep_soft', .25], [x.at('ولی'), 'hit', .35]],
+  g_low: x => [[x.a + .2, 'tick', .3], [x.at('سال'), 'counter_tick', .3]], g_storm: x => [[x.at('رکود'), 'bass_drop', .3], [x.at('زیاد'), 'tap', .3]],
+  g_nine: x => [[x.a + .2, 'pop', .3], [x.at('درصد'), 'counter_tick', .3], [x.at('یکی'), 'hit', .35]],
+  g_list: x => [[x.a + .2, 'typing', .25], [x.at('AI'), 'pop', .35]], g_share: x => [[x.at('همکاری'), 'tap', .35], [x.at('همکاری') + .5, 'notify', .3]]
+};
 const CUES = {
   hook: x => [[.4, 'notify', .35], [x.at('شصت'), 'hit', .45], [x.at('بفرست'), 'pop', .3]],
   cut: x => [[x.at('نود'), 'counter_tick', .3], [x.at('داخلی'), 'pop', .3], [x.at('پیام'), 'glass_ping', .3]],
@@ -75,7 +85,7 @@ window.ready = (async () => {
   S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json();
   DUR = TL.total; BB = S.beats.map(words).filter(Boolean);
   BB.forEach((x, i) => { x.a = i ? x.Lw.start - .1 : 0; x.z = i + 1 < BB.length ? BB[i + 1].Lw.start - .1 : TL.end_start; });
-  const pics = ['h', 'c', 't', 'k', 'm', 'd'].map(n => U('raw/' + n + '.png'));
+  const pics = (S.set === 'g' ? ['c'] : ['h', 'c', 't', 'k', 'm', 'd']).map(n => U('raw/' + n + '.png')).concat(S.set === 'g' ? [U('el/' + LG())] : []);
   await Promise.all(pics.map(u => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = u; })));
   await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'برگه خانواده')));
   BB.forEach(x => { x.keys = (KEYS[x.s.type] || (() => []))(x).filter(v => v > x.a + .6 && v < x.z - .6).sort((p, q) => p - q); });
@@ -83,7 +93,7 @@ window.ready = (async () => {
     for (let i = 0; i + 1 < pts.length; i++) { const g = pts[i + 1] - pts[i], n = Math.ceil(g / 2.7) - 1; for (let j = 1; j <= n; j++) add.push(pts[i] + g * j / (n + 1)); }
     x.keys = [...x.keys, ...add].sort((p, q) => p - q); });
   const sc = [];
-  for (const x of BB) { const pts = [x.a, ...x.keys], cu = (CUES[x.s.type] || (() => []))(x).filter(c => c[0] >= x.a - .05 && c[0] < x.z);
+  for (const x of BB) { const pts = [x.a, ...x.keys], cu = (CUES[x.s.type] || GCUES[x.s.type] || (() => []))(x).filter(c => c[0] >= x.a - .05 && c[0] < x.z);
     pts.forEach((p, j) => { const t1 = j + 1 < pts.length ? pts[j + 1] : x.z;
       sc.push({t0: +p.toFixed(2), t1: +t1.toFixed(2), type: x.s.type, bg: x.b.id + (j ? '.' + j : ''), sfx: cu.filter(c => c[0] >= p - .05 && c[0] < t1).map(c => [+c[0].toFixed(2), c[1], c[2]])}); }); }
   sc.push({t0: TL.end_start, t1: DUR, type: 'end', bg: 'end', sfx: [[TL.end_start + .1, 'shimmer', .35]]});
@@ -146,6 +156,7 @@ function money(x0, y0, w, k) { // ticker strip of hourly earnings
 // ---------- captions: spoken words in chunks of ≤ 4, cream pill with ink type, accent in green ----------
 function cap(x, t) {
   if (x.s.type === 'hook' && t < x.at('خرداد') - .1) return '';
+  if (x.s.type === 'g_hook') return '';
   if (t > x.Lw.end + .3) return '';
   const W = x.W; let j = 0; for (let q = 0; q < W.length; q++) if (t >= W[q].t - .05) j = q;
   const ch = []; let c = []; W.forEach((w, q) => { c.push(q); if (c.length === 4 || (c.length >= 2 && /[،؛.!؟?…:»]$/.test(w.w))) { ch.push(c); c = []; } }); if (c.length) ch.push(c);
@@ -216,14 +227,84 @@ function scene(x, t) {
         cur(t, [[A, 900, 1500], [at('گروه'), 230, 1220, 1], [x.z, 300, 1300]]);
     }
   }
+  { const g = sceneG(x, t); if (g !== null) return g; }
   return ground();
+}
+
+// ===== REEL-070 set «g» (Goldman Sachs 2027 outlook: the AI layoff wave delayed a year) =====
+function person(x0, y0, sz, col) { return `<svg class="a" style="left:${x0}px;top:${y0}px" width="${sz}" height="${sz * 1.25}" viewBox="0 0 80 100"><circle cx="40" cy="24" r="20" fill="${col}"/><path d="M6 100 Q6 54 40 54 Q74 54 74 100 Z" fill="${col}"/></svg>`; }
+function sceneG(x, t) {
+  const s = x.s, A = x.a, at = x.at, card = (x0, y0, w, h, inner, k, bg = '#fff') => k <= 0 ? '' : `<div class="a" style="left:${x0}px;top:${y0}px;width:${w}px;height:${h}px;border-radius:44px;background:${bg};box-shadow:0 24px 60px rgba(0,0,0,.12);transform:scale(${K(k, 0, 1.06).toFixed(3)});overflow:hidden">${inner}</div>`;
+  switch (s.type) {
+    case 'g_hook': {
+      // frame 0 = the cover photo (the colleague's empty desk with the box), slamming in; the red one-year stamp lands at 0.35 s
+      const te0 = at('اقتصاددان'), z = t < .35 ? L(1.55, 1.18, ex(T(t, 0, .35))) : t < te0 ? L(1.18, 1.3, io(T(t, .35, te0))) : L(1.3, 1.62, ex(T(t, te0, te0 + .5))), kt = pp(t, .35), sh = 12 * Math.sin(t * 50) * Math.exp(-((t - .45) ** 2) / .01);
+      const kn = T(t, .9, 1.8);
+      return `<div class="a" style="left:0;top:0;width:1080px;height:1120px;overflow:hidden"><img src="${U('raw/' + s.img + '.png')}" style="position:absolute;left:0;top:-80px;width:1080px;height:1920px;object-fit:cover;transform:scale(${z.toFixed(4)});transform-origin:${t < te0 ? 470 : L(470, 880, ex(T(t, te0, te0 + .5))).toFixed(0)}px 760px"></div>` +
+        `<div class="a" style="left:0;right:0;top:940px;height:1000px;background:linear-gradient(rgba(246,241,231,0),var(--cr) 18%)"></div>` +
+        (kt > 0 ? `<div class="a" style="left:${(560 + sh).toFixed(0)}px;top:330px;padding:16px 40px 26px;border-radius:30px;background:var(--rd);color:#fff;font:900 104px V;box-shadow:0 18px 40px rgba(229,72,59,.45);transform:rotate(-7deg) scale(${K(L(1.8, 1, ex(kt)), 0, 1.8).toFixed(3)});opacity:${K(kt * 4).toFixed(2)}">⏳ ${fa(1)} سال</div>` : '') +
+        (kn > 0 ? `<div class="a" style="left:90px;top:520px;padding:12px 32px 22px;border-radius:26px;background:var(--ink);color:#fff;font:900 70px V;transform:scale(${K(pp(t, .9), 0, 1.06).toFixed(3)})">یه میز خالی شد</div>` : '') +
+        `<div class="a" style="left:20px;right:20px;top:1080px;text-align:center;font-size:110px;line-height:1.22;white-space:nowrap">${up('اخراج به‌خاطر AI', 1, 104)}<br>${up('<span style="display:inline-block;padding:0 26px 14px;border-radius:28px;background:var(--g);color:#fff">سال دیگه</span> جدی می‌شه؟', 1, 92)}</div>` +
+        (() => { const te = at('اقتصاددان'), kg = pp(t, te - .05); return kg > 0 ? `<div class="a" style="left:110px;top:1490px;width:860px;padding:24px 30px 30px;border-radius:36px;background:#fff;box-shadow:0 24px 60px rgba(0,0,0,.16);display:flex;align-items:center;gap:28px;transform:translateY(${((1 - ex(T(t, te - .05, te + .35))) * 300).toFixed(0)}px) scale(${K(kg, 0, 1.06).toFixed(3)})">${logo(130)}<div><div dir="ltr" style="font:900 60px V;text-align:right">Goldman Sachs</div><div style="font:600 42px V;color:var(--mu)">چشم‌انداز اقتصادی ۲۰۲۷</div></div></div>` : ''; })();
+    }
+    case 'g_wave': {
+      const kd = T(t, A + .1, at('ولی') - .1), kf = T(t, at('ولی') - .05, at('ولی') + .8), W = 760, H = 520;
+      let wave = ''; for (let i = 0; i <= 60 * kd; i++) { const u = i / 60; wave += `${(u * W).toFixed(0)},${(H - 60 - (u * u * 380) - 40 * Math.sin(u * 9)).toFixed(0)} `; }
+      return ground() + card(110, 250, 860, 760, `<div style="padding:34px 46px 0;font:900 54px V">نرخ اخراج · امسال</div>` +
+        `<svg style="position:absolute;left:50px;top:170px" width="${W}" height="${H}"><line x1="0" y1="${H - 20}" x2="${W}" y2="${H - 20}" stroke="#121212" stroke-width="5"/>` +
+        `<polyline points="${wave}" fill="none" stroke="var(--rd)" stroke-width="12" stroke-dasharray="26 18" stroke-linecap="round"/>` +
+        `<line x1="0" y1="${H - 70}" x2="${(W * ex(kf)).toFixed(0)}" y2="${H - 70}" stroke="var(--g)" stroke-width="18" stroke-linecap="round"/></svg>` +
+        `<div style="position:absolute;right:60px;top:200px;font:900 46px V;color:var(--rd);opacity:${K(kd * 3).toFixed(2)}">انتظار: موج</div>` +
+        `<div style="position:absolute;left:60px;bottom:16px;font:900 50px V;color:var(--g);opacity:${K(kf * 3).toFixed(2)}">واقعیت: کم ↑</div>`, pp(t, A)) +
+        tag(330, 1080, 64, 'موج نیومد… هنوز', t, at('ولی') + .3, 'var(--ink)') + `<div class="a" dir="ltr" style="left:110px;top:1190px;font:600 40px V;color:var(--mu);opacity:${K((t - A) * 3).toFixed(2)}">Source: Goldman Sachs 2027 outlook · Fortune, 16 Nov</div>`;
+    }
+    case 'g_low': {
+      const ky = T(t, A + .5, at('سال') + .1);
+      const gauge = (x0, lab, v, k) => card(x0, 260, 420, 470, `<div style="margin-top:30px;text-align:center;font:900 54px V">${lab}</div><svg style="position:absolute;left:40px;top:120px" width="340" height="220"><path d="M 30 190 A 140 140 0 0 1 310 190" fill="none" stroke="#EEE7DA" stroke-width="40" stroke-linecap="round"/><path d="M 30 190 A 140 140 0 0 1 310 190" fill="none" stroke="var(--g)" stroke-width="40" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - v * ex(k)).toFixed(3)}"/><g transform="translate(170 190) rotate(${(-90 + 180 * v * ex(k)).toFixed(1)})"><rect x="-8" y="-130" width="16" height="130" rx="8" fill="#121212"/></g><circle cx="170" cy="190" r="22" fill="#121212"/></svg><div style="position:absolute;left:0;right:0;bottom:30px;text-align:center;font:900 64px V;color:var(--g)">کم</div>`, k);
+      return ground() + gauge(570, 'استخدام', .22, pp(t, A)) + gauge(90, 'اخراج', .18, pp(t, A + .25)) +
+        card(110, 820, 860, 300, `<div style="padding:34px 46px 0;font:900 52px V">تا کِی؟</div><div style="margin:24px 46px 0;height:70px;border-radius:35px;background:#EEE7DA;overflow:hidden"><div style="height:100%;width:${(100 * ex(ky)).toFixed(1)}%;background:var(--ink)"></div></div><div style="margin:14px 46px;font:900 58px V;color:var(--g)">${ky > .05 ? 'یه سال دیگه' : ''}</div>`, pp(t, A + .4));
+    }
+    case 'g_storm': {
+      const kr = T(t, at('رکود') - .1, at('رکود') + .7), kz = pp(t, at('زیاد') - .05);
+      let desks = ''; for (let i = 0; i < 6; i++) { const gone = ex(T(t, at('رکود') + .1 + i * .12, at('رکود') + .4 + i * .12)) * (i % 2 ? 1 : 0);
+        desks += `<div class="a" style="left:${110 + (i % 3) * 300}px;top:${900 + Math.floor(i / 3) * 230}px;width:240px;height:150px"><div style="position:absolute;left:0;right:0;top:40px;height:40px;border-radius:10px;background:#121212"></div><div style="position:absolute;left:30px;top:80px;width:16px;height:70px;background:#121212"></div><div style="position:absolute;right:30px;top:80px;width:16px;height:70px;background:#121212"></div>${person(80, -60 + 200 * gone, 80, gone > .1 ? 'var(--rd)' : 'var(--g)').replace('class="a"', `class="a" style="opacity:${(1 - gone).toFixed(2)}"`)}</div>`; }
+      const cloud = `<svg class="a" style="left:${L(-700, 150, ex(kr)).toFixed(0)}px;top:330px" width="780" height="360" viewBox="0 0 780 360"><path d="M120 300 Q20 300 30 220 Q40 150 120 160 Q140 60 260 70 Q330 0 430 50 Q540 20 580 120 Q700 110 720 210 Q740 300 640 300 Z" fill="#3B3F4A"/><path d="M330 300 L290 360 M430 300 L400 360" stroke="#7CC7FF" stroke-width="12" stroke-linecap="round"/><text x="390" y="230" text-anchor="middle" font-family="V" font-weight="900" font-size="96" fill="#fff">رکود</text></svg>`;
+      return ground() + tag(130, 200, 64, 'اثر AI ↑', t, A + .1) + cloud + desks + tag(560, 1380, 62, 'ما زیاد دیدیم', t, at('زیاد') - .05, 'var(--rd)');
+    }
+    case 'g_nine': {
+      const kn = T(t, A + .2, at('درصد') - .15), ko = T(t, at('یکی') - .05, at('یکی') + .6);
+      let ppl = ''; for (let i = 0; i < 11; i++) { const r = Math.floor(i / 4), c = i % 4, k = pp(t, A + .1 + i * .05), out = i === 10 ? ex(ko) : 0;
+        if (k > 0) ppl += `<div class="a" style="left:${(170 + c * 190 + (r === 2 ? 95 : 0) + 110 * out).toFixed(0)}px;top:${660 + r * 210}px;transform:scale(${K(k, 0, 1.06).toFixed(3)})">${person(0, 0, 130, i === 10 && ko > 0 ? 'var(--rd)' : 'var(--ink)').replace('class="a" style="left:0px;top:0px"', 'style="display:block"')}${i === 10 && ko > 0 ? `<div style="position:absolute;left:-40px;top:-70px;padding:4px 18px 12px;border-radius:16px;background:var(--rd);color:#fff;font:900 44px V;white-space:nowrap">جابه‌جا</div>` : ''}</div>`; }
+      return ground() + `<div class="a" style="left:0;right:0;top:230px;text-align:center;font:900 230px V;color:var(--rd)">${kn > 0 ? 'تا ' + fa(Math.round(9 * ex(kn))) + '٪' : ''}</div>` +
+        `<div class="a" style="left:90px;top:540px">${logo(90)}</div><div class="a" dir="ltr" style="left:200px;top:555px;font:900 48px V">Goldman Sachs</div>` + ppl + tag(300, 1300, 60, 'از هر ۱۱ نفر، ۱ نفر', t, at('یکی') + .2, 'var(--ink)');
+    }
+    case 'g_list': {
+      const kw = T(t, at('سه') - .1, at('AI') - .1), ka = pp(t, at('AI') - .05);
+      let rows = ''; for (let i = 0; i < 3; i++) { const k = K(kw * 3 - i);
+        rows += `<div style="position:relative;height:150px;border-bottom:4px dashed #D9D1C2"><div style="position:absolute;right:0;top:44px;font:900 64px V;color:var(--g)">${fa(i + 1)}.</div><div style="position:absolute;right:90px;top:66px;height:22px;border-radius:11px;background:#2B2B2B;width:${(k * [520, 440, 480][i]).toFixed(0)}px"></div>` +
+          (ka > 0 ? `<div style="position:absolute;left:10px;top:36px;padding:8px 26px 16px;border-radius:22px;background:var(--g);color:#fff;font:900 56px V;transform:rotate(${[-6, 5, -3][i]}deg) scale(${K(pp(t, at('AI') - .05 + i * .15), 0, 1.1).toFixed(3)})">AI ✓</div>` : '') + `</div>`; }
+      return ground() + tag(330, 200, 70, '⏳ یه سال وقت', t, A + .05, 'var(--rd)') +
+        card(110, 400, 860, 760, `<div style="padding:40px 50px 10px;font:900 62px V;border-bottom:6px solid var(--ink);margin:0 40px">۳ کار تکراری من</div><div style="padding:0 50px">${rows}</div>`, pp(t, A + .15), '#FFFDF6');
+    }
+    case 'g_share': {
+      const kh = pp(t, at('همکاری') - .05), fl = ex(T(t, at('همکاری') + .1, at('همکاری') + .7));
+      const cols = ['#6C5CE7', '#12A150', '#E5483B', '#F0A202', '#2D9CDB'];
+      let row = ''; cols.forEach((c, i) => { const k = pp(t, A + .1 + i * .08), hi = i === 2;
+        row += `<div class="a" style="left:${110 + i * 180}px;top:${hi ? 700 - 40 * kh : 700}px;width:150px;height:150px;border-radius:50%;background:${c};border:${hi && kh > 0 ? '10px solid var(--ink)' : 'none'};transform:scale(${K(k, 0, 1.06).toFixed(3)});overflow:hidden">${person(25, 30, 100, '#fff')}</div>`; });
+      return ground() + `<div class="a" style="left:0;right:0;top:300px;text-align:center;font:900 84px V">کدوم همکارت می‌گه<br><span style="color:var(--g)">«به ما کاری نداره»</span>؟</div>` + row +
+        tag(380, 900, 62, 'همون همکار', t, at('همکاری'), 'var(--ink)') +
+        (fl > 0 && fl < 1 ? `<div class="a" style="left:${L(540, 470, fl).toFixed(0)}px;top:${L(1300, 760, fl).toFixed(0)}px;font-size:110px;transform:rotate(-30deg)">✈️</div>` : '');
+    }
+  }
+  return null;
 }
 
 // end title: the green card from the hook comes back as the end card (final frame echoes the first idea)
 function endCard(u) {
   const w = L(200, 860, ex(T(u, 0, .5)));
-  return ground() + `<div class="a" style="left:${540 - w / 2}px;top:560px;width:${w}px;height:260px;border-radius:60px;background:var(--g)"></div>` +
-    `<div class="a" style="left:0;right:0;top:600px;text-align:center;color:#fff">${up('یه برگه، چهار خط', T(u, .3, .7), 100, '#fff')}</div>` +
+  const pul = S.set === 'g' ? 1 + .04 * Math.sin(u * 7) : 1;
+  return ground() + `<div class="a" style="left:${540 - w * pul / 2}px;top:560px;width:${w * pul}px;height:260px;border-radius:60px;background:var(--g)"></div>` + (S.set === 'g' ? `<div class="a" style="left:${(300 + 500 * T(u, .3, 2.2)).toFixed(0)}px;top:${(1300 - 500 * T(u, .3, 2.2)).toFixed(0)}px;font-size:120px;transform:rotate(-30deg)">✈️</div>` : '') +
+    `<div class="a" style="left:0;right:0;top:600px;text-align:center;color:#fff">${up(S.set === 'g' ? 'یه سال، سه کار' : 'یه برگه، چهار خط', T(u, .3, .7), 100, '#fff')}</div>` +
     `<div class="a" style="left:0;right:0;top:920px;text-align:center">${up((S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--g)">$1</span>'), T(u, .5, .9), 92)}</div>` +
     `<div class="a" style="left:0;right:0;top:1100px;text-align:center;font:600 56px V;color:var(--mu);opacity:${T(u, .8, 1.1).toFixed(2)}">${S.end_sub || ''} · ${S.handle || ''}</div>`;
 }

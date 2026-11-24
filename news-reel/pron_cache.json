@@ -698,5 +698,19 @@
   "score": 1,
   "voice": "RBEKbcQ62sKk2tsmPsAU",
   "date": "2026-11-24"
+ },
+ "Goldman Sachs": {
+  "mode": "A",
+  "spoken": "Goldman Sachs",
+  "score": 1,
+  "voice": "sfhAAJOJsezV06RnSptt",
+  "date": "2026-11-24"
+ },
+ "Goldman": {
+  "mode": "A",
+  "spoken": "Goldman",
+  "score": 1,
+  "voice": "sfhAAJOJsezV06RnSptt",
+  "date": "2026-11-24"
  }
 }
