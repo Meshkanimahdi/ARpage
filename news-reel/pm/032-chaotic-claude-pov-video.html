@@ -110,7 +110,7 @@ function ground(t, i) {
   const g = GLOW[i % GLOW.length], g2 = GLOW[(i + 3) % GLOW.length], a = t * .6 + i;
   const gp = (D.ground_img ? `<div class="ab" style="inset:-60px;background:url('${src('raw/' + D.ground_img[i % D.ground_img.length] + '.png')}') center/cover;opacity:.55;transform:scale(${(1.08 + .04 * Math.sin(t * .5 + i)).toFixed(3)}) translateX(${(Math.sin(t * .3 + i) * 30).toFixed(0)}px)"></div>` : '').replace('opacity:.55','opacity:.42');
   return `<div class="ab" style="inset:0;background:radial-gradient(900px 700px at ${(540 + 300 * Math.sin(a)).toFixed(0)}px ${(520 + 160 * Math.cos(a * .8)).toFixed(0)}px, ${g}66, transparent 70%),radial-gradient(800px 800px at ${(540 - 320 * Math.sin(a * .7)).toFixed(0)}px ${(1500 + 120 * Math.sin(a)).toFixed(0)}px, ${g2}55, transparent 70%),linear-gradient(160deg,#120D26,#07060F 60%,#0E1324)"></div>` +
-    `<svg class="ab" width="1080" height="1920" style="left:0;top:0;opacity:.35"><defs><pattern id="dg${i}" width="54" height="54" patternUnits="userSpaceOnUse" patternTransform="translate(${(t * 24 % 54).toFixed(1)} ${(t * 40 % 54).toFixed(1)})"><circle cx="2" cy="2" r="2.4" fill="#fff"/></pattern></defs><rect width="1080" height="1920" fill="url(#dg${i})"/></svg>` + gp;
+    `<svg class="ab" width="1080" height="1920" style="left:0;top:0;opacity:.35"><defs><pattern id="dg${i}" width="54" height="54" patternUnits="userSpaceOnUse" patternTransform="translate(${(t * 24 % 54).toFixed(1)} ${(t * 40 % 54).toFixed(1)})"><circle cx="2" cy="2" r="2.4" fill="#fff"/></pattern></defs><rect width="1080" height="1920" fill="url(#dg${i})"/></svg>` + (D.set === 'k' ? `<svg class="ab" width="1240" height="2080" style="left:${(-80 + 40 * Math.sin(t * .4 + i)).toFixed(0)}px;top:${(-80 + 40 * Math.cos(t * .3 + i)).toFixed(0)}px;opacity:.28;mix-blend-mode:screen"><filter id="gn${i}"><feTurbulence type="fractalNoise" baseFrequency=".018" numOctaves="3" seed="${i + 3}"/><feColorMatrix values="0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .75  0 0 0 1.8 -.6"/></filter><rect width="1240" height="2080" filter="url(#gn${i})"/></svg>` : '') + gp;
 }
 function framed(img, x, t, dim = 0) {
   // the photo lives inside a rebuilt ChatGPT app window: dark title bar with the real logo, the photo as the chat
@@ -556,7 +556,7 @@ function drawK(x, t) {
     case 'k_bars': {
       const h = H[0] || x.z - .6, up = outQ(ramp(t, A + .2, h - .1)), back = outQ(ramp(t, h, h + .6)), ai = lerp(lerp(.3, .9, up), .25, back), me = 1 - ai, MAX = 640, BY = 1120;
       const bar = (l, v, col, left) => `<div class="ab" style="left:${left}px;top:${(BY - MAX * v).toFixed(0)}px;width:280px;height:${(MAX * v).toFixed(0)}px;border-radius:30px 30px 0 0;background:${col};box-shadow:0 0 50px ${col}"></div>` +
-        `<div class="ab" style="left:${left}px;width:280px;top:${(BY - 70 - MAX * v).toFixed(0)}px;text-align:center;font:900 70px V">${faNum(Math.round(v * 100))}٪</div><div class="ab" style="left:${left}px;width:280px;top:${BY + 14}px;text-align:center;font:900 76px V">${l}</div>`;
+        `<div class="ab" style="left:${left}px;width:280px;top:${BY + 14}px;text-align:center;font:900 76px V">${l}</div>`;
       return ground(t, x.i) + memeLine('سؤال *۲*', 200, 130, ramp(t, A, A + .25), -2) +
         `<div class="ab" style="left:120px;right:120px;top:1120px;height:8px;background:#fff;border-radius:4px"></div>` +
         bar('خودش', me, back > .5 ? 'var(--teal)' : '#7A7A85', 620) + bar('AI', ai, back > .5 ? '#7A7A85' : 'var(--red)', 180) +
