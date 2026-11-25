@@ -54,7 +54,7 @@ const spr = u => u <= 0 ? 0 : 1 - Math.exp(-6.5 * u) * Math.cos(11 * u);
 const fa = s => String(s).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
 const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
 const h = (cls, css, html) => { const e = document.createElement('div'); if (cls) e.className = cls; if (css) e.style.cssText = css; if (html !== undefined) e.innerHTML = html; return e; };
-let S, TL, PARTS = [], BEATS = [], END = 60; const ISSUES = []; const WHO = {shopkeeper: 'صاحب مغازه', assistant: 'دستیار گوشی'}; const PLATES = ['A1', 'B1', 'A3', 'B3', 'A2', 'B2'];
+let S, TL, PARTS = [], BEATS = [], END = 60; const ISSUES = []; const WHO = {shopkeeper: 'صاحب مغازه', assistant: 'دستیار گوشی'}; let PLATES = ['A1', 'B1', 'A3', 'B3', 'A2', 'B2'];
 
 // ---- part builders: each returns {el, cur: [[dt, x, y, click]], draw(u)} with u = seconds since the part began ----
 const B = {};
@@ -156,9 +156,109 @@ B.cta = p => { const el = h('part'); el.append(h('a mask', 'left:0;right:0;top:2
     bs.forEach((b, i) => { const s = spr(u - .3 - i * .25), tap = Math.exp(-((u - .9 - i) ** 2) / .01) + Math.exp(-((u - 3.2 - i * .6) ** 2) / .01), bob = Math.sin((u - i) * 2.4) * 18 * P(u, 2.2, 2.8); b.style.transform = `translateY(${bob.toFixed(1)}px) scale(${(Math.min(1.04, s) * (1 - .08 * tap)).toFixed(4)})`; }); } };
 };
 
+// ===== REEL-071 set «g» (GTA VI launch): official press-kit screenshots carrying a motion-graphics treatment (RUNBOOK §000.6):
+// tracked callouts and brackets pinned to things in the picture, counters and checklists drawn over it, split compare;
+// data scenes on the warm canvas between the picture scenes =====
+const GIMGS = {gsplit: ['b_tower', 'b_iguana', 'b_street']};
+const GS = 1920 / 1440, PW = Math.round(2560 * GS);            // a 2560x1440 screenshot scaled to the frame height: a 3413-px pano
+const pano = img => h('a', `left:0;top:0;width:${PW}px;height:1920px;background:url(${U('raw/' + img + '.png')}) 0 0/${PW}px 1920px;will-change:transform`);
+const gx = v => v * 4 * GS;                                    // grid (640x360) → pano px
+const bracket = (x, y, w, hh) => { const e = h('a', `left:${x}px;top:${y}px;width:${w}px;height:${hh}px`); const L = 70, T = 10;
+  [[0, 0, 1, 1], [1, 0, -1, 1], [0, 1, 1, -1], [1, 1, -1, -1]].forEach(([cx, cy]) => { e.append(h('a', `${cx ? 'right' : 'left'}:0;${cy ? 'bottom' : 'top'}:0;width:${L}px;height:${T}px;background:var(--acc)`), h('a', `${cx ? 'right' : 'left'}:0;${cy ? 'bottom' : 'top'}:0;width:${T}px;height:${L}px;background:var(--acc)`)); }); return e; };
+const LAT = w => /[A-Za-z0-9]/.test(w) && !/[\u0600-\u06FF]/.test(w);
+const subRuns = ws => { let o = '', run = false; ws.forEach((w, q) => { const l = LAT(w.w); if (l && !run) o += '<span style="display:inline-block;direction:ltr">'; if (!l && run) o += '</span>'; run = l; o += `<span class="w${w.k ? ' k' : ''}" data-i="${q}">${esc(w.w)}</span> `; }); return o + (run ? '</span>' : ''); };   // Latin runs (GTA 6, PlayStation 5) stay left-to-right inside the RTL pill
+const chipEl = (txt, css, size = 54, bg = 'var(--acc)', fg = '#fff') => h('a', css + `;background:${bg};color:${fg};font:900 ${size}px/1.2 V;padding:${size * .18}px ${size * .5}px ${size * .34}px;border-radius:${size * .5}px;white-space:nowrap;box-shadow:0 14px 34px rgba(0,0,0,.35)`, txt);
+B.ghook = p => { const el = h('part'), ph = pano(p.img), tr = h('a', 'left:0;top:0;width:0;height:0');     // tr moves with the pano: everything in it is pinned to the picture
+  const jet = bracket(gx(238), gx(92), gx(112), gx(192)), jl = chipEl('یه رهگذرِ ساده تو بازی', `left:${gx(226)}px;top:${gx(284) + 16}px;direction:rtl`, 46, 'var(--ink)');
+  const pin = h('a', `left:${gx(190)}px;top:${gx(282)}px;width:34px;height:34px;border-radius:50%;background:var(--acc);border:8px solid #fff`), pl = chipEl('ایگوانا وسطِ خیابون', `left:${gx(190) - 30}px;top:${gx(282) + 60}px;direction:rtl`, 46);
+  tr.append(jet);
+  const shade = h('a', 'left:0;top:0;width:1080px;height:760px;background:linear-gradient(rgba(10,6,16,.86),rgba(10,6,16,.55) 62%,rgba(10,6,16,0))');
+  const t1 = h('a mask', 'left:40px;right:40px;top:240px;text-align:center;direction:rtl', `<span class="t9" style="font-size:150px;line-height:1.15;color:#fff">GTA 6 اومد؛</span>`);
+  const t2 = h('a', 'left:40px;right:40px;top:440px;text-align:center;direction:rtl', `<span class="t9" style="display:inline-block;font-size:124px;line-height:1.2;color:#fff;background:var(--acc);padding:0 36px 20px;border-radius:34px;transform-origin:50% 50%">زیادی واقعیه؟</span>`);
+  const cnt = h('a', 'left:0;right:0;top:1350px;text-align:center;direction:rtl', `<span class="t9" style="display:inline-block;background:#fff;color:var(--ink);font-size:76px;padding:8px 44px 22px;border-radius:44px;box-shadow:0 18px 40px rgba(0,0,0,.4)"></span>`);
+  el.append(ph, tr, shade, t1, t2, cnt);
+  return {el, cur: [[0, 900, 1500, 0], [.8, 700, 1420, 1], [2.4, 900, 1180, 0]], draw(u) {
+    const off = u < .35 ? mix(1750, 1250, eo(P(u, 0, .35))) : mix(1250, 840, eio(P(u, .35, 5.5))), z = u < .35 ? mix(1.35, 1.04, eo(P(u, 0, .35))) : 1.04;
+    ph.style.transform = tr.style.transform = `translateX(${(-off).toFixed(1)}px) scale(${z.toFixed(4)})`; ph.style.transformOrigin = tr.style.transformOrigin = `${(off + 540).toFixed(0)}px 700px`;
+    const kj = spr(u - .5); jet.style.transform = `scale(${mix(1.5, 1, Math.min(1, kj)).toFixed(3)})`; jet.style.opacity = kj > 0 ? 1 : 0; jl.style.transform = `scale(${Math.min(1.06, spr(u - .8)).toFixed(3)})`; jl.style.transformOrigin = '0 0';
+    const kp = spr(u - 1.6); pin.style.transform = `scale(${Math.min(1.2, kp).toFixed(3)})`; pl.style.transform = `scale(${Math.min(1.06, spr(u - 1.75)).toFixed(3)})`; pl.style.transformOrigin = '0 50%';
+    t1.firstChild.style.transform = `translateY(${(1 - Math.min(1, spr(u + .25))) * 180}px)`; t2.firstChild.style.transform = `scale(${(u < .12 ? 1 : 1 + .12 * Math.exp(-7 * (u - .12)) * Math.cos((u - .12) * 20)).toFixed(4)}) rotate(-2deg)`;
+    const kc = P(u, .9, 1.9); cnt.firstChild.textContent = fa(Math.round(13 * eo(kc))) + ' سال انتظار'; cnt.style.transform = `scale(${Math.min(1.06, spr(u - .85)).toFixed(3)})`; cnt.style.opacity = u > .85 ? 1 : 0; } };
+};
+B.grel = p => { const el = h('part'); const c1 = h('card', 'left:90px;top:230px;width:900px;height:430px');
+  c1.append(h('a', 'left:60px;right:60px;top:50px;text-align:right', `<span class="t6" style="font-size:50px;color:var(--mu)">تاریخ انتشار</span>`), h('a mask', 'left:60px;right:60px;top:150px;text-align:right', `<span class="t9" style="font-size:128px;line-height:1.3">۱۹ نوامبر ۲۰۲۶</span>`));
+  const c2 = h('blk', 'left:90px;top:710px;width:900px;height:420px'); const yr = h('a', 'right:60px;top:40px', `<span class="t9" style="font-size:150px;color:var(--acc)"></span>`);
+  const line = h('a', 'right:60px;top:290px;height:20px;border-radius:10px;background:#fff;width:0'), y0 = h('a', 'right:60px;top:330px', `<span class="t6" style="font-size:42px;color:#ddd;direction:ltr;display:inline-block">GTA V · 2013</span>`), y1 = h('a', 'left:60px;top:330px', `<span class="t6" style="font-size:42px;color:#ddd;direction:ltr;display:inline-block">GTA VI · 2026</span>`);
+  c2.append(yr, line, y0, y1);
+  const k1 = chipEl('PlayStation 5', 'left:120px;top:1210px;direction:ltr', 68, 'var(--ink)'), k2 = chipEl('Xbox Series X|S', 'left:120px;top:1360px;direction:ltr', 68, 'var(--ink)'), only = chipEl('فقط کنسول', 'right:110px;top:1285px;direction:rtl', 60);
+  el.append(c1, c2, k1, k2, only);
+  return {el, cur: [[0, 540, 1600, 0], [.7, 800, 440, 1], [1.7, 400, 1250, 1], [2.2, 420, 1400, 1]], draw(u) {
+    c1.style.transform = `scale(${(.5 + .5 * Math.min(1.03, spr(u - .1))).toFixed(4)})`; c1.children[1].firstChild.style.transform = `translateY(${(1 - Math.min(1, spr(u - .35))) * 190}px)`;
+    const s2 = spr(u - .7); c2.style.transform = `translateY(${(1 - Math.min(1, s2)) * 400}px)`; c2.style.opacity = s2 > 0 ? 1 : 0;
+    const kk = eo(P(u, .9, 1.9)); yr.firstChild.textContent = fa(Math.round(13 * kk)) + ' سال'; line.style.width = (780 * kk).toFixed(0) + 'px'; y1.style.opacity = P(u, 1.7, 1.9);
+    [k1, k2].forEach((k, i) => { k.style.transform = `scale(${Math.min(1.06, spr(u - 1.9 - i * .4)).toFixed(3)})`; k.style.transformOrigin = '0 50%'; }); only.style.transform = `rotate(6deg) scale(${Math.min(1.08, spr(u - 2.6)).toFixed(3)})`; } };
+};
+B.gmoney = p => { const el = h('part'); const lab = h('a mask', 'left:0;right:0;top:210px;text-align:center', `<span class="t9" style="font-size:84px">فروشِ روزِ اول</span>`);
+  const big = h('a', 'left:0;right:0;top:340px;text-align:center;direction:ltr', `<span class="t9" style="font-size:250px;line-height:1.1;color:var(--acc)"></span>`), unit = h('a', 'left:0;right:0;top:640px;text-align:center', `<span class="t9" style="font-size:90px">میلیارد دلار</span>`);
+  const pic = h('a', `left:90px;top:840px;width:900px;height:506px;border-radius:44px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.3);background:url(${U('raw/' + p.img + '.png')}) center/cover`);
+  const iris = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); iris.setAttribute('viewBox', '0 0 900 506'); iris.style.cssText = 'position:absolute;inset:0'; pic.append(iris);
+  const rec = chipEl('رکورد', 'left:130px;top:800px;direction:rtl', 64), q = h('a', 'left:70px;right:70px;top:1390px;text-align:center', `<span class="t9" style="display:inline-block;background:var(--ink);color:#fff;font-size:50px;line-height:1.4;padding:16px 40px 28px;border-radius:36px">«بزرگ‌ترین شروعِ تاریخِ سرگرمی»<br><span class="t6" style="font-size:38px;color:#ccc">به گفته‌ی سازنده‌ی بازی</span></span>`);
+  el.append(lab, big, unit, pic, rec, q);
+  return {el, cur: [[0, 540, 1600, 0], [1.1, 760, 520, 1], [2.0, 540, 1090, 1]], draw(u) {
+    lab.firstChild.style.transform = `translateY(${(1 - Math.min(1, spr(u))) * 130}px)`; const k = eo(P(u, .2, 1.3)); big.firstChild.textContent = '$' + (3.79 * k).toFixed(2); big.style.transform = `scale(${(1 + .1 * Math.exp(-8 * Math.max(0, u - 1.3)) * (u > 1.3 ? 1 : 0)).toFixed(4)})`;
+    unit.style.opacity = P(u, .4, .6); const sp = spr(u - 1.5); pic.style.transform = `rotate(-3deg) scale(${(.6 + .4 * Math.min(1.03, sp)).toFixed(4)})`; pic.style.opacity = sp > 0 ? 1 : 0;
+    const ki = eo(P(u, 1.9, 2.5)), R = mix(0, 700, ki), rot = mix(-60, 0, ki); let d = 'M0 0 H900 V506 H0 Z '; for (let i = 0; i < 6; i++) { const a = (rot + i * 60) * Math.PI / 180; d += (i ? 'L' : 'M') + (450 + R * Math.cos(a)).toFixed(1) + ' ' + (253 + R * Math.sin(a)).toFixed(1) + ' '; }
+    iris.innerHTML = `<path d="${d}Z" fill="#0E0E10" fill-rule="evenodd"/>`; pic.style.backgroundPosition = `${mix(30, 70, P(u, 1.9, 6)).toFixed(1)}% 50%`;
+    rec.style.transform = `rotate(-8deg) scale(${Math.min(1.1, spr(u - 2.3)).toFixed(3)})`; q.style.transform = `translateY(${(1 - Math.min(1, spr(u - 2.7))) * 500}px)`; } };
+};
+B.gsplit = p => { const el = h('part'); el.append(h('a', 'left:0;top:0;width:1080px;height:1920px;background:var(--ink)'));
+  const BD = [['b_tower', 0, 0, [246, 190, 340, 200], 'نور', 90], ['b_iguana', -120, 0, [436, 30, 270, 205], 'جزئیات', 575], ['b_street', 0, 0, [262, 40, 250, 420], 'شلوغیِ دنیا', 1060]];
+  const bands = BD.map(([img, lx, ty, bx, lb, y], i) => { const b = h('a', `left:0;top:${y}px;width:1080px;height:470px;overflow:hidden`), im = h('a', `left:${lx}px;top:${ty}px;width:1200px;height:490px;background:url(${U('raw/' + img + '.png')}) 0 0/1200px 490px`);
+    const br = bracket(bx[0], bx[1], bx[2], Math.min(bx[3], 440)), ch = chipEl(lb, `right:50px;top:330px;direction:rtl`, 72); const tr = h('a', 'left:0;top:0;width:0;height:0'); tr.append(br); b.append(im, tr, ch); el.append(b); return {b, im, tr, br, ch, i}; });
+  return {el, cur: [[0, 900, 300, 0], [.6, 420, 330, 1], [1.2, 560, 760, 1], [1.9, 400, 1340, 1]], draw(u) {
+    bands.forEach(o => { const a = o.i * .55, s = spr(u - a), dir = o.i % 2 ? -1 : 1; o.b.style.transform = `translateX(${((1 - Math.min(1, s)) * 1100 * dir).toFixed(1)}px)`; o.b.style.opacity = s > 0 ? 1 : 0;
+      const dx = mix(0, o.i % 2 ? 50 : -50, P(u, a, a + 5)); o.im.style.transform = o.tr.style.transform = `translateX(${dx.toFixed(1)}px) scale(${mix(1.08, 1, eo(P(u, a, a + 1.2))).toFixed(4)})`;
+      const kb = spr(u - a - .45); o.br.style.transform = `scale(${mix(1.6, 1, Math.min(1, kb)).toFixed(3)})`; o.br.style.opacity = kb > 0 ? 1 : 0; o.ch.style.transform = `scale(${Math.min(1.08, spr(u - a - .65)).toFixed(3)})`; o.ch.style.transformOrigin = '100% 50%'; }); } };
+};
+B.glist = p => { const el = h('part'), ph = pano(p.img), tr = h('a', 'left:0;top:0;width:0;height:0');
+  const br = bracket(gx(295), gx(212), gx(180), gx(120)), bl = chipEl('ماشینی که باید تعمیر شه', `left:${gx(295) + 30}px;top:${gx(212) - 96}px;direction:rtl`, 46, 'var(--ink)'); tr.append(br, bl);
+  const shade = h('a', 'left:0;top:0;width:1080px;height:1000px;background:linear-gradient(rgba(10,6,16,.8),rgba(10,6,16,.5) 60%,rgba(10,6,16,0))');
+  const card = h('card', 'left:70px;top:210px;width:640px;height:640px;direction:rtl'); card.append(h('a', 'left:40px;right:40px;top:36px;text-align:right', `<span class="t9" style="font-size:54px">یه بازیکن، بعد از</span>`));
+  const hrs = h('a', 'left:40px;right:40px;top:110px;text-align:right', `<span class="t9" style="font-size:96px;color:var(--acc)"></span>`); card.append(hrs);
+  const rows = ['تعمیر', 'خرید', 'اصلاح'].map((t, i) => { const r = h('a', `left:40px;right:40px;top:${270 + i * 116}px;height:96px;border-radius:26px;background:#F1EEE8`), tx = h('a', 'right:30px;top:12px', `<span class="t9" style="font-size:56px">${t}</span>`), ck = h('a', 'left:24px;top:14px;width:68px;height:68px;border-radius:50%;background:var(--acc);color:#fff;font:900 46px/68px V;text-align:center', '✓'); r.append(tx, ck); card.append(r); return {r, ck, i}; });
+  el.append(ph, tr, shade, card);
+  return {el, cur: [[0, 900, 1500, 0], [1.1, 180, 530, 1], [1.8, 180, 646, 1], [2.5, 180, 762, 1]], draw(u) {
+    const off = mix(1470, 1540, eio(P(u, 0, 6))); ph.style.transform = tr.style.transform = `translateX(${(-off).toFixed(1)}px)`;
+    const kb = spr(u - .3); br.style.transform = `scale(${mix(1.5, 1, Math.min(1, kb)).toFixed(3)})`; br.style.opacity = kb > 0 ? 1 : 0; bl.style.transform = `scale(${Math.min(1.06, spr(u - .55)).toFixed(3)})`; bl.style.transformOrigin = '0 0';
+    card.style.transform = `rotate(-2deg) scale(${(.5 + .5 * Math.min(1.03, spr(u - .1))).toFixed(4)})`; hrs.firstChild.textContent = '+' + fa(Math.round(10 * eo(P(u, .3, 1.1)))) + ' ساعت';
+    rows.forEach(o => { const a = 1.2 + o.i * .7; o.r.style.transform = `translateX(${((1 - eo(P(u, a - .5, a - .2))) * 700).toFixed(0)}px)`; o.ck.style.transform = `scale(${Math.min(1.15, spr(u - a)).toFixed(3)})`; }); } };
+};
+B.gbars = p => { const el = h('part'); el.append(h('a mask', 'left:60px;right:60px;top:200px;text-align:center', `<span class="t9" style="font-size:66px;line-height:1.35">چتِ استریم‌ها درباره‌ی<br>گیم‌پلی و گرافیک</span>`));
+  const mk = (y, lbl, frac, txt, acc) => { const c = h('card', `left:90px;top:${y}px;width:900px;height:400px`); c.append(h('a', 'left:50px;right:50px;top:36px;text-align:right', `<span class="t9" style="font-size:54px">${lbl}</span>`));
+    const tr = h('a', 'left:50px;right:50px;top:150px;height:110px;border-radius:30px;background:#EFEBE4'), bar = h('a', `right:50px;top:150px;height:110px;border-radius:30px;background:${acc ? 'var(--acc)' : 'var(--ink)'};width:0`), v = h('a', 'left:50px;right:50px;top:280px;text-align:right', `<span class="t9" style="font-size:70px;${acc ? 'color:var(--acc)' : ''}">${txt}</span>`); c.append(tr, bar, v); el.append(c); return {c, bar, v, frac}; };
+  const A = mk(480, 'تعریف از واقع‌گرایی', 1 / 3, 'حدودِ یک‌سوم', 1), Bq = mk(930, 'غر از کُندی و ۳۰ فریم', 1 / 4, 'حدودِ یک‌چهارم', 0);
+  const src = h('a', 'left:0;right:0;top:1380px;text-align:center', `<span class="t6" style="font-size:40px;color:var(--mu)">منبع: تحلیل چتِ Streams Charts</span>`); el.append(src);
+  return {el, cur: [[0, 540, 1600, 0], [.5, 700, 690, 1], [1.6, 780, 1140, 1]], draw(u) {
+    el.firstChild.firstChild.style.transform = `translateY(${(1 - Math.min(1, spr(u))) * 220}px)`;
+    [A, Bq].forEach((o, i) => { const a = .3 + i * 1.1, s = spr(u - a); o.c.style.transform = `translateY(${(1 - Math.min(1, s)) * 300}px) scale(${(.85 + .15 * Math.min(1.02, s)).toFixed(4)})`; o.c.style.opacity = s > 0 ? 1 : 0;
+      o.bar.style.width = (800 * o.frac * eo(P(u, a + .25, a + 1.1))).toFixed(0) + 'px'; o.v.style.opacity = P(u, a + .7, a + .9); }); src.style.opacity = P(u, 2.4, 2.7); } };
+};
+B.gpoll = p => { const el = h('part'); el.append(h('a', `left:0;top:0;width:1080px;height:1920px;background:${p.bg || p.tex ? 'transparent' : 'var(--ink)'}`), h('a mask', 'left:0;right:0;top:230px;text-align:center', `<span class="t9" style="font-size:104px;color:#fff">تو کدوم‌وری هستی؟</span>`));
+  const o1 = h('card', 'left:90px;top:470px;width:900px;height:330px;display:grid;place-items:center', `<span class="t9" style="font-size:96px">شبیهِ زندگی</span>`), o2 = h('a', 'left:90px;top:850px;width:900px;height:330px;border-radius:44px;background:var(--acc);display:grid;place-items:center', `<span class="t9" style="font-size:96px;color:#fff">فرار از زندگی</span>`);
+  const send = h('a', 'left:0;right:0;top:1270px;text-align:center', `<span class="t9" style="display:inline-block;background:#fff;color:var(--ink);font-size:52px;line-height:1.35;padding:12px 40px 26px;border-radius:44px">بفرست برای رفیقی که<br>۱۳ سال منتظرش بود ✈️</span>`), hd = h('a', 'left:0;right:0;top:1470px;text-align:center', `<span class="t9" style="font-size:40px;letter-spacing:4px;direction:ltr;display:inline-block;color:#fff">MESHKANI.PRO</span>`);
+  const ring = h('a', 'left:70px;top:450px;width:924px;height:354px;border-radius:60px;border:8px solid #fff;opacity:0'); el.append(o1, o2, ring, send, hd);
+  return {el, cur: [[0, 540, 1600, 0], [.8, 760, 640, 1], [2.0, 760, 1020, 1], [3.6, 540, 1330, 1]], draw(u) {
+    el.children[1].firstChild.style.transform = `translateY(${(1 - Math.min(1, spr(u))) * 180}px)`;
+    [o1, o2].forEach((o, i) => { const s = spr(u - .2 - i * .3), tap = Math.exp(-((u - 1.25 - i * 1.2) ** 2) / .012), bob = Math.sin((u - i) * 2.6) * 10 * P(u, 3, 3.6); o.style.transform = `translateX(${((1 - Math.min(1, s)) * (i ? -1100 : 1100)).toFixed(0)}px) translateY(${bob.toFixed(1)}px) scale(${(1 - .07 * tap).toFixed(4)})`; });
+    const sel = u < 1.25 ? -1 : u < 2.45 ? 0 : u < 3.6 ? 1 : Math.floor((u - 3.6) / .9 + 1) % 2 ? 0 : 1, tsel = u < 2.45 ? 1.25 : u < 3.6 ? 2.45 : 3.6 + Math.floor((u - 3.6) / .9) * .9; ring.style.opacity = sel < 0 ? 0 : 1; ring.style.transform = `translateY(${sel * 380}px) scale(${(1 + .08 * Math.exp(-9 * (u - tsel))).toFixed(4)})`;
+    send.style.transform = `scale(${(Math.min(1.06, spr(u - 3.2)) * (1 + .04 * Math.sin(u * 6) * P(u, 4, 4.5))).toFixed(4)})`; hd.style.opacity = P(u, 3.6, 4); } };
+};
+
 window.ready = (async () => {
   S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json(); END = TL.total;
   if (S.theme && S.theme.acc) document.documentElement.style.setProperty('--acc', S.theme.acc);
+  if (S.theme_color && S.theme_color.acc) document.documentElement.style.setProperty('--acc', S.theme_color.acc);
+  if (S.plates) PLATES = S.plates;
   $('tag').textContent = S.series_tag || ''; if (!S.series_tag) $('tag').remove();
   const shown = t => t.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/\|/g, ' ').trim().split(/\s+/);
   for (const bt of S.beats) { const L = TL.lines[bt.id]; if (!L) throw new Error('unknown line ' + bt.id);
@@ -170,17 +270,24 @@ window.ready = (async () => {
   const cam = $('cam');
   for (const b of BEATS) for (const p of b.bt.parts) { const f = B[p.type]; if (!f) { ISSUES.push('unknown part ' + p.type); continue; }
     const o = f(p);
-    if (p.type !== 'photo' && p.type !== 'quote') {   // prompt: UI over the photos — a dimmed plate behind every UI scene
+    if (p.type !== 'photo' && p.type !== 'quote' && p.type[0] !== 'g') {   // prompt: UI over the photos — a dimmed plate behind every UI scene
       const pl = p.bg || PLATES[PARTS.length % PLATES.length]; const bgd = h('a', `left:-40px;top:-40px;width:1160px;height:2000px;background:url(${U('raw/' + pl + '.png')}) center/cover;filter:brightness(.42) saturate(.85);z-index:-1`); o.el.append(bgd); o.el.style.zIndex = 0; o.bgd = bgd; }
+    if (p.type[0] === 'g' && p.tex) {   // set g: a drawn, drifting grain texture (no picture) behind card scenes, so they are not flat fills
+      const dark = p.tex === 'dark', id = 'tn' + PARTS.length, tx = h('a', 'left:-80px;top:-80px;width:1240px;height:2080px;z-index:-1', `<svg width="1240" height="2080" style="mix-blend-mode:${dark ? 'screen' : 'multiply'}"><filter id="${id}"><feTurbulence type="fractalNoise" baseFrequency="${dark ? '.006 .009' : '.009 .013'}" numOctaves="3" seed="${PARTS.length + 3}"/><feColorMatrix values="${dark ? '0 0 0 0 1  0 0 0 0 .31  0 0 0 0 .64  0 0 0 .75 -.2' : '0 0 0 0 .62  0 0 0 0 .5  0 0 0 0 .56  0 0 0 1.2 -.36'}"/></filter><rect width="1240" height="2080" filter="url(#${id})"/></svg>`);
+      if (dark) o.el.append(h('a', 'left:0;top:0;width:1080px;height:1920px;background:var(--ink);z-index:-2')); o.el.append(tx); o.el.style.zIndex = 0; o.bgd = tx; }
+    if (p.type[0] === 'g' && p.bg) {   // set g: a real screenshot behind the card scenes too (washed light, or dimmed with bgmode "dark"), so no scene sits on a flat fill
+      const dark = p.bgmode === 'dark', bgd = h('a', `left:-40px;top:-40px;width:1160px;height:2000px;background:url(${U('raw/' + p.bg + '.png')}) ${p.bgpos || 'center'}/cover;filter:${dark ? 'brightness(.36) saturate(.9)' : 'saturate(.8) contrast(1.1)'};z-index:-2`), wash = h('a', `left:0;top:0;width:1080px;height:1920px;background:${dark ? 'rgba(10,6,16,.3)' : 'rgba(241,238,232,.66)'};z-index:-1`); o.el.append(bgd, wash); o.el.style.zIndex = 0; o.bgd = bgd; }
     o.t0 = p.at ? b.wt(p.at) - .05 : (b === BEATS[0] ? 0 : b.a - .1); o.p = p; cam.append(o.el); PARTS.push(o); }
   PARTS.sort((x, y) => x.t0 - y.t0); PARTS[0].t0 = 0;
   PARTS.forEach((o, i) => { o.t1 = i + 1 < PARTS.length ? PARTS[i + 1].t0 : END; if (o.t1 - o.t0 > 4 && i < PARTS.length - 1) ISSUES.push(`part ${o.p.type} lasts ${(o.t1 - o.t0).toFixed(1)}s (> 4 s)`); });
   await document.fonts.ready; await Promise.all(['600', '900'].map(w => document.fonts.load(`${w} 40px V`, 'آزمایش AI')));
-  await Promise.all([...new Set(S.beats.flatMap(b => b.parts.map(q => q.img).filter(Boolean)).concat(PLATES))].map(id => new Promise(res => { const im = new Image(); im.onload = () => im.decode().then(res, res); im.onerror = () => { ISSUES.push('missing plate ' + id); res(); }; im.src = U('raw/' + id + '.png'); })));
+  await Promise.all([...new Set(S.beats.flatMap(b => b.parts.flatMap(q => [q.img, q.bg, ...(GIMGS[q.type] || [])]).filter(Boolean)).concat(PLATES))].map(id => new Promise(res => { const im = new Image(); im.onload = () => im.decode().then(res, res); im.onerror = () => { ISSUES.push('missing plate ' + id); res(); }; im.src = U('raw/' + id + '.png'); })));
   window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
   // sound cues written from the motion (§00.22): flood = low swell, iris = shutter tick, click = tap, card spring = pop, bar draw = tick run, typing = keys
   const SFX = {photo: [[.45, 'click', .5]], vote: [[1.2, 'tap', .45], [2.2, 'tap', .45]], stats: [[.15, 'pop', .4], [.85, 'pop', .4]], phone: [[1.0, 'tap', .45], [1.8, 'glass_ping', .35]],
     reminders: [[.4, 'pop', .35], [1.2, 'pop', .35], [2.0, 'pop', .35]], grid: [[.6, 'tick', .25], [1.6, 'tick', .25]], choice: [[.2, 'hit', .4], [.7, 'tap', .4]], chat: [[.4, 'notify', .35], [1.0, 'notify', .35]], cta: [[.9, 'tap', .5], [1.9, 'tap', .5]], quote: [[.1, 'hit', .35]]};
+  Object.assign(SFX, {ghook: [[.02, 'hit', .4], [.9, 'counter_tick', .3], [1.6, 'pop', .3]], grel: [[.15, 'pop', .35], [.9, 'tick', .3], [1.9, 'tap', .35], [2.3, 'tap', .35]], gmoney: [[.2, 'counter_tick', .35], [1.3, 'hit', .4], [2.0, 'click', .35]],
+    gsplit: [[.05, 'sweep_soft', .3], [.6, 'pop', .3], [1.2, 'pop', .3], [1.9, 'click', .3]], glist: [[.3, 'pop', .3], [1.2, 'tick', .35], [1.9, 'tick', .35], [2.6, 'tick', .35]], gbars: [[.5, 'tick', .3], [1.6, 'tick', .3], [2.6, 'glass_ping', .3]], gpoll: [[.2, 'pop', .35], [1.2, 'tap', .45], [2.4, 'tap', .45], [4.0, 'notify', .3]]});
   window.SCENES = PARTS.map(o => ({t0: o.t0, t1: o.t1, type: o.p.type, sfx: (SFX[o.p.type] || []).map(([d, n, v]) => [o.t0 + d, n, v])}));
   seek(0);
 })();
@@ -211,7 +318,7 @@ function seek(t) {
   const sub = $('sub'), lineOn = t >= b.a - .05 && t <= b.L.end + .3 && t < TL.end_start;
   if (lineOn) { let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
     const c0 = Math.floor(j / 4) * 4, key = b.bt.id + ':' + c0;
-    if (sub._k !== key) { sub._k = key; sub.innerHTML = (WHO[b.bt.speaker] ? `<div class="who" style="background:${b.bt.speaker === 'assistant' ? '#2E6BFF' : 'var(--acc)'}">${esc(WHO[b.bt.speaker])}</div>` : '') + `<span class="pill">${b.words.slice(c0, c0 + 4).map((w, q) => `<span class="w${w.k ? ' k' : ''}" data-i="${q}">${esc(w.w)}</span>`).join(' ')}</span>`; }
+    if (sub._k !== key) { sub._k = key; sub.innerHTML = (WHO[b.bt.speaker] ? `<div class="who" style="background:${b.bt.speaker === 'assistant' ? '#2E6BFF' : 'var(--acc)'}">${esc(WHO[b.bt.speaker])}</div>` : '') + `<span class="pill">${subRuns(b.words.slice(c0, c0 + 4))}</span>`; }
     [...sub.querySelectorAll('.w')].forEach(el => { const tw = b.wt(c0 + +el.dataset.i), k = eo(P(t, tw - .04, tw + .14)); el.style.opacity = k; el.style.transform = `translateY(${(1 - k) * 14}px)`; });
   } else { sub.innerHTML = ''; sub._k = null; }
   const tg = $('tag'); if (tg) tg.style.transform = `translateY(${(1 - Math.min(1, spr(t - .2))) * -200}px)`;

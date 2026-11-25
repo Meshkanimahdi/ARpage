@@ -712,5 +712,26 @@
   "score": 1,
   "voice": "sfhAAJOJsezV06RnSptt",
   "date": "2026-11-24"
+ },
+ "Xbox": {
+  "mode": "A",
+  "spoken": "Xbox",
+  "score": 1,
+  "voice": "N7wuKHXQQ5fKd75noieq",
+  "date": "2026-11-25"
+ },
+ "GTA six": {
+  "mode": "C",
+  "spoken": "جی‌تی‌اِی سیکْس",
+  "score": 1,
+  "voice": "N7wuKHXQQ5fKd75noieq",
+  "date": "2026-11-25"
+ },
+ "PlayStation five": {
+  "mode": "C",
+  "spoken": "پْلِی‌اِسْتِیشِن فایْو",
+  "score": 1,
+  "voice": "N7wuKHXQQ5fKd75noieq",
+  "date": "2026-11-25"
  }
 }

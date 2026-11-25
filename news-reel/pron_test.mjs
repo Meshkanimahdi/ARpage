@@ -50,7 +50,9 @@ for (const term of fresh) {
   let best = null;
   for (const [mode, text, lang] of tries) {
     const f = path.join(out, `${slug}-${mode}.mp3`); await tts(text, lang, f);
-    const heard = await sttEn(f), score = sim(term, heard);
+    // the English STT writes spoken numbers as digits or Roman numerals («GTA six» → "GTA 6" / "GTA VI"): compare numbers as words
+    const numw = x => String(x).replace(/\b(VI|6)\b/g, 'six').replace(/\b(V|5)\b/g, 'five').replace(/\b(IV|4)\b/g, 'four').replace(/\b(III|3)\b/g, 'three').replace(/\b(II|2)\b/g, 'two').replace(/\b7\b/g, 'seven').replace(/\b8\b/g, 'eight').replace(/\b9\b/g, 'nine');
+    const heard = await sttEn(f), score = Math.max(sim(term, heard), sim(numw(term), numw(heard)));
     console.log(term, mode, score.toFixed(2), '->', heard);
     if (!best || score > best.score + 0.02 || (Math.abs(score - best.score) <= 0.02 && mode === 'C')) best = {mode, text, score, f};
   }
