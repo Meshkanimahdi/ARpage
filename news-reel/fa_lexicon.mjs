@@ -45,7 +45,7 @@ const PRON_WORDS = {
   'YouTube': 'یوتیوب', 'Instagram': 'اینستاگْرام', 'TikTok': 'تیک‌تاک', 'LinkedIn': 'لینْکْدین', 'WhatsApp': 'واتْس‌اَپ',
   'Elon': 'ایلان', 'Musk': 'ماسک', 'Sam': 'سَم', 'Altman': 'آلْتْمَن', 'Jensen': 'جِنْسِن', 'Huang': 'هوانگ',
   'Nasdaq': 'نَزْدَک', 'IPO': 'آی‌پی‌اُو', 'app': 'اَپ', 'agent': 'اِیجِنْت', 'prompt': 'پْرامْپْت', 'code': 'کُد',
-  'GTA': 'جی‌تی‌اِی', 'six': 'سیکْس', 'five': 'فایْو', 'PlayStation': 'پْلِی‌اِسْتِیشِن', 'Xbox': 'اِکْس‌باکْس', 'Rockstar': 'راک‌اِسْتار',
+  'GTA': 'جی‌تی‌اِی', 'six': 'سیکْس', 'five': 'فایْو', 'PlayStation': 'پْلِی‌اِسْتِیشِن', 'Xbox': 'اِکْس‌باکْس', 'Rockstar': 'راک‌اِسْتار', 'Muse': 'مْیوز',
   'Science': 'ساینْس', 'Stanford': 'اِسْتَنْفورد', 'Georgia': 'جورْجیا', 'Tech': 'تِک',
 };
 export const PRON = new Proxy({}, {get: (_, term) => {

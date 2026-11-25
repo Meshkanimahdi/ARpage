@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>meshkani.pro — product walkthrough explainer (prompt 055)</title>
+<!-- Skill motion-graphy-2026, prompt 055 "Datagran ChatGPT ads explainer" (EXPL), built as its own engine (REEL-072, 2026-11-25).
+     Structure kept from the prompt: one user's journey through a product; ONE through-line object taken from the product
+     (here the red unread dot of a chat) that changes role in every scene and becomes the dot of the end card; the real UI
+     rebuilt as vector layers that move on their own, driven by a cursor with real clicks; screen-studio camera (1.0 → 1.04
+     per scene plus a short kick, never still); one typeface; one accent colour used only on the through-line object and the
+     key word; springs with a small overshoot; nothing appears from nothing (it grows, unfolds or is revealed by a mask);
+     scene changes are match cuts: the next ground opens as a circle from the spot where the dot rested.
+     Banned by the prompt and not used: particle bursts, glows, lens flares, camera shake, RGB split, crossfades, gradients.
+     Page standards: 1080x1920, Persian narration (eleven_v4) with a word-by-word caption, library music, motion-matched SFX.
+     Data: story.json beats[{id, text, scene{type}}] with types hook, brand, recipe, saved, trip, perm, ask (set "muse");
+     el/instagram.png and el/meta.png (official logos). ?cover=1 draws the cover background instead of the film.
+     Pure seek(t): every style is computed from t; no CSS animations, timers or Math.random. -->
+<style>
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
+  @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-900-normal.woff2); unicode-range: U+0000-00FF; }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-600-normal.woff2); }
+  @font-face { font-family: V; font-weight: 600; src: url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2); unicode-range: U+0000-00FF; }
+  :root { --acc: #FF3040; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #15131A; }
+  #root { position: absolute; inset: 0; overflow: hidden; font-family: V; font-weight: 900; }
+  #cam { position: absolute; inset: 0; transform-origin: 540px 900px; }
+  #stage { position: absolute; inset: 0; }
+  .sc { position: absolute; inset: 0; overflow: hidden; isolation: isolate; }
+  .a { position: absolute; }
+  .c { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; line-height: 1.25; }
+  .w6 { font-weight: 600; }
+  .tex { position: absolute; inset: 0; pointer-events: none; }
+  #sub { position: absolute; left: 50px; right: 50px; top: 1500px; height: 150px; display: flex; align-items: center; justify-content: center; z-index: 9; }
+  #sub .pill { padding: 12px 38px 22px; border-radius: 30px; font: 900 58px/1.3 V; white-space: nowrap; }
+  #sub .w { display: inline-block; margin: 0 .13em; }
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="cam"><div id="stage"></div></div>
+  <svg class="tex" id="texL" width="1080" height="1920" style="mix-blend-mode:multiply"><filter id="tl"><feTurbulence type="fractalNoise" baseFrequency=".009 .013" numOctaves="3" seed="5"/><feColorMatrix values="0 0 0 0 .56  0 0 0 0 .52  0 0 0 0 .5  0 0 0 1.2 -.38"/></filter><rect width="1080" height="1920" filter="url(#tl)"/></svg>
+  <svg class="tex" id="texD" width="1080" height="1920" style="mix-blend-mode:screen"><filter id="td"><feTurbulence type="fractalNoise" baseFrequency=".007 .011" numOctaves="3" seed="9"/><feColorMatrix values="0 0 0 0 .42  0 0 0 0 .36  0 0 0 0 .52  0 0 0 .8 -.22"/></filter><rect width="1080" height="1920" filter="url(#td)"/></svg>
+  <div id="sub"></div>
+</div>
+<script>
+const Q = new URLSearchParams(location.search), COVER = location.search.startsWith('?cover'), DIR = Q.get('dir') || Q.get('cover?dir') || '/work/story/';   // reel_render.mjs --page=pm/055-….html?cover draws the cover background
+const U = s => s.startsWith('/') ? s : DIR + s, $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), mix = (a, b, k) => a + (b - a) * k, pr = (t, a, b) => cl((t - a) / (b - a));
+const ex = k => 1 - Math.pow(2, -10 * cl(k));                                            // exponential ease-out
+const spring = k => { k = cl(k); return 1 - Math.exp(-7 * k) * Math.cos(9 * k) * (1 - k * .2); };   // small overshoot (~8%)
+const sp = (t, a, d = .55) => t < a ? 0 : spring((t - a) / d);                           // spring that starts at time a
+const io = k => { k = cl(k); return k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; };
+const fa = n => String(n).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const ISSUES = [];
+let S, TL, B = [], END = 40;
+const DARK = {hook: 0, brand: 1, recipe: 0, saved: 1, trip: 0, perm: 1, ask: 0, end: 1};
+const TH = d => d ? {bg: '#15131A', fg: '#F4F2EE', mu: '#A39FAD', card: '#24212C', line: '#3A3644', grid: '#302C3A'}
+                  : {bg: '#F4F2EE', fg: '#15131A', mu: '#8C8894', card: '#FFFFFF', line: '#E4E0D9', grid: '#D3CEC5'};
+// where the through-line dot rests at the end of each scene: the next scene opens as a circle from this point (match cut)
+const REST = {hook: [112, 828], brand: [540, 420], recipe: [499, 847], saved: [350, 392], trip: [176, 700], perm: [540, 1090], ask: [150, 1100]};
+
+const A = (css, inner = '') => `<div class="a" style="${css}">${inner}</div>`;
+const txt = (s, y, size, col, extra = '') => `<div class="c" style="top:${y}px;font-size:${size}px;color:${col};${extra}">${s}</div>`;
+const mask = k => `clip-path:inset(-10% 0 -10% ${((1 - cl(k)) * 100).toFixed(1)}%);transform:translateY(${((1 - cl(k)) * 36).toFixed(1)}px);`;   // RTL wipe from the right
+const acc = s => `<span style="color:var(--acc)">${s}</span>`, ltr = s => `<span dir="ltr" style="display:inline-block">${s}</span>`;
+const bar = (css, w, h, col) => A(`${css};width:${w}px;height:${h}px;border-radius:${h / 2}px;background:${col}`);
+const dot = (x, y, r, inner = '', extra = '') => A(`left:${(x - r).toFixed(1)}px;top:${(y - r).toFixed(1)}px;width:${(2 * r).toFixed(1)}px;height:${(2 * r).toFixed(1)}px;border-radius:50%;background:var(--acc);z-index:6;${extra}`, inner);
+const chipH = (s, size, bg, fg, k, extra = '') => `<span style="display:inline-block;padding:${size * .2}px ${size * .55}px ${size * .36}px;border-radius:${size * .5}px;background:${bg};color:${fg};font-size:${size}px;white-space:nowrap;transform:scale(${cl(k, 0, 1.2).toFixed(3)});${extra}">${s}</span>`;
+const TAG = col => `<span class="w6" style="font-size:30px;color:${col}">بازسازیِ نمایشی</span>`;
+function cursor(x, y, t, tc) {
+  const press = tc !== undefined && t >= tc ? Math.exp(-8 * (t - tc)) : 0, ring = tc !== undefined && t >= tc ? pr(t, tc, tc + .45) : 1;
+  return `<svg class="a" style="left:0;top:0;z-index:8" width="1080" height="1920" viewBox="0 0 1080 1920">${ring < 1 ? `<circle cx="${x}" cy="${y}" r="${24 + ring * 80}" fill="none" stroke="#15131A" stroke-width="${7 * (1 - ring)}"/>` : ''}
+    <g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${(1 - .18 * press).toFixed(3)})"><path d="M0 0 L0 74 L18 58 L32 90 L46 84 L32 52 L56 52 Z" fill="#fff" stroke="#15131A" stroke-width="6" stroke-linejoin="round"/></g></svg>`;
+}
+const glide = (t, pts) => { let p = pts[0]; for (let i = 1; i < pts.length; i++) { const q = pts[i]; if (t >= pts[i - 1][0]) { const k = io(pr(t, pts[i - 1][0], q[0])); p = [0, mix(pts[i - 1][1], q[1], k), mix(pts[i - 1][2], q[2], k)]; } } return [p[1], p[2]]; };
+const W = (b, s) => { const i = b.words.findIndex(w => w.w.includes(s)); return b.wt(i < 0 ? 0 : i); };   // time of the word that says s
+const ground = (P, t) => A(`left:-60px;top:-60px;right:-60px;bottom:-60px;background-color:${P.bg}`) +
+  A(`left:-60px;top:-60px;right:-60px;bottom:-60px;background-image:radial-gradient(circle, ${P.grid} 3.4px, transparent 3.9px);background-size:54px 54px;transform:translate(${((t * 7) % 54).toFixed(1)}px,${((t * 10) % 54).toFixed(1)}px)`);
+const wrap = (h, d, t, clip) => `<div class="sc" style="${clip ? `clip-path:circle(${clip[2].toFixed(0)}px at ${clip[0]}px ${clip[1]}px)` : ''}">${ground(TH(d), t)}${h}</div>`;
+// one chat row of the direct-message list (drawn, never a screenshot)
+const row = (P, y, name, badge, hi, press = 0) => A(`left:24px;right:24px;top:${y.toFixed(1)}px;height:144px;border-radius:36px;background:${hi ? '#FFE9EB' : 'transparent'};transform:scale(${(1 - .03 * press).toFixed(3)})`,
+  A(`right:22px;top:22px;width:100px;height:100px;border-radius:50%;background:${hi ? P.fg : '#E7E2DA'}`) +
+  (name ? A('right:150px;top:16px;font-size:54px;color:' + P.fg, ltr(name)) + A('right:150px;top:88px', `<span class="w6" style="font-size:36px;color:${P.mu}">پیامِ جدید</span>`)
+        : bar('right:150px;top:36px', 250, 28, '#D8D3CA') + bar('right:150px;top:86px', 410, 22, '#E7E2DA')) +
+  (badge ? A(`left:30px;top:44px;min-width:56px;height:56px;border-radius:28px;background:${P.fg};color:${P.bg};font-size:32px;line-height:54px;text-align:center`, badge) : ''));
+const dmHead = (P) => `<img src="${U('el/instagram.png')}" style="position:absolute;right:44px;top:32px;width:76px;height:76px">` + A('right:146px;top:30px;font-size:56px;color:' + P.fg, 'دایرکت‌ها') + A('left:44px;top:50px', TAG(P.mu)) + A(`left:0;right:0;top:140px;height:4px;background:${P.line}`);
+const panel = (P, x, y, w, h, inner, extra = '') => A(`left:${x}px;top:${y}px;width:${w}px;height:${h}px;border-radius:56px;background:${P.card};box-shadow:0 30px 70px rgba(21,19,26,.14);overflow:hidden;${extra}`, inner);
+
+const SCN = {
+  // 1 — hook: the headline is printed from frame 0; the dot drops beside it and lands on the new Muse chat; a catch-up card unfolds out of it
+  hook(b, t, u) { const P = TH(0); let h = '';
+    h += txt(`اینستا یه ${ltr('AI')} گذاشت`, 170, 112, P.fg) + txt(`وسطِ ${acc('دایرکت‌ها')}`, 318, 150, P.fg);
+    const kin = sp(u, -.2, .5), tc = 1.1, press = u >= tc ? Math.exp(-8 * (u - tc)) : 0;
+    let rows = row(P, 160, 'Muse', '', 1, press).replace('transform:scale(', `transform-origin:50% 0;opacity:${cl(kin * 3)};transform:scaleY(${cl(kin, 0, 1.06).toFixed(3)}) scale(`);
+    [['', '۳'], ['', '۷'], ['', '۱۲'], ['', '۲']].forEach((r, i) => rows += row(P, 160 + i * 150 + 150 * Math.min(1.03, kin), r[0], r[1], 0));
+    h += panel(P, 60, 590, 960, 850, dmHead(P) + rows);
+    const kd = pr(u, .05, .45), ky = kd * kd, land = sp(u, .45, .5), dy = mix(-70, 828, ky), sq = u > .45 ? 1 + .25 * Math.exp(-9 * (u - .45)) * Math.cos((u - .45) * 22) : 1;
+    const ts = 1.2, ks = sp(u, ts, .6);
+    h += A(`left:150px;top:900px;width:800px;height:470px;border-radius:44px;background:${P.fg};transform-origin:0 0;transform:scale(${cl(ks, 0, 1.05).toFixed(3)});opacity:${cl(ks * 4)};box-shadow:0 30px 70px rgba(21,19,26,.3)`,
+      A('right:44px;top:26px;font-size:60px;color:' + P.bg, 'جا انداختی:') + [0, 1, 2].map(i => { const kl = ex(pr(u, ts + .3 + i * .16, ts + .6 + i * .16)); const hl = Math.exp(-Math.pow((u - (ts + 1.25 + i * .55)) / .22, 2)); return A(`left:24px;right:24px;top:${144 + i * 100}px;height:92px;border-radius:30px;background:rgba(255,255,255,${(.14 * hl).toFixed(3)});opacity:${kl};transform:translateX(${((1 - kl) * 60).toFixed(0)}px) scale(${(1 + .03 * hl).toFixed(4)})`,
+        A('right:16px;top:14px;width:64px;height:64px;border-radius:50%;background:#3A3644') + bar('right:106px;top:30px', [330, 260, 380][i], 30, '#4A4556') + A(`left:16px;top:16px;padding:2px 24px 10px;border-radius:30px;background:#3A3644;color:${P.bg};font-size:36px`, ['۳ پیام', '۷ پیام', '۱۲ پیام'][i])); }).join(''));
+    h += dot(112, dy, 26 * (u < .45 ? 1 : sq) * (1 + .12 * Math.sin(u * 5) * pr(u, 1, 1.4)));
+    const [cx, cy] = glide(u, [[.5, 880, 1560], [tc, 620, 836], [1.5, 620, 836], [2.3, 900, 1420]]); h += cursor(cx, cy, u, tc);
+    return h; },
+  // 2 — brand: the dot grows into Muse's avatar, the name types on, the official Meta logo, the five countries and Iran
+  brand(b, t, u) { const P = TH(1); let h = '';
+    const tM = W(b, 'Muse'), tMeta = W(b, 'Meta'), tC = W(b, 'فعلاً') - .15, tI = Math.max(tC + .62, W(b, 'ایران') - .35);
+    h += dot(540, 420, mix(26, 120, sp(u, .05, .6)));
+    const n = Math.round(4 * pr(t, tM - .12, tM + .3)), caret = n < 4 || Math.floor(t * 3) % 2 === 0;
+    h += `<div class="c" dir="ltr" style="top:545px;font-size:240px;color:${P.fg};line-height:1.1">${'Muse'.slice(0, n)}<span style="display:inline-block;width:16px;height:190px;margin-left:10px;background:${caret ? P.fg : 'transparent'};vertical-align:-12px"></span></div>`;
+    h += txt('ایجنتِ هوشِ مصنوعی', 838, 62, P.mu, mask(ex(pr(t, tM + .2, tM + .6))));
+    const km = sp(t, tMeta - .1, .5);
+    h += A(`left:330px;top:960px;width:420px;height:150px;border-radius:40px;background:#fff;transform:scale(${cl(km, 0, 1.08).toFixed(3)});opacity:${cl(km * 4)}`, `<img src="${U('el/meta.png')}" style="position:absolute;left:50px;top:43px;width:320px;height:64px">`);
+    const names = ['آمریکا', 'کانادا', 'مکزیک', 'ژاپن', 'سنگاپور'], ch = (s, i) => chipH(s, 50, P.fg, P.bg, sp(t, tC + i * .09, .4), 'margin:0 10px');
+    h += A('left:30px;right:30px;top:1160px;text-align:center;direction:rtl', names.slice(0, 3).map(ch).join(''));
+    h += A('left:30px;right:30px;top:1280px;text-align:center;direction:rtl', names.slice(3).map((s, i) => ch(s, i + 3)).join('') +
+      chipH(`ایران: ${acc('نه')}`, 50, 'transparent', P.fg, sp(t, tI, .45), `margin:0 10px;box-shadow:inset 0 0 0 5px ${P.fg}`));
+    return h; },
+  // 3 — recipe: a shared cooking reel flies into the chat; the reply unfolds into a shopping list; the dot becomes the first tick
+  recipe(b, t, u) { const P = TH(0); let h = '';
+    const tL = W(b, 'لیست') - .35, pan = 60 * io(pr(t, tL, tL + .6));
+    h += txt('یه ریلز بفرست', 170, 104, P.fg, mask(ex(pr(u, .02, .4))));
+    const kb = sp(u, .35, .55), by = mix(1000, 60, Math.min(1.02, kb));
+    const reel = A(`right:50px;top:${by.toFixed(1)}px;width:390px;height:520px;border-radius:50px;background:#FFDFAE;opacity:${cl(kb * 5)}`,
+      `<svg width="390" height="520" viewBox="0 0 330 440"><circle cx="150" cy="235" r="78" fill="none" stroke="#15131A" stroke-width="16"/><rect x="222" y="224" width="96" height="22" rx="11" fill="#15131A" transform="rotate(-18 222 235)"/><circle cx="150" cy="235" r="34" fill="#FF9F43"/>
+       <path d="M110 120 q14 -22 0 -44 M150 112 q14 -22 0 -44 M190 120 q14 -22 0 -44" fill="none" stroke="#15131A" stroke-width="9" stroke-linecap="round" opacity="${(.4 + .4 * Math.sin(t * 5)).toFixed(2)}"/>
+       <circle cx="62" cy="378" r="38" fill="#15131A"/><path d="M50 358 L84 378 L50 398 Z" fill="#fff"/></svg>` + A('left:136px;top:414px;font-size:44px;color:#15131A', 'ریلزِ آشپزی'));
+    const kc = sp(t, tL, .6), items = ['گوجه', 'تخم‌مرغ', 'پیاز', 'نان'];
+    const tD = tL + .45, kd = io(pr(t, tD, tD + .4)), dx = mix(890, 439, kd), dyy = mix(66, 128 - pan + 359 + 31, kd) - 60 * Math.sin(Math.PI * kd);
+    const list = A(`left:40px;top:200px;width:470px;height:640px;border-radius:44px;background:${P.card};box-shadow:inset 0 0 0 5px ${P.line};transform-origin:50% 0;transform:scaleY(${cl(kc, 0, 1.05).toFixed(3)});opacity:${cl(kc * 4)}`,
+      A('right:40px;top:22px;font-size:60px;color:' + P.fg, 'لیستِ خرید') + A('left:36px;top:48px', `<span class="w6" style="font-size:30px;color:${P.mu}">نمونه</span>`) +
+      items.map((s, i) => { const ki = ex(pr(t, tL + .3 + i * .18, tL + .6 + i * .18)), tk = sp(t, tD + .4 + i * .2, .4);
+        return A(`left:40px;right:40px;top:${150 + i * 116}px;height:80px;opacity:${ki};transform:translateY(${((1 - ki) * 30).toFixed(0)}px)`,
+          A(`right:0;top:9px;width:62px;height:62px;border-radius:16px;box-shadow:inset 0 0 0 5px ${P.fg};background:${i && tk > .3 ? P.fg : 'transparent'}`, i && tk > .3 ? `<svg width="62" height="62"><path d="M17 32 L27 43 L46 20" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '') +
+          A('right:92px;top:0', `<span class="w6" style="font-size:56px;color:${P.fg}">${s}</span>`)); }).join(''));
+    const head = A('right:40px;top:36px;width:60px;height:60px;border-radius:50%;background:' + (kd > 0 ? '#E7E2DA' : 'var(--acc)')) + A('right:124px;top:26px;font-size:54px;color:' + P.fg, ltr('Muse')) + A('left:44px;top:46px', TAG(P.mu)) + A(`left:0;right:0;top:128px;height:4px;background:${P.line}`);
+    const inner = A(`left:0;top:${(128 - pan).toFixed(1)}px;width:960px;height:1300px`, reel + list);
+    const fly = kd > 0 ? dot(dx, dyy, mix(30, 31, kd), kd >= 1 ? `<svg width="62" height="62"><path d="M17 32 L27 43 L46 20" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '') : '';
+    h += panel(P, 60, 360, 960, 1000, inner + A(`left:0;top:0;width:960px;height:130px;background:${P.card}`, head) + fly);
+    const [cx, cy] = glide(u, [[0, 900, 1500], [.3, 820, 1240], [.7, 820, 1240], [1.4, 930, 1440]]); h += cursor(cx, cy, u, .3);
+    return h; },
+  // 4 — saved: a messy grid of saved posts re-flows into three labelled collections; the dot hops across the folder tabs
+  saved(b, t, u) { const P = TH(1); let h = '';
+    const tS = W(b, 'پوشه') - .45, cat = [0, 1, 2, 1, 2, 0, 2, 0, 1], colX = c => 700 - c * 290, COL = ['#8EC5FF', '#FFC76B', '#D0B2FF'], cnt = [0, 0, 0], seen = [0, 0, 0];
+    h += txt('پست‌های سیوشده', 170, 100, P.fg, mask(ex(pr(u, .02, .4))));
+    const ICON = [`<path d="M52 150 L210 64 L150 214 L128 156 Z" fill="#15131A"/><path d="M128 156 L210 64" stroke="#8EC5FF" stroke-width="8"/>`,
+      `<path d="M56 136 h148 a74 74 0 0 1 -148 0 z" fill="#15131A"/><path d="M100 104 q12 -20 0 -40 M130 96 q12 -20 0 -40 M160 104 q12 -20 0 -40" fill="none" stroke="#15131A" stroke-width="9" stroke-linecap="round"/>`,
+      `<path d="M92 52 L116 44 Q130 62 144 44 L168 52 L214 92 L186 122 L170 108 L170 214 L90 214 L90 108 L74 122 L46 92 Z" fill="#15131A"/>`];
+    cat.forEach((c, i) => { const k = sp(t, tS + .1 + i * .05, .65), kk = Math.min(1.04, k), r0 = Math.floor(i / 3), c0 = i % 3, x0 = 120 + c0 * 290, y0 = 520 + r0 * 290, x1 = colX(c), y1 = 520 + seen[c] * 290; seen[c]++; if (k > .5) cnt[c]++;
+      const wob = (1 - cl(k)) * (((i * 37) % 7) - 3) * 2.2 + (1 - cl(k)) * Math.sin(t * 3 + i) * 1.5, pop = sp(u, .05 + i * .04, .45);
+      h += A(`left:${mix(x0, x1, kk).toFixed(1)}px;top:${mix(y0, y1, kk).toFixed(1)}px;width:260px;height:260px;border-radius:40px;background:${COL[c]};transform:rotate(${wob.toFixed(2)}deg) scale(${cl(pop, 0, 1.06).toFixed(3)});z-index:${k > 0 && k < 1 ? 3 : 1}`,
+        `<svg width="260" height="260" viewBox="0 0 260 260">${ICON[c]}<path d="M196 22 h36 v52 l-18 -14 l-18 14 z" fill="#15131A" opacity=".85"/></svg>`); });
+    ['سفر', 'غذا', 'لباس'].forEach((s, c) => { const k = sp(t, tS + c * .14, .5);
+      h += A(`left:${colX(c)}px;top:392px;width:260px;height:100px;border-radius:30px 30px 8px 8px;background:${P.card};box-shadow:inset 0 0 0 4px ${P.line};transform-origin:50% 100%;transform:scaleY(${cl(k, 0, 1.08).toFixed(3)});opacity:${cl(k * 4)}`,
+        A('right:28px;top:10px;font-size:50px;color:' + P.fg, s) + A('left:26px;top:22px', `<span class="w6" style="font-size:38px;color:${P.mu}">${fa(cnt[c])}/۳</span>`)); });
+    // the dot hops from tab to tab
+    const hops = [[540, 320], ...[0, 1, 2].map(c => [colX(c) + 230, 392])], th = tS + .25; let seg = 0; for (let i = 1; i <= 3; i++) if (t >= th + (i - 1) * .34) seg = i;
+    const kq = seg ? io(pr(t, th + (seg - 1) * .34, th + (seg - 1) * .34 + .28)) : 0, p0 = hops[Math.max(0, seg - 1)], p1 = hops[seg];
+    h += dot(mix(p0[0], p1[0], kq), mix(p0[1], p1[1], kq) - 90 * Math.sin(Math.PI * kq), 24 * sp(u, .1, .4));
+    return h; },
+  // 5 — trip: three travel reels become pins; a route draws through day 1, 2, 3 while the frame travels sideways; the dot rides the line
+  trip(b, t, u) { const P = TH(0); let h = '';
+    const tP = W(b, 'برنامه') - .3, tF = W(b, 'مُد') - .35, kL = io(pr(t, tP + .15, tF - .45)), kz = io(pr(t, tF - .45, tF)), NX = [1600, 950, 300], yAt = x => 880 + 110 * Math.sin((x - 300) / 1300 * Math.PI * 2);
+    h += txt(acc('برنامه‌ی سفر'), 170, 112, P.fg, mask(ex(pr(u, .02, .4))));
+    const off = mix(-820, 0, kL), xd = mix(1600, 300, kL);
+    let pts = ''; for (let x = 1600; x >= xd; x -= 20) pts += `${x},${yAt(x).toFixed(1)} `; pts += `${xd.toFixed(1)},${yAt(xd).toFixed(1)}`;
+    let strip = `<svg class="a" style="left:0;top:0" width="1900" height="1920" viewBox="0 0 1900 1920"><polyline points="${pts}" fill="none" stroke="${P.fg}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 26"/>` +
+      NX.map((x, i) => `<circle cx="${x}" cy="${yAt(x)}" r="${(30 * sp(t, tP + i * .1, .4)).toFixed(1)}" fill="${P.card}" stroke="${P.fg}" stroke-width="10"/>`).join('') + `</svg>`;
+    NX.forEach((x, i) => { const reach = [.02, .5, .97][i], kk = kL >= reach ? sp(t, 0, .001) : 0, on = kL >= reach, kc = on ? spring(pr(kL, reach, reach + .16) + (i === 2 ? pr(t, tF, tF + .3) : 0)) : 0, up = i % 2;
+      strip += A(`left:${x - 220}px;top:${up ? 400 : 1040}px;width:440px;height:330px;border-radius:48px;background:${P.card};box-shadow:0 24px 60px rgba(21,19,26,.14);transform-origin:50% ${up ? 100 : 0}%;transform:scale(${cl(kc, 0, 1.06).toFixed(3)});opacity:${cl(kc * 4)}`,
+        A('right:40px;top:22px;font-size:72px;color:' + P.fg, 'روزِ ' + fa(i + 1)) + bar('right:40px;top:160px', [290, 330, 260][i], 32, '#D8D3CA') + bar('right:40px;top:222px', [340, 250, 310][i], 28, '#E7E2DA') +
+        `<svg class="a" style="left:30px;top:26px" width="70" height="90" viewBox="0 0 70 90"><path d="M35 86 C10 52 4 42 4 30 a31 31 0 0 1 62 0 c0 12 -6 22 -31 56 z" fill="${P.fg}"/><circle cx="35" cy="30" r="11" fill="${P.card}"/></svg>`); });
+    h += A(`left:0;top:0;width:1900px;height:1920px;transform-origin:0 0;transform:translate(${mix(off, 8, kz).toFixed(1)}px,${mix(0, 207, kz).toFixed(1)}px) scale(${mix(1, .56, kz).toFixed(4)})`, strip + dot(xd, yAt(xd), mix(26, 40, kz)));   // travel along the route, then pull back so the whole plan is in frame
+    const ko = sp(t, tF + .05, .55);   // «پیشنهادِ لباس»: an outfit card pops out of the dot once the route is done
+    h += A(`left:250px;top:1010px;width:580px;height:400px;border-radius:56px;background:#D0B2FF;transform-origin:-74px -310px;transform:scale(${cl(ko, 0, 1.05).toFixed(3)});opacity:${cl(ko * 4)};z-index:4`,
+      `<svg class="a" style="left:30px;top:60px" width="260" height="260" viewBox="0 0 260 260"><path d="M92 52 L116 44 Q130 62 144 44 L168 52 L214 92 L186 122 L170 108 L170 214 L90 214 L90 108 L74 122 L46 92 Z" fill="#15131A"/></svg>` + A('right:40px;top:110px;font-size:64px;line-height:1.3;color:#15131A;text-align:right', 'پیشنهادِ<br>لباس'));
+    // the three travel reels that feed the plan: they shrink into the first pin
+    [0, 1, 2].forEach(i => { const kin = sp(u, .03 + i * .07, .45), kout = io(pr(t, tP, tP + .35));
+      h += A(`left:${mix(150 + i * 270, 760, kout).toFixed(1)}px;top:${mix(330, 800, kout).toFixed(1)}px;width:240px;height:300px;border-radius:38px;background:#8EC5FF;transform:scale(${(cl(kin, 0, 1.06) * (1 - kout)).toFixed(3)}) rotate(${(i - 1) * 4}deg);z-index:2`,
+        `<svg width="240" height="300" viewBox="0 0 240 300"><path d="M44 170 L196 86 L138 234 L118 178 Z" fill="#15131A"/><circle cx="52" cy="252" r="30" fill="#15131A"/><path d="M43 236 L69 252 L43 268 Z" fill="#fff"/></svg>`); });
+    return h; },
+  // 6 — perm: Meta's statement set as a quotation (not a screen); the dot stamps down as the approval seal
+  perm(b, t, u) { const P = TH(1); let h = '';
+    const tT = W(b, 'تأیید') + .15, ks = t < tT ? 0 : 1;
+    h += txt('»', 196, 190, P.line, `left:auto;right:70px;width:auto;opacity:${ex(pr(u, 0, .3))}`);
+    h += txt(`بدونِ ${acc('تأییدِ تو')}`, 400, 132, P.fg, mask(ex(pr(u, .05, .45))));
+    h += txt('هیچ پیامی فرستاده نمی‌شه', 580, 92, P.fg, mask(ex(pr(u, .3, .7))));
+    const ka = sp(u, .6, .5);
+    h += A(`left:0;right:0;top:770px;text-align:center;direction:rtl;transform:scale(${cl(ka, 0, 1.05).toFixed(3)});opacity:${cl(ka * 4)}`,
+      `<span class="w6" style="font-size:52px;color:${P.mu};vertical-align:middle">به گفته‌ی</span> <span style="display:inline-block;vertical-align:middle;margin-right:20px;padding:26px 36px 20px;border-radius:34px;background:#fff"><img src="${U('el/meta.png')}" style="width:250px;height:50px;display:block"></span>`);
+    if (ks) { const kk = pr(t, tT, tT + .16), sc = mix(3.2, 1, kk * kk) * (1 + .06 * Math.exp(-10 * Math.max(0, t - tT - .16)) * Math.cos((t - tT) * 26));
+      h += dot(540, 1090, 135, `<div style="position:absolute;inset:14px;border-radius:50%;box-shadow:inset 0 0 0 7px #fff"></div><div style="position:absolute;left:0;right:0;top:92px;text-align:center;font-size:56px;color:#fff">تأییدِ تو</div>`, `transform:scale(${sc.toFixed(3)}) rotate(-9deg);opacity:${cl(kk * 3)}`); }
+    else h += dot(540, mix(-60, 300, ex(pr(u, .02, .4))), 24);
+    const kch = i => sp(t, tT + .45 + i * .14, .45);
+    h += A(`left:0;right:0;top:1262px;text-align:center;opacity:${ex(pr(t, tT + .35, tT + .6))}`, `<span class="w6" style="font-size:38px;color:${P.mu}">هر وقت خواستی بهش بگو:</span>`);
+    h += A('left:0;right:0;top:1330px;text-align:center;direction:rtl', chipH('فراموش کن', 50, P.fg, P.bg, kch(0), 'margin:0 12px') + chipH('برگردون', 50, P.fg, P.bg, kch(1), 'margin:0 12px'));
+    return h; },
+  // 7 — ask: the question fills the frame; a comment box types «آره» / «نه»; the send chip arrives with a paper plane
+  ask(b, t, u) { const P = TH(0); let h = '';
+    const tK = W(b, 'کامنت') - .45, tS = W(b, 'بفرست') - .25;
+    h += txt(`می‌ذاری یه ${ltr('AI')}`, 200, 128, P.fg, mask(ex(pr(u, .02, .4))));
+    h += txt(`${acc('دایرکت‌هاتو')} بخونه؟`, 370, 128, P.fg, mask(ex(pr(u, .25, .65))));
+    const kf = sp(t, tK, .55), ph = Math.max(0, t - tK - .3), cyc = ph % 1.7, word = Math.floor(ph / 1.7) % 2 ? 'نه' : 'آره', n = cyc < 1.25 ? Math.round(word.length * pr(cyc, 0, .35)) : Math.round(word.length * (1 - pr(cyc, 1.25, 1.5)));
+    h += A(`left:0;right:0;top:596px;text-align:center;opacity:${cl(kf * 3)}`, `<span class="w6" style="font-size:42px;color:${P.mu}">تو کامنت بنویس:</span>`);
+    h += A(`left:110px;top:670px;width:860px;height:150px;border-radius:75px;background:${P.card};box-shadow:inset 0 0 0 6px ${P.fg};transform:scale(${cl(kf, 0, 1.05).toFixed(3)});opacity:${cl(kf * 4)}`,
+      A('right:56px;top:22px;font-size:72px;color:' + P.fg, word.slice(0, n) + `<span style="display:inline-block;width:8px;height:78px;margin-right:8px;vertical-align:-14px;background:${Math.floor(t * 3) % 2 ? P.fg : 'transparent'}"></span>`) +
+      A(`left:22px;top:22px;width:106px;height:106px;border-radius:50%;background:${P.fg}`, `<svg width="106" height="106"><path d="M53 76 V32 M34 50 L53 31 L72 50" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>`));
+    ['آره', 'نه'].forEach((s, i) => { const on = word === s && cyc > .3 && cyc < 1.25 && ph > 0, k = sp(t, tK + .15 + i * .12, .45);
+      h += A(`left:${i ? 150 : 560}px;top:872px;width:370px;height:150px;border-radius:44px;background:${on ? P.fg : 'transparent'};box-shadow:inset 0 0 0 6px ${P.fg};text-align:center;font-size:84px;line-height:138px;color:${on ? P.bg : P.fg};transform:scale(${(cl(k, 0, 1.05) * (on ? 1.04 : 1)).toFixed(3)});opacity:${cl(k * 4)}`, s); });
+    const kse = sp(t, tS, .6), fly = io(pr(t, tS + .1, tS + .9));
+    h += A(`left:110px;top:1100px;width:860px;height:270px;border-radius:54px;background:${P.fg};transform-origin:50% 100%;transform:translateY(${((1 - Math.min(1, kse)) * 300).toFixed(0)}px) scale(${cl(kse, 0, 1.04).toFixed(3)});opacity:${cl(kse * 4)}`,
+      A('left:0;right:0;top:24px;text-align:center;font-size:60px;line-height:1.5;color:' + P.bg, 'بفرست برای اونی که<br>هزار تا پست سیو کرده') +
+      `<svg class="a" style="left:${mix(-140, 700, fly).toFixed(0)}px;top:${(mix(150, -70, fly) - 60 * Math.sin(Math.PI * fly)).toFixed(0)}px" width="130" height="110" viewBox="0 0 130 110"><path d="M6 58 L124 6 L86 104 L66 66 Z" fill="#fff" stroke="#15131A" stroke-width="7" stroke-linejoin="round"/><path d="M66 66 L124 6" stroke="#15131A" stroke-width="7"/></svg>`);
+    h += dot(150, mix(1500, 1100, Math.min(1, kse)), 26 * cl(kse * 3));
+    h += txt(ltr('MESHKANI.PRO'), 1404, 40, P.mu, `letter-spacing:5px;opacity:${ex(pr(t, tS + .5, tS + .9))}`);
+    if (t < tS) { const [cx, cy] = glide(t, [[tK, 900, 1420], [tK + .5, 760, 960], [tK + 2, 760, 960], [tK + 2.4, 330, 960], [tK + 4, 330, 960]]); if (t >= tK) h += cursor(cx, cy, t, t < tK + 2 ? tK + .55 : tK + 2.45); }
+    return h; },
+};
+function endCard(u, t) { const P = TH(1), k = sp(u, .05, .6);
+  return dot(540, 740, 26 + 44 * Math.min(1.05, k)) + txt(ltr('MESHKANI.PRO'), 860, 88, P.fg, `letter-spacing:4px;${mask(ex(pr(u, .15, .6)))}`) +
+    txt('هر روز، داغ‌ترین خبرِ تکنولوژی', 1010, 52, P.mu, mask(ex(pr(u, .4, .9)))); }
+// the cover background (?cover=1): one oversized subject on the dark ground, the Muse chat with a very large unread dot; the headline goes below it (cover_real.mjs)
+function coverArt() { const P = TH(0);
+  return `<img src="${U('el/instagram.png')}" style="position:absolute;left:480px;top:70px;width:120px;height:120px">` +
+    A('left:50px;top:226px;width:980px;height:520px;border-radius:90px;background:#fff;box-shadow:0 40px 90px rgba(0,0,0,.5)',
+      A('right:50px;top:60px;width:250px;height:250px;border-radius:50%;background:#15131A') + A('right:340px;top:50px;font-size:170px;color:#15131A;line-height:1.2', ltr('Muse')) +
+      A('right:340px;top:262px', `<span class="w6" style="font-size:64px;color:${P.mu}">پیامِ جدید</span>`) + bar('right:60px;top:372px', 560, 44, '#D8D3CA') + bar('right:60px;top:440px', 380, 36, '#E7E2DA') + A('left:300px;top:444px', TAG(P.mu))) +
+    dot(200, 600, 150, `<div style="position:absolute;left:0;right:0;top:36px;text-align:center;font-size:180px;line-height:1.2;color:#fff">۱</div>`, 'box-shadow:0 0 0 18px #15131A') +
+    `<svg class="a" style="left:0;top:0;z-index:8" width="1080" height="1920"><g transform="translate(250 640) scale(2)"><path d="M0 0 L0 74 L18 58 L32 90 L46 84 L32 52 L56 52 Z" fill="#fff" stroke="#15131A" stroke-width="6" stroke-linejoin="round"/></g></svg>`; }
+
+// motion-matched sound cues per scene (STORY_SPEC "Sound design"): a pop when the dot lands, clicks for cursor clicks, typing for
+// typed text, ticks for list lines and chips, one hit for the stamp; never a whoosh on every cut
+const SFX = {
+  hook: b => [[.45, 'pop', .4], [1.1, 'click', .35], [1.3, 'notify', .35]],
+  brand: b => [[b.a + .08, 'hit', .32], [W(b, 'Muse') - .1, 'typing', .3], [W(b, 'Meta') - .05, 'pop', .3], [W(b, 'پنج') - .1, 'tick', .3], [W(b, 'ایران'), 'tap', .35]],
+  recipe: b => [[b.a + .3, 'click', .35], [b.a + .7, 'pop', .3], [W(b, 'لیست') + .1, 'tick', .3], [W(b, 'لیست') + .65, 'glass_ping', .35]],
+  saved: b => [[b.a + .1, 'tap', .3], [W(b, 'پوشه') - .25, 'pop', .32], [W(b, 'پوشه') + .15, 'pop', .3], [W(b, 'پوشه') + .5, 'pop', .3]],
+  trip: b => [[b.a + .1, 'tap', .3], [W(b, 'برنامه') - .25, 'click', .3], [W(b, 'مُد') - .3, 'pop', .32], [W(b, 'مُد') + .9, 'glass_ping', .3]],
+  perm: b => [[b.a + .1, 'tap', .25], [W(b, 'تأیید') + .3, 'hit', .45], [W(b, 'تأیید') + .75, 'pop', .3]],
+  ask: b => [[b.a + .1, 'pop', .3], [W(b, 'کامنت') - .1, 'typing', .3], [W(b, 'کامنت') + 1.7, 'click', .3], [W(b, 'بفرست') - .2, 'notify', .35]],
+};
+window.ready = (async () => {
+  S = await (await fetch(U('story.json'))).json(); TL = await (await fetch(U('timeline.json'))).json(); END = TL.total;
+  const shown = t => t.replace(/\[[^\]]*\]/g, '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').trim().split(/\s+/);
+  for (const bt of S.beats) {
+    const L = TL.lines[bt.id]; if (!L) { ISSUES.push('no timing for ' + bt.id); continue; }
+    if (!SCN[(bt.scene || {}).type]) { ISSUES.push('no scene type for ' + bt.id); continue; }
+    let on = false; const words = shown(bt.text).map(w => { const st = w.startsWith('*') || w.startsWith('«*'); if (st) on = true; const k = on || /\*/.test(w); if (/\*[.…،؛!؟?»]*$/.test(w)) on = false; return {w: w.replace(/\*/g, ''), k}; });
+    const wt = j => { const i = Math.round(cl(j / Math.max(1, words.length - 1)) * (L.words.length - 1)); return (L.words[i] || [L.start])[0]; };
+    B.push({bt, sc: bt.scene, L, words, wt});
+  }
+  B.forEach((b, i) => { b.i = i; b.a = i ? b.L.start - .08 : 0; b.b = i + 1 < B.length ? B[i + 1].L.start - .08 : TL.end_start; });
+  await Promise.all(['instagram.png', 'meta.png'].map(f => new Promise(r => { const im = new Image(); im.onload = () => im.decode().then(r, r); im.onerror = () => { ISSUES.push('missing el/' + f); r(); }; im.src = U('el/' + f); })));
+  await document.fonts.ready; await Promise.all(['900 40px V', '600 40px V'].map(f => document.fonts.load(f, 'دایرکت Muse AI')));
+  window.START = 0; window.DURATION = END; window.ISSUES = ISSUES;
+  window.SCENES = B.map(b => ({t0: b.a, t1: b.b, type: b.sc.type, bg: b.bt.id, sfx: SFX[b.sc.type](b).filter(x => x[0] >= b.a - .05 && x[0] < b.b + .3)}));
+  window.SCENES.push({t0: TL.end_start, t1: END, type: 'end', bg: 'end', sfx: [[TL.end_start + .15, 'glass_ping', .4]]});
+  seek(0);
+})();
+function seek(t) {
+  if (!B.length) return;
+  const st = $('stage');
+  if (COVER) { st.innerHTML = wrap(coverArt(), 1, 0); $('sub').innerHTML = ''; $('texL').style.opacity = 0; $('texD').style.opacity = .26; return; }
+  let bi = 0; for (let i = 0; i < B.length; i++) if (t >= B[i].a) bi = i;
+  const endOn = t >= TL.end_start, b = B[bi], a0 = endOn ? TL.end_start : b.a, b0 = endOn ? END : b.b, type = endOn ? 'end' : b.sc.type, d = DARK[type];
+  // screen-studio camera: every scene pushes 1.0 → 1.04, with a short exponential kick where it starts
+  $('cam').style.transform = `scale(${(1 + .04 * io(pr(t, a0, b0)) + .03 * Math.exp(-9 * (t - a0))).toFixed(4)})`;
+  let h; const cur = endOn ? endCard(t - a0, t) : SCN[type](b, t, t - b.a), prev = endOn ? B[B.length - 1] : B[bi - 1], u = t - a0;
+  if (prev && u < .42) { const pt = a0 - .002, R = REST[prev.sc.type]; h = wrap(SCN[prev.sc.type](prev, pt, pt - prev.a), DARK[prev.sc.type], pt) + wrap(cur, d, t, [R[0], R[1], 30 + 2300 * ex(pr(u, 0, .42) * .8) * pr(u, 0, .42)]); }
+  else h = wrap(cur, d, t);
+  if (st._h !== h) { st._h = h; st.innerHTML = h; }
+  $('texL').style.opacity = d ? 0 : .32; $('texD').style.opacity = d ? .26 : 0;
+  caption(b, t, endOn, d);
+}
+function caption(b, t, endOn, d) {
+  const sub = $('sub');
+  if (endOn || t > b.L.end + .35) { if (sub._k) { sub.innerHTML = ''; sub._k = null; } return; }
+  let j = 0; for (let q = 0; q < b.words.length; q++) if (t >= b.wt(q) - .04) j = q;
+  const c0 = Math.floor(j / 4) * 4, ch = b.words.slice(c0, c0 + 4), key = b.bt.id + ':' + c0 + ':' + d;
+  if (sub._k !== key) { sub._k = key; const lat = w => /[A-Za-z0-9]/.test(w.w) && !/[؀-ۿ]/.test(w.w), gs = [];
+    ch.forEach((w, q) => { const g = gs[gs.length - 1]; if (g && lat(w) && g.l) { g.w += ' ' + w.w; g.k = g.k || w.k; } else gs.push({w: w.w, k: w.k, i: q, l: lat(w)}); });   // Latin runs stay left-to-right
+    sub.innerHTML = `<span class="pill" style="background:${d ? '#F4F2EE' : '#15131A'};color:${d ? '#15131A' : '#F4F2EE'}">${gs.map(g => `<span class="w" data-i="${g.i}" ${g.l ? 'dir="ltr"' : ''} style="${g.k ? 'color:#FF3040' : ''}">${g.w}</span>`).join(' ')}</span>`; }
+  sub.querySelectorAll('.w').forEach(el => { const tw = b.wt(c0 + +el.dataset.i), k = ex(pr(t, tw - .05, tw + .2)); el.style.opacity = .25 + .75 * k; });
+}
+window.seek = seek;
+</script>
+</body>
+</html>
