@@ -210,7 +210,7 @@ B.gmoney = p => { const el = h('part'); const lab = h('a mask', 'left:0;right:0;
     unit.style.opacity = P(u, .4, .6); const sp = spr(u - .8); pic.style.transform = `rotate(-3deg) scale(${(.6 + .4 * Math.min(1.03, sp)).toFixed(4)})`; pic.style.opacity = sp > 0 ? 1 : 0;
     const ki = eo(P(u, 1.05, 1.7)), R = mix(0, 700, ki), rot = mix(-60, 0, ki); let d = 'M0 0 H900 V506 H0 Z '; for (let i = 0; i < 6; i++) { const a = (rot + i * 60) * Math.PI / 180; d += (i ? 'L' : 'M') + (450 + R * Math.cos(a)).toFixed(1) + ' ' + (253 + R * Math.sin(a)).toFixed(1) + ' '; }
     iris.innerHTML = `<path d="${d}Z" fill="#0E0E10" fill-rule="evenodd"/>`; pic.style.backgroundPosition = `${mix(30, 70, P(u, 1.9, 6)).toFixed(1)}% 50%`;
-    rec.style.transform = `rotate(-8deg) scale(${Math.min(1.1, spr(u - 2.3)).toFixed(3)})`; q.style.transform = `translateY(${(1 - Math.min(1, spr(u - 2.7))) * 500}px)`; } };
+    rec.style.transform = `rotate(-8deg) scale(${Math.min(1.1, spr(u - 2.3)).toFixed(3)})`; q.style.transform = `translateY(${(1 - Math.min(1, spr(u - 1.5))) * 500}px)`; } };
 };
 B.gsplit = p => { const el = h('part'); el.append(h('a', 'left:0;top:0;width:1080px;height:1920px;background:var(--ink)'));
   const BD = [['b_tower', 0, 0, [246, 190, 340, 200], 'نور', 60], ['b_iguana', -120, 0, [436, 30, 270, 205], 'جزئیات', 570], ['b_street', 0, 0, [262, 40, 250, 420], 'شلوغیِ دنیا', 1080]];
