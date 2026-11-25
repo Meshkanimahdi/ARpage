@@ -136,6 +136,20 @@ def lint(d, kind, hist_path):
             leads = [str(sc_.get('lead', '')).lower() for sc_ in (m.get('scenes') or [])]
             if leads and any(not l for l in leads): f.append('every motion scene needs `lead`: data | chart | ui | type | 3d | diagram | photo')
             if leads and leads.count('photo') > (int(len(leads) * .6) if st.get('heat') == 'hot' and m.get('real_footage') else max(1, len(leads) // 4)): f.append(f"{leads.count('photo')} of {len(leads)} scenes are photo-led (max a quarter): redesign them as data, chart, UI or type scenes")
+            # user rule 2026-11-25 (RUNBOOK §000.6): real pictures are welcome, a slideshow is not. «استفاده از تصاویر
+            # واقعی خوبه اما به شرطی که با ادیت‌های موشن‌گرافی خوب همراه باشه، نه فقط با یه ساند افکت ساده و اسلاید شدن»
+            if m.get('real_footage'):
+                TREAT = ('cutout', 'parallax', 'tracked', 'callout', 'mask', 'kinetic', 'data', 'chart', 'counter', 'ui', 'split', 'annotation', 'morph', '3d', 'compare', 'zoom-to-detail', 'outline', 'timeline')
+                scs = m.get('scenes') or []
+                for i, sc_ in enumerate(scs):
+                    if str(sc_.get('lead', '')).lower() != 'photo': continue
+                    tr = [str(t_).lower() for t_ in (sc_.get('treatment') or [])]
+                    good = {k for k in TREAT for t_ in tr if k in t_}
+                    if len(good) < 2: f.append(f"scene {i + 1} shows a real picture without a motion-graphics treatment: give `treatment` with at least 2 of {', '.join(TREAT[:10])}… (a push-in, slide or zoom alone is a slideshow) — §000.6")
+                run = 0
+                for sc_ in scs:
+                    run = run + 1 if str(sc_.get('lead', '')).lower() == 'photo' else 0
+                    if run > 2: f.append('more than 2 picture-led scenes in a row: put a data, chart, UI or type scene between them — §000.6'); break
             if hist and (m.get('category') or '') == hist[-1].get('category'): f.append(f"motion.category {m.get('category')} repeats the previous reel")
         sc = m.get('scenes') or []
         if len(sc) < 6: f.append('plan at least 6 scenes')

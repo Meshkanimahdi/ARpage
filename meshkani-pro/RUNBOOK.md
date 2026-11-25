@@ -120,6 +120,15 @@ a median of 140 sends per 1k reach, 26 s average watch and 46 % retention, stall
    real screens (press kits, official sites; credit in the caption), not conceptual stock-style photos. For
    `heat: hot` with `motion.real_footage: true` (also in story.json) the photo-led share may reach 60 %. Never a
    re-upload of someone else's video; every reel is our own edit with our own narration.
+   **Never a slideshow (Mahdi 2026-11-25, same day):** «استفاده از تصاویر واقعی خوبه اما به شرطی که با ادیت‌های
+   موشن‌گرافی خوب همراه باشه، نه فقط با یه ساند افکت ساده و اسلاید شدن». Every picture-led scene carries a
+   motion-graphics treatment built on the picture itself, at least two of: the subject cut out from its background with
+   parallax between the layers, tracked callouts and labels pinned to things in the picture, masks and outlines that
+   reveal a detail, kinetic type that interacts with the picture, counters/charts/data drawn over it, split-screen
+   compare, zoom to a detail with an annotation, a UI rebuilt on top. A push-in, pan, slide or zoom with a sound effect
+   alone does not count. At most 2 picture-led scenes in a row; the scenes between them are data, chart, UI or type.
+   `motion.scenes[].treatment` lists it; `concept_gate.py` fails a picture-led scene without it. Both critics score
+   `motion_richness` ≤ 5 when pictures only slide or zoom, and the ≥ 7 bar stays.
 7. **Hashtags and search:** at most 5 hashtags: the subject in Latin (#GTA6), the subject in Persian, one category tag,
    one audience tag, never generic filler such as #هوش_مصنوعی alone on a non-AI story. The subject's name is in the
    first caption line and in the on-screen headline, because search reads those. No popularity guesses.
