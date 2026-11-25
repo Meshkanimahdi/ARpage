@@ -57,7 +57,7 @@ const DARK = {hook: 0, brand: 1, recipe: 0, saved: 1, trip: 0, perm: 1, ask: 0, 
 const TH = d => d ? {bg: '#15131A', fg: '#F4F2EE', mu: '#A39FAD', card: '#24212C', line: '#3A3644', grid: '#302C3A'}
                   : {bg: '#F4F2EE', fg: '#15131A', mu: '#8C8894', card: '#FFFFFF', line: '#E4E0D9', grid: '#D3CEC5'};
 // where the through-line dot rests at the end of each scene: the next scene opens as a circle from this point (match cut)
-const REST = {hook: [112, 828], brand: [540, 420], recipe: [499, 847], saved: [350, 392], trip: [176, 700], perm: [540, 1090], ask: [150, 1100]};
+const REST = {hook: [112, 828], brand: [540, 420], recipe: [499, 847], saved: [350, 392], trip: [202, 700], perm: [540, 1090], ask: [150, 1100]};
 
 const A = (css, inner = '') => `<div class="a" style="${css}">${inner}</div>`;
 const txt = (s, y, size, col, extra = '') => `<div class="c" style="top:${y}px;font-size:${size}px;color:${col};${extra}">${s}</div>`;
@@ -66,7 +66,7 @@ const acc = s => `<span style="color:var(--acc)">${s}</span>`, ltr = s => `<span
 const bar = (css, w, h, col) => A(`${css};width:${w}px;height:${h}px;border-radius:${h / 2}px;background:${col}`);
 const dot = (x, y, r, inner = '', extra = '') => A(`left:${(x - r).toFixed(1)}px;top:${(y - r).toFixed(1)}px;width:${(2 * r).toFixed(1)}px;height:${(2 * r).toFixed(1)}px;border-radius:50%;background:var(--acc);z-index:6;${extra}`, inner);
 const chipH = (s, size, bg, fg, k, extra = '') => `<span style="display:inline-block;padding:${size * .2}px ${size * .55}px ${size * .36}px;border-radius:${size * .5}px;background:${bg};color:${fg};font-size:${size}px;white-space:nowrap;transform:scale(${cl(k, 0, 1.2).toFixed(3)});${extra}">${s}</span>`;
-const TAG = col => `<span class="w6" style="font-size:30px;color:${col}">بازسازیِ نمایشی</span>`;
+const TAG = col => `<span class="w6" style="font-size:36px;color:${col}">بازسازیِ نمایشی</span>`;
 function cursor(x, y, t, tc) {
   const press = tc !== undefined && t >= tc ? Math.exp(-8 * (t - tc)) : 0, ring = tc !== undefined && t >= tc ? pr(t, tc, tc + .45) : 1;
   return `<svg class="a" style="left:0;top:0;z-index:8" width="1080" height="1920" viewBox="0 0 1080 1920">${ring < 1 ? `<circle cx="${x}" cy="${y}" r="${24 + ring * 80}" fill="none" stroke="#15131A" stroke-width="${7 * (1 - ring)}"/>` : ''}
@@ -80,27 +80,29 @@ const wrap = (h, d, t, clip) => `<div class="sc" style="${clip ? `clip-path:circ
 // one chat row of the direct-message list (drawn, never a screenshot)
 const row = (P, y, name, badge, hi, press = 0) => A(`left:24px;right:24px;top:${y.toFixed(1)}px;height:144px;border-radius:36px;background:${hi ? '#FFE9EB' : 'transparent'};transform:scale(${(1 - .03 * press).toFixed(3)})`,
   A(`right:22px;top:22px;width:100px;height:100px;border-radius:50%;background:${hi ? P.fg : '#E7E2DA'}`) +
-  (name ? A('right:150px;top:16px;font-size:54px;color:' + P.fg, ltr(name)) + A('right:150px;top:88px', `<span class="w6" style="font-size:36px;color:${P.mu}">پیامِ جدید</span>`)
+  (name ? A('right:150px;top:16px;font-size:54px;color:' + P.fg, ltr(name)) + A('right:150px;top:88px', `<span class="w6" style="font-size:36px;color:${P.mu}">ایجنتِ ${ltr('Meta')}</span>`)
         : bar('right:150px;top:36px', 250, 28, '#D8D3CA') + bar('right:150px;top:86px', 410, 22, '#E7E2DA')) +
   (badge ? A(`left:30px;top:44px;min-width:56px;height:56px;border-radius:28px;background:${P.fg};color:${P.bg};font-size:32px;line-height:54px;text-align:center`, badge) : ''));
-const dmHead = (P) => `<img src="${U('el/instagram.png')}" style="position:absolute;right:44px;top:32px;width:76px;height:76px">` + A('right:146px;top:30px;font-size:56px;color:' + P.fg, 'دایرکت‌ها') + A('left:44px;top:50px', TAG(P.mu)) + A(`left:0;right:0;top:140px;height:4px;background:${P.line}`);
+const dmHead = (P) => `<img src="${U('el/instagram.png')}" style="position:absolute;right:44px;top:32px;width:76px;height:76px">` + A('right:146px;top:30px;font-size:56px;color:' + P.fg, 'دایرکت‌ها') + A('left:44px;top:46px', TAG(P.mu)) + A(`left:0;right:0;top:140px;height:4px;background:${P.line}`);
 const panel = (P, x, y, w, h, inner, extra = '') => A(`left:${x}px;top:${y}px;width:${w}px;height:${h}px;border-radius:56px;background:${P.card};box-shadow:0 30px 70px rgba(21,19,26,.14);overflow:hidden;${extra}`, inner);
 
 const SCN = {
   // 1 — hook: the headline is printed from frame 0; the dot drops beside it and lands on the new Muse chat; a catch-up card unfolds out of it
   hook(b, t, u) { const P = TH(0); let h = '';
     h += txt(`اینستا یه ${ltr('AI')} گذاشت`, 170, 112, P.fg) + txt(`وسطِ ${acc('دایرکت‌ها')}`, 318, 150, P.fg);
-    const kin = sp(u, -.2, .5), tc = 1.1, press = u >= tc ? Math.exp(-8 * (u - tc)) : 0;
+    const kin = sp(u, -.2, .5), tc = .75, press = u >= tc ? Math.exp(-8 * (u - tc)) : 0;
     let rows = row(P, 160, 'Muse', '', 1, press).replace('transform:scale(', `transform-origin:50% 0;opacity:${cl(kin * 3)};transform:scaleY(${cl(kin, 0, 1.06).toFixed(3)}) scale(`);
-    [['', '۳'], ['', '۷'], ['', '۱۲'], ['', '۲']].forEach((r, i) => rows += row(P, 160 + i * 150 + 150 * Math.min(1.03, kin), r[0], r[1], 0));
-    h += panel(P, 60, 590, 960, 850, dmHead(P) + rows);
+    [['', '۳'], ['', '۷'], ['', '۱۲']].forEach((r, i) => rows += row(P, 160 + i * 150 + 150 * Math.min(1.03, kin), r[0], r[1], 0));
+    h += panel(P, 60, 590, 960, 790, dmHead(P) + rows);
+    const ku = ex(pr(u, .15, .55)); h += A(`left:${(940 - 480 * ku).toFixed(0)}px;top:486px;width:${(480 * ku).toFixed(0)}px;height:14px;border-radius:7px;background:var(--acc)`);   // the key word is underlined as the dot falls
     const kd = pr(u, .05, .45), ky = kd * kd, land = sp(u, .45, .5), dy = mix(-70, 828, ky), sq = u > .45 ? 1 + .25 * Math.exp(-9 * (u - .45)) * Math.cos((u - .45) * 22) : 1;
-    const ts = 1.2, ks = sp(u, ts, .6);
-    h += A(`left:150px;top:900px;width:800px;height:470px;border-radius:44px;background:${P.fg};transform-origin:0 0;transform:scale(${cl(ks, 0, 1.05).toFixed(3)});opacity:${cl(ks * 4)};box-shadow:0 30px 70px rgba(21,19,26,.3)`,
-      A('right:44px;top:26px;font-size:60px;color:' + P.bg, 'جا انداختی:') + [0, 1, 2].map(i => { const kl = ex(pr(u, ts + .3 + i * .16, ts + .6 + i * .16)); const hl = Math.exp(-Math.pow((u - (ts + 1.25 + i * .55)) / .22, 2)); return A(`left:24px;right:24px;top:${144 + i * 100}px;height:92px;border-radius:30px;background:rgba(255,255,255,${(.14 * hl).toFixed(3)});opacity:${kl};transform:translateX(${((1 - kl) * 60).toFixed(0)}px) scale(${(1 + .03 * hl).toFixed(4)})`,
-        A('right:16px;top:14px;width:64px;height:64px;border-radius:50%;background:#3A3644') + bar('right:106px;top:30px', [330, 260, 380][i], 30, '#4A4556') + A(`left:16px;top:16px;padding:2px 24px 10px;border-radius:30px;background:#3A3644;color:${P.bg};font-size:36px`, ['۳ پیام', '۷ پیام', '۱۲ پیام'][i])); }).join(''));
+    const ts = .85, ks = sp(u, ts, .55);
+    h += A(`left:200px;top:900px;width:770px;height:470px;border-radius:44px;background:${P.fg};transform-origin:0 0;transform:scale(${cl(ks, 0, 1.05).toFixed(3)});opacity:${cl(ks * 4)};box-shadow:0 30px 70px rgba(21,19,26,.3)`,
+      A('right:44px;top:26px;font-size:60px;color:' + P.bg, 'جا انداختی:') + [0, 1, 2].map(i => { const kl = ex(pr(u, ts + .1 + i * .12, ts + .4 + i * .12)); const hl = Math.exp(-Math.pow((u - (ts + 1.25 + i * .55)) / .22, 2)); return A(`left:24px;right:24px;top:${144 + i * 100}px;height:92px;border-radius:30px;background:rgba(255,255,255,${(.14 * hl).toFixed(3)});opacity:${kl};transform:translateX(${((1 - kl) * 60).toFixed(0)}px) scale(${(1 + .03 * hl).toFixed(4)})`,
+        A('right:16px;top:14px;width:64px;height:64px;border-radius:50%;background:#4A4556') + A('right:100px;top:10px', `<span class="w6" style="font-size:44px;color:${P.bg}">${['گروهِ خانواده', 'رفیقِ قدیمی', 'همکار'][i]}</span>`) + A(`left:16px;top:16px;padding:2px 24px 10px;border-radius:30px;background:#3A3644;color:${P.bg};font-size:36px`, ['۳ پیام', '۷ پیام', '۱۲ پیام'][i])); }).join(''));
     h += dot(112, dy, 26 * (u < .45 ? 1 : sq) * (1 + .12 * Math.sin(u * 5) * pr(u, 1, 1.4)));
-    const [cx, cy] = glide(u, [[.5, 880, 1560], [tc, 620, 836], [1.5, 620, 836], [2.3, 900, 1420]]); h += cursor(cx, cy, u, tc);
+    const [cx, cy] = glide(u, [[.3, 1120, 1500], [tc, 620, 836], [1.5, 620, 836], [2.3, 960, 1410]]); h += cursor(cx, cy, u, tc);
+    const kq = sp(u, 1.75, .5); h += A(`left:90px;top:1392px;transform:rotate(-4deg) scale(${cl(kq, 0, 1.08).toFixed(3)});transform-origin:0 50%;opacity:${cl(kq * 4)};z-index:7`, chipH('دایرکت‌هاتو می‌خونه؟', 58, P.card, P.fg, 1, `box-shadow:inset 0 0 0 6px ${P.fg}`));   // the question of the last beat, teased in the first two seconds
     return h; },
   // 2 — brand: the dot grows into Muse's avatar, the name types on, the official Meta logo, the five countries and Iran
   brand(b, t, u) { const P = TH(1); let h = '';
@@ -120,7 +122,7 @@ const SCN = {
   recipe(b, t, u) { const P = TH(0); let h = '';
     const tL = W(b, 'لیست') - .35, pan = 60 * io(pr(t, tL, tL + .6));
     h += txt('یه ریلز بفرست', 170, 104, P.fg, mask(ex(pr(u, .02, .4))));
-    const kb = sp(u, .35, .55), by = mix(1000, 60, Math.min(1.02, kb));
+    const kb = sp(u, .35, .55), by = mix(1000, 190, Math.min(1.02, kb));
     const reel = A(`right:50px;top:${by.toFixed(1)}px;width:390px;height:520px;border-radius:50px;background:#FFDFAE;opacity:${cl(kb * 5)}`,
       `<svg width="390" height="520" viewBox="0 0 330 440"><circle cx="150" cy="235" r="78" fill="none" stroke="#15131A" stroke-width="16"/><rect x="222" y="224" width="96" height="22" rx="11" fill="#15131A" transform="rotate(-18 222 235)"/><circle cx="150" cy="235" r="34" fill="#FF9F43"/>
        <path d="M110 120 q14 -22 0 -44 M150 112 q14 -22 0 -44 M190 120 q14 -22 0 -44" fill="none" stroke="#15131A" stroke-width="9" stroke-linecap="round" opacity="${(.4 + .4 * Math.sin(t * 5)).toFixed(2)}"/>
@@ -128,7 +130,7 @@ const SCN = {
     const kc = sp(t, tL, .6), items = ['گوجه', 'تخم‌مرغ', 'پیاز', 'نان'];
     const tD = tL + .45, kd = io(pr(t, tD, tD + .4)), dx = mix(890, 439, kd), dyy = mix(66, 128 - pan + 359 + 31, kd) - 60 * Math.sin(Math.PI * kd);
     const list = A(`left:40px;top:200px;width:470px;height:640px;border-radius:44px;background:${P.card};box-shadow:inset 0 0 0 5px ${P.line};transform-origin:50% 0;transform:scaleY(${cl(kc, 0, 1.05).toFixed(3)});opacity:${cl(kc * 4)}`,
-      A('right:40px;top:22px;font-size:60px;color:' + P.fg, 'لیستِ خرید') + A('left:36px;top:48px', `<span class="w6" style="font-size:30px;color:${P.mu}">نمونه</span>`) +
+      A('right:40px;top:22px;font-size:60px;color:' + P.fg, 'لیستِ خرید') + A('left:36px;top:48px', `<span class="w6" style="font-size:38px;color:${P.mu}">نمونه</span>`) +
       items.map((s, i) => { const ki = ex(pr(t, tL + .3 + i * .18, tL + .6 + i * .18)), tk = sp(t, tD + .4 + i * .2, .4);
         return A(`left:40px;right:40px;top:${150 + i * 116}px;height:80px;opacity:${ki};transform:translateY(${((1 - ki) * 30).toFixed(0)}px)`,
           A(`right:0;top:9px;width:62px;height:62px;border-radius:16px;box-shadow:inset 0 0 0 5px ${P.fg};background:${i && tk > .3 ? P.fg : 'transparent'}`, i && tk > .3 ? `<svg width="62" height="62"><path d="M17 32 L27 43 L46 20" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '') +
@@ -142,7 +144,7 @@ const SCN = {
   // 4 — saved: a messy grid of saved posts re-flows into three labelled collections; the dot hops across the folder tabs
   saved(b, t, u) { const P = TH(1); let h = '';
     const tS = W(b, 'پوشه') - .45, cat = [0, 1, 2, 1, 2, 0, 2, 0, 1], colX = c => 700 - c * 290, COL = ['#8EC5FF', '#FFC76B', '#D0B2FF'], cnt = [0, 0, 0], seen = [0, 0, 0];
-    h += txt('پست‌های سیوشده', 170, 100, P.fg, mask(ex(pr(u, .02, .4))));
+    h += txt('پست‌های سیوشده', 170, 100, P.fg, mask(ex(pr(u, .02, .4)))) + A('left:60px;top:1404px', TAG(P.mu));
     const ICON = [`<path d="M52 150 L210 64 L150 214 L128 156 Z" fill="#15131A"/><path d="M128 156 L210 64" stroke="#8EC5FF" stroke-width="8"/>`,
       `<path d="M56 136 h148 a74 74 0 0 1 -148 0 z" fill="#15131A"/><path d="M100 104 q12 -20 0 -40 M130 96 q12 -20 0 -40 M160 104 q12 -20 0 -40" fill="none" stroke="#15131A" stroke-width="9" stroke-linecap="round"/>`,
       `<path d="M92 52 L116 44 Q130 62 144 44 L168 52 L214 92 L186 122 L170 108 L170 214 L90 214 L90 108 L74 122 L46 92 Z" fill="#15131A"/>`];
@@ -154,14 +156,15 @@ const SCN = {
       h += A(`left:${colX(c)}px;top:392px;width:260px;height:100px;border-radius:30px 30px 8px 8px;background:${P.card};box-shadow:inset 0 0 0 4px ${P.line};transform-origin:50% 100%;transform:scaleY(${cl(k, 0, 1.08).toFixed(3)});opacity:${cl(k * 4)}`,
         A('right:28px;top:10px;font-size:50px;color:' + P.fg, s) + A('left:26px;top:22px', `<span class="w6" style="font-size:38px;color:${P.mu}">${fa(cnt[c])}/۳</span>`)); });
     // the dot hops from tab to tab
-    const hops = [[540, 320], ...[0, 1, 2].map(c => [colX(c) + 230, 392])], th = tS + .25; let seg = 0; for (let i = 1; i <= 3; i++) if (t >= th + (i - 1) * .34) seg = i;
+    const hops = [[1016, 452], ...[0, 1, 2].map(c => [colX(c) + 230, 392])], th = tS + .25; let seg = 0; for (let i = 1; i <= 3; i++) if (t >= th + (i - 1) * .34) seg = i;
     const kq = seg ? io(pr(t, th + (seg - 1) * .34, th + (seg - 1) * .34 + .28)) : 0, p0 = hops[Math.max(0, seg - 1)], p1 = hops[seg];
     h += dot(mix(p0[0], p1[0], kq), mix(p0[1], p1[1], kq) - 90 * Math.sin(Math.PI * kq), 24 * sp(u, .1, .4));
     return h; },
   // 5 — trip: three travel reels become pins; a route draws through day 1, 2, 3 while the frame travels sideways; the dot rides the line
   trip(b, t, u) { const P = TH(0); let h = '';
     const tP = W(b, 'برنامه') - .3, tF = W(b, 'مُد') - .35, kL = io(pr(t, tP + .15, tF - .45)), kz = io(pr(t, tF - .45, tF)), NX = [1600, 950, 300], yAt = x => 880 + 110 * Math.sin((x - 300) / 1300 * Math.PI * 2);
-    h += txt(acc('برنامه‌ی سفر'), 170, 112, P.fg, mask(ex(pr(u, .02, .4))));
+    h += t < tF ? txt(acc('برنامه‌ی سفر'), 170, 112, P.fg, mask(ex(pr(u, .02, .4)))) : txt(acc('پیشنهادِ لباس'), 170, 112, P.fg, mask(ex(pr(t, tF, tF + .35))));
+    h += A('left:60px;top:1404px', TAG(P.mu));
     const off = mix(-820, 0, kL), xd = mix(1600, 300, kL);
     let pts = ''; for (let x = 1600; x >= xd; x -= 20) pts += `${x},${yAt(x).toFixed(1)} `; pts += `${xd.toFixed(1)},${yAt(xd).toFixed(1)}`;
     let strip = `<svg class="a" style="left:0;top:0" width="1900" height="1920" viewBox="0 0 1900 1920"><polyline points="${pts}" fill="none" stroke="${P.fg}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 26"/>` +
@@ -170,21 +173,20 @@ const SCN = {
       strip += A(`left:${x - 220}px;top:${up ? 400 : 1040}px;width:440px;height:330px;border-radius:48px;background:${P.card};box-shadow:0 24px 60px rgba(21,19,26,.14);transform-origin:50% ${up ? 100 : 0}%;transform:scale(${cl(kc, 0, 1.06).toFixed(3)});opacity:${cl(kc * 4)}`,
         A('right:40px;top:22px;font-size:72px;color:' + P.fg, 'روزِ ' + fa(i + 1)) + bar('right:40px;top:160px', [290, 330, 260][i], 32, '#D8D3CA') + bar('right:40px;top:222px', [340, 250, 310][i], 28, '#E7E2DA') +
         `<svg class="a" style="left:30px;top:26px" width="70" height="90" viewBox="0 0 70 90"><path d="M35 86 C10 52 4 42 4 30 a31 31 0 0 1 62 0 c0 12 -6 22 -31 56 z" fill="${P.fg}"/><circle cx="35" cy="30" r="11" fill="${P.card}"/></svg>`); });
-    h += A(`left:0;top:0;width:1900px;height:1920px;transform-origin:0 0;transform:translate(${mix(off, 8, kz).toFixed(1)}px,${mix(0, 207, kz).toFixed(1)}px) scale(${mix(1, .56, kz).toFixed(4)})`, strip + dot(xd, yAt(xd), mix(26, 40, kz)));   // travel along the route, then pull back so the whole plan is in frame
+    h += A(`left:0;top:0;width:1900px;height:1920px;transform-origin:0 0;transform:translate(${mix(off, 46, kz).toFixed(1)}px,${mix(0, 242, kz).toFixed(1)}px) scale(${mix(1, .52, kz).toFixed(4)})`, strip + dot(xd, yAt(xd), mix(26, 40, kz)));   // travel along the route, then pull back so the whole plan is in frame
     const ko = sp(t, tF + .05, .55);   // «پیشنهادِ لباس»: an outfit card pops out of the dot once the route is done
-    h += A(`left:250px;top:1010px;width:580px;height:400px;border-radius:56px;background:#D0B2FF;transform-origin:-74px -310px;transform:scale(${cl(ko, 0, 1.05).toFixed(3)});opacity:${cl(ko * 4)};z-index:4`,
-      `<svg class="a" style="left:30px;top:60px" width="260" height="260" viewBox="0 0 260 260"><path d="M92 52 L116 44 Q130 62 144 44 L168 52 L214 92 L186 122 L170 108 L170 214 L90 214 L90 108 L74 122 L46 92 Z" fill="#15131A"/></svg>` + A('right:40px;top:110px;font-size:64px;line-height:1.3;color:#15131A;text-align:right', 'پیشنهادِ<br>لباس'));
+    h += A(`left:250px;top:1010px;width:580px;height:400px;border-radius:56px;background:#D0B2FF;transform-origin:-48px -310px;transform:scale(${cl(ko, 0, 1.05).toFixed(3)});opacity:${cl(ko * 4)};z-index:4`,
+      `<svg class="a" style="left:30px;top:60px" width="260" height="260" viewBox="0 0 260 260"><path d="M92 52 L116 44 Q130 62 144 44 L168 52 L214 92 L186 122 L170 108 L170 214 L90 214 L90 108 L74 122 L46 92 Z" fill="#15131A"/></svg>` + A('right:40px;top:110px;font-size:64px;line-height:1.3;color:#15131A;text-align:right', 'از ریلزهای<br>مُد'));
     // the three travel reels that feed the plan: they shrink into the first pin
     [0, 1, 2].forEach(i => { const kin = sp(u, .03 + i * .07, .45), kout = io(pr(t, tP, tP + .35));
-      h += A(`left:${mix(150 + i * 270, 760, kout).toFixed(1)}px;top:${mix(330, 800, kout).toFixed(1)}px;width:240px;height:300px;border-radius:38px;background:#8EC5FF;transform:scale(${(cl(kin, 0, 1.06) * (1 - kout)).toFixed(3)}) rotate(${(i - 1) * 4}deg);z-index:2`,
-        `<svg width="240" height="300" viewBox="0 0 240 300"><path d="M44 170 L196 86 L138 234 L118 178 Z" fill="#15131A"/><circle cx="52" cy="252" r="30" fill="#15131A"/><path d="M43 236 L69 252 L43 268 Z" fill="#fff"/></svg>`); });
+      h += A(`left:${mix(70 + i * 330, 760, kout).toFixed(1)}px;top:${mix(340, 780, kout).toFixed(1)}px;width:290px;height:362px;border-radius:44px;background:#8EC5FF;transform:scale(${(cl(kin, 0, 1.06) * (1 - kout)).toFixed(3)}) rotate(${(i - 1) * 4}deg);z-index:2`,
+        `<svg width="290" height="362" viewBox="0 0 240 300"><path d="M44 170 L196 86 L138 234 L118 178 Z" fill="#15131A"/><circle cx="52" cy="252" r="30" fill="#15131A"/><path d="M43 236 L69 252 L43 268 Z" fill="#fff"/></svg>`); });
     return h; },
   // 6 — perm: Meta's statement set as a quotation (not a screen); the dot stamps down as the approval seal
   perm(b, t, u) { const P = TH(1); let h = '';
     const tT = W(b, 'تأیید') + .15, ks = t < tT ? 0 : 1;
-    h += txt('»', 196, 190, P.line, `left:auto;right:70px;width:auto;opacity:${ex(pr(u, 0, .3))}`);
-    h += txt(`بدونِ ${acc('تأییدِ تو')}`, 400, 132, P.fg, mask(ex(pr(u, .05, .45))));
-    h += txt('هیچ پیامی فرستاده نمی‌شه', 580, 92, P.fg, mask(ex(pr(u, .3, .7))));
+        h += txt(`بدونِ ${acc('تأییدِ تو')}`, 400, 132, P.fg, mask(ex(pr(u, .05, .45))));
+    h += txt('هیچ پیامی فرستاده نمی‌شه', 584, 84, P.fg, mask(ex(pr(u, .3, .7))));
     const ka = sp(u, .6, .5);
     h += A(`left:0;right:0;top:770px;text-align:center;direction:rtl;transform:scale(${cl(ka, 0, 1.05).toFixed(3)});opacity:${cl(ka * 4)}`,
       `<span class="w6" style="font-size:52px;color:${P.mu};vertical-align:middle">به گفته‌ی</span> <span style="display:inline-block;vertical-align:middle;margin-right:20px;padding:26px 36px 20px;border-radius:34px;background:#fff"><img src="${U('el/meta.png')}" style="width:250px;height:50px;display:block"></span>`);
@@ -197,9 +199,9 @@ const SCN = {
     return h; },
   // 7 — ask: the question fills the frame; a comment box types «آره» / «نه»; the send chip arrives with a paper plane
   ask(b, t, u) { const P = TH(0); let h = '';
-    const tK = W(b, 'کامنت') - .45, tS = W(b, 'بفرست') - .25;
+    const tK = Math.min(W(b, 'کامنت') - .45, b.a + 1.1), tS = W(b, 'بفرست') - .25;
     h += txt(`می‌ذاری یه ${ltr('AI')}`, 200, 128, P.fg, mask(ex(pr(u, .02, .4))));
-    h += txt(`${acc('دایرکت‌هاتو')} بخونه؟`, 370, 128, P.fg, mask(ex(pr(u, .25, .65))));
+    h += txt(`${acc('دایرکت‌هاتو')} بخونه؟`, 374, 116, P.fg, mask(ex(pr(u, .25, .65))));
     const kf = sp(t, tK, .55), ph = Math.max(0, t - tK - .3), cyc = ph % 1.7, word = Math.floor(ph / 1.7) % 2 ? 'نه' : 'آره', n = cyc < 1.25 ? Math.round(word.length * pr(cyc, 0, .35)) : Math.round(word.length * (1 - pr(cyc, 1.25, 1.5)));
     h += A(`left:0;right:0;top:596px;text-align:center;opacity:${cl(kf * 3)}`, `<span class="w6" style="font-size:42px;color:${P.mu}">تو کامنت بنویس:</span>`);
     h += A(`left:110px;top:670px;width:860px;height:150px;border-radius:75px;background:${P.card};box-shadow:inset 0 0 0 6px ${P.fg};transform:scale(${cl(kf, 0, 1.05).toFixed(3)});opacity:${cl(kf * 4)}`,
@@ -221,17 +223,18 @@ function endCard(u, t) { const P = TH(1), k = sp(u, .05, .6);
     txt('هر روز، داغ‌ترین خبرِ تکنولوژی', 1010, 52, P.mu, mask(ex(pr(u, .4, .9)))); }
 // the cover background (?cover=1): one oversized subject on the dark ground, the Muse chat with a very large unread dot; the headline goes below it (cover_real.mjs)
 function coverArt() { const P = TH(0);
-  return `<img src="${U('el/instagram.png')}" style="position:absolute;left:480px;top:70px;width:120px;height:120px">` +
-    A('left:50px;top:226px;width:980px;height:520px;border-radius:90px;background:#fff;box-shadow:0 40px 90px rgba(0,0,0,.5)',
-      A('right:50px;top:60px;width:250px;height:250px;border-radius:50%;background:#15131A') + A('right:340px;top:50px;font-size:170px;color:#15131A;line-height:1.2', ltr('Muse')) +
-      A('right:340px;top:262px', `<span class="w6" style="font-size:64px;color:${P.mu}">پیامِ جدید</span>`) + bar('right:60px;top:372px', 560, 44, '#D8D3CA') + bar('right:60px;top:440px', 380, 36, '#E7E2DA') + A('left:300px;top:444px', TAG(P.mu))) +
-    dot(200, 600, 150, `<div style="position:absolute;left:0;right:0;top:36px;text-align:center;font-size:180px;line-height:1.2;color:#fff">۱</div>`, 'box-shadow:0 0 0 18px #15131A') +
-    `<svg class="a" style="left:0;top:0;z-index:8" width="1080" height="1920"><g transform="translate(250 640) scale(2)"><path d="M0 0 L0 74 L18 58 L32 90 L46 84 L32 52 L56 52 Z" fill="#fff" stroke="#15131A" stroke-width="6" stroke-linejoin="round"/></g></svg>`; }
+  return `<img src="${U('el/instagram.png')}" style="position:absolute;left:96px;top:296px;width:96px;height:96px;z-index:7">` +
+    A('left:50px;top:262px;width:980px;height:500px;border-radius:90px;background:#fff;box-shadow:0 40px 90px rgba(0,0,0,.5)',
+      A('right:50px;top:60px;width:250px;height:250px;border-radius:50%;background:#15131A', `<svg width="250" height="250" viewBox="-125 -125 250 250"><path d="M0 -84 C8 -26 26 -8 84 0 C26 8 8 26 0 84 C-8 26 -26 8 -84 0 C-26 -8 -8 -26 0 -84 Z" fill="#fff"/></svg>`) + A('right:340px;top:50px;font-size:170px;color:#15131A;line-height:1.2', ltr('Muse')) +
+      A('right:340px;top:262px', `<span class="w6" style="font-size:64px;color:${P.mu}">ایجنتِ ${ltr('Meta')}</span>`) + bar('right:60px;top:372px', 520, 44, '#D8D3CA') + A('right:60px;top:432px', TAG(P.mu))) +
+    dot(196, 668, 140, `<div dir="ltr" style="position:absolute;left:0;right:0;top:66px;text-align:center;font-size:124px;line-height:1.2;color:#fff">AI</div>`, 'box-shadow:0 0 0 18px #15131A') +
+    A('left:0;right:0;top:1462px;text-align:center;transform:rotate(-3deg)', chipH('دایرکت‌هاتو می‌خونه؟', 84, '#F4F2EE', '#15131A', 1)) +
+    `<svg class="a" style="left:0;top:0;z-index:8" width="1080" height="1920"><g transform="translate(262 716) scale(1.9)"><path d="M0 0 L0 74 L18 58 L32 90 L46 84 L32 52 L56 52 Z" fill="#fff" stroke="#15131A" stroke-width="6" stroke-linejoin="round"/></g></svg>`; }
 
 // motion-matched sound cues per scene (STORY_SPEC "Sound design"): a pop when the dot lands, clicks for cursor clicks, typing for
 // typed text, ticks for list lines and chips, one hit for the stamp; never a whoosh on every cut
 const SFX = {
-  hook: b => [[.45, 'pop', .4], [1.1, 'click', .35], [1.3, 'notify', .35]],
+  hook: b => [[.45, 'pop', .4], [.75, 'click', .35], [1.75, 'notify', .35]],
   brand: b => [[b.a + .08, 'hit', .32], [W(b, 'Muse') - .1, 'typing', .3], [W(b, 'Meta') - .05, 'pop', .3], [W(b, 'پنج') - .1, 'tick', .3], [W(b, 'ایران'), 'tap', .35]],
   recipe: b => [[b.a + .3, 'click', .35], [b.a + .7, 'pop', .3], [W(b, 'لیست') + .1, 'tick', .3], [W(b, 'لیست') + .65, 'glass_ping', .35]],
   saved: b => [[b.a + .1, 'tap', .3], [W(b, 'پوشه') - .25, 'pop', .32], [W(b, 'پوشه') + .15, 'pop', .3], [W(b, 'پوشه') + .5, 'pop', .3]],
@@ -280,7 +283,7 @@ function caption(b, t, endOn, d) {
   if (sub._k !== key) { sub._k = key; const lat = w => /[A-Za-z0-9]/.test(w.w) && !/[؀-ۿ]/.test(w.w), gs = [];
     ch.forEach((w, q) => { const g = gs[gs.length - 1]; if (g && lat(w) && g.l) { g.w += ' ' + w.w; g.k = g.k || w.k; } else gs.push({w: w.w, k: w.k, i: q, l: lat(w)}); });   // Latin runs stay left-to-right
     sub.innerHTML = `<span class="pill" style="background:${d ? '#F4F2EE' : '#15131A'};color:${d ? '#15131A' : '#F4F2EE'}">${gs.map(g => `<span class="w" data-i="${g.i}" ${g.l ? 'dir="ltr"' : ''} style="${g.k ? 'color:#FF3040' : ''}">${g.w}</span>`).join(' ')}</span>`; }
-  sub.querySelectorAll('.w').forEach(el => { const tw = b.wt(c0 + +el.dataset.i), k = ex(pr(t, tw - .05, tw + .2)); el.style.opacity = .25 + .75 * k; });
+  sub.querySelectorAll('.w').forEach(el => { const tw = b.wt(c0 + +el.dataset.i), k = ex(pr(t, tw - .05, tw + .2)); el.style.opacity = .5 + .5 * k; });
 }
 window.seek = seek;
 </script>
