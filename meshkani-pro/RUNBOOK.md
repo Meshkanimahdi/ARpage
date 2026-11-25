@@ -88,6 +88,50 @@ publish twice, never publish late, never publish unverified content.
 
 ---
 
+## 000. Hot-first growth rules (user rule 2026-11-25, overrides §00.0 scope and mix, §00.24 photo limits for hot stories, and the weekly-bank-first order of §00.13 and §4.2)
+Mahdi: «تو داغ‌ترین خبرها رو اصلاً پوشش نمی‌دی. همه در مورد انتشار GTA 6 صحبت می‌کردند و تو اصلاً راجع بهش صحبت نکردی و
+همش داری ریلزهای کلیشه‌ای می‌سازی… آموزش دادن موارد به‌روز به اشتراک‌گذاری کمک می‌کنه، ولی نباید پشت سر هم بیاد که پیج
+جنبه‌ی آموزشی بگیره… تگ‌گذاری ضعیفه… در آواگذاری کلمات نریشن دقت کن… خبر اخراج توسط AI چند بار تکرار شده؛ هیچ خبری
+نباید دوبار تکرار بشه مگر اینکه آپدیت جدید ازش اومده باشه». Goal he set: 100k followers in a month through great hooks and
+watch time. The record (diagnosis of 2026-11-25): 29 of 55 reels stalled in the 1,200–1,700-view test batch; breakouts had
+a median of 140 sends per 1k reach, 26 s average watch and 46 % retention, stalled reels 4 / 12 s / 25 %; from 11-18 to
+11-24 no reel left the test batch; topics came from the Friday bank, up to 14 days old, and «AI layoffs» ran four times
+(REEL-056, 060, 065, 070).
+1. **Scope:** technology that people are talking about, AI first but not only AI: big game and gadget launches, apps and
+   platforms, big-tech moves, viral demos, Iranian tech news. `ai_anchor` keeps its name and holds that development.
+2. **Live trend scan before every reel and carousel (blocking, replaces "bank first"):** at prepare time run at least six
+   live searches for the last 72 h (global tech press, gaming, AI labs, Persian tech news such as Zoomit/Digiato, what is
+   trending on X/YouTube/Google Trends) and write the top five stories with dates and links into `research.md`. The
+   hottest story not yet covered wins. The Topic Bank is the fallback when nothing is hot. `story.heat`: `hot` (anchor
+   ≤ 3 days, `story.trend_evidence` ≥ 2 URLs) or `fresh` (≤ 7 days). At most every second reel may be `fresh`.
+   Nothing older than 7 days.
+3. **No story twice:** `story.theme` (a slug such as `ai-layoffs`, `gta6-launch`) is recorded in the motion history; the
+   same theme within the last 45 reels fails the gate unless `story.update` says what is new. The same holds between a
+   day's carousel and reels.
+4. **Teaching fresh things:** a `practice` reel teaches one thing that became possible in the last 7 days (a new
+   feature, a new free tool, a trick with a tool that works in Iran), shown on the real screen step by step. Never two
+   `practice` reels in a row; about 2 in 7.
+5. **Hook and watch time (what the ranking rewards: watch time, likes per reach, sends per reach):** the first spoken
+   second names the hot subject; an open question or a surprising fact is on screen from frame 0 and is answered only
+   near the end; 20–35 s for news; a new shot or event at least every 2 s; the last line gives one reason to send it to a
+   named person. Targets checked at every PIVOT_REVIEW: sends per 1k reach ≥ 30, average watch ≥ 50 % of the length,
+   retention ≥ 40 %. Views alone are not a target.
+6. **Show the real thing:** a hot story is told with the subject's own official stills, trailer frames, product shots or
+   real screens (press kits, official sites; credit in the caption), not conceptual stock-style photos. For
+   `heat: hot` with `motion.real_footage: true` (also in story.json) the photo-led share may reach 60 %. Never a
+   re-upload of someone else's video; every reel is our own edit with our own narration.
+7. **Hashtags and search:** at most 5 hashtags: the subject in Latin (#GTA6), the subject in Persian, one category tag,
+   one audience tag, never generic filler such as #هوش_مصنوعی alone on a non-AI story. The subject's name is in the
+   first caption line and in the on-screen headline, because search reads those. No popularity guesses.
+8. **Narration pronunciation (blocking):** every word that `story_voice.mjs` lists in `voice/flags.json` is respelled
+   with diacritics (اِعراب، کسره‌ی اضافه) or replaced, and the take is redone; every beat scores ≥ 0.86 in the
+   speech-to-text check, except a beat whose only miss is a Latin name that passed `pron_test`. Numbers are written
+   out in words for the voice. Voices keep rotating (none of the last 12) and alternate between clearly different ages
+   and energies, not only different names.
+9. **No duplicate uploads and no content lifted from other pages** (repost exclusion from recommendations).
+Enforced: `concept_gate.py` (theme, heat, trend_evidence, practice spacing), `reel_gate.py` (60 % only for hot real
+footage; history records `theme` and `heat`), `story_voice.mjs` (0.86).
+
 ## 00.0 Page purpose — AI news and the role of AI in people's lives (user rule 2026-11-18, overrides §00.1–3, §00.13 and §4.0a "proven formulas" where they differ)
 Mahdi: «به نظرت موضوعات خیلی احمقانه پشت هم جلو نمیره؟ همش توصیه به مردم در مورد موارد خانگی، کلاهبرداری و…
 این پیج هدفش این نبود، قرار بود اطلاع‌رسانی اخبار هوش مصنوعی باشه بیشتر، یعنی نقش هوش مصنوعی در زندگی انسان‌ها،

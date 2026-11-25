@@ -141,7 +141,8 @@ def main():
     if not pp: fails.append('no photo_probe.json: run `node news-reel/reel_render.mjs --dir=<dir> --page=<engine> --mode=probe` (RUNBOOK §00.24)')
     else:
         pr = json.loads(pp.read_text()); info['photo_probe'] = {k: pr.get(k) for k in ('mean_cover', 'photo_led_share')}
-        if (pr.get('photo_led_share') or 0) > 0.35:
+        _hot = story.get('heat') == 'hot' and story.get('real_footage')   # §000 (2026-11-25): a hot story may show the real thing (official stills/footage) for up to 60 %
+        if (pr.get('photo_led_share') or 0) > (0.60 if _hot else 0.35):
             fails.append(f"photo-led seconds {pr['photo_led_share']:.0%} of the reel (max 35 %): this is a photo slideshow, rebuild the scenes as motion graphics (charts, numbers, UI, type) — RUNBOOK §00.24")
 
     # 4b. topic cooldown (user rule 2026-10-26: robots/workers two days running): the field must differ from the
@@ -210,7 +211,7 @@ def main():
     out = {'pass': not fails, 'fails': fails, 'hard_fails': hard_fails, 'score_fails': score_fails,
            'low_score_publish_allowed': not hard_fails, 'info': info,
            'history_entry': {'reel': story.get('content_id', ''), 'date': story.get('date', ''), 'prompt': pid, 'engine': eng,
-                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'voice_gender': vg, 'engine_new': bool(story.get('engine_new')), 'photo_led': (info.get('photo_probe') or {}).get('photo_led_share'), 'mix': (story.get('mix') or (story.get('story') or {}).get('mix', '')), 'ai_anchor': (story.get('ai_anchor') or {}).get('url', ''), 'series': (story.get('series') or {}).get('name', ''), 'series_part': (story.get('series') or {}).get('part'), 'sfx': sorted(sx_now), 'life': story.get('life'), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else ''),
+                             'category': cat, 'field': story.get('field', ''), 'voice': story.get('voice', ''), 'voice_gender': vg, 'engine_new': bool(story.get('engine_new')), 'photo_led': (info.get('photo_probe') or {}).get('photo_led_share'), 'mix': (story.get('mix') or (story.get('story') or {}).get('mix', '')), 'ai_anchor': (story.get('ai_anchor') or {}).get('url', ''), 'series': (story.get('series') or {}).get('name', ''), 'series_part': (story.get('series') or {}).get('part'), 'sfx': sorted(sx_now), 'life': story.get('life'), 'theme': story.get('theme', ''), 'heat': story.get('heat', ''), 'cover_pos': (json.loads(rep_p.read_text()).get('pos') if rep_p.exists() else ''),
                              **({f'cover_{k}': json.loads(rep_p.read_text()).get(k, '') for k in ('kicker', 'sub', 'twist', 'style', 'accent')} if rep_p.exists() else {})}}
     (d / 'gate.json').write_text(json.dumps(out, ensure_ascii=False, indent=1))
     print(json.dumps(out, ensure_ascii=False))

@@ -62,6 +62,29 @@ def lint(d, kind, hist_path):
         if age > lim: f.append(f'ai_anchor is {age} days old (max {lim} for mix={mix}): find a newer AI development')
     except ValueError:
         if an.get('date'): f.append('ai_anchor.date / story.date must be YYYY-MM-DD')
+    # user rule 2026-11-25 (RUNBOOK §000): cover what everyone is talking about NOW, never repeat a story, teach fresh
+    # things but not back to back. «تو داغ‌ترین خبرها رو اصلاً پوشش نمی‌دی… هیچ خبری نباید دوبار تکرار بشه مگر اینکه
+    # آپدیت جدید ازش اومده باشه… آموزش موارد به‌روز، ولی نه پشت سر هم».
+    _h = json.loads(Path(hist_path).read_text()) if hist_path and Path(hist_path).exists() else []
+    th = str(st.get('theme') or '').strip().lower()
+    if not th: f.append('story.theme missing: a short slug of the story family (e.g. ai-layoffs, gta6-launch) — §000 no-repeat rule')
+    else:
+        rep = [x for x in _h[-45:] if str(x.get('theme') or '').lower() == th]
+        if rep and not st.get('update'):
+            f.append(f"theme «{th}» was already covered in {rep[-1].get('reel')}: no story twice unless there is a real update (then say what is new in story.update) — §000")
+    heat = st.get('heat')
+    if heat not in ('hot', 'fresh'): f.append('story.heat must be hot (everyone is talking about it now, anchor ≤ 3 days) or fresh (anchor ≤ 7 days) — §000')
+    try:
+        _age = (_dt.date.fromisoformat(str(st.get('date', ''))[:10]) - _dt.date.fromisoformat(str(an.get('date', ''))[:10])).days
+        if heat == 'hot' and _age > 3: f.append(f'heat=hot but the anchor is {_age} days old (max 3)')
+        if heat == 'fresh' and _age > 7: f.append(f'heat=fresh but the anchor is {_age} days old (max 7)')
+    except ValueError: pass
+    if heat == 'hot' and len(st.get('trend_evidence') or []) < 2:
+        f.append('heat=hot needs story.trend_evidence: at least 2 URLs from the live trend scan showing it is widely discussed in the last 72 h — §000')
+    if kind == 'reel' and heat == 'fresh' and _h and _h[-1].get('heat') != 'hot':
+        f.append('the previous reel was not a hot story: this one must be heat=hot (at most every second reel may be merely fresh) — §000')
+    if kind == 'reel' and mix == 'practice' and _h and _h[-1].get('mix') == 'practice':
+        f.append('two teaching (practice) reels in a row: the page must not turn into a tutorial page — §000')
     if not st.get('life_impact'): f.append('story.life_impact missing: what this AI development changes for the viewer (the angle, not the topic)')
     # household/safety advice drift (REEL-050…059: gas, heating, freezer food, antibiotics, scams, fake photos, blackouts)
     ADVICE = r'scam|fraud|phish|otp|verification code|voice clon|deepfake|fake (photo|shop|cure)|safety|readiness|emergenc|gas|heating|blackout|power cut|water shortage|food safety|freezer|antibiotic|medicine|health myth'
@@ -112,7 +135,7 @@ def lint(d, kind, hist_path):
                 f.append(f'only {built} of 85 motion prompts have an engine and the last 3 reels reused old ones: this reel builds a NEW engine from an unused prompt (motion.engine_new: true) — RUNBOOK §00.24')
             leads = [str(sc_.get('lead', '')).lower() for sc_ in (m.get('scenes') or [])]
             if leads and any(not l for l in leads): f.append('every motion scene needs `lead`: data | chart | ui | type | 3d | diagram | photo')
-            if leads and leads.count('photo') > max(1, len(leads) // 4): f.append(f"{leads.count('photo')} of {len(leads)} scenes are photo-led (max a quarter): redesign them as data, chart, UI or type scenes")
+            if leads and leads.count('photo') > (int(len(leads) * .6) if st.get('heat') == 'hot' and m.get('real_footage') else max(1, len(leads) // 4)): f.append(f"{leads.count('photo')} of {len(leads)} scenes are photo-led (max a quarter): redesign them as data, chart, UI or type scenes")
             if hist and (m.get('category') or '') == hist[-1].get('category'): f.append(f"motion.category {m.get('category')} repeats the previous reel")
         sc = m.get('scenes') or []
         if len(sc) < 6: f.append('plan at least 6 scenes')

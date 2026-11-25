@@ -118,7 +118,7 @@ const flags = qc.map(q => { const heard = ' ' + norm(q.heard) + ' ';
   return {id: q.id, score: q.score, missed_words: miss}; }).filter(x => x.missed_words.length);
 fs.writeFileSync(path.join(vdir, 'flags.json'), JSON.stringify(flags, null, 1));
 if (flags.length) console.log('possible misread words (voice/flags.json):', flags.map(f => f.id + ': ' + f.missed_words.join('، ')).join(' | '));
-for (const q of qc) if (q.score < 0.8) console.log('!!', q.id, q.score, '|', q.spoken, '\n   ->', q.heard);
+for (const q of qc) if (q.score < 0.86) console.log('!!', q.id, q.score, '|', q.spoken, '\n   ->', q.heard);
 
 const GAP = .16, FIRST = .3, ENDCARD = 2.4, tempo = TEMPO, lines = {};
 let t = FIRST;
@@ -134,4 +134,4 @@ fs.writeFileSync(path.join(dir, 'timeline.json'), JSON.stringify({start: 0, line
 console.log(`timeline: ${total}s (${items.length} beats, tempo ${tempo}, min STT ${Math.min(...qc.map(q => q.score)).toFixed(2)})`);
 const MAXLEN = Math.min(152, (S.target_len || 150) + 6);   // length follows the topic (user rule 2026-11-02): 30–150 s, set story.json → target_len
 if (total > MAXLEN) { console.error(`too long: ${total}s > ${MAXLEN}s (story.json target_len ${S.target_len || 150}, hard max 150 s, RUNBOOK §4.0)`); process.exit(3); }
-if (qc.some(q => q.score < 0.8)) { console.error('speech-to-text below 0.8 on some beats (voice/qc.json): respell with diacritics or rephrase'); process.exit(4); }
+if (qc.some(q => q.score < 0.86)) { console.error('speech-to-text below 0.86 on some beats (voice/qc.json): respell with diacritics or rephrase'); process.exit(4); }
