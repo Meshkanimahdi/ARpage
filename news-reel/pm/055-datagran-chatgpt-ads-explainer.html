@@ -79,7 +79,7 @@ const ground = (P, t) => A(`left:-60px;top:-60px;right:-60px;bottom:-60px;backgr
 const wrap = (h, d, t, clip) => `<div class="sc" style="${clip ? `clip-path:circle(${clip[2].toFixed(0)}px at ${clip[0]}px ${clip[1]}px)` : ''}">${ground(TH(d), t)}${h}</div>`;
 // one chat row of the direct-message list (drawn, never a screenshot)
 const row = (P, y, name, badge, hi, press = 0) => A(`left:24px;right:24px;top:${y.toFixed(1)}px;height:144px;border-radius:36px;background:${hi ? '#FFE9EB' : 'transparent'};transform:scale(${(1 - .03 * press).toFixed(3)})`,
-  A(`right:22px;top:22px;width:100px;height:100px;border-radius:50%;background:${hi ? P.fg : '#E7E2DA'}`) +
+  A(`right:22px;top:22px;width:100px;height:100px;border-radius:50%;background:${hi ? P.fg : '#E7E2DA'}`, hi ? `<svg width="100" height="100" viewBox="-50 -50 100 100"><path d="M0 -34 C3 -10 10 -3 34 0 C10 3 3 10 0 34 C-3 10 -10 3 -34 0 C-10 -3 -3 -10 0 -34 Z" fill="#fff"/></svg>` : '') +
   (name ? A('right:150px;top:16px;font-size:54px;color:' + P.fg, ltr(name)) + A('right:150px;top:88px', `<span class="w6" style="font-size:36px;color:${P.mu}">ایجنتِ ${ltr('Meta')}</span>`)
         : bar('right:150px;top:36px', 250, 28, '#D8D3CA') + bar('right:150px;top:86px', 410, 22, '#E7E2DA')) +
   (badge ? A(`left:30px;top:44px;min-width:56px;height:56px;border-radius:28px;background:${P.fg};color:${P.bg};font-size:32px;line-height:54px;text-align:center`, badge) : ''));
@@ -94,14 +94,14 @@ const SCN = {
     let rows = row(P, 160, 'Muse', '', 1, press).replace('transform:scale(', `transform-origin:50% 0;opacity:${cl(kin * 3)};transform:scaleY(${cl(kin, 0, 1.06).toFixed(3)}) scale(`);
     [['', '۳'], ['', '۷'], ['', '۱۲']].forEach((r, i) => rows += row(P, 160 + i * 150 + 150 * Math.min(1.03, kin), r[0], r[1], 0));
     h += panel(P, 60, 590, 960, 790, dmHead(P) + rows);
-    const ku = ex(pr(u, .15, .55)); h += A(`left:${(940 - 480 * ku).toFixed(0)}px;top:486px;width:${(480 * ku).toFixed(0)}px;height:14px;border-radius:7px;background:var(--acc)`);   // the key word is underlined as the dot falls
+    const ku = ex(pr(u, .15, .55)); h += A(`left:${(660 - 580 * ku).toFixed(0)}px;top:510px;width:${(580 * ku).toFixed(0)}px;height:14px;border-radius:7px;background:var(--acc)`);   // the key word is underlined as the dot falls
     const kd = pr(u, .05, .45), ky = kd * kd, land = sp(u, .45, .5), dy = mix(-70, 828, ky), sq = u > .45 ? 1 + .25 * Math.exp(-9 * (u - .45)) * Math.cos((u - .45) * 22) : 1;
     const ts = .85, ks = sp(u, ts, .55);
     h += A(`left:200px;top:900px;width:770px;height:470px;border-radius:44px;background:${P.fg};transform-origin:0 0;transform:scale(${cl(ks, 0, 1.05).toFixed(3)});opacity:${cl(ks * 4)};box-shadow:0 30px 70px rgba(21,19,26,.3)`,
-      A('right:44px;top:26px;font-size:60px;color:' + P.bg, 'جا انداختی:') + [0, 1, 2].map(i => { const kl = ex(pr(u, ts + .1 + i * .12, ts + .4 + i * .12)); const hl = Math.exp(-Math.pow((u - (ts + 1.25 + i * .55)) / .22, 2)); return A(`left:24px;right:24px;top:${144 + i * 100}px;height:92px;border-radius:30px;background:rgba(255,255,255,${(.14 * hl).toFixed(3)});opacity:${kl};transform:translateX(${((1 - kl) * 60).toFixed(0)}px) scale(${(1 + .03 * hl).toFixed(4)})`,
+      A('right:44px;top:26px;font-size:60px;color:' + P.bg, 'جا انداختی:') + [0, 1, 2].map(i => { const kl = ex(pr(u, ts + .1 + i * .12, ts + .4 + i * .12)); const hl = Math.exp(-Math.pow((u - (ts + 1.25 + i * .55)) / .22, 2)); return A(`left:24px;right:24px;top:${144 + i * 100}px;height:92px;border-radius:30px;background:rgba(255,255,255,${(.3 * hl).toFixed(3)});opacity:${kl};transform:translateX(${((1 - kl) * 60).toFixed(0)}px) scale(${(1 + .05 * hl).toFixed(4)})`,
         A('right:16px;top:14px;width:64px;height:64px;border-radius:50%;background:#4A4556') + A('right:100px;top:10px', `<span class="w6" style="font-size:44px;color:${P.bg}">${['گروهِ خانواده', 'رفیقِ قدیمی', 'همکار'][i]}</span>`) + A(`left:16px;top:16px;padding:2px 24px 10px;border-radius:30px;background:#3A3644;color:${P.bg};font-size:36px`, ['۳ پیام', '۷ پیام', '۱۲ پیام'][i])); }).join(''));
     h += dot(112, dy, 26 * (u < .45 ? 1 : sq) * (1 + .12 * Math.sin(u * 5) * pr(u, 1, 1.4)));
-    const [cx, cy] = glide(u, [[.3, 1120, 1500], [tc, 620, 836], [1.5, 620, 836], [2.3, 960, 1410]]); h += cursor(cx, cy, u, tc);
+    const [cx, cy] = glide(u, [[.3, 1120, 1500], [tc, 620, 836], [1.0, 620, 836], [1.5, 1000, 1330]]); h += cursor(cx, cy, u, tc);
     const kq = sp(u, 1.75, .5); h += A(`left:90px;top:1392px;transform:rotate(-4deg) scale(${cl(kq, 0, 1.08).toFixed(3)});transform-origin:0 50%;opacity:${cl(kq * 4)};z-index:7`, chipH('دایرکت‌هاتو می‌خونه؟', 58, P.card, P.fg, 1, `box-shadow:inset 0 0 0 6px ${P.fg}`));   // the question of the last beat, teased in the first two seconds
     return h; },
   // 2 — brand: the dot grows into Muse's avatar, the name types on, the official Meta logo, the five countries and Iran
