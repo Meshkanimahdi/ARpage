@@ -50,7 +50,7 @@
   #badge { position: absolute; left: 50%; top: 120px; transform: translateX(-50%); background: #fff; border-radius: 999px; padding: 10px 34px 16px;
            font: 900 40px V; color: var(--ink); box-shadow: 0 10px 40px rgba(20,23,31,.12); direction: ltr; white-space: nowrap; }
   #l1 { position: absolute; left: 60px; right: 60px; top: 230px; text-align: center; font: 900 92px/1.25 V; color: var(--ink); }
-  #l2 { position: absolute; left: 60px; right: 60px; top: 1500px; text-align: center; font: 900 56px/1.5 V; color: #fff; }
+  #l2 { position: absolute; left: 60px; right: 60px; top: 1500px; text-align: center; font: 900 50px/1.5 V; color: #fff; }
   #l2 span { background: rgba(20,23,31,.86); padding: 2px 12px 8px; margin: 4px 2px !important; border-radius: 12px; }   /* readable over the photo card */
   #l1 span, #l2 span { display: inline-block; margin: 0 10px; }
 </style>
@@ -88,8 +88,8 @@ function build() {
       const cy = s.ttl === false ? 1170 : 1330;   // ttl:false = no repeat of the photo's headline under it (it doubled the text on screen)
       if (s.ttl !== false) { const t = el('div', 'ttl', sec.el, s.title.replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>')); t.style.top = '1080px'; t.style.fontSize = '66px'; }
       const one = s.chipcols === 1, n = (s.chips || []).length;   // chipcols:1 = one full-width chip per row (long, sourced chip text)
-      (s.chips || []).forEach(([id, tx, tn], i) => { const [bg, fg] = tone(tn); const c = one ? piece(sec, id, 'chip', 150, cy + i * 124, 600, 100, `<span>${tx}</span>`, 60 + 20 * i, 50) : piece(sec, id, 'chip', i % 2 ? 470 : 110, cy + Math.floor(i / 2) * 140, 320, 104, `<span>${tx}</span>`, 70 + 50 * (i % 2), 50); c.face.style.cssText += `background:${bg};color:${fg}`; });
-      h = cy + (one ? n * 124 : Math.ceil(n / 2) * 140) + 40;
+      (s.chips || []).forEach(([id, tx, tn], i) => { const [bg, fg] = tone(tn); const c = one ? piece(sec, id, 'chip', 150, cy + i * 150, 600, 100, `<span>${tx}</span>`, 60 + 20 * i, 50) : piece(sec, id, 'chip', i % 2 ? 470 : 110, cy + Math.floor(i / 2) * 140, 320, 104, `<span>${tx}</span>`, 70 + 50 * (i % 2), 50); c.face.style.cssText += `background:${bg};color:${fg}`; });
+      h = cy + (one ? n * 150 : Math.ceil(n / 2) * 140) + 40;
     } else if (s.kind === 'cards') {
       const t = el('div', 'ttl', sec.el, s.title.replace(/\*([^*]+)\*/g, '<b>$1</b>')); t.style.top = '0px'; let yy = 210;   // was 140: the first standing card hid the section title
       (s.cards || []).forEach(([id, ti, sub, tn, img]) => { const [bg, fg] = tone(tn);
