@@ -10,11 +10,12 @@
 @font-face{font-family:Lalezar;font-weight:400;src:url(/logo-motion/node_modules/@fontsource/lalezar/files/lalezar-arabic-400-normal.woff2)}
 @font-face{font-family:Lalezar;font-weight:400;src:url(/logo-motion/node_modules/@fontsource/inter/files/inter-latin-900-normal.woff2);unicode-range:U+0000-00FF}  /* Latin words in a poster headline (GTA 6) in a heavy weight, not the thin fallback */
 @font-face{font-family:Markazi;font-weight:700;src:url(/logo-motion/node_modules/@fontsource/markazi-text/files/markazi-text-arabic-700-normal.woff2)}
+@font-face{font-family:Markazi;font-weight:700;src:url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-latin-900-normal.woff2);unicode-range:U+0000-00FF}  /* Latin words (AI) in the serif style match the reel's sans, not a system serif */
 @font-face{font-family:Kufi;font-weight:900;src:url(/logo-motion/node_modules/@fontsource/noto-kufi-arabic/files/noto-kufi-arabic-arabic-900-normal.woff2)}
 @font-face{font-family:Changa;font-weight:800;src:url(/logo-motion/node_modules/@fontsource/changa/files/changa-arabic-800-normal.woff2)}
 @font-face{font-family:Messiri;font-weight:700;src:url(/logo-motion/node_modules/@fontsource/el-messiri/files/el-messiri-arabic-700-normal.woff2)}
 /* headline styles (Mahdi 2026-11-18: «تیترها همه با یه فونت و یه استایل نباشه که یکنواخت باشه»): ?style=bold|poster|serif|kufi|tech|soft */
-body.underline #t b{color:#fff;text-decoration:underline;text-decoration-color:var(--a,#FFC86B);text-decoration-thickness:.085em;text-underline-offset:.2em}
+body.underline #t b{color:var(--a,#FFC86B);text-decoration-skip-ink:none;text-decoration:underline;text-decoration-color:var(--a,#FFC86B);text-decoration-thickness:.085em;text-underline-offset:.2em}
 body.marker #t b{color:#fff;background:linear-gradient(transparent 56%,var(--a,#FFC86B) 56%,var(--a,#FFC86B) 94%,transparent 94%);padding:0 .14em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 body.twosize #t .s{font-size:.6em;font-weight:inherit;opacity:.95}
 body.rule #blk::before{content:'';display:block;width:150px;height:8px;background:var(--a,#FFC86B);margin:0 auto 34px;border-radius:4px}
