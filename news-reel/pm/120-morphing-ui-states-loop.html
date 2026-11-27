@@ -12,7 +12,7 @@
      Allowed edits (SKILL.md): 1440x1440 → 1080x1920, the state list → the story's own UI states (story.states),
      Geist → Vazirmatn (Persian), the song → library music + per-state library sfx (page standard), captions on a
      strip (RUNBOOK sound-off rule), the opening state may carry a real photo (RUNBOOK §4.0 rule 4).
-     Data: story.json {hook_title, tex? (true = drawn paper/dot-grid ground instead of the blurred photo), states[{at:[beatId, word], kind: call|sms|chat|code|loader|balance|toast|button|rule|dial|meter|merge, …}],
+     Data: story.json {hook_title, sfx_map? ({kind: sfx}), tex? (true = drawn paper/dot-grid ground instead of the blurred photo), states[{at:[beatId, word], kind: call|sms|chat|code|loader|balance|toast|button|rule|dial|meter|merge, …}],
        beats[{id, text}], end_text, handle} + timeline.json; photos raw/<img>.png. Pure seek(t). -->
 <style>
   @font-face { font-family: V; font-weight: 500; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-500-normal.woff2); }
@@ -172,6 +172,7 @@ window.ready = (async () => {
   ST = S.states.map(s => Object.assign({}, s, {t0: s.at[0] === 'end' ? TE : (wtOf[s.at[0]] ? Math.max(0, wtOf[s.at[0]](s.at[1]) - .05) : (ISSUES.push('bad at ' + s.at), 0))}));
   ST[0].t0 = 0; ST.sort((a, b) => a.t0 - b.t0); ST.forEach((s, i) => { s.t1 = i + 1 < ST.length ? ST[i + 1].t0 : END; });
   const SND = {call: 'notify', sms: 'notify', chat: 'tap', code: 'typing', loader: 'tick', balance: 'counter_tick', toast: 'hit', rule: 'click', dial: 'tap', button: 'pop', meter: 'tick', merge: 'pop'};
+  Object.assign(SND, S.sfx_map || {});   // sfx_map: per-kind override so consecutive reels do not repeat one effect set
   ST.forEach((s, i) => { if (i) CUES.push([s.t0, SND[s.kind] || 'tap', .3]); });
   $('title').innerHTML = (S.hook_title || '').replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/\|/g, '<br>');
   $('handle').textContent = S.handle || '@meshkani.pro';
