@@ -10,7 +10,7 @@
      once in paper cut-out shadow theatre (warm backlight behind a paper sheet, silhouettes, paper that flutters).
      Shots join through motion (torn-paper sweep, drop, slide), never crossfades. Pure seek(t): every style is computed
      from t; no timers, no state carried between frames.
-     Data: story.json {no_hand?, phone_html? (own phone screen markup, {dir} = story dir), beats[{id, text, ev[[word, op, ...args]], cam?[z0, z1]}], hook_title, end_text, end_sub, handle}
+     Data: story.json {tones?[c0, c1] (desk colour flips per beat and mid-beat), no_hand?, phone_html? (own phone screen markup, {dir} = story dir), beats[{id, text, ev[[word, op, ...args]], cam?[z0, z1]}], hook_title, end_text, end_sub, handle}
        ops: obj name {x,y,w,r} · lift name · phone {x,y} · print id {x,y,w,r,slide?} · tag text {x,y,r} · label n text {y}
             check {x,y} · arrow up|down {x,y} · ruler · cards [t1,t2,t3] · stamp text {x,y} · focus {z,x,y} · unfocus
             circle · theatre · tear · clear
@@ -152,6 +152,7 @@ function beatWords(bt, L) {
 
 // ---------- camera ----------
 let FOCUS = [];
+let CUTS = [];
 function cam(t) {
   const b = BEATS.find(b => t >= b.a && t < b.b) || BEATS[BEATS.length - 1];
   const [z0, z1] = b.bt.cam || [1, 1.06], k = E.io(P(t, b.a, b.b));
@@ -184,6 +185,9 @@ window.ready = (async () => {
   END = TL.total; buildDesk();
   for (const bt of S.beats) { const L = TL.lines[bt.id]; if (!L) throw new Error('unknown line ' + bt.id); BEATS.push({bt, L, ...beatWords(bt, L)}); }
   BEATS.forEach((b, i) => { b.a = i ? b.L.start - .1 : 0; b.b = i + 1 < BEATS.length ? BEATS[i + 1].L.start - .1 : TL.end_start; });
+  // S.tones: the desk colour flips at every beat and once mid-beat (snapped to a word start): a hard cut on the paper
+  if (S.tones) for (const [i, b] of BEATS.entries()) { if (i) CUTS.push(b.a); if (b.b - b.a > 3.2) { const m = (b.a + b.b) / 2, w = b.words.map(x => x.a).filter(x => x > b.a + 1.2 && x < b.b - 1.2).sort((p, q) => Math.abs(p - m) - Math.abs(q - m))[0]; CUTS.push(w || m); } }
+  for (const c of CUTS) CUES.push([c, 'click', .16]);
   const names = new Set(); for (const b of BEATS) for (const e of (b.bt.ev || [])) if (e[1] === 'obj') names.add(e[2]);
   await Promise.all([...names].map(n => new Promise(res => { const im = new Image(); im.onload = () => { NAT[n] = im.naturalHeight / im.naturalWidth; res(); }; im.onerror = () => { ISSUES.push('missing cut-out ' + n); res(); }; im.src = url(`raw/o_${n}.png`); })));
   const byName = {}; let phone = null; const live = () => ITEMS.filter(i => i.t1 > 1e8);
@@ -229,6 +233,7 @@ window.ready = (async () => {
 
 function seek(t) {
   cam(t);
+  if (S.tones) { const n = CUTS.filter(c => t >= c).length; $('desk').style.background = S.tones[n % S.tones.length]; }
   for (const it of ITEMS) {
     if (it.kind === 'phone') {
       const a = t - it.t0, k = E.p3(P(a, 0, .55)), out = it.t1 < 1e8 ? E.i3(P(t, it.t1, it.t1 + .4)) : 0, el = it.el;
