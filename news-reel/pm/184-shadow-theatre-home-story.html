@@ -10,7 +10,7 @@
      once in paper cut-out shadow theatre (warm backlight behind a paper sheet, silhouettes, paper that flutters).
      Shots join through motion (torn-paper sweep, drop, slide), never crossfades. Pure seek(t): every style is computed
      from t; no timers, no state carried between frames.
-     Data: story.json {beats[{id, text, ev[[word, op, ...args]], cam?[z0, z1]}], hook_title, end_text, end_sub, handle}
+     Data: story.json {no_hand?, phone_html? (own phone screen markup, {dir} = story dir), beats[{id, text, ev[[word, op, ...args]], cam?[z0, z1]}], hook_title, end_text, end_sub, handle}
        ops: obj name {x,y,w,r} · lift name · phone {x,y} · print id {x,y,w,r,slide?} · tag text {x,y,r} · label n text {y}
             check {x,y} · arrow up|down {x,y} · ruler · cards [t1,t2,t3] · stamp text {x,y} · focus {z,x,y} · unfocus
             circle · theatre · tear · clear
@@ -165,6 +165,7 @@ function cam(t) {
 
 // ---------- build from story ----------
 function ph() {
+  if (S.phone_html) return `<div class="scr">${S.phone_html.replace(/\{dir\}/g, url(''))}</div>`;   // phone_html: the story's own screen (rebuilt UI); {dir} = the story dir
   return `<div class="scr"><div class="top">دیوار</div><div class="pic" style="background:url(${url('raw/o_model.png')}) 50% 70%/auto 92% no-repeat, linear-gradient(#dfe9f2,#eef1ec)"></div>
     <h3>ارزیابی قیمت</h3><p>بازه‌ی تخمینی این آگهی</p><div class="blur"></div><div class="rng"><i></i></div><div class="rows"><div style="width:70%"></div><div style="width:52%"></div><div style="width:61%"></div></div></div>`;
 }
@@ -194,7 +195,7 @@ window.ready = (async () => {
       else if (op === 'lift') { const it = byName[e[2]] || (e[2] === 'phone' ? phone : null); if (it) it.t1 = t; }
       else if (op === 'clear') { live().forEach((it, i) => it.t1 = t + i * .07); CUES.push([t, 'sweep_soft', .25]); }
       else if (op === 'phone') { phone = add({kind: 'phone', t0: t, x: o.x, y: o.y, w: 430, hh: 860, sc: o.sc || 1, slideUp: true, el: mk('', '<div id="phone">' + ph() + '</div>')});
-        const hand = add({kind: 'hand', t0: t, x: o.x - 40, y: o.y + 430 * (o.sc || 1) + 180, w: 300, hh: 446, hand: true, el: mk('', `<img src="${url('raw/o_hand.png')}">`)}); hand.t1 = t + .75; phone.handT = t;
+        if (!S.no_hand) { const hand = add({kind: 'hand', t0: t, x: o.x - 40, y: o.y + 430 * (o.sc || 1) + 180, w: 300, hh: 446, hand: true, el: mk('', `<img src="${url('raw/o_hand.png')}">`)}); hand.t1 = t + .75; phone.handT = t; }   // no_hand: no hand cut-out for this story
         CUES.push([t + .55, 'glass_ping', .3]); }
       else if (op === 'print') { const it = add({kind: 'print', t0: t, x: o.x, y: o.y, w: o.w, r: o.r || 0, hh: o.w * 1.84, slide: !!o.slide, el: mk('print', `<img src="${url('raw/' + e[2] + '.png')}">`)}); byName[e[2]] = it; CUES.push([t + (o.slide ? .3 : .28), o.slide ? 'sweep_soft' : 'tap', .3]); }
       else if (op === 'tag') { const it = add({kind: 'tag', t0: t, x: o.x, y: o.y, w: o.w || 360, r: o.r || 0, hh: 110, flat: true, el: mk('tag', `<span>${e[2]}</span>`)}); byName['tag:' + e[2]] = it; CUES.push([t + .28, 'click', .32]); }
