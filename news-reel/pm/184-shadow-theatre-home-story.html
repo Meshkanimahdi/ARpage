@@ -10,7 +10,7 @@
      once in paper cut-out shadow theatre (warm backlight behind a paper sheet, silhouettes, paper that flutters).
      Shots join through motion (torn-paper sweep, drop, slide), never crossfades. Pure seek(t): every style is computed
      from t; no timers, no state carried between frames.
-     Data: story.json {tones?[c0, c1] (desk colour flips per beat and mid-beat), no_hand?, phone_html? (own phone screen markup, {dir} = story dir), beats[{id, text, ev[[word, op, ...args]], cam?[z0, z1]}], hook_title, end_text, end_sub, handle}
+     Data: story.json {drift? (slow push/slide also during focus holds), tones?[c0, c1] (desk colour flips per beat and mid-beat), no_hand?, phone_html? (own phone screen markup, {dir} = story dir), beats[{id, text, ev[[word, op, ...args]], cam?[z0, z1]}], hook_title, end_text, end_sub, handle}
        ops: obj name {x,y,w,r} · lift name · phone {x,y} · print id {x,y,w,r,slide?} · tag text {x,y,r} · label n text {y}
             check {x,y} · arrow up|down {x,y} · ruler · cards [t1,t2,t3] · stamp text {x,y} · focus {z,x,y} · unfocus
             circle · theatre · tear · clear
@@ -160,6 +160,8 @@ function cam(t) {
   let z = lerp(z0, z1, k), cx = 540 + sw * lerp(-34, 34, k), cy = 960 + lerp(20, -20, k);
   for (const f of FOCUS) { const kin = E.p3(P(t, f.t0, f.t0 + .7)), kout = f.t1 ? E.io(P(t, f.t1, f.t1 + .5)) : 0, kk = kin * (1 - kout);
     if (kk > 0) { z = lerp(z, f.z, kk); cx = lerp(cx, f.x, kk); cy = lerp(cy, f.y, kk); } }
+  // S.drift: keep a slow push and slide on top of any focus hold, so a held layout never freezes
+  if (S.drift) { z *= 1 + .04 * k; cx += sw * 16 * (k - .5); }
   const tx = 540 - cx * z, ty = 960 - cy * z;
   $('world').style.transform = `translate(${tx}px,${ty}px) scale(${z})`;
 }
@@ -277,7 +279,7 @@ function seek(t) {
   const sub = $('sub'), b = BEATS.find(b => t >= b.L.start - .05 && t <= b.L.end + .25);
   if (b && b !== BEATS[0] && t < TL.end_start) {
     const ci = b.chunks.findIndex(c => t < b.words[c[c.length - 1]].e + .1), c = b.chunks[ci < 0 ? b.chunks.length - 1 : ci];
-    const key = b.bt.id + ':' + c[0]; if (sub.dataset.k !== key) { sub.dataset.k = key; sub.innerHTML = '<span class="strip">' + c.map(i => `<span class="w${b.words[i].k ? ' k' : ''}">${b.words[i].w.replace(/[،:؛]$/, '')}</span>`).join('') + '</span>'; }
+    const key = b.bt.id + ':' + c[0]; if (sub.dataset.k !== key) { sub.dataset.k = key; sub.innerHTML = '<span class="strip">' + c.map(i => `<span class="w${b.words[i].k ? ' k' : ''}">${b.words[i].w.replace(/[،:؛]$/, '').replace(/یِ/g, 'ی')}</span>`).join('') + '</span>'; }
     const a0 = b.words[c[0]].a, kk = E.b(P(t, a0 - .08, a0 + .2)); sub.style.opacity = 1; sub.style.transform = `translateY(${(1 - kk) * 40}px) scale(${lerp(.9, 1, kk)})`;
     sub.querySelectorAll('.w').forEach((el, j) => { el.style.opacity = t >= b.words[c[j]].a - .05 ? 1 : .35; });
   } else { sub.style.opacity = 0; sub.dataset.k = ''; }
