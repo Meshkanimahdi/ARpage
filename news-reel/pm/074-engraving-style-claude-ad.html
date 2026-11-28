@@ -8,7 +8,7 @@
      labels), elements painted on top of real images, images small / bigger / several at once, morphing text,
      clean animations of the brand's own mark, zooms, every morph exact, ending on the real logo.
      Page standards: 1080x1920, Persian narration (eleven_v4) with a word-by-word caption, music bed.
-     Data: story.json beats[{id, text, scene{type, img}}], brand, product, end_text, end_sub; el/<logos>.png,
+     Data: story.json beats[{id, text, scene{type, img}}], brand, product, end_text, end_sub; tex/tones (pw_ scenes: grain + dot-grid ground, tone flips per idea); el/<logos>.png,
      raw/<sNN>.png photo panels. Pure seek(t): every style is computed from t, no CSS animations or timers. -->
 <style>
   @font-face { font-family: V; font-weight: 900; src: url(/logo-motion/node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-900-normal.woff2); }
@@ -427,12 +427,121 @@ function cfEnd(u) {
     `<div class="t" dir="ltr" style="top:1160px;font-size:42px;font-weight:600;letter-spacing:4px;color:#fff;opacity:${pr(u, .7, 1)}">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;
 }
 
+// ===== REEL-076 (password-manager alert email): data-driven overlays on painted UI =====
+// overlays shared by every pw_ scene: s.big [lines] at s.big_y; s.chips [[word, html, bg, col, x, y, size, ltr?]];
+// s.stamps [[word, text, x, y, rot, size]]; s.rings [[word, cx, cy, rx, ry, col]]; s.arrows [[word, x1, y1, x2, y2, col]].
+// word = index into the beat's words (−1 = the beat start); an item lands on its word, a stamp slams.
+function pwOver(b, t, s, A) {
+  const at = j => j < 0 ? A + .15 : b.wt(j); let r = '';
+  if (s.big) r += big(s.big, s.big_y || 170, s.big_size || 104, pr(t, A, A + .45), s.big_col || 'var(--ink)');
+  (s.rings || []).forEach(([j, cx, cy, rx, ry, col]) => { const w0 = at(j); if (t > w0 - .1) r += svg(ring(cx, cy, rx + 10 * Math.sin(t * 7), ry + 10 * Math.sin(t * 7), pr(t, w0 - .05, w0 + .5), col || 'var(--red)')); });
+  (s.arrows || []).forEach(([j, x1, y1, x2, y2, col]) => { const w0 = at(j); r += svg(arrow(x1, y1, x2, y2, pr(t, w0 - .05, w0 + .55), col || 'var(--acc)')); });
+  (s.chips || []).forEach(([j, html, bg, col, x, y, size, ltr]) => { const w0 = at(j); r += chip(x, y, html, bg, col, size || 64, pr(t, w0 - .05, w0 + .3), ltr); });
+  (s.stamps || []).forEach(([j, txt, x, y, rot, size]) => { const w0 = at(j); r += stamp(txt, x, y, pr(t, w0 - .05, w0 + .25), 'var(--red)', rot || -7, size || 100); });
+  return r;
+}
+// the rebuilt alert email (vector, labelled): sender row, title, two lines, a blue link button
+function alertCard(x, y, w, k, s, t, shake = 0) {
+  const e = back(cl(k)), h = w * .62;
+  return `<div style="position:absolute;left:${(x + shake).toFixed(1)}px;top:${y}px;width:${w}px;height:${h}px;border-radius:${w * .06}px;background:#fff;box-shadow:0 30px 70px rgba(0,0,0,.45);transform:scale(${e.toFixed(3)});opacity:${cl(k * 3).toFixed(2)};direction:rtl;overflow:hidden">
+    <div style="position:absolute;right:${w * .07}px;top:${w * .06}px;width:${w * .1}px;height:${w * .1}px;border-radius:50%;background:var(--red);color:#fff;font:900 ${w * .07}px/${w * .1}px V;text-align:center">!</div>
+    <div style="position:absolute;right:${w * .2}px;top:${w * .065}px;font:900 ${w * .062}px V;color:#121212">${s.card_title || ''}</div>
+    <div style="position:absolute;right:${w * .2}px;top:${w * .15}px;font:600 ${w * .042}px V;color:#777" dir="ltr">${s.card_from || ''}</div>
+    ${(s.card_rows || []).map((row, i) => `<div style="position:absolute;right:${w * .07}px;top:${w * (.27 + i * .085)}px;font:600 ${w * .045}px V;color:#333">${row}</div>`).join('')}
+    <div style="position:absolute;left:${w * .07}px;right:${w * .07}px;bottom:${w * .06}px;height:${w * .11}px;border-radius:${w * .03}px;background:#2F6BFF;color:#fff;font:900 ${w * .05}px/${w * .11}px V;text-align:center">${s.card_btn || ''}</div></div>`;
+}
+// a vault: a rounded safe with a dial; lock = 0..1 (bolt slides), q = question-mark overlay
+function vault(cx, cy, size, k, t, lock = 1, q = 0) {
+  const e = back(cl(k)), d = size;
+  return `<div style="position:absolute;left:${cx - d / 2}px;top:${cy - d / 2}px;width:${d}px;height:${d}px;border-radius:${d * .12}px;background:linear-gradient(160deg,#2A2E35,#121418);box-shadow:0 40px 80px rgba(0,0,0,.35);transform:scale(${e.toFixed(3)})">
+    <div style="position:absolute;left:${d * .28}px;top:${d * .28}px;width:${d * .44}px;height:${d * .44}px;border-radius:50%;border:${d * .045}px solid #C9CED6;box-sizing:border-box;transform:rotate(${(t * 40 % 360).toFixed(1)}deg)"><div style="position:absolute;left:46%;top:4%;width:8%;height:30%;background:#C9CED6;border-radius:4px"></div></div>
+    <div style="position:absolute;right:${-d * .06}px;top:${d * .44}px;width:${d * .16 * lock}px;height:${d * .12}px;border-radius:6px;background:#C9CED6"></div>
+    ${q > 0 ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 ${d * .7}px V;color:var(--red);opacity:${cl(q * 2).toFixed(2)};transform:scale(${back(cl(q)).toFixed(3)})">؟</div>` : ''}</div>`;
+}
+function scene5(b, t, s, A, k0, K, z) {
+  if (!/^pw_/.test(s.type || '')) return null;
+  let r = ''; const w = (s.words || []).map(j => b.wt(j));
+  // textured ground for the painted-UI scenes (S.tex): grain + dot grid, tone flips on every idea (a hard cut)
+  if (S.tex && !['pw_hook', 'pw_ask'].includes(s.type)) { const n = (window.SCENES || []).filter(x => t >= x.t0).length, tone = (S.tones || ['#F3F1EC', '#CFC8BB'])[n % 2];
+    r += `<div style="position:absolute;inset:0;background:${tone}"></div>` + svg(`<filter id="gn"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="${n}"/><feColorMatrix values="0 0 0 0 .3  0 0 0 0 .27  0 0 0 0 .22  0 0 0 .55 0"/></filter><rect width="1080" height="1920" filter="url(#gn)" opacity=".5"/><pattern id="dg" width="54" height="54" patternUnits="userSpaceOnUse"><circle cx="27" cy="27" r="5" fill="rgba(18,18,18,.16)"/></pattern><rect width="1080" height="1920" fill="url(#dg)"/>`); }
+  switch (s.type) {
+    case 'pw_hook': {
+      const zs = mix(1.2, 1.03, io(pr(t, 0, b.b))) + (w[0] ? .07 * Math.exp(-6 * Math.max(0, t - w[0])) * (t > w[0] ? 1 : 0) : 0);
+      r += `<div style="position:absolute;inset:0;overflow:hidden;background:#000"><img src="${IMG(s.img)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 60%;transform:scale(${zs.toFixed(3)});transform-origin:580px 1150px"></div>` + darkTop(900);
+      const sh = t > .55 && t < 1.0 ? Math.sin(t * 70) * 9 : 0, c = s.card || [300, 980, 520];
+      r += alertCard(c[0], c[1], c[2], pr(t, .05, .35), s, t, sh);
+      r += big((S.hook_lines || (S.hook_title || '').split('|')).map(x => x.trim()), 190, S.hook_size || 100, 1, '#fff');
+      return r + pwOver(b, t, s, A);
+    }
+    case 'pw_three': {
+      const names = s.names || [];
+      names.forEach((nm, i) => { const tw = w[i] !== undefined ? w[i] : A + .3 + i * .6, k = pr(t, tw - .1, tw + .35), y = 420 + i * 330, dx = (1 - ex(k)) * (i % 2 ? -1300 : 1300);
+        r += `<div style="position:absolute;left:${120 + dx}px;top:${y}px;width:840px;height:240px;border-radius:36px;background:#fff;box-shadow:0 20px 50px rgba(0,0,0,.16);border:5px solid #121212;direction:ltr">` +
+          vault(130, 120, 160, k, t, 1) + `<div style="position:absolute;left:250px;top:62px;font:900 92px V;color:#121212">${nm}</div></div>`;
+        });
+      { const kc = pr(t, (w[names.length] || A + 2) - .05, (w[names.length] || A + 2) + .35); if (kc > 0) r += `<div class="t" style="top:1340px;font-size:${(120 * back(kc)).toFixed(0)}px;color:var(--red)">${s.count || ''}</div>`; }
+      return r + pwOver(b, t, s, A);
+    }
+    case 'pw_alert': {
+      if (!S.tex) r += `<div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,#ECEAE4,#FAFAF7)"></div>`;
+      const sh = w[0] && t > w[0] && t < w[0] + .45 ? Math.sin(t * 70) * 10 : 0, zz = mix(1.0, 1.08, io(pr(t, A, b.b)));
+      r += `<div style="position:absolute;inset:0;transform:scale(${zz.toFixed(3)});transform-origin:540px 900px">` + alertCard(150, 520, 780, pr(t, A, A + .4), s, t, sh) + '</div>';
+      return r + pwOver(b, t, s, A);
+    }
+    case 'pw_vault': {
+      r += vault(540, 820, 520, pr(t, A, A + .45), t, s.unlock ? 1 - pr(t, w[0] || A + 1, (w[0] || A + 1) + .5) : 1, 0);
+      return r + pwOver(b, t, s, A);
+    }
+    case 'pw_crack': {
+      const kq = w[0] ? pr(t, w[0] - .05, w[0] + .4) : 0;
+      r += vault(540, 760, 460, pr(t, A, A + .4), t, 1, kq);
+      { const kk = w[1] ? pr(t, w[1], w[1] + 1.4) : 0; if (w[1] !== undefined && t > w[1] - .1) {
+        const pw = (s.weak || '123456'), n = Math.ceil(pw.length * ex(kk));
+        r += `<div dir="ltr" style="position:absolute;left:200px;right:200px;top:1100px;height:130px;border-radius:30px;background:#fff;border:6px solid #121212;font:900 80px/120px V;text-align:center;letter-spacing:10px;color:var(--red)">${pw.slice(0, n)}${'•'.repeat(pw.length - n)}</div>`;
+        r += `<div style="position:absolute;left:200px;right:200px;top:1260px;height:26px;border-radius:13px;background:#E4E0D6"><div style="height:100%;width:${(100 * ex(kk)).toFixed(1)}%;border-radius:13px;background:var(--red)"></div></div>`; } }
+      return r + pwOver(b, t, s, A);
+    }
+    case 'pw_phish': {
+      const k = pr(t, A, A + .4), e = back(k);
+      r += `<div style="position:absolute;left:70px;right:70px;top:640px;height:170px;border-radius:85px;background:#fff;border:6px solid #121212;box-shadow:0 20px 50px rgba(0,0,0,.18);transform:scale(${e.toFixed(3)});direction:ltr;display:flex;align-items:center;gap:26px;padding:0 50px;box-sizing:border-box">` +
+        `<div style="width:64px;height:64px;border-radius:50%;background:${w[0] && t > w[0] ? 'var(--red)' : '#999'}"></div><div style="font:900 64px V;color:#121212">${s.url || ''}</div></div>`;
+      return r + pwOver(b, t, s, A);
+    }
+    case 'pw_steps': {
+      const labs = s.labels || [];
+      labs.forEach((lb, i) => { const tw = w[i] !== undefined ? w[i] : A + .5 + i * .8, k = pr(t, tw - .05, tw + .35), y = 520 + i * 360;
+        r += `<div style="position:absolute;left:80px;right:80px;top:${y}px;height:300px;border-radius:40px;background:#fff;border:6px solid #121212;box-shadow:0 20px 50px rgba(0,0,0,.14);transform:translateX(${((1 - ex(k)) * 1300).toFixed(0)}px);direction:rtl;display:flex;align-items:center;gap:36px;padding:0 50px;box-sizing:border-box">` +
+          `<div style="flex:none;width:150px;height:150px;border-radius:40px;background:var(--acc);color:#fff;font:900 110px/150px V;text-align:center">${fa(i + 1)}</div><div style="font:900 72px/1.25 V;color:#121212;white-space:normal">${lb}</div></div>`;
+        if (k >= 1) r += svg(stroke(`M 840 ${y + 150} l 34 38 l 70 -90`, pr(t, tw + .35, tw + .7), 'var(--green)', 20)); });
+      { const kk = pr(t, A, b.b); r += `<div style="position:absolute;left:80px;right:80px;top:1300px;height:22px;border-radius:11px;background:#E4E0D6"><div style="height:100%;width:${(100 * kk).toFixed(1)}%;border-radius:11px;background:var(--acc)"></div></div>`; }
+      return r + pwOver(b, t, s, A);
+    }
+    case 'pw_ask': {
+      r += card(s.img, 40, 380, 1000, 1060, k0, z, '50% 45%');
+      const k = w[0] ? pr(t, w[0] - .05, w[0] + .35) : 0;
+      if (k > 0) r += `<div class="t" style="top:760px;font-size:${((s.to_size || 112) * back(k)).toFixed(0)}px;line-height:1.15;color:#fff;text-shadow:0 10px 0 var(--acc),0 20px 50px rgba(0,0,0,.55)">${(s.to || '').split('|').join('<br>')}</div>`;
+      return r + pwOver(b, t, s, A);
+    }
+  }
+  ISSUES.push('unknown scene ' + s.type); return '';
+}
+function pwEnd(u) {
+  const q = (S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--acc)">$1</span>');
+  const steps = S.end_steps || [];
+  return `<div style="position:absolute;inset:-40px;background:url('${IMG(S.end_bg || 'h1.png')}') center/cover;filter:blur(14px) brightness(.4);transform:scale(${(1.1 - .06 * pr(u, 0, 4)).toFixed(3)})"></div>` +
+    steps.map((l, i) => chip(120, 420 + i * 150, fa(i + 1) + ' · ' + l, i === steps.length - 1 ? 'var(--acc)' : '#121212', '#fff', 64, pr(u, .1 + i * .15, .4 + i * .15))).join('') +
+    `<div class="t" style="top:900px;font-size:104px;color:#fff;opacity:${pr(u, .5, .8)}">${q}</div>` +
+    `<div class="t" style="top:1045px;font-size:58px;font-weight:600;color:#fff;opacity:${pr(u, .6, .9)}">${S.end_sub || ''}</div>` +
+    `<div class="t" dir="ltr" style="top:1150px;font-size:42px;font-weight:600;letter-spacing:4px;color:#fff;opacity:${pr(u, .7, 1)}">${(S.handle || '').replace('@', '').toUpperCase()}</div>`;
+}
+
 function scene(b, t, u) {
   const s = b.sc, A = b.a, k0 = b.i === 0 ? 1 : pr(t, A - .3, A + .25), kt = b.kt, K = (i, d = .45) => kt[i] === undefined ? 0 : pr(t, Math.min(kt[i], A + .6) - .05, Math.min(kt[i], A + .6) - .05 + d), z = mix(1.12, 1.0, io(pr(t, A, b.b)));
   let r = '';
   { const r2 = scene2(b, t, s, A, k0, K, z); if (r2 !== null) return r2; }
   { const r3 = scene3(b, t, s, A, k0, K, z); if (r3 !== null) return r3; }
   { const r4 = scene4(b, t, s, A, k0, K, z); if (r4 !== null) return r4; }
+  { const r5 = scene5(b, t, s, A, k0, K, z); if (r5 !== null) return r5; }
   switch (s.type) {
     case 'hook': {
       // frame 0: the big photo, the real mark, and the plain promise; the number counts up on the keyword
@@ -530,6 +639,7 @@ function scene(b, t, u) {
 function endCard(u) {
   if (S.end_type === 'hc') return hcEnd(u);
   if (S.end_type === 'cf') return cfEnd(u);
+  if (S.end_type === 'pw') return pwEnd(u);
   // ends on the real mark: a spin-in, the name, the question
   const q = (S.end_text || '').replace(/\*([^*]+)\*/g, '<span style="color:var(--acc)">$1</span>');
   if (S.end_logo) return `<div style="position:absolute;inset:-40px;background:url('${IMG('hq2.jpg')}') center/cover;filter:blur(8px);opacity:.22;transform:scale(${(1.1 - .06 * pr(u, 0, 4)).toFixed(3)})"></div>` + endLogo(u);
