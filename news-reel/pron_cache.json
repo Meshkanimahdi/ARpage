@@ -782,5 +782,61 @@
   "score": 1,
   "voice": "01Hje9fLgarTAqnLKNEK",
   "date": "2026-11-27"
+ },
+ "mSecure": {
+  "mode": "A",
+  "spoken": "mSecure",
+  "score": 0.71,
+  "voice": "4D8rX5FMrycxXbF6iW0I",
+  "date": "2026-11-28"
+ },
+ "Password": {
+  "mode": "A",
+  "spoken": "Password",
+  "score": 1,
+  "voice": "4D8rX5FMrycxXbF6iW0I",
+  "date": "2026-11-28"
+ },
+ "pCloud Pass": {
+  "mode": "B",
+  "spoken": "pCloud Pass",
+  "score": 1,
+  "voice": "4D8rX5FMrycxXbF6iW0I",
+  "date": "2026-11-28"
+ },
+ "pCloud": {
+  "mode": "B",
+  "spoken": "pCloud",
+  "score": 1,
+  "voice": "4D8rX5FMrycxXbF6iW0I",
+  "date": "2026-11-28"
+ },
+ "LastPass": {
+  "mode": "A",
+  "spoken": "LastPass",
+  "score": 1,
+  "voice": "4D8rX5FMrycxXbF6iW0I",
+  "date": "2026-11-28"
+ },
+ "M-Secure": {
+  "mode": "A",
+  "spoken": "M-Secure",
+  "score": 0.71,
+  "voice": "4D8rX5FMrycxXbF6iW0I",
+  "date": "2026-11-28"
+ },
+ "One Password": {
+  "mode": "A",
+  "spoken": "One Password",
+  "score": 0.73,
+  "voice": "4D8rX5FMrycxXbF6iW0I",
+  "date": "2026-11-28"
+ },
+ "P-Cloud": {
+  "mode": "B",
+  "spoken": "P-Cloud",
+  "score": 1,
+  "voice": "4D8rX5FMrycxXbF6iW0I",
+  "date": "2026-11-28"
  }
 }
